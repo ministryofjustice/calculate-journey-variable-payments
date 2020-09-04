@@ -5,12 +5,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     url: "jdbc:postgresql://localhost:5432/jpc"
-    username: jonnycavell
+    username: bobby
     password:
 logging:
   level:
     ROOT: INFO
 import-files:
-  locations: "/Users/jonnycavell/PECS/jpc/locations.xlsx"
-  serco-prices: "/Users/jonnycavell/PECS/jpc/serco_prices.xlsx"
-  geo-prices: "/Users/jonnycavell/PECS/jpc/geo_prices.xlsx"
+  locations: "/locations.xlsx"
+  serco-prices: "/serco_prices.xlsx"
+  geo-prices: "/geo_prices.xlsx"
