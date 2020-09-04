@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/jpc"
+    username: jonnycavell
+    password:
+logging:
+  level:
+    ROOT: INFO
+import-files:
+  locations: "/Users/jonnycavell/PECS/jpc/locations.xlsx"
+  serco-prices: "/Users/jonnycavell/PECS/jpc/serco_prices.xlsx"
+  geo-prices: "/Users/jonnycavell/PECS/jpc/geo_prices.xlsx"
