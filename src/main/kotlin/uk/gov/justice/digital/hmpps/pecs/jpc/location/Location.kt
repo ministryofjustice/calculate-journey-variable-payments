@@ -8,7 +8,7 @@ import javax.validation.constraints.Size
 
 @Entity
 class Location(
-        @NotNull @Size(min = 1, max = 2) val locationType: String,
+        @NotNull @Size(min = 1) val locationType: String,
         @Column(unique = true, nullable = false) @Size(min = 1) val nomisAgencyId: String,
         @Column(unique = true, nullable = false) @Size(min = 1) val siteName: String,
         @NotNull val addedAt: LocalDateTime = LocalDateTime.now(),
