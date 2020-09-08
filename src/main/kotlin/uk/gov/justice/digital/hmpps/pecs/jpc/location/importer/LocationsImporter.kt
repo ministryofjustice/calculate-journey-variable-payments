@@ -13,16 +13,14 @@ import java.io.File
 import java.io.FileInputStream
 
 @Component
-class LocationsImporter(private val repo: LocationRepository, private val eventPublisher: ApplicationEventPublisher) : InitializingBean {
+class LocationsImporter(private val repo: LocationRepository, private val eventPublisher: ApplicationEventPublisher)  {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Value("\${import-files.locations}")
     private lateinit var locationsFile: String
 
-    fun import(locationsFile: File) {
-        val excelFile = FileInputStream(locationsFile)
-        val workbook = XSSFWorkbook(excelFile)
+    fun import(workbook: XSSFWorkbook) : Set<String> {
 
         val locationsFromCells = listOf(Court, Police, Prison, Hospital, Immigration, STCSCH, Other)
         val errors: MutableSet<String?> = mutableSetOf()
@@ -51,17 +49,23 @@ class LocationsImporter(private val repo: LocationRepository, private val eventP
 
             }
         }
+
+        logger.info("LOCATIONS INSERTED: ${repo.count()}")
+
+        return errors.filterNotNull().sorted().toSet()
+    }
+
+     fun afterPropertiesSet() {
+        repo.deleteAll()
+
+        val excelFile = FileInputStream(locationsFile)
+        val workbook = XSSFWorkbook(excelFile)
+
+        val errors = import(workbook)
+
         workbook.close()
         excelFile.close()
 
-        if (errors.isNotEmpty()) logger.error("LOCATION ERRORS")
-        errors.filterNotNull().sorted().forEach{println(it)}
-        logger.info("LOCATIONS INSERTED: ${repo.count()}")
-    }
-
-    override fun afterPropertiesSet() {
-        repo.deleteAll()
-        import(File(locationsFile))
         eventPublisher.publishEvent(LocationsImportedEvent(this))
     }
 }

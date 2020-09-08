@@ -1,26 +1,72 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.core.io.ResourceLoader
+import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 class LocationImporterTest(
         @Autowired val eventPublisher: ApplicationEventPublisher,
         @Autowired val repo: LocationRepository) {
 
+
+    fun createWorkbook() : XSSFWorkbook{
+        val workbook = XSSFWorkbook()
+
+        val sheetNames = listOf("QUERIES", "JPCU", "JPCNOMIS", "NOMIS", "Overview", "Courts", "Police", "Police Info",
+                "Prisons", "Hospitals", "Immigration", "STC&SCH", "Other")
+
+        val colNames = listOf("DLN", "Location Type", "Site Name", "NOMIS Agency ID")
+
+
+        sheetNames.forEach {
+            val sheet = workbook.createSheet(it)
+            val headerRow = sheet.createRow(0)
+            colNames.forEachIndexed { index, s ->
+                headerRow.createCell(index).setCellValue(s)
+            }
+        }
+        return workbook
+    }
+
     @Test
-    fun `Assert hello content and status code`() {
+    fun `Assert workbook with only headers imports without errors`() {
         val locationsImporter = LocationsImporter(repo, eventPublisher)
 
-//       locationsImporter.import("classpath:locations.xlsx")
-//
-//       Assertions.assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-//        Assertions.assertThat(entity.body).contains("<h1>Spring Boot Web Thymeleaf Example</h1>")
+        val workbook = createWorkbook()
+        val errors = locationsImporter.import(workbook)
+
+        Assertions.assertTrue(errors.isEmpty())
+
+        workbook.close()
+    }
+
+    @Test
+    fun `Assert empty site name returns error`() {
+        val locationsImporter = LocationsImporter(repo, eventPublisher)
+
+        val workbook = createWorkbook()
+
+        val courtsSheet = workbook.getSheetAt(5)
+        val row = courtsSheet.createRow(1)
+
+        row.createCell(0).setCellValue("")
+        row.createCell(1).setCellValue("Mag Court")
+        row.createCell(2).setCellValue("") // site name
+        row.createCell(3).setCellValue("NOM100")
+
+        val errors = locationsImporter.import(workbook)
+
+        Assertions.assertEquals("ii", errors.toList().get(0))
+
+        workbook.close()
     }
 }
