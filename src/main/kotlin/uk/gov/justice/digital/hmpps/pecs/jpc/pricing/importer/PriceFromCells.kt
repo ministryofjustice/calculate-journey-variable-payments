@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer
 
 import com.github.kittinunf.result.Result
 import org.apache.poi.ss.usermodel.Cell
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
@@ -11,7 +10,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 @Component
 class PriceFromCells(private val locationRepo: LocationRepository) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
     val sheetIndex = 0
 
     fun getPriceResult(supplier: Supplier, cells: List<Cell>) : Result<Price, Exception> {
