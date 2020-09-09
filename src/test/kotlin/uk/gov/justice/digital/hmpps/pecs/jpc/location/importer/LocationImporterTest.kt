@@ -1,9 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
@@ -17,15 +16,18 @@ class LocationImporterTest(
         @Autowired val eventPublisher: ApplicationEventPublisher,
         @Autowired val repo: LocationRepository) {
 
+    private lateinit var locationsImporter: LocationsImporter
+    private lateinit var workbook: XSSFWorkbook
 
-    fun createWorkbook() : XSSFWorkbook{
-        val workbook = XSSFWorkbook()
+    @BeforeEach
+    fun before() {
+        locationsImporter = LocationsImporter(repo, eventPublisher)
+        workbook = XSSFWorkbook()
 
         val sheetNames = listOf("QUERIES", "JPCU", "JPCNOMIS", "NOMIS", "Overview", "Courts", "Police", "Police Info",
                 "Prisons", "Hospitals", "Immigration", "STC&SCH", "Other")
 
         val colNames = listOf("DLN", "Location Type", "Site Name", "NOMIS Agency ID")
-
 
         sheetNames.forEach {
             val sheet = workbook.createSheet(it)
@@ -34,28 +36,18 @@ class LocationImporterTest(
                 headerRow.createCell(index).setCellValue(s)
             }
         }
-        return workbook
     }
 
     @Test
     fun `Assert workbook with only headers imports without errors`() {
-        val locationsImporter = LocationsImporter(repo, eventPublisher)
-
-        val workbook = createWorkbook()
         val errors = locationsImporter.import(workbook)
 
-        Assertions.assertTrue(errors.isEmpty())
-
-        workbook.close()
+        assertThat(errors).isEmpty()
     }
 
     @Test
     fun `Assert empty site name returns error`() {
-        val locationsImporter = LocationsImporter(repo, eventPublisher)
-
-        val workbook = createWorkbook()
-
-        val courtsSheet = workbook.getSheetAt(5)
+        val courtsSheet = workbook.getSheetAt(Court.sheetIndex)
         val row = courtsSheet.createRow(1)
 
         row.createCell(0).setCellValue("")
@@ -65,8 +57,11 @@ class LocationImporterTest(
 
         val errors = locationsImporter.import(workbook)
 
-        Assertions.assertEquals("ii", errors.toList().get(0))
+        assertThat(errors).isNotEmpty
+    }
 
+    @AfterEach
+    fun after() {
         workbook.close()
     }
 }
