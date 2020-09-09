@@ -1,7 +1,4 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
-object STCSCH : LocationFromCells {
+object STCSCH : LocationFromCells(11, "STC&SCH")
 
-    override val sheetIndex = 11
-    override val sheetName = "STC&SCH"
-}

@@ -47,7 +47,7 @@ class LocationImporterTest(
 
     @Test
     fun `Assert empty site name returns error`() {
-        val courtsSheet = workbook.getSheetAt(Court.sheetIndex)
+        val courtsSheet = workbook.getSheetAt(Court.index)
         val row = courtsSheet.createRow(1)
 
         row.createCell(0).setCellValue("")

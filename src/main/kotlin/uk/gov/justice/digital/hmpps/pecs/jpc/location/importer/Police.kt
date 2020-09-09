@@ -1,7 +1,4 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
-object Police : LocationFromCells {
+object Police : LocationFromCells(6, "POLICE")
 
-    override val sheetIndex = 6
-    override val sheetName = "POLICE"
-}
