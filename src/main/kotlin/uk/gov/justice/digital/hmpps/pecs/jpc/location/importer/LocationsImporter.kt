@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
@@ -10,7 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import java.io.FileInputStream
 
 @Component
-class LocationsImporter(private val repo: LocationRepository, private val eventPublisher: ApplicationEventPublisher)  {
+class LocationsImporter(private val repo: LocationRepository, private val eventPublisher: ApplicationEventPublisher) : InitializingBean {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -19,15 +20,15 @@ class LocationsImporter(private val repo: LocationRepository, private val eventP
 
     fun import(locationsWorkbook: XSSFWorkbook) : Set<String> {
 
-        val locationsFromCells = listOf(Court, Police, Prison, Hospital, Immigration, STCSCH, Other)
         val errors: MutableSet<String?> = mutableSetOf()
 
-        locationsFromCells.forEach { locationFromCells ->
-            val sheet = locationFromCells.sheet(locationsWorkbook)
-            val rows = sheet.drop(1).filter { !it.getCell(1)?.stringCellValue.isNullOrBlank() }
+        LocationType.values().iterator().forEach { locationType ->
+            val sheet = locationType.sheet(locationsWorkbook)
 
-            rows.forEach {
-                Result.runCatching { repo.save(locationFromCells.location(it.toList())) }
+            val rows = sheet.drop(1).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
+
+            rows.forEach { row ->
+                Result.runCatching { repo.save(locationType.toLocation(row)) }
                         .onFailure { errors.add(it.message + " " + it.cause.toString()) }
             }
         }
@@ -37,7 +38,7 @@ class LocationsImporter(private val repo: LocationRepository, private val eventP
         return errors.filterNotNull().sorted().toSet()
     }
 
-     fun afterPropertiesSet() {
+     override fun afterPropertiesSet() {
         repo.deleteAll()
 
         val excelFile = FileInputStream(locationsFile)
