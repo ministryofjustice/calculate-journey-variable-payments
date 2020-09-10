@@ -18,6 +18,7 @@ dependencies {
 	implementation("org.apache.poi:poi-ooxml:4.1.2")
 	implementation("com.github.kittinunf.result:result:3.1.0")
 	implementation("com.github.kittinunf.result:result-coroutines:3.1.0")
+	implementation("com.beust:klaxon:5.4")
 
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql")
