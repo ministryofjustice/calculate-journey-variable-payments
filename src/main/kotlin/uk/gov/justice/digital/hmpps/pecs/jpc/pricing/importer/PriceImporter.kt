@@ -2,18 +2,27 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.ApplicationListener
+import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImportedEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.ImportStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import java.io.File
 import java.io.FileInputStream
+import java.time.Clock
+import java.time.Duration
+import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Component
-class PriceImporter(private val locationRepo: LocationRepository, private val priceRepo: PriceRepository) : ApplicationListener<LocationsImportedEvent> {
+class PriceImporter(private val locationRepo: LocationRepository,
+                    private val priceRepo: PriceRepository,
+                    private val clock: Clock) {
+
+    @Autowired
+    private lateinit var resourceLoader: ResourceLoader
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
@@ -21,42 +30,64 @@ class PriceImporter(private val locationRepo: LocationRepository, private val pr
     @Value("\${import-files.serco-prices}")
     private lateinit var sercoPricesFile: String
 
+    private val running = AtomicBoolean(false)
+
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(priceFile: File, supplier: Supplier) {
-        val excelFile = FileInputStream(priceFile)
-        val workbook = XSSFWorkbook(excelFile)
-
+    fun import(workbook: XSSFWorkbook, supplier: Supplier) {
         val priceFromCells = PriceFromCells(locationRepo)
         val sheet = workbook.getSheetAt(priceFromCells.sheetIndex)
-        val rows = sheet.iterator().asSequence().toList().drop(1).filter { r ->
-            !r.getCell(1)?.stringCellValue.isNullOrBlank()
-        }
 
-        val errors: MutableSet<String?> = mutableSetOf()
+        val errors: MutableList<String?> = mutableListOf()
+        val rows = sheet.drop(1).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
+
+        var total = 0
+
         rows.forEach { r ->
+            total++
             val rowCells = r.iterator().asSequence().toList()
-
-            val priceResult = priceFromCells.getPriceResult(supplier, rowCells)
-            priceResult.fold({ price ->
-                try {
-                    priceRepo.save(price)
-                } catch (e: Exception) { errors.add(e.message) }
-            }, { error -> errors.add(error.message) })
+            Result.runCatching { priceRepo.save(priceFromCells.getPriceResult(supplier, rowCells)) }
+                    .onFailure {
+                        errors.add(it.message + " " + it.cause.toString())
+                    }
         }
 
-        workbook.close()
-        excelFile.close()
+        errors.filterNotNull().groupBy { it }.toSortedMap().forEach { logger.info(" ${supplier.name}:  ${it.value.size} ${it.key}") }
 
-        errors.filterNotNull().sorted().forEach{println(supplier.name + " " + it)}
-        logger.info("$supplier PRICES INSERTED: ${priceRepo.count()}")
+        logger.info("$supplier PRICES INSERTED: ${total - errors.size} out of $total.")
     }
 
-
-    override fun onApplicationEvent(event: LocationsImportedEvent) {
-        priceRepo.deleteAll()
-        import(File(geoPricesFile), Supplier.GEOAMEY)
-        import(File(sercoPricesFile), Supplier.SERCO)
+    private fun import(pricesFile: String, supplier: Supplier) {
+        FileInputStream(resourceLoader.getResource("classpath:$pricesFile").file).use { prices ->
+            XSSFWorkbook(prices).use {
+                import(it, supplier)
+            }
+        }
     }
 
+    fun import(): ImportStatus {
+        // Imposed a crude temporary locking solution to prevent DB clashes/conflicts.
+        if (running.compareAndSet(false, true)) {
+            val start = LocalDateTime.now(clock)
+
+            logger.info("Price data import started: $start")
+
+            try {
+                priceRepo.deleteAll()
+
+                import(geoPricesFile, Supplier.GEOAMEY)
+                import(sercoPricesFile, Supplier.SERCO)
+
+                return ImportStatus.DONE
+            } finally {
+                running.set(false)
+
+                val end = LocalDateTime.now(clock)
+
+                logger.info("Price import ended: $end. Time taken (in seconds): ${Duration.between(start, end).seconds}")
+            }
+        }
+
+        return ImportStatus.IN_PROGRESS
+    }
 }

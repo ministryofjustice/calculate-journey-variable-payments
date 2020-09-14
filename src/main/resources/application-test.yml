@@ -14,8 +14,6 @@ spring:
     datasource:
       url: "spring.jpa.database: HSQL"
 
-
-
 server:
   port: 8080
   servlet:
@@ -50,8 +48,8 @@ logging:
   level:
     ROOT: INFO
 import-files:
-  locations: "/Users/jonnycavell/PECS/jpc/locations.xlsx"
-  serco-prices: "/Users/jonnycavell/PECS/jpc/serco_prices.xlsx"
-  geo-prices: "/Users/jonnycavell/PECS/jpc/geo_prices.xlsx"
+  locations: "/spreadsheets/locations.xlsx"
+  serco-prices: "/spreadsheets/supplier_b_prices.xlsx"
+  geo-prices: "/spreadsheets/supplier_a_prices.xlsx"
 
 
