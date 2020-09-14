@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.pricing
+package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import com.beust.klaxon.Klaxon
 import org.junit.jupiter.api.Assertions
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Move
 
-class JourneyParseTest {
+class JourneysParserTest {
 
     @Test
     fun `Assert Journey can be created from json`() {

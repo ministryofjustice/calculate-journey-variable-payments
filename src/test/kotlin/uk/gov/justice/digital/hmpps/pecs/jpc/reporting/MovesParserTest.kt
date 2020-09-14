@@ -1,11 +1,11 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.pricing
+package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import com.beust.klaxon.Klaxon
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Move
 
-class MoveParseTest {
+class MovesParserTest {
 
     @Test
     fun `Assert Move can be created from json`() {
