@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 fun cannedEvent(): Event{
     val occurredAndRecordedAt = LocalDateTime.parse("2020-06-16T10:20:30+01:00", DateTimeFormatter.ISO_DATE_TIME)
@@ -13,7 +13,7 @@ fun cannedEvent(): Event{
             type="MoveCancel",
             actionedBy="serco",
             eventableType="move",
-            eventableId=UUID.fromString("02b4c0f5-4d85-4fb6-be6c-53d74b85bf2e"),
+            eventableId= UUID.fromString("02b4c0f5-4d85-4fb6-be6c-53d74b85bf2e"),
             details= mapOf("cancellation_reason" to "made_in_error", "cancellation_reason_comment" to "cancelled because the prisoner refused to move"),
             occurredAt=occurredAndRecordedAt,
             recordedAt=occurredAndRecordedAt,

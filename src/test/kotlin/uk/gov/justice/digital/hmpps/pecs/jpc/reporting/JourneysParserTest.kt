@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 fun cannedJourney(): Journey{
     val clientTimestamp = LocalDateTime.parse("2020-09-08T12:49:00+01:00", DateTimeFormatter.ISO_DATE_TIME)

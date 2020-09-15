@@ -9,15 +9,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
+
 import javax.validation.ConstraintViolationException
 
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
-@DataJpaTest
-class JourneyRepositoryTest {
+    @DataJpaTest
+    class JourneyRepositoryTest {
 
     @Autowired
     lateinit var repository: JourneyRepository
@@ -26,7 +24,7 @@ class JourneyRepositoryTest {
     lateinit var entityManager: TestEntityManager
 
     @Test
-    fun `can save Event`() {
+    fun `can save Journey`() {
         val cannedJourney = cannedJourney()
         val journey = repository.save(cannedJourney)
 

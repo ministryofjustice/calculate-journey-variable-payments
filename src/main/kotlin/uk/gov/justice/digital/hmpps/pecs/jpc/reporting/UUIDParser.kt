@@ -3,9 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import com.beust.klaxon.Converter
 import com.beust.klaxon.JsonValue
 import com.beust.klaxon.KlaxonException
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 @Target(AnnotationTarget.FIELD)
 annotation class EventUUID

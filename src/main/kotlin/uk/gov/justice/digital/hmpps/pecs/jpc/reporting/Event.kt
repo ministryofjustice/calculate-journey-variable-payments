@@ -3,8 +3,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
-import java.util.*
-import javax.persistence.*
+import java.util.UUID
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
 import javax.validation.constraints.NotBlank
 
 @Entity
