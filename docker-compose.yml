@@ -15,10 +15,38 @@ services:
       POSTGRES_DB: jpc
       POSTGRES_USER: jpc
       POSTGRES_PASSWORD: letmein
+    networks:
+      - hmpps
 
   adminer:
     image: adminer
+    depends_on:
+      - db
     container_name: jpc-browser-sql-tool
     restart: always
     ports:
       - 8080:8080
+    networks:
+      - hmpps
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    networks:
+      - hmpps
+    ports:
+      - "4567-4597:4567-4597"
+      - 8999:8080
+    environment:
+      - SERVICES=s3
+      - DEBUG=${DEBUG- }
+      - DATA_DIR=${DATA_DIR- }
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=eu-west-2
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - $PWD/localstack:/docker-entrypoint-initaws.d
+
+networks:
+  hmpps:
