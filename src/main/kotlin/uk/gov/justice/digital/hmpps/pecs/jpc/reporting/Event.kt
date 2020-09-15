@@ -42,12 +42,12 @@ data class Event @JvmOverloads constructor(
         @Column
         val detailsString: String = details.toString(),
 
-        @EventDate
+        @EventDateTime
         @Json(name = "occurred_at")
         @Column(nullable = false, columnDefinition = "TIMESTAMP")
         val occurredAt: LocalDateTime,
 
-        @EventDate
+        @EventDateTime
         @Json(name = "recorded_at")
         @Column(nullable = false, columnDefinition = "TIMESTAMP")
         val recordedAt: LocalDateTime,
@@ -58,7 +58,7 @@ data class Event @JvmOverloads constructor(
     companion object {
         fun fromJson(json: String): Event? {
             return Klaxon().
-            fieldConverter(EventDate::class, dateConverter).
+            fieldConverter(EventDateTime::class, dateTimeConverter).
             fieldConverter(EventUUID::class, uuidConverter).
             parse<Event>(json)
         }

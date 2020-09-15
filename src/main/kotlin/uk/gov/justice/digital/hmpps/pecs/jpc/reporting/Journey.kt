@@ -2,20 +2,48 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
+import java.time.LocalDateTime
+import java.util.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
+import javax.validation.constraints.NotBlank
 
+@Entity
+@Table(name = "JOURNEYS")
 data class Journey(
-        val id: String,
 
+        @EventUUID
+        @Id
+        @Column(name = "journey_id", nullable = false)
+        val id: UUID,
+
+        @EventUUID
         @Json(name = "move_id")
-        val moveId: String,
+        val moveId: UUID,
+
+        @Column(nullable = false)
         val billable: Boolean,
+
+        @Column(nullable = false)
+        @get: NotBlank(message = "state cannot be blank")
         val state: String,
+
+        @Column(nullable = false)
+        @get: NotBlank(message = "supplier cannot be blank")
         val supplier: String,
 
+        @EventDateTime
+        @Json(name = "client_timestamp")
+        val clientTimestamp: LocalDateTime,
+
         @Json(name = "vehicle_registration")
-        val vehicleRegistration: String,
+        val vehicleRegistration: String?,
 
         @Json(name = "from_location")
+        @Column(nullable = false)
+        @get: NotBlank(message = "from location cannot be blank")
         val fromLocation: String,
 
         @Json(name = "to_location")
@@ -23,7 +51,10 @@ data class Journey(
 ) {
     companion object {
         fun fromJson(json: String): Journey? {
-            return Klaxon().parse<Journey>(json)
+            return Klaxon().
+            fieldConverter(EventDateTime::class, dateTimeConverter).
+            fieldConverter(EventUUID::class, uuidConverter).
+            parse<Journey>(json)
         }
     }
 }

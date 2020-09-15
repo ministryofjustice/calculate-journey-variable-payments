@@ -17,32 +17,29 @@ import javax.validation.ConstraintViolationException
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
 @DataJpaTest
-class EventRepositoryTest {
-
-    val occurredAndRecordedAt = LocalDateTime.parse("2020-06-16T10:20:30+01:00", DateTimeFormatter.ISO_DATE_TIME)
+class MoveRepositoryTest {
 
     @Autowired
-    lateinit var repository: EventRepository
+    lateinit var repository: MoveRepository
 
     @Autowired
     lateinit var entityManager: TestEntityManager
 
     @Test
     fun `can save Event`() {
-        val eventToSave = cannedEvent()
-        repository.save(eventToSave)
+        val cannedMove = cannedMove()
+        val move = repository.save(cannedMove)
 
         entityManager.flush()
 
-        // details not saved in db so should be null
-        assertThat(repository.findById(eventToSave.id).orElseThrow()).isEqualTo(eventToSave.copy(details = null))
+        assertThat(repository.findById(cannedMove.id).orElseThrow()).isEqualTo(cannedMove)
     }
 
     @Test
-    fun `should throw constraint violation if type is empty`() {
-        val eventToSave = cannedEvent().copy(type = "")
+    fun `should throw constraint violation if status is empty`() {
+        val moveToSave = cannedMove().copy(status = "")
         assertThatThrownBy {
-            repository.save(eventToSave)
+            repository.save(moveToSave)
             entityManager.flush()
         }.isInstanceOf(ConstraintViolationException::class.java)
     }

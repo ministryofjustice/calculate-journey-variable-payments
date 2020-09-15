@@ -4,3 +4,7 @@ fun getReportLines(path: String): List<String> {
     return object {}.javaClass.getResource(path).readText().split("\n")
 }
 
+
+
+
+
