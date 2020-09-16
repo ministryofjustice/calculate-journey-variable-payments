@@ -23,6 +23,9 @@ class MoveRepositoryTest {
     lateinit var eventRepository: EventRepository
 
     @Autowired
+    lateinit var journeyRepository: JourneyRepository
+
+    @Autowired
     lateinit var entityManager: TestEntityManager
 
     @Test
@@ -30,14 +33,33 @@ class MoveRepositoryTest {
         val cannedMove = cannedMove()
         moveRepository.save(cannedMove)
 
-        val cannedEvent = cannedEvent()
-        eventRepository.save(cannedEvent)
+        val cannedMoveEvent = cannedMoveEvent()
+        eventRepository.save(cannedMoveEvent)
 
         entityManager.flush()
+        entityManager.clear()
 
         val retrievedMove = moveRepository.findById(cannedMove.id)
+        assertThat(retrievedMove.get().events.toList()[0].id).isEqualTo(cannedMoveEvent.id)
+    }
 
-        assertThat(retrievedMove).isEqualTo(cannedMove)
+    @Test
+    fun `can save Move, Journeys and retrieve Journey from Move`() {
+        val cannedMove = cannedMove()
+        moveRepository.save(cannedMove)
+
+        val cannedJourney = cannedJourney()
+        journeyRepository.save(cannedJourney)
+
+        val cannedJourneyEvent = cannedJourneyEvent()
+        eventRepository.save(cannedJourneyEvent)
+
+        entityManager.flush()
+        entityManager.clear()
+
+        val retrievedMove = moveRepository.findById(cannedMove.id)
+        val firstRetrievedJourney = retrievedMove.get().journeys.toList()[0]
+        assertThat(firstRetrievedJourney.id).isEqualTo(cannedJourney.id)
     }
 
     @Test

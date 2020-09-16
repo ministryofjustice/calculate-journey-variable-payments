@@ -36,9 +36,15 @@ data class Move(
         val toLocation: String? = null,
 
         @Json(ignored = true)
-        @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
+        @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true )
         @JoinColumn(name = "eventableId")
-        val events: List<Event> = mutableListOf<Event>()
+        @org.hibernate.annotations.ForeignKey( name = "none")
+        val events: Set<Event> = setOf<Event>(),
+
+        @Json(ignored = true)
+        @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+        @JoinColumn(name = "moveId")
+        val journeys: Set<Journey> = setOf<Journey>()
 
 ) {
     companion object {

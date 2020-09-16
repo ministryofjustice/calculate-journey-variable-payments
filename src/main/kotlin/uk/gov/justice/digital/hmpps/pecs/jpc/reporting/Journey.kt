@@ -4,10 +4,7 @@ import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
 import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
 @Entity
@@ -47,7 +44,8 @@ data class Journey(
         val fromLocation: String,
 
         @Json(name = "to_location")
-        val toLocation: String? = null
+        val toLocation: String? = null,
+
 ) {
     companion object {
         fun fromJson(json: String): Journey? {

@@ -7,10 +7,9 @@ import java.util.UUID
 
 interface EventRepository : CrudRepository<Event, UUID> {
 
-//    @Query("SELECT e FROM Event e WHERE e.eventableType = :eventableType and e.eventableId IN (:eventableIds)")
-//    fun findByEventableTypeAndEventableIds(
-//            @Param("eventableType") eventableType: String,
-//            @Param("eventableIds") eventableIds: List<UUID>
-//    ): List<Event>
+    @Query("SELECT e FROM Event e WHERE  e.eventableId IN (:eventableIds)")
+    fun findByEventableIds(
+            @Param("eventableIds") eventableIds: List<UUID>
+    ): List<Event>
 
 }
