@@ -29,7 +29,7 @@ class EventRepositoryTest {
 
     @Test
     fun `can save Event`() {
-        val eventToSave = cannedEvent()
+        val eventToSave = cannedMoveEvent()
         repository.save(eventToSave)
 
         entityManager.flush()
@@ -38,20 +38,27 @@ class EventRepositoryTest {
         assertThat(repository.findById(eventToSave.id).orElseThrow()).isEqualTo(eventToSave.copy(details = null))
     }
 
-//    @Test
-//    fun `can retrieve Event by eventType and eventId`() {
-//        val eventToSave = cannedEvent()
-//        repository.save(eventToSave)
-//
-//        entityManager.flush()
-//
-//        val retrievedEntity = repository.findByEventableTypeAndEventableIds("move", listOf(UUID.fromString("02b4c0f5-4d85-4fb6-be6c-53d74b85bf2e")))
-//        assertThat(repository.findById(eventToSave.id).orElseThrow()).isEqualTo(eventToSave.copy(details = null))
-//    }
+    @Test
+    fun `can retrieve Event using list of eventableIds`() {
+        val eventWithCorrectEventableId = cannedJourneyEvent()
+        val event2WithCorrectEventableId = eventWithCorrectEventableId.copy(id = UUID.randomUUID())
+        val event3WithIncorrectEventableId = eventWithCorrectEventableId.copy(id = UUID.randomUUID(), eventableId = UUID.randomUUID())
+
+        repository.save(eventWithCorrectEventableId)
+        repository.save(event2WithCorrectEventableId)
+        repository.save(event3WithIncorrectEventableId)
+
+        entityManager.flush()
+
+        val savedEvents = repository.findByEventableIds(listOf(eventWithCorrectEventableId.eventableId))
+
+        // Only 2 events should come back
+        assertThat(savedEvents.map { it.id }.toSet()).isEqualTo(setOf(eventWithCorrectEventableId.id, event2WithCorrectEventableId.id))
+    }
 
     @Test
     fun `should throw constraint violation if type is empty`() {
-        val eventToSave = cannedEvent().copy(type = "")
+        val eventToSave = cannedMoveEvent().copy(type = "")
         assertThatThrownBy {
             repository.save(eventToSave)
             entityManager.flush()

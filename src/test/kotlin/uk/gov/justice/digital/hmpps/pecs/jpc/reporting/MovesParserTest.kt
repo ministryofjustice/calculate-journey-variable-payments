@@ -6,11 +6,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-fun cannedMove(): Move {
-    val moveDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
-    val move = Move(id = UUID.fromString("02b4c0f5-4d85-4fb6-be6c-53d74b85bf2e"), reference = "UKW4591N", date = moveDate, status = "requested", fromLocation = "WYI", toLocation = "GNI")
-    return move
-}
+
 
 class MovesParserTest {
 

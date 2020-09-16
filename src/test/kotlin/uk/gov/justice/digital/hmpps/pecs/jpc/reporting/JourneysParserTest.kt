@@ -6,11 +6,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-fun cannedJourney(): Journey{
-    val clientTimestamp = LocalDateTime.parse("2020-09-08T12:49:00+01:00", DateTimeFormatter.ISO_DATE_TIME)
-    val journey = Journey(id= UUID.fromString("0036ae57-1eb7-4ffb-9a76-2c052b18c60b"), moveId=UUID.fromString("d864dfcd-f41a-4030-972b-dd42ec268efa"), clientTimestamp = clientTimestamp, billable=false, state="completed", supplier="geoamey", vehicleRegistration="UHE-92", fromLocation="GCS11", toLocation="HPS008")
-    return journey
-}
+
+
+
 class JourneysParserTest {
 
     @Test
