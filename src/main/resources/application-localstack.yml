@@ -1,0 +1,7 @@
+aws:
+  provider: localstack
+  endpoint.url: http://localhost:4572
+  region: eu-west-2
+
+server:
+  shutdown: immediate

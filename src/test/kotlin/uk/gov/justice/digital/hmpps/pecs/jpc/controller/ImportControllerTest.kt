@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.ImportStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
 import java.time.Clock
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

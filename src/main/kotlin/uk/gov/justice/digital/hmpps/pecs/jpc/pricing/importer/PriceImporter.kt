@@ -3,14 +3,15 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.ResourceLoader
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.ResourceProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.ImportStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import java.io.FileInputStream
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
+import java.io.InputStream
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
@@ -22,7 +23,12 @@ class PriceImporter(private val locationRepo: LocationRepository,
                     private val clock: Clock) {
 
     @Autowired
-    private lateinit var resourceLoader: ResourceLoader
+    @Qualifier("serco")
+    private lateinit var sercoResourceProvider: ResourceProvider
+
+    @Autowired
+    @Qualifier("geoamey")
+    private lateinit var geoameyResourceProvider: ResourceProvider
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
@@ -57,11 +63,9 @@ class PriceImporter(private val locationRepo: LocationRepository,
         logger.info("$supplier PRICES INSERTED: ${total - errors.size} out of $total.")
     }
 
-    private fun import(pricesFile: String, supplier: Supplier) {
-        FileInputStream(resourceLoader.getResource("classpath:$pricesFile").file).use { prices ->
-            XSSFWorkbook(prices).use {
-                import(it, supplier)
-            }
+    private fun import(prices: InputStream, supplier: Supplier) {
+        XSSFWorkbook(prices).use {
+            import(it, supplier)
         }
     }
 
@@ -75,8 +79,8 @@ class PriceImporter(private val locationRepo: LocationRepository,
             try {
                 priceRepo.deleteAll()
 
-                import(geoPricesFile, Supplier.GEOAMEY)
-                import(sercoPricesFile, Supplier.SERCO)
+                import(geoameyResourceProvider.get(geoPricesFile), Supplier.GEOAMEY)
+                import(sercoResourceProvider.get(sercoPricesFile), Supplier.SERCO)
 
                 return ImportStatus.DONE
             } finally {

@@ -48,8 +48,9 @@ logging:
   level:
     ROOT: INFO
 import-files:
-  locations: "/spreadsheets/locations.xlsx"
-  serco-prices: "/spreadsheets/supplier_b_prices.xlsx"
-  geo-prices: "/spreadsheets/supplier_a_prices.xlsx"
+  locations: classpath:/spreadsheets/locations.xlsx
+  serco-prices: classpath:/spreadsheets/supplier_b_prices.xlsx
+  geo-prices: classpath:/spreadsheets/supplier_a_prices.xlsx
 
-
+aws:
+  provider: test
