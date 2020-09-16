@@ -17,26 +17,34 @@ import javax.validation.ConstraintViolationException
 class MoveRepositoryTest {
 
     @Autowired
-    lateinit var repository: MoveRepository
+    lateinit var moveRepository: MoveRepository
+
+    @Autowired
+    lateinit var eventRepository: EventRepository
 
     @Autowired
     lateinit var entityManager: TestEntityManager
 
     @Test
-    fun `can save Move`() {
+    fun `can save Move and Events, and retrieve Move Events`() {
         val cannedMove = cannedMove()
-        val move = repository.save(cannedMove)
+        moveRepository.save(cannedMove)
+
+        val cannedEvent = cannedEvent()
+        eventRepository.save(cannedEvent)
 
         entityManager.flush()
 
-        assertThat(repository.findById(cannedMove.id).orElseThrow()).isEqualTo(cannedMove)
+        val retrievedMove = moveRepository.findById(cannedMove.id)
+
+        assertThat(retrievedMove).isEqualTo(cannedMove)
     }
 
     @Test
     fun `should throw constraint violation if status is empty`() {
         val moveToSave = cannedMove().copy(status = "")
         assertThatThrownBy {
-            repository.save(moveToSave)
+            moveRepository.save(moveToSave)
             entityManager.flush()
         }.isInstanceOf(ConstraintViolationException::class.java)
     }

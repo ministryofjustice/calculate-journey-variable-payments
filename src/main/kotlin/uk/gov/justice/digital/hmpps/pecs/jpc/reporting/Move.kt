@@ -4,10 +4,7 @@ import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDate
 import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
 @Entity
@@ -36,7 +33,13 @@ data class Move(
         val fromLocation: String,
 
         @Json(name = "to_location")
-        val toLocation: String? = null
+        val toLocation: String? = null,
+
+        @Json(ignored = true)
+        @OneToMany(cascade = arrayOf(CascadeType.ALL), fetch = FetchType.EAGER, orphanRemoval = true)
+        @JoinColumn(name = "eventableId")
+        val events: List<Event> = mutableListOf<Event>()
+
 ) {
     companion object {
         fun fromJson(json: String): Move? {

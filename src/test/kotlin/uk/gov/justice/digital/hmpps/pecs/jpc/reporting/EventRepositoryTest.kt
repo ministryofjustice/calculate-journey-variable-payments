@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.validation.ConstraintViolationException
 
 @ExtendWith(SpringExtension::class)
@@ -36,6 +37,17 @@ class EventRepositoryTest {
         // details not saved in db so should be null
         assertThat(repository.findById(eventToSave.id).orElseThrow()).isEqualTo(eventToSave.copy(details = null))
     }
+
+//    @Test
+//    fun `can retrieve Event by eventType and eventId`() {
+//        val eventToSave = cannedEvent()
+//        repository.save(eventToSave)
+//
+//        entityManager.flush()
+//
+//        val retrievedEntity = repository.findByEventableTypeAndEventableIds("move", listOf(UUID.fromString("02b4c0f5-4d85-4fb6-be6c-53d74b85bf2e")))
+//        assertThat(repository.findById(eventToSave.id).orElseThrow()).isEqualTo(eventToSave.copy(details = null))
+//    }
 
     @Test
     fun `should throw constraint violation if type is empty`() {
