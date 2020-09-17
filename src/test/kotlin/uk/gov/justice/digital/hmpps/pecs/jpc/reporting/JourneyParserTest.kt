@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class JourneysParserTest {
+class JourneyParserTest {
 
     @Test
     fun `Assert Journey can be created from json`() {

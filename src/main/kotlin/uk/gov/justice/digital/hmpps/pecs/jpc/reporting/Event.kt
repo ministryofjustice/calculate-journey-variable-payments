@@ -5,7 +5,7 @@ import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 
-data class Event @JvmOverloads constructor(
+data class Event constructor(
 
         @get: NotBlank(message = "id cannot be blank")
         val id: String,

@@ -16,12 +16,21 @@ fun cannedMove(): Move {
     val moveDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
     val move = Move(
             id = "M1",
+            profileId = "PR1",
             reference = "UKW4591N",
             date = moveDate,
             status = "requested",
             fromLocation = "WYI",
             toLocation = "GNI")
     return move
+}
+
+fun cannedPerson(): Person{
+    return Person("PE1", "PRISON1")
+}
+
+fun cannedProfile(): Profile{
+    return Profile("PR1", "PE1")
 }
 
 fun cannedMoveEvent(): Event{

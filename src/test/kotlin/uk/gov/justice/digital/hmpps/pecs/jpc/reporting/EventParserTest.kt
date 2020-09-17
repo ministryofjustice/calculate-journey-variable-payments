@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 
-class EventsParserTest {
+class EventParserTest {
 
     @Test
     fun `Assert Event can be created from json`() {

@@ -10,6 +10,9 @@ data class Move(
         @get: NotBlank(message = "id cannot be blank")
         val id: String,
 
+        @Json(name = "profile_id")
+        val profileId: String?,
+
         @get: NotBlank(message = "reference cannot be blank")
         val reference: String,
 
