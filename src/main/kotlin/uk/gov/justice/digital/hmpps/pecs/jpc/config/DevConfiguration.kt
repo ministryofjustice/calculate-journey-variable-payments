@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ResourceLoader
-import java.io.InputStream
 
 @Configuration
 @ConditionalOnMissingBean(AwsConfiguration::class)
@@ -25,7 +24,7 @@ class DevConfiguration {
     fun locationsResourceProvider() : SpreadsheetProvider {
         logger.info("Using anonymous resource provider for locations.")
 
-        return resourceProvider()
+        return spreadsheetProvider()
     }
 
     @Bean
@@ -34,7 +33,7 @@ class DevConfiguration {
     fun sercoPricesResourceProvider(): SpreadsheetProvider {
         logger.info("Using anonymous resource provider for serco.")
 
-        return resourceProvider()
+        return spreadsheetProvider()
     }
 
     @Bean
@@ -43,12 +42,8 @@ class DevConfiguration {
     fun geoameyPricesResourceProvider(): SpreadsheetProvider {
         logger.info("Using anonymous resource provider for geoamey.")
 
-        return resourceProvider()
+        return spreadsheetProvider()
     }
 
-    private fun resourceProvider() : SpreadsheetProvider = object: SpreadsheetProvider {
-        override fun get(resourceName: String): InputStream {
-            return resourceLoader.getResource(resourceName).inputStream
-        }
-    }
+    private fun spreadsheetProvider() = SpreadsheetProvider { resourceLoader.getResource(it).inputStream }
 }

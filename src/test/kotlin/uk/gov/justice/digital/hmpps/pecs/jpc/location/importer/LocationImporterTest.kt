@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.ActiveProfiles
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.SpreadsheetProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import java.time.Clock
 
@@ -17,16 +19,16 @@ import java.time.Clock
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 class LocationImporterTest(
-        @Autowired val eventPublisher: ApplicationEventPublisher,
         @Autowired val repo: LocationRepository,
-        @Autowired val clock: Clock) {
+        @Autowired val clock: Clock,
+        @Qualifier("locations") val spreadsheetProvider: SpreadsheetProvider) {
 
     private lateinit var locationsImporter: LocationsImporter
     private lateinit var workbook: XSSFWorkbook
 
     @BeforeEach
     fun before() {
-        locationsImporter = LocationsImporter(repo, clock)
+        locationsImporter = LocationsImporter(repo, clock, spreadsheetProvider)
         workbook = XSSFWorkbook()
 
         val sheetNames = listOf("QUERIES", "JPCU", "JPCNOMIS", "NOMIS", "Overview", "Courts", "Police", "Police Info",

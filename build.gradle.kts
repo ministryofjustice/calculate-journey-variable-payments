@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("uk.gov.justice.hmpps.gradle-spring-boot") version "1.0.2"
-	kotlin("plugin.spring") version "1.4.0"
-	kotlin("plugin.jpa") version "1.4.0"
-	kotlin("plugin.allopen") version "1.4.0"
+	id("uk.gov.justice.hmpps.gradle-spring-boot") version "1.0.4"
+	kotlin("plugin.spring") version "1.4.10"
+	kotlin("plugin.jpa") version "1.4.10"
+	kotlin("plugin.allopen") version "1.4.10"
 }
 
 allOpen {
@@ -19,8 +19,8 @@ dependencies {
 	implementation("com.github.kittinunf.result:result:3.1.0")
 	implementation("com.github.kittinunf.result:result-coroutines:3.1.0")
 	implementation("com.beust:klaxon:5.4")
-	implementation("com.amazonaws:aws-java-sdk-s3:1.11.860")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.11.863")
 
 	runtimeOnly("com.h2database:h2")
-	runtimeOnly("org.postgresql:postgresql")
+	runtimeOnly("org.postgresql:postgresql:42.2.16")
 }
