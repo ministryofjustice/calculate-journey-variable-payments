@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration
 import java.time.Clock
 
 @Configuration
-open class ImporterConfiguration {
+class ImporterConfiguration {
 
     @Bean
-    open fun clock() = Clock.systemDefaultZone()
+    fun clock() = Clock.systemDefaultZone()
 }
