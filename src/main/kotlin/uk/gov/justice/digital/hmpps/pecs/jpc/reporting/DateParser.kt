@@ -17,7 +17,7 @@ val dateConverter = object: Converter {
             if (jv.string != null) {
                 LocalDate.parse(jv.string, DateTimeFormatter.ISO_LOCAL_DATE)
             } else {
-                throw KlaxonException("Couldn't parse date: ${jv.string}")
+                null
             }
 
     override fun toJson(o: Any)

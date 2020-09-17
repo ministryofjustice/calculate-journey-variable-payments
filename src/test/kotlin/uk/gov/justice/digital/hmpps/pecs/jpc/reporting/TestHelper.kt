@@ -15,7 +15,7 @@ fun getReportLines(path: String): List<String> {
 fun cannedMove(): Move {
     val moveDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
     val move = Move(
-            id = UUID.fromString("02b4c0f5-4d85-4fb6-be6c-53d74b85bf2e"),
+            id = "M1",
             reference = "UKW4591N",
             date = moveDate,
             status = "requested",
@@ -26,7 +26,7 @@ fun cannedMove(): Move {
 
 fun cannedMoveEvent(): Event{
     val event = Event(
-            id=UUID.fromString("00699c3d-b4db-4e9d-858c-36f81aa19815"),
+            id="E1",
             type="MoveCancel",
             actionedBy= supplier,
             eventableType="move",
@@ -39,7 +39,7 @@ fun cannedMoveEvent(): Event{
 }
 fun cannedJourney(): Journey{
     val journey = Journey(
-            id= UUID.fromString("0036ae57-1eb7-4ffb-9a76-2c052b18c60b"),
+            id= "J1",
             moveId= cannedMove().id,
             clientTimestamp = occurredAndRecordedAt,
             billable=false, state="completed",
@@ -52,7 +52,7 @@ fun cannedJourney(): Journey{
 
 fun cannedJourneyEvent(): Event{
     val event = Event(
-            id= UUID.fromString("00699c3d-b4db-4e9d-858c-36f81aa19818"),
+            id="E1",
             type="JourneyStart",
             actionedBy= supplier,
             eventableType="journey",
