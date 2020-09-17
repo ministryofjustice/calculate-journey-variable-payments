@@ -16,15 +16,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @Component
 class LocationsImporter(private val repo: LocationRepository,
-                        private val clock: Clock) {
+                        private val clock: Clock,
+                        @Qualifier("locations") private val spreadsheetProvider: SpreadsheetProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val running = AtomicBoolean(false)
-
-    @Autowired
-    @Qualifier("locations")
-    private lateinit var spreadsheetLoader: SpreadsheetProvider
 
     @Value("\${import-files.locations}")
     private lateinit var locationsFile: String
@@ -63,7 +60,7 @@ class LocationsImporter(private val repo: LocationRepository,
             repo.deleteAll()
 
             try {
-                spreadsheetLoader.get(locationsFile).use { locations ->
+                spreadsheetProvider.get(locationsFile).use { locations ->
                     XSSFWorkbook(locations).use {
                         import(it)
 
