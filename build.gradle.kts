@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	id("uk.gov.justice.hmpps.gradle-spring-boot") version "1.0.4"
-	kotlin("plugin.spring") version "1.4.0"
-	kotlin("plugin.jpa") version "1.4.0"
-	kotlin("plugin.allopen") version "1.4.0"
+	kotlin("plugin.spring") version "1.4.10"
+	kotlin("plugin.jpa") version "1.4.10"
+	kotlin("plugin.allopen") version "1.4.10"
 }
 
 allOpen {
