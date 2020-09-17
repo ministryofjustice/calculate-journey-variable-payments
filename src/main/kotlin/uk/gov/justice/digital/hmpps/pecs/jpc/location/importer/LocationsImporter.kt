@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.ResourceProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.SpreadsheetProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
 import java.time.Clock
@@ -24,7 +24,7 @@ class LocationsImporter(private val repo: LocationRepository,
 
     @Autowired
     @Qualifier("locations")
-    private lateinit var resourceLoader: ResourceProvider
+    private lateinit var spreadsheetLoader: SpreadsheetProvider
 
     @Value("\${import-files.locations}")
     private lateinit var locationsFile: String
@@ -63,10 +63,12 @@ class LocationsImporter(private val repo: LocationRepository,
             repo.deleteAll()
 
             try {
-                XSSFWorkbook(resourceLoader.get(locationsFile)).use {
-                    import(it)
+                spreadsheetLoader.get(locationsFile).use { locations ->
+                    XSSFWorkbook(locations).use {
+                        import(it)
 
-                    return ImportStatus.DONE
+                        return ImportStatus.DONE
+                    }
                 }
             } finally {
                 running.set(false)

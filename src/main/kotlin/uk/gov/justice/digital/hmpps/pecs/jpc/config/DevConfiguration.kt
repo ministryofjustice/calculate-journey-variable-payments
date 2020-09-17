@@ -22,7 +22,7 @@ class DevConfiguration {
     @Bean
     @Qualifier("locations")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "test")
-    fun locationsResourceProvider() : ResourceProvider {
+    fun locationsResourceProvider() : SpreadsheetProvider {
         logger.info("Using anonymous resource provider for locations.")
 
         return resourceProvider()
@@ -31,7 +31,7 @@ class DevConfiguration {
     @Bean
     @Qualifier("serco")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "test")
-    fun sercoPricesResourceProvider(): ResourceProvider {
+    fun sercoPricesResourceProvider(): SpreadsheetProvider {
         logger.info("Using anonymous resource provider for serco.")
 
         return resourceProvider()
@@ -40,13 +40,13 @@ class DevConfiguration {
     @Bean
     @Qualifier("geoamey")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "test")
-    fun geoameyPricesResourceProvider(): ResourceProvider {
+    fun geoameyPricesResourceProvider(): SpreadsheetProvider {
         logger.info("Using anonymous resource provider for geoamey.")
 
         return resourceProvider()
     }
 
-    private fun resourceProvider() : ResourceProvider = object: ResourceProvider {
+    private fun resourceProvider() : SpreadsheetProvider = object: SpreadsheetProvider {
         override fun get(resourceName: String): InputStream {
             return resourceLoader.getResource(resourceName).inputStream
         }

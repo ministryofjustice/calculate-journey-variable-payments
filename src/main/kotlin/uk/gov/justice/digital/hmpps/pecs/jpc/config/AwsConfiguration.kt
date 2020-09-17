@@ -33,27 +33,27 @@ class AwsConfiguration {
     @Bean
     @Qualifier("locations")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
-    fun locationsResourceProvider(provider: AmazonS3): ResourceProvider {
+    fun locationsResourceProvider(provider: AmazonS3): SpreadsheetProvider {
         logger.info("Using S3 resource provider.")
 
-        return S3ResourceProvider(provider, "locations")
+        return S3SpreadsheetProvider(provider, "locations")
     }
 
     @Bean
     @Qualifier("serco")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
-    fun sercoPricesResourceProvider(provider: AmazonS3): ResourceProvider {
+    fun sercoPricesResourceProvider(provider: AmazonS3): SpreadsheetProvider {
         logger.info("Using S3 resource provider.")
 
-        return S3ResourceProvider(provider, "serco")
+        return S3SpreadsheetProvider(provider, "serco")
     }
 
     @Bean
     @Qualifier("geoamey")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
-    fun geoameyPricesResourceProvider(provider: AmazonS3): ResourceProvider {
+    fun geoameyPricesResourceProvider(provider: AmazonS3): SpreadsheetProvider {
         logger.info("Using S3 resource provider.")
 
-        return S3ResourceProvider(provider, "geoamey")
+        return S3SpreadsheetProvider(provider, "geoamey")
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.ResourceProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.SpreadsheetProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
@@ -24,11 +24,11 @@ class PriceImporter(private val locationRepo: LocationRepository,
 
     @Autowired
     @Qualifier("serco")
-    private lateinit var sercoResourceProvider: ResourceProvider
+    private lateinit var sercoSpreadsheetProvider: SpreadsheetProvider
 
     @Autowired
     @Qualifier("geoamey")
-    private lateinit var geoameyResourceProvider: ResourceProvider
+    private lateinit var geoameySpreadsheetProvider: SpreadsheetProvider
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
@@ -79,8 +79,8 @@ class PriceImporter(private val locationRepo: LocationRepository,
             try {
                 priceRepo.deleteAll()
 
-                import(geoameyResourceProvider.get(geoPricesFile), Supplier.GEOAMEY)
-                import(sercoResourceProvider.get(sercoPricesFile), Supplier.SERCO)
+                geoameySpreadsheetProvider.get(geoPricesFile).use { prices -> import(prices, Supplier.GEOAMEY) }
+                sercoSpreadsheetProvider.get(sercoPricesFile).use { prices -> import(prices, Supplier.SERCO) }
 
                 return ImportStatus.DONE
             } finally {
