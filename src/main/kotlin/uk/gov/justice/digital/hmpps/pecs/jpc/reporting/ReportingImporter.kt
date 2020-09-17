@@ -51,7 +51,7 @@ object ReportingImporter {
             MovePersonJourneysEvents(
                     move = move,
                     person = if(move.profileId == null) null else people[profileId2PersonId[move.profileId]],
-                    journeysWithEvents = journeys.getValue(move.id).map { journey ->
+                    journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey ->
                         JourneyWithEvents(journey = journey, events = events.getOrDefault(journey.id, listOf())) },
                     events = events.getOrDefault(move.id, listOf()
                     )
