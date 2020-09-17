@@ -3,11 +3,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDate
-import java.util.UUID
 import javax.validation.constraints.NotBlank
 
 data class Move(
 
+        @get: NotBlank(message = "id cannot be blank")
         val id: String,
 
         @get: NotBlank(message = "reference cannot be blank")

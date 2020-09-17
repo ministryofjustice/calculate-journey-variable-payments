@@ -5,30 +5,32 @@ import java.time.LocalDate
 
 object ReportingImporter {
 
-    fun importAsMoves(moveFiles: List<File>): Collection<Move> {
-        val moves = moveFiles.flatMap {
+    /**
+     * Takes a list of files, and for each line in each file convert from JSON to entity of type T
+     * @param files List of jsonl files to parse
+     * @param f Lambda that takes a String and converts to entity of type T?
+     * @return List of entities of type T
+     */
+    fun <T>read(files: List<File>, f: (j: String) -> T?): List<T>{
+        return files.flatMap {
             it.readText().split("\n").map { json ->
-                Move.fromJson(json)
+                f(json)
             }
-        }
-        return moves.filterNotNull().map { it.id to it }.toMap().values
+        }.filterNotNull()
+    }
+    fun importAsMoves(moveFiles: List<File>): Collection<Move> {
+        val moves = read(moveFiles) { Move.fromJson(it) }
+        return moves.map { it.id to it }.toMap().values
     }
 
     fun importAsMoveIdToJourneys(journeyFiles: List<File>): Map<String, List<Journey>> {
-        val journeys = journeyFiles.flatMap {
-            it.readText().split("\n").map { json ->
-                Journey.fromJson(json)
-            }
-        }
-        return journeys.filterNotNull().map {it.id to it}.toMap().values.groupBy { it.moveId }
+        val journeys = read(journeyFiles) {Journey.fromJson(it)}
+        return journeys.map {it.id to it}.toMap().values.groupBy { it.moveId }
     }
 
     fun importAsEventableIdToEvents(eventFiles: List<File>): Map<String, List<Event>> {
-        return eventFiles.flatMap {
-            it.readText().split("\n").map { json ->
-                Event.fromJson(json)
-            }
-        }.filterNotNull().groupBy { it.eventableId }
+        val events = read(eventFiles) {Event.fromJson(it)}
+        return events.groupBy { it.eventableId }
     }
 
     fun importAll(moveFiles: List<File>, journeyFiles: List<File>, eventFiles: List<File>): List<MoveWithJourneysAndEvents> {

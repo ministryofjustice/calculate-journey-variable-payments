@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
-import java.util.UUID
 import javax.validation.constraints.NotBlank
 
 data class Journey(
