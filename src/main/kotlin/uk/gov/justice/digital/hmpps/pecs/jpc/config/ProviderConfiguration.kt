@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.GetObjectRequest
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConditionalOnExpression("{'localstack'}.contains('\${aws.provider}')")
-class AwsConfiguration {
+class ProviderConfiguration {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -25,35 +25,32 @@ class AwsConfiguration {
 
         return AmazonS3ClientBuilder
                 .standard()
-                .withEndpointConfiguration(EndpointConfiguration(endpoint, region))
+                .withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpoint, region))
                 .withPathStyleAccessEnabled(true)
                 .build()
     }
 
     @Bean
-    @Qualifier("locations")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
-    fun locationsResourceProvider(provider: AmazonS3): SpreadsheetProvider {
+    fun locationsResourceProvider(client: AmazonS3): Schedule34LocationsProvider {
         logger.info("Using S3 resource provider.")
 
-        return S3SpreadsheetProvider(provider, "locations")
+        return Schedule34LocationsProvider { client.getObject(GetObjectRequest("locations", it)).objectContent }
     }
 
     @Bean
-    @Qualifier("serco")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
-    fun sercoPricesResourceProvider(provider: AmazonS3): SpreadsheetProvider {
+    fun sercoPricesResourceProvider(client: AmazonS3): SercoPricesProvider {
         logger.info("Using S3 resource provider.")
 
-        return S3SpreadsheetProvider(provider, "serco")
+        return SercoPricesProvider { client.getObject(GetObjectRequest("serco", it)).objectContent }
     }
 
     @Bean
-    @Qualifier("geoamey")
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
-    fun geoameyPricesResourceProvider(provider: AmazonS3): SpreadsheetProvider {
+    fun geoameyPricesResourceProvider(client: AmazonS3): GeoamyPricesProvider {
         logger.info("Using S3 resource provider.")
 
-        return S3SpreadsheetProvider(provider, "geoamey")
+        return GeoamyPricesProvider { client.getObject(GetObjectRequest("geoamey", it)).objectContent }
     }
 }
