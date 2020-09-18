@@ -30,7 +30,7 @@ services:
       - hmpps
 
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:0.11.5
     container_name: localstack
     networks:
       - hmpps
