@@ -1,27 +1,24 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.ActiveProfiles
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.SpreadsheetProvider
+import org.springframework.test.context.ContextConfiguration
+import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import java.time.Clock
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
+@ContextConfiguration(classes = [TestConfig::class])
 class LocationImporterTest(
         @Autowired val repo: LocationRepository,
         @Autowired val clock: Clock,
-        @Qualifier("locations") val spreadsheetProvider: SpreadsheetProvider) {
+        @Autowired val spreadsheetProvider: Schedule34LocationsProvider) {
 
     private lateinit var locationsImporter: LocationsImporter
     private lateinit var workbook: XSSFWorkbook
