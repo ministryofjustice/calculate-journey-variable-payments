@@ -2,11 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.SpreadsheetProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
 import java.time.Clock
@@ -17,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Component
 class LocationsImporter(private val repo: LocationRepository,
                         private val clock: Clock,
-                        @Qualifier("locations") private val spreadsheetProvider: SpreadsheetProvider) {
+                        private val spreadsheetProvider: Schedule34LocationsProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

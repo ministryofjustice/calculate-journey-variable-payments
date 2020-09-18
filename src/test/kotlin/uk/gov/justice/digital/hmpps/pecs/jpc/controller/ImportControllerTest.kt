@@ -9,23 +9,22 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.context.annotation.Bean
+import org.springframework.core.io.ResourceLoader
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
 import java.time.Clock
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
-@ContextConfiguration(classes = [ImportControllerTest.TestClock::class])
+@ContextConfiguration(classes = [TestConfig::class])
 class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
-
-    @TestConfiguration
-    class TestClock {
-        @Bean
-        fun clock() = Clock.systemDefaultZone()
-    }
 
     @Test
     fun `can import locations followed by prices`() {
