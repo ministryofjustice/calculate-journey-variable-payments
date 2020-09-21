@@ -53,4 +53,12 @@ class ProviderConfiguration {
 
         return GeoamyPricesProvider { client.getObject(GetObjectRequest("geoamey", it)).objectContent }
     }
+
+
+    @Bean
+    @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
+    fun reportingResourceProvider(client: AmazonS3): ReportingProvider {
+        logger.info("Using S3 resource provider.")
+        return ReportingProvider { client.getObjectAsString("geoamey", it)}
+    }
 }

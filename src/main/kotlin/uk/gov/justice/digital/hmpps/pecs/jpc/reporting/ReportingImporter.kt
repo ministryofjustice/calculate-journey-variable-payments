@@ -1,46 +1,46 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import java.io.File
 import java.time.LocalDate
 
 object ReportingImporter {
 
     /**
-     * Takes a list of files, and for each line in each file convert from JSON to entity of type T
-     * @param files List of jsonl files to parse
+     * Takes a list of files content, and for each line in each file convert from JSON to entity of type T
+     * @param file List of jsonl files content to parse
      * @param f Lambda that takes a String and converts to entity of type T?
      * @return Sequence of entities of type T
      */
-    fun <T>read(files: List<File>, f: (j: String) -> T?): Sequence<T>{
+    fun <T>read(files: List<String>, f: (j: String) -> T?): Sequence<T>{
         return files.asSequence().flatMap {
-            it.readText().split("\n").map { json ->
+            it.split("\n").map { json ->
                 f(json)
             }
         }.filterNotNull()
     }
     
-    fun importAsProfileIdToPersonId(profileFiles: List<File>) : Map<String, String>{
+    fun importAsProfileIdToPersonId(profileFiles: List<String>) : Map<String, String>{
         return read(profileFiles) {Profile.fromJson(it)}.
         associateBy(keySelector = {it.id}, valueTransform = {it.personId})
     }
 
-    fun importAsPersonIdToPerson(peopleFiles: List<File>) : Map<String, Person>{
+    fun importAsPersonIdToPerson(peopleFiles: List<String>) : Map<String, Person>{
         return read(peopleFiles) {Person.fromJson(it)}.associateBy(Person::id)
     }
     
-    fun importAsMoves(moveFiles: List<File>): Collection<Move> {
+    fun importAsMoves(moveFiles: List<String>): Collection<Move> {
         return read(moveFiles) { Move.fromJson(it) }.associateBy(Move::id).values
     }
 
-    fun importAsMoveIdToJourneys(journeyFiles: List<File>): Map<String, List<Journey>> {
+
+    fun importAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
         return read(journeyFiles) {Journey.fromJson(it)}.associateBy(Journey::id).values.groupBy(Journey::moveId)
     }
 
-    fun importAsEventableIdToEvents(eventFiles: List<File>): Map<String, List<Event>> {
+    fun importAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
         return read(eventFiles) {Event.fromJson(it)}.groupBy(Event::eventableId)
     }
 
-    fun importAll(moveFiles: List<File>, profileFiles: List<File>, peopleFiles: List<File>, journeyFiles: List<File>, eventFiles: List<File>): List<MovePersonJourneysEvents> {
+    fun importAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<MovePersonJourneysEvents> {
         val moves = importAsMoves(moveFiles)
         val profileId2PersonId = importAsProfileIdToPersonId(profileFiles)
         val people = importAsPersonIdToPerson(peopleFiles)
