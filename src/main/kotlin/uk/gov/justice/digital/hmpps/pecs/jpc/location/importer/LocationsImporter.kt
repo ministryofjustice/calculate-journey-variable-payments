@@ -15,9 +15,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Component
 class LocationsImporter(private val repo: LocationRepository,
                         private val clock: Clock,
-                        private val spreadsheetProvider: Schedule34LocationsProvider) {
+                        private val schedule34LocationsProvider: Schedule34LocationsProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val rowOffset = 2;
 
     private val running = AtomicBoolean(false)
 
@@ -26,7 +27,7 @@ class LocationsImporter(private val repo: LocationRepository,
 
     fun import(locationsWorkbook: XSSFWorkbook) {
 
-        val errors: MutableList<String?> = mutableListOf()
+        val errors: MutableList<LocationImportError?> = mutableListOf()
 
         var total = 0
 
@@ -35,16 +36,21 @@ class LocationsImporter(private val repo: LocationRepository,
 
             val rows = sheet.drop(1).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
 
-            rows.forEach { row ->
-                total++
-                Result.runCatching { repo.save(locationType.toLocation(row)) }
-                        .onFailure { errors.add(it.message + " " + it.cause.toString()) }
+            rows.forEachIndexed{ index, row ->
+                run {
+                    Result.runCatching {
+                        locationType.active(row)?.let {
+                            repo.save(it)
+                            total++
+                        }
+                    }.onFailure { errors.add(LocationImportError(locationType, index + rowOffset, it.cause?.cause ?: it)) }
+                }
             }
         }
 
-        errors.filterNotNull().sorted().forEach { logger.info(it) }
+        errors.filterNotNull().forEach { logger.info(it.toString()) }
 
-        logger.info("LOCATIONS INSERTED: ${total - errors.size} out of $total.")
+        logger.info("LOCATIONS INSERTED: $total. TOTAL ERRORS: ${errors.size}")
     }
 
     fun import(): ImportStatus {
@@ -58,7 +64,7 @@ class LocationsImporter(private val repo: LocationRepository,
             repo.deleteAll()
 
             try {
-                spreadsheetProvider.get(locationsFile).use { locations ->
+                schedule34LocationsProvider.get(locationsFile).use { locations ->
                     XSSFWorkbook(locations).use {
                         import(it)
 

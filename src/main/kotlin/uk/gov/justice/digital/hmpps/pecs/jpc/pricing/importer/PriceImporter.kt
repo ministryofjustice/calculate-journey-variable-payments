@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
@@ -20,13 +19,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Component
 class PriceImporter(private val locationRepo: LocationRepository,
                     private val priceRepo: PriceRepository,
-                    private val clock: Clock) {
-
-    @Autowired
-    private lateinit var sercoSpreadsheetProvider: SercoPricesProvider
-
-    @Autowired
-    private lateinit var geoameySpreadsheetProvider: GeoamyPricesProvider
+                    private val clock: Clock,
+                    private val sercoPrices: SercoPricesProvider,
+                    private val geoameyPrices: GeoamyPricesProvider) {
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
@@ -77,8 +72,8 @@ class PriceImporter(private val locationRepo: LocationRepository,
             try {
                 priceRepo.deleteAll()
 
-                geoameySpreadsheetProvider.get(geoPricesFile).use { prices -> import(prices, Supplier.GEOAMEY) }
-                sercoSpreadsheetProvider.get(sercoPricesFile).use { prices -> import(prices, Supplier.SERCO) }
+                sercoPrices.get(geoPricesFile).use { prices -> import(prices, Supplier.GEOAMEY) }
+                geoameyPrices.get(sercoPricesFile).use { prices -> import(prices, Supplier.SERCO) }
 
                 return ImportStatus.DONE
             } finally {
