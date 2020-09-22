@@ -12,14 +12,15 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
+private const val COLUMN_HEADINGS = 1
+
 @Component
 class LocationsImporter(private val repo: LocationRepository,
                         private val clock: Clock,
                         private val schedule34LocationsProvider: Schedule34LocationsProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val rowOffset = 2;
-
+    private val rowOffset = 2
     private val running = AtomicBoolean(false)
 
     @Value("\${import-files.locations}")
@@ -31,19 +32,19 @@ class LocationsImporter(private val repo: LocationRepository,
 
         var total = 0
 
-        LocationType.values().iterator().forEach { locationType ->
-            val sheet = locationType.sheet(locationsWorkbook)
+        LocationTab.values().map { locationTab ->
+            val sheet = locationTab.sheet(locationsWorkbook)
 
-            val rows = sheet.drop(1).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
+            val rows = sheet.drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
 
             rows.forEachIndexed{ index, row ->
                 run {
                     Result.runCatching {
-                        locationType.active(row)?.let {
+                        locationTab.map(row).let {
                             repo.save(it)
                             total++
                         }
-                    }.onFailure { errors.add(LocationImportError(locationType, index + rowOffset, it.cause?.cause ?: it)) }
+                    }.onFailure { errors.add(LocationImportError(locationTab, index + rowOffset, it.cause?.cause ?: it)) }
                 }
             }
         }

@@ -72,8 +72,8 @@ class PriceImporter(private val locationRepo: LocationRepository,
             try {
                 priceRepo.deleteAll()
 
-                sercoPrices.get(geoPricesFile).use { prices -> import(prices, Supplier.GEOAMEY) }
-                geoameyPrices.get(sercoPricesFile).use { prices -> import(prices, Supplier.SERCO) }
+                sercoPrices.get(geoPricesFile).use { import(it, Supplier.GEOAMEY) }
+                geoameyPrices.get(sercoPricesFile).use { import(it, Supplier.SERCO) }
 
                 return ImportStatus.DONE
             } finally {
