@@ -24,7 +24,7 @@ class LocationRepositoryTest {
 
     @Test
     fun `can save location`() {
-        val location = repository.save(Location("location type", "agency id", "site name"))
+        val location = repository.save(Location(LocationType.PR, "agency id", "site name"))
 
         entityManager.flush()
 
@@ -34,7 +34,7 @@ class LocationRepositoryTest {
     @Test
     fun `should throw constraint violation if fields empty`() {
         assertThatThrownBy {
-            repository.save(Location("", "", ""))
+            repository.save(Location(LocationType.PR, "", ""))
             entityManager.flush()
         }.isInstanceOf(ConstraintViolationException::class.java)
     }

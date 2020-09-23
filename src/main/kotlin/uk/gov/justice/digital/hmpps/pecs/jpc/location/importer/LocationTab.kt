@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 
 private const val TYPE = 1
 private const val SITE = 2
@@ -25,12 +26,13 @@ enum class LocationTab(val tabName: String) {
 
     fun map(cells: List<Cell>): Location {
         return Location(
-                locationType = cells[TYPE].stringCellValue.toUpperCase().trim(),
+                locationType = LocationType.map(cells[TYPE].stringCellValue.toUpperCase().trim())
+                        ?: throw IllegalArgumentException("Unsupported location type: " + cells[TYPE].stringCellValue),
                 nomisAgencyId = cells[AGENCY].stringCellValue.trim(),
                 siteName = cells[SITE].stringCellValue.toUpperCase().trim())
     }
 
-    fun map(cells: Row): Location = map(cells.toList())
+    fun map(row: Row): Location = map(row.toList())
 
     fun sheet(locationsWorkbook: XSSFWorkbook): Sheet = locationsWorkbook.getSheet(tabName)
 }

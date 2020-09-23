@@ -39,3 +39,7 @@ out/
 .DS_Store
 
 /dps-gradle-spring-boot-suppressions.xml
+
+*.xlsx
+*.jsonl
+
