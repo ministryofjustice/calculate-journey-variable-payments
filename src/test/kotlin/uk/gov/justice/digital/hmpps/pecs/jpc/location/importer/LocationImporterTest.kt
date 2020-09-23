@@ -53,7 +53,7 @@ class LocationImporterTest(
     @Test
     @Disabled
     fun `Assert empty site name returns error`() {
-        val courtsSheet = workbook.getSheetAt(LocationType.COURT.index)
+        val courtsSheet = workbook.getSheet(LocationTab.COURT.tabName)
         val row = courtsSheet.createRow(1)
 
         row.createCell(0).setCellValue("")

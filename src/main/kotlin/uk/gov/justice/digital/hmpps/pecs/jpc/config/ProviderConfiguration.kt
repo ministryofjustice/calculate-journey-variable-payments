@@ -33,7 +33,7 @@ class ProviderConfiguration {
     @Bean
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
     fun locationsResourceProvider(client: AmazonS3): Schedule34LocationsProvider {
-        logger.info("Using S3 resource provider.")
+        logger.info("Using localstack AWS S3 provider for Schedule 34 locations.")
 
         return Schedule34LocationsProvider { client.getObject(GetObjectRequest("locations", it)).objectContent }
     }
@@ -41,7 +41,7 @@ class ProviderConfiguration {
     @Bean
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
     fun sercoPricesResourceProvider(client: AmazonS3): SercoPricesProvider {
-        logger.info("Using S3 resource provider.")
+        logger.info("Using localstack AWS S3 provider for Serco prices.")
 
         return SercoPricesProvider { client.getObject(GetObjectRequest("serco", it)).objectContent }
     }
@@ -49,7 +49,7 @@ class ProviderConfiguration {
     @Bean
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
     fun geoameyPricesResourceProvider(client: AmazonS3): GeoamyPricesProvider {
-        logger.info("Using S3 resource provider.")
+        logger.info("Using localstack AWS S3 provider for Geoamey prices.")
 
         return GeoamyPricesProvider { client.getObject(GetObjectRequest("geoamey", it)).objectContent }
     }
