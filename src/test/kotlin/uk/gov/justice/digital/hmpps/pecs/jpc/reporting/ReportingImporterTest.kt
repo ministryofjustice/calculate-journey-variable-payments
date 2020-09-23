@@ -14,8 +14,8 @@ import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
 @Import(TestConfig::class)
-//@ActiveProfiles("localstack")
 @ActiveProfiles("test")
+//@ActiveProfiles("localstack")
 //@SpringBootTest
 internal class ReportingImporterTest {
 
@@ -25,7 +25,7 @@ internal class ReportingImporterTest {
     @Test
     fun `For the 3rd of the month, starting on the 2nd should return 2 file names`() {
         val fileNames = ReportingImporter.fileNamesForDate("moves", LocalDate.of(2020, 9, 3), 2)
-        Assertions.assertEquals(listOf("2020-09-02-moves.jsonl", "2020-09-03-moves.jsonl"), fileNames)
+        Assertions.assertEquals(listOf("2020/09/02/2020-09-02-moves.jsonl", "2020/09/03/2020-09-03-moves.jsonl"), fileNames)
     }
 
 

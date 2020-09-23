@@ -12,10 +12,10 @@ object ReportingParser {
      */
     fun <T>read(files: List<String>, f: (j: String) -> T?): Sequence<T>{
         return files.asSequence().flatMap {
-            it.split("\n").map { json ->
-                f(json)
-            }
-        }.filterNotNull()
+            it.split("\n").
+            filter{it.isNotEmpty()}.
+            map { json -> f(json) }}.
+        filterNotNull()
     }
     
     fun parseAsProfileIdToPersonId(profileFiles: List<String>) : Map<String, String>{

@@ -44,7 +44,9 @@ class ReportingImporter {
 
     companion object{
         fun fileNamesForDate(entity: String, endDate: LocalDate, startDayOfMonth: Int): List<String> {
-            return (startDayOfMonth..endDate.dayOfMonth).map { day -> "${endDate.year}-${padZero(endDate.monthValue)}-${padZero(day)}-$entity.jsonl" }
+            return (startDayOfMonth..endDate.dayOfMonth).map {
+                day -> "${endDate.year}/${padZero(endDate.monthValue)}/${padZero(day)}/${endDate.year}-${padZero(endDate.monthValue)}-${padZero(day)}-$entity.jsonl"
+            }
         }
 
         private fun padZero(value: Int) = if (value < 10) "0${value}" else value.toString()
