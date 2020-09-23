@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 
 @Configuration
 @ConditionalOnExpression("{'localstack'}.contains('\${aws.provider}')")
@@ -59,6 +60,8 @@ class ProviderConfiguration {
     @ConditionalOnProperty(name = ["aws.provider"], havingValue = "localstack")
     fun reportingResourceProvider(client: AmazonS3): ReportingProvider {
         logger.info("Using S3 resource provider.")
-        return ReportingProvider { client.getObjectAsString("geoamey", it)}
+        return ReportingProvider {
+            client.getObjectAsString("jpc", it)
+        }
     }
 }
