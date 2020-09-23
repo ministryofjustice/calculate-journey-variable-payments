@@ -2,104 +2,41 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.location
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LocationTypeTest {
 
-    @Test
-    fun `airport location type is mapped`() {
-        assertThat(LocationType.map("Airport")).isEqualTo(LocationType.AP)
-        assertThat(LocationType.map(" aiRport ")).isEqualTo(LocationType.AP)
-        assertThat(LocationType.map("AIRPORT")).isEqualTo(LocationType.AP)
+    fun testData(): Stream<Arguments> =
+            Stream.of(
+                    Arguments.of("Airport", " aiRport ", "AIRPORT", LocationType.AP),
+                    Arguments.of("Combined Court"," CombineD Court ", "COMBINED COURT", LocationType.CM),
+                    Arguments.of("County Court"," county Court ", "COUNTY COURT", LocationType.CO),
+                    Arguments.of("Crown Court"," CrowN court ", "CROWN COURT", LocationType.CC),
+                    Arguments.of("Hospital"," hOspital ", "HOSPITAL", LocationType.HP),
+                    Arguments.of("Immigration"," immIgration ", "IMMIGRATION", LocationType.IM),
+                    Arguments.of("Mag Court"," maG courT ", "MAG COURT", LocationType.MC),
+                    Arguments.of("Other"," othEr ", "OTHER", LocationType.O),
+                    Arguments.of("Police"," policE ", "POLICE", LocationType.PS),
+                    Arguments.of("Prison"," prisOn ", "PRISON", LocationType.PR),
+                    Arguments.of("sch"," sCh ", "SCH", LocationType.SCH),
+                    Arguments.of("stc"," stC ", "STC", LocationType.STC)
+            )
+
+    @ParameterizedTest
+    @MethodSource("testData")
+    fun `test all locations map exact, mixed with whitespace and all uppercase` (exact: String, mixedCaseAndWhiteSpace: String, allUpperCase: String, expected: LocationType) {
+        assertThat(LocationType.map(exact)).isEqualTo(expected)
+        assertThat(LocationType.map(mixedCaseAndWhiteSpace)).isEqualTo(expected)
+        assertThat(LocationType.map(allUpperCase)).isEqualTo(expected)
     }
 
     @Test
-    fun `combined court location type is mapped`() {
-        assertThat(LocationType.map("Combined Court")).isEqualTo(LocationType.CM)
-        assertThat(LocationType.map(" CombineD Court ")).isEqualTo(LocationType.CM)
-        assertThat(LocationType.map("COMBINED COURT")).isEqualTo(LocationType.CM)
-    }
-
-    @Test
-    fun `county court location type is mapped`() {
-        assertThat(LocationType.map("County Court")).isEqualTo(LocationType.CO)
-        assertThat(LocationType.map(" county Court ")).isEqualTo(LocationType.CO)
-        assertThat(LocationType.map("COUNTY COURT")).isEqualTo(LocationType.CO)
-    }
-
-    @Test
-    fun `crown court location type is mapped`() {
-        assertThat(LocationType.map("Crown Court")).isEqualTo(LocationType.CC)
-        assertThat(LocationType.map(" CrowN court ")).isEqualTo(LocationType.CC)
-        assertThat(LocationType.map("CROWN COURT")).isEqualTo(LocationType.CC)
-    }
-
-    @Test
-    fun `hospital location type is mapped`() {
-        assertThat(LocationType.map("Hospital")).isEqualTo(LocationType.HP)
-        assertThat(LocationType.map(" hOspital ")).isEqualTo(LocationType.HP)
-        assertThat(LocationType.map("HOSPITAL")).isEqualTo(LocationType.HP)
-    }
-
-    @Test
-    fun `immigration location type is mapped`() {
-        assertThat(LocationType.map("Immigration")).isEqualTo(LocationType.IM)
-        assertThat(LocationType.map(" immigration ")).isEqualTo(LocationType.IM)
-        assertThat(LocationType.map("IMMIGRATION")).isEqualTo(LocationType.IM)
-    }
-
-    @Test
-    fun `magistrates court location type is mapped`() {
-        assertThat(LocationType.map("Mag Court")).isEqualTo(LocationType.MC)
-        assertThat(LocationType.map(" maG courT ")).isEqualTo(LocationType.MC)
-        assertThat(LocationType.map("MAG COURT")).isEqualTo(LocationType.MC)
-    }
-
-    @Test
-    fun `other location type is mapped`() {
-        assertThat(LocationType.map("Other")).isEqualTo(LocationType.O)
-        assertThat(LocationType.map(" other ")).isEqualTo(LocationType.O)
-        assertThat(LocationType.map("OTHER")).isEqualTo(LocationType.O)
-    }
-
-    @Test
-    fun `police location type is mapped`() {
-        assertThat(LocationType.map("Police")).isEqualTo(LocationType.PS)
-        assertThat(LocationType.map(" police ")).isEqualTo(LocationType.PS)
-        assertThat(LocationType.map("POLICE")).isEqualTo(LocationType.PS)
-    }
-
-    @Test
-    fun `prison location type is mapped`() {
-        assertThat(LocationType.map("Prison")).isEqualTo(LocationType.PR)
-        assertThat(LocationType.map(" prison ")).isEqualTo(LocationType.PR)
-        assertThat(LocationType.map("PRISON")).isEqualTo(LocationType.PR)
-    }
-
-    @Test
-    fun `secure children's home location type is mapped`() {
-        assertThat(LocationType.map("SCH")).isEqualTo(LocationType.SCH)
-        assertThat(LocationType.map(" sch ")).isEqualTo(LocationType.SCH)
-    }
-
-    @Test
-    fun `secure training centre location type is mapped`() {
-        assertThat(LocationType.map("STC")).isEqualTo(LocationType.STC)
-        assertThat(LocationType.map(" stc ")).isEqualTo(LocationType.STC)
-    }
-
-    @Test
-    fun `location types are not mapped`() {
-        assertThat(LocationType.map("Alrport")).isNull()
-        assertThat(LocationType.map("C0MBINED COURT")).isNull()
-        assertThat(LocationType.map("C0UNTY COURT")).isNull()
-        assertThat(LocationType.map("CR0WN Court")).isNull()
-        assertThat(LocationType.map("H0spital")).isNull()
-        assertThat(LocationType.map("IMMIGRATI0N")).isNull()
-        assertThat(LocationType.map("MAGISTRATES COURT")).isNull()
-        assertThat(LocationType.map("0ther")).isNull()
-        assertThat(LocationType.map("Pris0n")).isNull()
-        assertThat(LocationType.map("P0l1ce")).isNull()
-        assertThat(LocationType.map("SCHH")).isNull()
-        assertThat(LocationType.map("STCC")).isNull()
+    fun `unrecognised location type is not mapped`() {
+        assertThat(LocationType.map("garbage")).isNull()
     }
 }
