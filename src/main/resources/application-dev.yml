@@ -1,6 +1,5 @@
 resources:
   provider: s3
-  endpoint.url: http://localhost:4572
 
 server:
   shutdown: immediate
