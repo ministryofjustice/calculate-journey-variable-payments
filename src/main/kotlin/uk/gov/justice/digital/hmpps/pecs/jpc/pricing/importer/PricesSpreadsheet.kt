@@ -1,17 +1,30 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer
 
 import org.apache.poi.ss.usermodel.Cell
-import org.springframework.stereotype.Component
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 
-@Component
-class PriceFromCells(private val locationRepo: LocationRepository) {
+private const val COLUMN_HEADINGS = 1
+private const val ROW_OFFSET = 2
 
-    val sheetIndex = 0
+/**
+ * Simple wrapper class to encapsulate the logic around access to data in the supplier prices spreadsheet,
+ */
+class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplier, private val locationRepo: LocationRepository) {
 
-    fun getPriceResult(supplier: Supplier, cells: List<Cell>): Price {
+    val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
+
+    /**
+     * Only rows containing prices are returned. The heading row is not included.
+     */
+    fun getRows(): List<Row> = spreadsheet.getSheetAt(0).drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
+
+    fun mapToPrice(row: Row) = getPriceResult(supplier, row.toList())
+
+    private fun getPriceResult(supplier: Supplier, cells: List<Cell>): Price {
         val journeyId = cells[0].numericCellValue
         val fromLocationName = cells[1].stringCellValue.toUpperCase().trim()
         val toLocationName = cells[2].stringCellValue.toUpperCase().trim()
@@ -32,4 +45,6 @@ class PriceFromCells(private val locationRepo: LocationRepository) {
                 journeyId = journeyId.toInt(),
                 priceInPence = (price * 100).toInt())
     }
+
+    fun addError(row: Row, error: Throwable) = errors.add(PricesSpreadsheetError(supplier, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
 }

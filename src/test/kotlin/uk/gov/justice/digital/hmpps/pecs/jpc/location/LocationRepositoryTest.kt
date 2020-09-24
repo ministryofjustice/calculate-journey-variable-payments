@@ -14,7 +14,7 @@ import javax.validation.ConstraintViolationException
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
 @DataJpaTest
-class LocationRepositoryTest {
+internal class LocationRepositoryTest {
 
     @Autowired
     lateinit var repository: LocationRepository
