@@ -24,6 +24,7 @@ class ReportingImporter {
                 moveFiles = movesContent,
                 journeyFiles = journeysContent,
                 eventFiles = eventsContent,
+//                eventFiles = listOf(),
                 profileFiles = profilesContent,
                 peopleFiles = peopleContent)
     }

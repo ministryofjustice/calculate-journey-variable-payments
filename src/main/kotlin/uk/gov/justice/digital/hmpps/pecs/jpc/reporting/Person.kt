@@ -10,7 +10,7 @@ data class Person(
         val id: String,
 
         @Json(name = "prison_number")
-        val prisonNumber: String,
+        val prisonNumber: String?,
 
 ) {
     companion object {

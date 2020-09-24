@@ -15,7 +15,7 @@ import java.time.LocalDate
 @ExtendWith(SpringExtension::class)
 @Import(TestConfig::class)
 @ActiveProfiles("test")
-//@ActiveProfiles("localstack")
+//@ActiveProfiles("dev")
 //@SpringBootTest
 internal class ReportingImporterTest {
 

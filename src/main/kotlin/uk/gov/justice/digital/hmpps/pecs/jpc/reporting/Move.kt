@@ -23,7 +23,8 @@ data class Move(
         val status: String,
 
         @Json(name = "from_location")
-        val fromLocation: String?,
+        @get: NotBlank(message = "from location cannot be blank")
+        val fromLocation: String,
 
         @Json(name = "to_location")
         val toLocation: String? = null,
