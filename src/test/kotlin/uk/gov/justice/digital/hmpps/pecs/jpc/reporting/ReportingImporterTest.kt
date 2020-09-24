@@ -33,8 +33,8 @@ internal class ReportingImporterTest {
     fun `Get files for date should ignore missing days`() {
         val content = importer.import(LocalDate.of(2020, 9, 3))
 
-        // There should be 4 unique moves
-        Assertions.assertEquals(4, content.size)
+        // There should be 3 moves over the two files that are rejected or cancelled
+        Assertions.assertEquals(3, content.size)
     }
 
 }

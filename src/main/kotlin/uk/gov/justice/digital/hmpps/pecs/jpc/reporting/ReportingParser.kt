@@ -35,16 +35,22 @@ object ReportingParser {
     }
 
     fun parseAsMoves(moveFiles: List<String>): Collection<Move> {
-        return read(moveFiles) { Move.fromJson(it) }.associateBy(Move::id).values
+        return read(moveFiles) { Move.fromJson(it) }.
+        filter { MoveStatus.statuses.contains(it.status) }.
+        associateBy(Move::id).values
     }
 
 
     fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
-        return read(journeyFiles) { Journey.fromJson(it) }.associateBy(Journey::id).values.groupBy(Journey::moveId)
+        return read(journeyFiles) { Journey.fromJson(it) }.
+        filter { JourneyState.states.contains(it.state) }.
+        associateBy(Journey::id).values.groupBy(Journey::moveId)
     }
 
     fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
-        return read(eventFiles) { Event.fromJson(it) }.groupBy(Event::eventableId)
+        return read(eventFiles) { Event.fromJson(it) }.
+        filter { EventType.types.contains(it.type) }.
+        groupBy(Event::eventableId)
     }
 
     fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<MovePersonJourneysEvents> {

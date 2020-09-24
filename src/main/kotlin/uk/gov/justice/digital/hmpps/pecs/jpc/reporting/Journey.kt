@@ -44,3 +44,12 @@ data class Journey(
         }
     }
 }
+
+enum class JourneyState(val value: String) {
+    CANCELLED("cancelled"),
+    COMPLETED("completed");
+
+    companion object{
+        val states = values().map { it.value }
+    }
+}

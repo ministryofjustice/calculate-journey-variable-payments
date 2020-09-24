@@ -38,3 +38,12 @@ data class Move(
         }
     }
 }
+
+enum class MoveStatus(val value: String) {
+    CANCELLED("cancelled"),
+    COMPLETED("completed");
+
+    companion object{
+        val statuses = values().map { it.value }
+    }
+}
