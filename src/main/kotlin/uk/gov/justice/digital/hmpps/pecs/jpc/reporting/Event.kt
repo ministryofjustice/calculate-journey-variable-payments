@@ -44,3 +44,23 @@ data class Event constructor(
         }
     }
 }
+
+enum class EventType(val value: String) {
+    MOVE_START("MoveStart"),
+    MOVE_CANCEL("MoveCancel"),
+    MOVE_COMPLETE("MoveComplete"),
+    MOVE_LOCKOUT("MoveLockout"),
+    MOVE_LODGING_START("MoveLodgingStart"),
+    MOVE_LODGING_END("MoveLodgingEnd"),
+    MOVE_REDIRECT("MoveRedirect"),
+    JOURNEY_START("JourneyStart"),
+    JOURNEY_END("JourneyEnd"),
+    JOURNEY_LOCKOUT("JourneyLockout"),
+    JOURNEY_LODGING("JourneyLodging"),
+    JOURNEY_CANCEL("JourneyCancel"),
+    ;
+
+    companion object{
+        val types = values().map { it.value }
+    }
+}

@@ -23,7 +23,8 @@ data class Move(
         val status: String,
 
         @Json(name = "from_location")
-        val fromLocation: String?,
+        @get: NotBlank(message = "from location cannot be blank")
+        val fromLocation: String,
 
         @Json(name = "to_location")
         val toLocation: String? = null,
@@ -35,5 +36,14 @@ data class Move(
             fieldConverter(EventDate::class, dateConverter).
             parse<Move>(json)
         }
+    }
+}
+
+enum class MoveStatus(val value: String) {
+    CANCELLED("cancelled"),
+    COMPLETED("completed");
+
+    companion object{
+        val statuses = values().map { it.value }
     }
 }

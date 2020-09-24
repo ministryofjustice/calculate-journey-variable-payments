@@ -15,7 +15,7 @@ import java.time.LocalDate
 @ExtendWith(SpringExtension::class)
 @Import(TestConfig::class)
 @ActiveProfiles("test")
-//@ActiveProfiles("localstack")
+//@ActiveProfiles("dev")
 //@SpringBootTest
 internal class ReportingImporterTest {
 
@@ -33,8 +33,9 @@ internal class ReportingImporterTest {
     fun `Get files for date should ignore missing days`() {
         val content = importer.import(LocalDate.of(2020, 9, 3))
 
-        // There should be 4 unique moves
-        Assertions.assertEquals(4, content.size)
+        // There should be 3 moves (unique moves that are rejected or cancelled)
+        // M2 should not be present because it's in the requested state only
+        Assertions.assertEquals(setOf("M1", "M3", "M4"), content.map { it.move.id }.toSet())
     }
 
 }

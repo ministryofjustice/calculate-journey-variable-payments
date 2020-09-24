@@ -30,7 +30,7 @@ data class Journey(
 
         @Json(name = "from_location")
         @get: NotBlank(message = "from location cannot be blank")
-        val fromLocation: String?,
+        val fromLocation: String,
 
         @Json(name = "to_location")
         val toLocation: String? = null,
@@ -42,5 +42,14 @@ data class Journey(
             fieldConverter(EventDateTime::class, dateTimeConverter).
             parse<Journey>(json)
         }
+    }
+}
+
+enum class JourneyState(val value: String) {
+    CANCELLED("cancelled"),
+    COMPLETED("completed");
+
+    companion object{
+        val states = values().map { it.value }
     }
 }
