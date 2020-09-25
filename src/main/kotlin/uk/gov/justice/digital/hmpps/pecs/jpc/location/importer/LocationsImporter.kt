@@ -30,7 +30,7 @@ class LocationsImporter(private val repo: LocationRepository,
 
         val spreadsheet = LocationsSpreadsheet(locationsWorkbook)
 
-        LocationsSpreadsheet.Tab.values().map { tab ->
+        LocationsSpreadsheet.Tab.values().forEach { tab ->
             spreadsheet.getRowsFrom(tab).forEach { row ->
                 Result.runCatching {
                     spreadsheet.mapToLocation(row).let {

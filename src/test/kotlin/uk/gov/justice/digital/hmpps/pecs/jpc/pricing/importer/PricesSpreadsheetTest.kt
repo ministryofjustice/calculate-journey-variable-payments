@@ -35,7 +35,7 @@ internal class PricesSpreadsheetTest {
 
         @Test
         fun `errors are recorded`() {
-            val exception: RuntimeException = RuntimeException("something went wrong")
+            val exception = RuntimeException("something went wrong")
 
             spreadsheet.addError(row, exception)
 
@@ -46,13 +46,11 @@ internal class PricesSpreadsheetTest {
     @Nested
     inner class MappingRowsPrice {
 
-        private val row: Row = sheet.createRow(1)
-
-        init {
-            row.createCell(0).setCellValue(1.0)
-            row.createCell(1).setCellValue("from site")
-            row.createCell(2).setCellValue("to site")
-            row.createCell(3).setCellValue(100.00)
+        private val row: Row = sheet.createRow(1).apply {
+            this.createCell(0).setCellValue(1.0)
+            this.createCell(1).setCellValue("from site")
+            this.createCell(2).setCellValue("to site")
+            this.createCell(3).setCellValue(100.00)
         }
 
         @Test
