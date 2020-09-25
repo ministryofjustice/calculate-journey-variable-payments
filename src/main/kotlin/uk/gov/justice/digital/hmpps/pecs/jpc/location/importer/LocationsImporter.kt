@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Component
-class LocationsImporter(private val repo: LocationRepository,
+class LocationsImporter(private val locationRepo: LocationRepository,
                         private val clock: Clock,
                         private val schedule34LocationsProvider: Schedule34LocationsProvider) {
 
@@ -25,22 +25,19 @@ class LocationsImporter(private val repo: LocationRepository,
     private lateinit var locationsFile: String
 
     fun import(spreadsheet: LocationsSpreadsheet) {
-        var total = 0
+        val count = locationRepo.count();
 
         LocationsSpreadsheet.Tab.values().forEach { tab ->
             spreadsheet.getRowsFrom(tab).forEach { row ->
-                Result.runCatching {
-                    spreadsheet.mapToLocation(row).let {
-                        repo.save(it)
-                        total++
-                    }
-                }.onFailure { spreadsheet.addError(tab, row, it) }
+                Result.runCatching { spreadsheet.mapToLocation(row).let { locationRepo.save(it) } }.onFailure { spreadsheet.addError(tab, row, it) }
             }
         }
 
         spreadsheet.errors.forEach { logger.info(it.toString()) }
 
-        logger.info("LOCATIONS INSERTED: $total. TOTAL ERRORS: ${spreadsheet.errors.size}")
+        val inserted = locationRepo.count() - count
+
+        logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
     fun import(): ImportStatus {
@@ -51,7 +48,7 @@ class LocationsImporter(private val repo: LocationRepository,
 
             logger.info("Location data import started: $start")
 
-            repo.deleteAll()
+            locationRepo.deleteAll()
 
             try {
                 schedule34LocationsProvider.get(locationsFile).use { locations ->

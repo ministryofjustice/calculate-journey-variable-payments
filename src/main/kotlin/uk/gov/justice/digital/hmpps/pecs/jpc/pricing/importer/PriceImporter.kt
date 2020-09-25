@@ -35,20 +35,17 @@ class PriceImporter(private val priceRepo: PriceRepository,
     private val logger = LoggerFactory.getLogger(javaClass)
 
     internal fun import(spreadsheet: PricesSpreadsheet) {
-        var total = 0
+        val count = priceRepo.count()
 
         spreadsheet.getRows().forEach { row ->
-            Result.runCatching {
-                spreadsheet.mapToPrice(row).let {
-                    priceRepo.save(it)
-                    total++
-                }
-            }.onFailure { spreadsheet.addError(row, it) }
+            Result.runCatching { spreadsheet.mapToPrice(row).let { priceRepo.save(it) } }.onFailure { spreadsheet.addError(row, it) }
         }
 
         spreadsheet.errors.forEach { logger.info(it.toString()) }
 
-        logger.info("${spreadsheet.supplier} PRICES INSERTED: $total. TOTAL ERRORS: ${spreadsheet.errors.size}")
+        val inserted = priceRepo.count() - count
+
+        logger.info("${spreadsheet.supplier} PRICES INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
     private fun import(prices: InputStream, supplier: Supplier) {
