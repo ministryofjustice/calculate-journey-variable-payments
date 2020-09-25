@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Workbook
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -35,5 +36,10 @@ internal class LocationsSpreadsheetTest {
         internal fun `court location type is mapped correctly`() {
             assertThat(spreadsheet.mapToLocation(listOf(ignored, supportedLocationType, site, agency)).locationType).isEqualTo(LocationType.CC)
         }
+    }
+
+    @AfterEach
+    fun after() {
+        spreadsheet.close()
     }
 }

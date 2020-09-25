@@ -6,14 +6,15 @@ import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import java.io.Closeable
 
 private const val COLUMN_HEADINGS = 1
 private const val ROW_OFFSET = 2
 
 /**
- * Simple wrapper class to encapsulate the logic around access to data in the supplier prices spreadsheet,
+ * Simple wrapper class to encapsulate the logic around access to data in the supplier prices spreadsheet. When finished with the spreadsheet should be closed.
  */
-class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplier, private val locationRepo: LocationRepository) {
+class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplier, private val locationRepo: LocationRepository) : Closeable {
 
     val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
 
@@ -47,4 +48,8 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
     }
 
     fun addError(row: Row, error: Throwable) = errors.add(PricesSpreadsheetError(supplier, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
+
+    override fun close() {
+        spreadsheet.close()
+    }
 }

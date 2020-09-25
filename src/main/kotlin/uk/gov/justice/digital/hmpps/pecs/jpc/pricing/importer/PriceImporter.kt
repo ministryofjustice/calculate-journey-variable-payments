@@ -34,10 +34,8 @@ class PriceImporter(private val priceRepo: PriceRepository,
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    internal fun import(pricesWorkbook: XSSFWorkbook, supplier: Supplier) {
+    internal fun import(spreadsheet: PricesSpreadsheet) {
         var total = 0
-
-        val spreadsheet = PricesSpreadsheet(pricesWorkbook, supplier, locationRepository)
 
         spreadsheet.getRows().forEach { row ->
             Result.runCatching {
@@ -50,12 +48,12 @@ class PriceImporter(private val priceRepo: PriceRepository,
 
         spreadsheet.errors.forEach { logger.info(it.toString()) }
 
-        logger.info("$supplier PRICES INSERTED: $total. TOTAL ERRORS: ${spreadsheet.errors.size}")
+        logger.info("${spreadsheet.supplier} PRICES INSERTED: $total. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
     private fun import(prices: InputStream, supplier: Supplier) {
-        XSSFWorkbook(prices).use {
-            import(it, supplier)
+        PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository).use {
+            import(it)
         }
     }
 

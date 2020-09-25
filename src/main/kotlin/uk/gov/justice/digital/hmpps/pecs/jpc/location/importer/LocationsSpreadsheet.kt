@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import java.io.Closeable
 
 private const val TYPE = 1
 private const val SITE = 2
@@ -13,9 +14,9 @@ private const val COLUMN_HEADINGS = 1
 private const val ROW_OFFSET = 2
 
 /**
- * Simple wrapper class to encapsulate the logic around access to data in the locations spreadsheet,
+ * Simple wrapper class to encapsulate the logic around access to data in the locations spreadsheet. When finished with the spreadsheet should be closed.
  */
-class LocationsSpreadsheet(private val spreadsheet: Workbook) {
+class LocationsSpreadsheet(private val spreadsheet: Workbook) : Closeable {
 
     enum class Tab(val label: String) {
         COURT("Courts"),
@@ -45,4 +46,8 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook) {
     fun mapToLocation(row: Row): Location = mapToLocation(row.toList())
 
     fun addError(tab: Tab, row: Row, error: Throwable) = errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
+
+    override fun close() {
+        spreadsheet.close()
+    }
 }

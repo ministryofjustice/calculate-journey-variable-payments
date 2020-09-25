@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.assertj.core.api.Assertions.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
@@ -79,5 +80,10 @@ internal class PricesSpreadsheetTest {
                     .isInstanceOf(RuntimeException::class.java)
                     .withFailMessage("Missing from location UNKNOWN TO SITE for supplier GEOAMEY")
         }
+    }
+
+    @AfterEach
+    fun after() {
+        spreadsheet.close()
     }
 }

@@ -24,11 +24,8 @@ class LocationsImporter(private val repo: LocationRepository,
     @Value("\${import-files.locations}")
     private lateinit var locationsFile: String
 
-    fun import(locationsWorkbook: XSSFWorkbook) {
-
+    fun import(spreadsheet: LocationsSpreadsheet) {
         var total = 0
-
-        val spreadsheet = LocationsSpreadsheet(locationsWorkbook)
 
         LocationsSpreadsheet.Tab.values().forEach { tab ->
             spreadsheet.getRowsFrom(tab).forEach { row ->
@@ -58,7 +55,7 @@ class LocationsImporter(private val repo: LocationRepository,
 
             try {
                 schedule34LocationsProvider.get(locationsFile).use { locations ->
-                    XSSFWorkbook(locations).use {
+                    LocationsSpreadsheet(XSSFWorkbook(locations)).use {
                         import(it)
 
                         return ImportStatus.DONE
