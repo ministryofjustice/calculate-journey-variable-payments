@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
@@ -17,11 +18,11 @@ import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Component
-class PriceImporter(private val locationRepo: LocationRepository,
-                    private val priceRepo: PriceRepository,
+class PriceImporter(private val priceRepo: PriceRepository,
                     private val clock: Clock,
                     private val sercoPrices: SercoPricesProvider,
-                    private val geoameyPrices: GeoamyPricesProvider) {
+                    private val geoameyPrices: GeoamyPricesProvider,
+                    private val locationRepository: LocationRepository) {
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
@@ -33,32 +34,23 @@ class PriceImporter(private val locationRepo: LocationRepository,
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(workbook: XSSFWorkbook, supplier: Supplier) {
-        val priceFromCells = PriceFromCells(locationRepo)
-        val sheet = workbook.getSheetAt(priceFromCells.sheetIndex)
+    internal fun import(spreadsheet: PricesSpreadsheet) {
+        val count = priceRepo.count()
 
-        val errors: MutableList<String?> = mutableListOf()
-        val rows = sheet.drop(1).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
-
-        var total = 0
-
-        rows.forEach { r ->
-            total++
-            val rowCells = r.iterator().asSequence().toList()
-            Result.runCatching { priceRepo.save(priceFromCells.getPriceResult(supplier, rowCells)) }
-                    .onFailure {
-                        errors.add(it.message + " " + it.cause.toString())
-                    }
+        spreadsheet.getRows().forEach { row ->
+            Result.runCatching { spreadsheet.mapToPrice(row).let { priceRepo.save(it) } }.onFailure { spreadsheet.addError(row, it) }
         }
 
-        errors.filterNotNull().groupBy { it }.toSortedMap().forEach { logger.info(" ${supplier.name}:  ${it.value.size} ${it.key}") }
+        spreadsheet.errors.forEach { logger.info(it.toString()) }
 
-        logger.info("$supplier PRICES INSERTED: ${total - errors.size} out of $total.")
+        val inserted = priceRepo.count() - count
+
+        logger.info("${spreadsheet.supplier} PRICES INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
     private fun import(prices: InputStream, supplier: Supplier) {
-        XSSFWorkbook(prices).use {
-            import(it, supplier)
+        PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository).use {
+            import(it)
         }
     }
 

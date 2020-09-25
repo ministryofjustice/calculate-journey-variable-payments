@@ -12,46 +12,32 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
-private const val COLUMN_HEADINGS = 1
-
 @Component
-class LocationsImporter(private val repo: LocationRepository,
+class LocationsImporter(private val locationRepo: LocationRepository,
                         private val clock: Clock,
                         private val schedule34LocationsProvider: Schedule34LocationsProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val rowOffset = 2
+
     private val running = AtomicBoolean(false)
 
     @Value("\${import-files.locations}")
     private lateinit var locationsFile: String
 
-    fun import(locationsWorkbook: XSSFWorkbook) {
+    fun import(spreadsheet: LocationsSpreadsheet) {
+        val count = locationRepo.count();
 
-        val errors: MutableList<LocationImportError?> = mutableListOf()
-
-        var total = 0
-
-        LocationTab.values().map { locationTab ->
-            val sheet = locationTab.sheet(locationsWorkbook)
-
-            val rows = sheet.drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
-
-            rows.forEachIndexed{ index, row ->
-                run {
-                    Result.runCatching {
-                        locationTab.map(row).let {
-                            repo.save(it)
-                            total++
-                        }
-                    }.onFailure { errors.add(LocationImportError(locationTab, index + rowOffset, it.cause?.cause ?: it)) }
-                }
+        LocationsSpreadsheet.Tab.values().forEach { tab ->
+            spreadsheet.getRowsFrom(tab).forEach { row ->
+                Result.runCatching { spreadsheet.mapToLocation(row).let { locationRepo.save(it) } }.onFailure { spreadsheet.addError(tab, row, it) }
             }
         }
 
-        errors.filterNotNull().forEach { logger.info(it.toString()) }
+        spreadsheet.errors.forEach { logger.info(it.toString()) }
 
-        logger.info("LOCATIONS INSERTED: $total. TOTAL ERRORS: ${errors.size}")
+        val inserted = locationRepo.count() - count
+
+        logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
     fun import(): ImportStatus {
@@ -62,11 +48,11 @@ class LocationsImporter(private val repo: LocationRepository,
 
             logger.info("Location data import started: $start")
 
-            repo.deleteAll()
+            locationRepo.deleteAll()
 
             try {
                 schedule34LocationsProvider.get(locationsFile).use { locations ->
-                    XSSFWorkbook(locations).use {
+                    LocationsSpreadsheet(XSSFWorkbook(locations)).use {
                         import(it)
 
                         return ImportStatus.DONE

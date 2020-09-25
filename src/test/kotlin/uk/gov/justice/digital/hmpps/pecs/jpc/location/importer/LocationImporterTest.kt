@@ -22,6 +22,7 @@ class LocationImporterTest(
 
     private lateinit var locationsImporter: LocationsImporter
     private lateinit var workbook: XSSFWorkbook
+    private lateinit var locationsSpreadsheet: LocationsSpreadsheet
 
     @BeforeEach
     fun before() {
@@ -40,12 +41,14 @@ class LocationImporterTest(
                 headerRow.createCell(index).setCellValue(s)
             }
         }
+
+        locationsSpreadsheet = LocationsSpreadsheet(workbook)
     }
 
     @Test
     @Disabled
     fun `Assert workbook with only headers imports without errors`() {
-        val errors = locationsImporter.import(workbook)
+        val errors = locationsImporter.import(LocationsSpreadsheet(workbook))
 
 //        assertThat(errors).isEmpty()
     }
@@ -53,7 +56,7 @@ class LocationImporterTest(
     @Test
     @Disabled
     fun `Assert empty site name returns error`() {
-        val courtsSheet = workbook.getSheet(LocationTab.COURT.tabName)
+        val courtsSheet = workbook.getSheet(LocationsSpreadsheet.Tab.COURT.label)
         val row = courtsSheet.createRow(1)
 
         row.createCell(0).setCellValue("")
@@ -61,13 +64,13 @@ class LocationImporterTest(
         row.createCell(2).setCellValue("") // site name
         row.createCell(3).setCellValue("NOM100")
 
-        val errors = locationsImporter.import(workbook)
+        val errors = locationsImporter.import(LocationsSpreadsheet(workbook))
 
 //        assertThat(errors).isNotEmpty
     }
 
     @AfterEach
     fun after() {
-        workbook.close()
+        locationsSpreadsheet.close()
     }
 }
