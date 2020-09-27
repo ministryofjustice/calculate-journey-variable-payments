@@ -7,11 +7,18 @@ data class MovePrice(
         val movePersonJourneysEvents: MovePersonJourneysEvents,
         val journeyPrices: List<JourneyPrice>
 ){
-
+    /**
+     * Returns the price in pence if all billable journeys have a price
+     * Otherwise returns null
+     */
+    fun totalInPence(): Int? {
+        return if(journeyPrices.any{ it.priceInPence == null }) null
+        else journeyPrices.filter {  it.journeyWithEvents.journey.billable }.sumBy { it.priceInPence!! }
+    }
 }
 
 data class JourneyPrice(
-        val journey: JourneyWithEvents,
+        val journeyWithEvents: JourneyWithEvents,
         val priceInPence: Int?
 ){
 

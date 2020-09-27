@@ -1,10 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import com.beust.klaxon.Klaxon
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 val defaultDateTime = LocalDateTime.parse("2020-06-16T10:20:30+01:00", DateTimeFormatter.ISO_DATE_TIME)
 val defaultDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
@@ -19,6 +23,31 @@ const val defaultPersonId="PE1"
 val defaultSupplier =  Supplier.SERCO.reportingName()
 
 fun json(vararg x: Any) = x.joinToString("\n") { Klaxon().toJsonString(it) }
+
+fun locationFactory(
+        locationType: LocationType = LocationType.PR,
+        nomisAgencyId : String = "WYU",
+        siteName: String = "from"
+): Location{
+    return Location(locationType, nomisAgencyId, siteName)
+}
+
+fun priceFactory(
+        supplier: Supplier = Supplier.SERCO,
+        fromSiteName: String = "from",
+        toSiteName: String = "to",
+        priceInPence: Int = 101): Price {
+
+    return Price(
+            journeyId = 1,
+            supplier = supplier,
+            fromLocationName = fromSiteName,
+            fromLocationId = UUID.randomUUID(),
+            toLocationName = toSiteName,
+            toLocationId = UUID.randomUUID(),
+            priceInPence = priceInPence
+    )
+}
 
 fun moveFactory(
         moveId: String = defaultMoveId,

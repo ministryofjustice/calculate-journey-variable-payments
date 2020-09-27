@@ -29,8 +29,7 @@ class PriceCalculator(
 
     }
 
-    private fun priceKey(price: Price) = "${price.fromLocationName}-${price.toLocationName}"
-    private fun priceKey(journey: Journey) =
+    fun priceKey(journey: Journey) =
             "${nomisAgencyId2Location[journey.fromLocation]?.siteName}-${nomisAgencyId2Location[journey.toLocation]?.siteName}"
 
 
@@ -40,5 +39,9 @@ class PriceCalculator(
             val journeyPrice = sercoJourney2price[priceKey(it.journeysWithEvents[0].journey)]?.priceInPence
             MovePrice(it, listOf(JourneyPrice(it.journeysWithEvents[0], journeyPrice)))
         }
+    }
+
+    companion object{
+        fun priceKey(price: Price) = "${price.fromLocationName}-${price.toLocationName}"
     }
 }
