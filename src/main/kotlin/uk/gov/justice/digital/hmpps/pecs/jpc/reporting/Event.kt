@@ -13,9 +13,7 @@ data class Event constructor(
         @get: NotBlank(message = "type cannot be blank")
         val type: String,
 
-        @Json(name = "actioned_by")
-        @get: NotBlank(message = "actioned by cannot be blank")
-        val actionedBy: String,
+        val supplier: String? = null,
 
         @Json(name = "eventable_type")
         @get: NotBlank(message = "eventable type cannot be blank")
@@ -46,7 +44,8 @@ data class Event constructor(
 }
 
 enum class EventType(val value: String) {
-    MOVE_START("MoveStart"),
+
+MOVE_START("MoveStart"),
     MOVE_CANCEL("MoveCancel"),
     MOVE_COMPLETE("MoveComplete"),
     MOVE_LOCKOUT("MoveLockout"),

@@ -40,4 +40,9 @@ data class Price(
         val addedAt: LocalDateTime = LocalDateTime.now()
 )
 
-enum class Supplier {SERCO, GEOAMEY}
+enum class Supplier {
+        SERCO,
+        GEOAMEY;
+
+        fun reportingName() = name.toLowerCase()
+}

@@ -13,7 +13,7 @@ data class Journey(
         @Json(name = "move_id")
         val moveId: String,
 
-        val billable: Boolean?,
+        val billable: Boolean,
 
         @get: NotBlank(message = "state cannot be blank")
         val state: String,

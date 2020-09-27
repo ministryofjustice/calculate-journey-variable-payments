@@ -34,6 +34,7 @@ class ReportingImporter {
         val fileNames = fileNamesForDate(entity, date, startDayOfMonth)
         return fileNames.map {
             try {
+                logger.info("Retrieveing file $it")
                 provider.get(it)
             }
             catch (e: Exception){
@@ -52,4 +53,5 @@ class ReportingImporter {
 
         private fun padZero(value: Int) = if (value < 10) "0${value}" else value.toString()
     }
+
 }

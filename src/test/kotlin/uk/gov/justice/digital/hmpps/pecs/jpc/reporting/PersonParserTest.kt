@@ -12,7 +12,7 @@ class PersonParserTest {
 
         val parsedPerson = Person.fromJson(personJson)
 
-       Assertions.assertEquals(cannedPerson(), parsedPerson)
+       Assertions.assertEquals(personFactory(), parsedPerson)
     }
 
 }

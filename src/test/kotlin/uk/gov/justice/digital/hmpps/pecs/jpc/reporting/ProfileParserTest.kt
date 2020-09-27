@@ -13,7 +13,7 @@ class ProfileParserTest {
 
         val parsedProfile = Profile.fromJson(profileJson)
 
-       Assertions.assertEquals(cannedProfile(), parsedProfile)
+       Assertions.assertEquals(profileFactory(), parsedProfile)
     }
 
 }
