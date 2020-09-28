@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 
 @Component
@@ -38,7 +37,7 @@ class LocationsImporter(private val locationRepo: LocationRepository,
         locationRepo.deleteAll()
 
         schedule34LocationsProvider.get(locationsFile).use { locations ->
-            LocationsSpreadsheet(XSSFWorkbook(locations)).use {
+            LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {
                 import(it)
             }
         }

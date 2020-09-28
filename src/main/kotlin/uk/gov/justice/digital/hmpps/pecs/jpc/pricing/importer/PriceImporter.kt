@@ -7,16 +7,10 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 import java.io.InputStream
-import java.time.Clock
-import java.time.Duration
-import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicBoolean
 
 @Component
 class PriceImporter(private val priceRepo: PriceRepository,

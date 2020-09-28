@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.io.Closeable
 
 private const val COLUMN_HEADINGS = 1
-private const val ROW_OFFSET = 2
+private const val ROW_OFFSET = 1
 
 /**
  * Simple wrapper class to encapsulate the logic around access to data in the supplier prices spreadsheet. When finished with the spreadsheet should be closed.

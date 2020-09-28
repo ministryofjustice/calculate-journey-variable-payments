@@ -40,7 +40,7 @@ internal class PricesSpreadsheetTest {
 
             spreadsheet.addError(row, exception)
 
-            assertThat(spreadsheet.errors).containsOnly(PricesSpreadsheetError(Supplier.GEOAMEY, 2, exception))
+            assertThat(spreadsheet.errors).containsOnly(PricesSpreadsheetError(Supplier.GEOAMEY, row.rowNum + 1, exception))
         }
     }
 

@@ -6,4 +6,6 @@ import java.util.*
 interface LocationRepository : CrudRepository<Location, UUID> {
 
     fun findBySiteName(siteName: String) : Location?
+
+    fun findByNomisAgencyId(id: String) : Location?
 }
