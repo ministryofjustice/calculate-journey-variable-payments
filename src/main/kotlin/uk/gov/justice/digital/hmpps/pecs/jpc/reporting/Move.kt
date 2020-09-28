@@ -10,6 +10,9 @@ data class Move(
         @get: NotBlank(message = "id cannot be blank")
         val id: String,
 
+        @get: NotBlank(message = "supplier cannot be blank")
+        val supplier: String,
+
         @Json(name = "profile_id")
         val profileId: String?,
 
@@ -40,7 +43,6 @@ data class Move(
 }
 
 enum class MoveStatus(val value: String) {
-    CANCELLED("cancelled"),
     COMPLETED("completed");
 
     companion object{

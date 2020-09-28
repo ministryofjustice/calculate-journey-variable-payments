@@ -4,3 +4,6 @@ resources:
 
 server:
   shutdown: immediate
+
+S3_REPORTING_BUCKET_NAME:
+  jpc

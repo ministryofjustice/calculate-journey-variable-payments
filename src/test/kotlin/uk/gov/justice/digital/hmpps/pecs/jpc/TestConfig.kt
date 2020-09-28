@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.time.Clock
 

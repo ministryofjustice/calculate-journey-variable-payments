@@ -77,15 +77,13 @@ internal class ReportingParserTest {
     }
 
     @Test
-    fun `Get import moves should return only unique, completed or cancelled moves`() {
+    fun `Get import moves should return only unique, completed moves`() {
+
         val moves = ReportingParser.parseAsMoves(moveReports())
-        //There should be 2 moves because the first one in both files is the same
-        Assertions.assertEquals(2, moves.size)
+        Assertions.assertEquals(1, moves.size)
 
-        // M1 should be complete, M4 cancelled
+        // M1 should be complete
         Assertions.assertEquals(MoveStatus.COMPLETED.value, moves.find{it.id == "M1"}?.status)
-        Assertions.assertEquals(MoveStatus.CANCELLED.value, moves.find{it.id == "M4"}?.status)
-
     }
 
     @Test
@@ -130,6 +128,7 @@ internal class ReportingParserTest {
         Assertions.assertEquals(1, events.getValue("M2").size)
     }
 
+
     @Test
     fun `import all`() {
         val movesWithJourneysAndEvents = ReportingParser.parseAll(
@@ -140,8 +139,8 @@ internal class ReportingParserTest {
                 eventFiles = eventReports()
         )
 
-        // There should be 2 distinct moves from the 5 in the files
-        Assertions.assertEquals(2, movesWithJourneysAndEvents.size)
+        // There should be 1 unique move (completed) from the 5 in the files
+        Assertions.assertEquals(1, movesWithJourneysAndEvents.size)
 
         val move1 = movesWithJourneysAndEvents.find { it.move.id == "M1" }!!
 

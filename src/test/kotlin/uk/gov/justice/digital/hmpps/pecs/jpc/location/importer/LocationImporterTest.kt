@@ -9,7 +9,6 @@ import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import java.time.Clock
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -17,7 +16,6 @@ import java.time.Clock
 @ContextConfiguration(classes = [TestConfig::class])
 class LocationImporterTest(
         @Autowired val repo: LocationRepository,
-        @Autowired val clock: Clock,
         @Autowired val spreadsheetProvider: Schedule34LocationsProvider) {
 
     private lateinit var locationsImporter: LocationsImporter
@@ -26,7 +24,7 @@ class LocationImporterTest(
 
     @BeforeEach
     fun before() {
-        locationsImporter = LocationsImporter(repo, clock, spreadsheetProvider)
+        locationsImporter = LocationsImporter(repo, spreadsheetProvider)
         workbook = XSSFWorkbook()
 
         val sheetNames = listOf("QUERIES", "JPCU", "JPCNOMIS", "NOMIS", "Overview", "Courts", "Police", "Police Info",

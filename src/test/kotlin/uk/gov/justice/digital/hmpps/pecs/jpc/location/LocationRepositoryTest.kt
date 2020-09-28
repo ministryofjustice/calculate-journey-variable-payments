@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import javax.validation.ConstraintViolationException
 
-@ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
 @DataJpaTest
 internal class LocationRepositoryTest {

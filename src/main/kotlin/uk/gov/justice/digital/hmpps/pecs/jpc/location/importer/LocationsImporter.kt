@@ -7,19 +7,13 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
-import java.time.Clock
-import java.time.Duration
-import java.time.LocalDateTime
-import java.util.concurrent.atomic.AtomicBoolean
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 
 @Component
 class LocationsImporter(private val locationRepo: LocationRepository,
-                        private val clock: Clock,
-                        private val schedule34LocationsProvider: Schedule34LocationsProvider) {
+                        private val schedule34LocationsProvider: Schedule34LocationsProvider) : Importer<Unit> {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    private val running = AtomicBoolean(false)
 
     @Value("\${import-files.locations}")
     private lateinit var locationsFile: String
@@ -40,35 +34,13 @@ class LocationsImporter(private val locationRepo: LocationRepository,
         logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
-    fun import(): ImportStatus {
-        // Imposed a crude temporary locking solution to prevent DB clashes/conflicts.
-        if (running.compareAndSet(false, true)) {
+    override fun import() {
+        locationRepo.deleteAll()
 
-            val start = LocalDateTime.now(clock)
-
-            logger.info("Location data import started: $start")
-
-            locationRepo.deleteAll()
-
-            try {
-                schedule34LocationsProvider.get(locationsFile).use { locations ->
-                    LocationsSpreadsheet(XSSFWorkbook(locations)).use {
-                        import(it)
-
-                        return ImportStatus.DONE
-                    }
-                }
-            } finally {
-                running.set(false)
-
-                val end = LocalDateTime.now(clock)
-
-                logger.info("Location import ended: $end. Time taken (in seconds): ${Duration.between(start, end).seconds}")
+        schedule34LocationsProvider.get(locationsFile).use { locations ->
+            LocationsSpreadsheet(XSSFWorkbook(locations)).use {
+                import(it)
             }
         }
-
-        logger.info("Import already in progress...")
-
-        return ImportStatus.IN_PROGRESS
     }
 }
