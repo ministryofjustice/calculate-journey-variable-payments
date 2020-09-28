@@ -40,13 +40,13 @@ class LocationImporterTest(
             }
         }
 
-        locationsSpreadsheet = LocationsSpreadsheet(workbook)
+        locationsSpreadsheet = LocationsSpreadsheet(workbook, repo)
     }
 
     @Test
     @Disabled
     fun `Assert workbook with only headers imports without errors`() {
-        val errors = locationsImporter.import(LocationsSpreadsheet(workbook))
+        val errors = locationsImporter.import(LocationsSpreadsheet(workbook, repo))
 
 //        assertThat(errors).isEmpty()
     }
@@ -62,7 +62,7 @@ class LocationImporterTest(
         row.createCell(2).setCellValue("") // site name
         row.createCell(3).setCellValue("NOM100")
 
-        val errors = locationsImporter.import(LocationsSpreadsheet(workbook))
+        val errors = locationsImporter.import(LocationsSpreadsheet(workbook, repo))
 
 //        assertThat(errors).isNotEmpty
     }
