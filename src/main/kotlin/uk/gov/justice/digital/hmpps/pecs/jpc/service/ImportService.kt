@@ -2,13 +2,17 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Import
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculatorFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.output.OutputSpreadsheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
+import java.io.File
+import java.io.OutputStream
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
@@ -57,19 +61,18 @@ class ImportService(
 
     fun importReports() = importUnlessLocked(reportingImporter)
 
-    fun calculatePrices(): String {
-        return if (importLocations().second == ImportStatus.IN_PROGRESS) ImportStatus.IN_PROGRESS.name
-        else if (importPrices().second == ImportStatus.IN_PROGRESS) ImportStatus.IN_PROGRESS.name
+    fun spreadsheet(): File? {
+        return if (importLocations().second == ImportStatus.IN_PROGRESS) null
+        else if (importPrices().second == ImportStatus.IN_PROGRESS) null
         else {
             val (reports, status) = importReports()
             if (reports != null) {
                 val calculator = calculatorFactory.calculator(reports.toList())
                 val prices = calculator.standardPrices(Supplier.SERCO)
-                prices.toString()
+                OutputSpreadsheet().generateSpreadsheet(prices)
             } else {
-                "ERROR: ${status.name}"
+                null
             }
         }
-
     }
 }

@@ -1,8 +1,17 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.springframework.core.io.InputStreamResource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
+import java.io.FileInputStream
+import java.io.IOException
+import javax.servlet.http.HttpServletResponse
+
 
 @RestController
 class ImportController(private val importService: ImportService) {
@@ -13,6 +22,18 @@ class ImportController(private val importService: ImportService) {
     @PostMapping("/prices/import")
     fun prices(): String = importService.importPrices().second.name
 
-    @PostMapping("/calculate-prices")
-    fun all(): String = importService.calculatePrices()
+    @GetMapping("/spreadsheet")
+    @Throws(IOException::class)
+    fun spreadsheet(response: HttpServletResponse?): ResponseEntity<InputStreamResource?>? {
+
+        return importService.spreadsheet()?.let { file ->
+            val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")
+            val resource = InputStreamResource(FileInputStream(file))
+            ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=jonny.xlsx") // Content-Type
+                    .contentType(mediaType)
+                    .contentLength(file.length())
+                    .body(resource)
+        } ?: ResponseEntity.noContent().build()
+    }
 }
