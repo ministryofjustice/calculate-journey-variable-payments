@@ -23,16 +23,16 @@ internal class StandardMovesPriceCalculatorTest{
     private val standardMovePrice = priceFactory(fromSiteName = "from", toSiteName = "to", priceInPence = 101)
     private val priceRepository: PriceRepository = mock { on {findAll()} doReturn listOf(standardMovePrice)}
 
-    private val calculator = PriceCalculator(locationRepository, priceRepository)
+    private val calculatorFactory = PriceCalculatorFactory(locationRepository, priceRepository)
 
     @Test
     fun `price key for Price should be $fromSiteName-$SiteName`(){
-        assertThat(PriceCalculator.priceKey(standardMovePrice)).isEqualTo("from-to")
+        assertThat(priceKey(standardMovePrice)).isEqualTo("from-to")
     }
 
     @Test
     fun `price key for Journey should be $fromSiteName-$toSiteName`(){
-        assertThat(calculator.priceKey(journeyFactory(fromLocation = "WYI", toLocation = "GNI"))).isEqualTo("from-to")
+        assertThat(calculatorFactory.calculator(listOf()).priceKey(journeyFactory(fromLocation = "WYI", toLocation = "GNI"))).isEqualTo("from-to")
     }
 
     @Test
@@ -52,10 +52,8 @@ internal class StandardMovesPriceCalculatorTest{
         )
 
 
-        val prices = calculator.standardPrices(
-                Supplier.SERCO,
-                listOf(completedMoveWithPricedJourney, completedMoveWithUnpricedJourney)
-        )
+        val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedJourney, completedMoveWithUnpricedJourney))
+        val prices = calculator.standardPrices(Supplier.SERCO)
 
         // Both moves should be standard moves
         assertThat(prices.map { it.movePersonJourneysEvents.move.id }).isEqualTo(listOf("M1", "M2"))

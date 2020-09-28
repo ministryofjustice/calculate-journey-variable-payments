@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 import java.io.InputStream
 import java.time.Clock
 import java.time.Duration
@@ -19,18 +20,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 @Component
 class PriceImporter(private val priceRepo: PriceRepository,
-                    private val clock: Clock,
                     private val sercoPrices: SercoPricesProvider,
                     private val geoameyPrices: GeoamyPricesProvider,
-                    private val locationRepository: LocationRepository) {
+                    private val locationRepository: LocationRepository) : Importer<Unit> {
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
 
     @Value("\${import-files.serco-prices}")
     private lateinit var sercoPricesFile: String
-
-    private val running = AtomicBoolean(false)
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -54,29 +52,9 @@ class PriceImporter(private val priceRepo: PriceRepository,
         }
     }
 
-    fun import(): ImportStatus {
-        // Imposed a crude temporary locking solution to prevent DB clashes/conflicts.
-        if (running.compareAndSet(false, true)) {
-            val start = LocalDateTime.now(clock)
-
-            logger.info("Price data import started: $start")
-
-            try {
-                priceRepo.deleteAll()
-
-                sercoPrices.get(geoPricesFile).use { import(it, Supplier.GEOAMEY) }
-                geoameyPrices.get(sercoPricesFile).use { import(it, Supplier.SERCO) }
-
-                return ImportStatus.DONE
-            } finally {
-                running.set(false)
-
-                val end = LocalDateTime.now(clock)
-
-                logger.info("Price import ended: $end. Time taken (in seconds): ${Duration.between(start, end).seconds}")
-            }
-        }
-
-        return ImportStatus.IN_PROGRESS
+    override fun import() {
+        priceRepo.deleteAll()
+        sercoPrices.get(sercoPricesFile).use { import(it, Supplier.SERCO) }
+        geoameyPrices.get(geoPricesFile).use { import(it, Supplier.GEOAMEY) }
     }
 }

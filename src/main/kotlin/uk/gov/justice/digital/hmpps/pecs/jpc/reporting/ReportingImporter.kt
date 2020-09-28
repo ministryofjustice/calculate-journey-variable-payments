@@ -4,15 +4,18 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 import java.time.LocalDate
 
 @Component
-class ReportingImporter {
+class ReportingImporter : Importer<Collection<MovePersonJourneysEvents>> {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var provider: ReportingProvider
+
+    override fun import() = import(LocalDate.now().minusDays(1))
 
     fun import(date: LocalDate, startDayOfMonth: Int = 1): Collection<MovePersonJourneysEvents>{
         val movesContent = getContents("moves", date, startDayOfMonth)
@@ -24,7 +27,6 @@ class ReportingImporter {
                 moveFiles = movesContent,
                 journeyFiles = journeysContent,
                 eventFiles = eventsContent,
-//                eventFiles = listOf(),
                 profileFiles = profilesContent,
                 peopleFiles = peopleContent)
     }

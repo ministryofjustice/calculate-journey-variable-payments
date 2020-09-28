@@ -92,7 +92,7 @@ fun moveEventFactory(
             supplier= supplier,
             eventableType="move",
             eventableId= moveId,
-            details= mapOf("cancellation_reason" to "made_in_error", "cancellation_reason_comment" to "cancelled because the prisoner refused to move"),
+            details= mapOf("string_key" to "string_val", "int_key" to 3, "bool_key" to true),
             occurredAt=defaultDateTime,
             recordedAt=defaultDateTime,
             notes="")
