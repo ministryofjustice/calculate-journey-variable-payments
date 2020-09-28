@@ -17,9 +17,4 @@ data class MovePrice(
     }
 }
 
-data class JourneyPrice(
-        val journeyWithEvents: JourneyWithEvents,
-        val priceInPence: Int?
-){
-
-}
+data class JourneyPrice(val journeyWithEvents: JourneyWithEvents, val priceInPence: Int?)

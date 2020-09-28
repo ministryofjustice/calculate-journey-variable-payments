@@ -32,19 +32,18 @@ class ImportService(
      * @param importer - the importer to perform the actual import
      * @return a pair representing the return result of the importer or null if unsuccessful, and an import status
      */
-    fun <T>importUnlessLocked(importer:Importer<T>) : Pair<T?, ImportStatus>{
+    fun <T> importUnlessLocked(importer: Importer<T>): Pair<T?, ImportStatus> {
         val statusAndResult = if (lock.compareAndSet(false, true)) {
             logger.info("Attempting import of ${importer.javaClass}")
             val start = LocalDateTime.now(clock)
             try {
-                Pair(importer.import() , ImportStatus.DONE)
+                Pair(importer.import(), ImportStatus.DONE)
             } finally {
                 lock.set(false)
                 val end = LocalDateTime.now(clock)
                 logger.info("Import ended: $end. Time taken (in seconds): ${Duration.between(start, end).seconds}")
             }
-        }
-        else{
+        } else {
             logger.warn("Import already in progress.")
             Pair(null, ImportStatus.IN_PROGRESS)
         }
@@ -58,29 +57,19 @@ class ImportService(
 
     fun importReports() = importUnlessLocked(reportingImporter)
 
-    fun calculatePrices() : String{
-        val r =
-                if(importLocations().second == ImportStatus.IN_PROGRESS) ImportStatus.IN_PROGRESS.name
-                else if(importPrices().second == ImportStatus.IN_PROGRESS) ImportStatus.IN_PROGRESS.name
-                else {
-                    val (reports, status) = importReports()
-                    if(reports != null) {
-                        val calculator = calculatorFactory.calculator(reports.toList())
-                        val prices = calculator.standardPrices(Supplier.SERCO)
-                        prices.toString()
-                    }
-                    else{
-                        "ERROR: ${status.name}"
-                    }
-                }
+    fun calculatePrices(): String {
+        return if (importLocations().second == ImportStatus.IN_PROGRESS) ImportStatus.IN_PROGRESS.name
+        else if (importPrices().second == ImportStatus.IN_PROGRESS) ImportStatus.IN_PROGRESS.name
+        else {
+            val (reports, status) = importReports()
+            if (reports != null) {
+                val calculator = calculatorFactory.calculator(reports.toList())
+                val prices = calculator.standardPrices(Supplier.SERCO)
+                prices.toString()
+            } else {
+                "ERROR: ${status.name}"
+            }
+        }
 
-        return r
     }
-
-//    fun importAll() : ImportStatus{
-//        listOf(locationsImporter, priceImporter).forEach {
-//            if (importUnlessLocked(it) == ImportStatus.IN_PROGRESS) return ImportStatus.IN_PROGRESS
-//        }
-//        return ImportStatus.DONE
-//    }
 }
