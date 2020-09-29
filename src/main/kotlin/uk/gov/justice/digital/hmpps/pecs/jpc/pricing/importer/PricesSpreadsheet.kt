@@ -5,16 +5,24 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.io.Closeable
 
+private const val JOURNEY_ID = 0
+private const val FROM_LOCATION = 1
+private const val TO_LOCATION = 2
+private const val PRICE = 3
 private const val COLUMN_HEADINGS = 1
 private const val ROW_OFFSET = 1
 
 /**
  * Simple wrapper class to encapsulate the logic around access to data in the supplier prices spreadsheet. When finished with the spreadsheet should be closed.
  */
-class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplier, private val locationRepo: LocationRepository) : Closeable {
+class PricesSpreadsheet(private val spreadsheet: Workbook,
+                        val supplier: Supplier,
+                        private val locationRepo: LocationRepository,
+                        private val priceRepository: PriceRepository) : Closeable {
 
     val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
 
@@ -26,16 +34,24 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
     fun mapToPrice(row: Row) = getPriceResult(supplier, row.toList())
 
     private fun getPriceResult(supplier: Supplier, cells: List<Cell>): Price {
-        val journeyId = cells[0].numericCellValue
-        val fromLocationName = cells[1].stringCellValue.toUpperCase().trim()
-        val toLocationName = cells[2].stringCellValue.toUpperCase().trim()
-        val price = cells[3].numericCellValue
+        val journeyId = Result.runCatching { cells[JOURNEY_ID].numericCellValue }.getOrElse { throw IllegalArgumentException("Error retrieving journey id for supplier '$supplier'", it) }
+
+        val fromLocationName = cells[FROM_LOCATION].stringCellValue.toUpperCase().trim().takeUnless { it.isBlank() }
+                ?: throw NullPointerException("From location name cannot be blank")
+        val toLocationName = cells[TO_LOCATION].stringCellValue.toUpperCase().trim().takeUnless { it.isBlank() }
+                ?: throw NullPointerException("To location name cannot be blank")
+
+        val price = Result.runCatching { cells[PRICE].numericCellValue }.getOrElse { throw IllegalArgumentException("Error retrieving price for supplier '$supplier'", it) }
 
         val fromLocation = locationRepo.findBySiteName(fromLocationName)
-                ?: throw RuntimeException("Missing from location $fromLocationName for supplier $supplier")
+                ?: throw NullPointerException("From location '$fromLocationName' for supplier '$supplier' not found")
 
         val toLocation = locationRepo.findBySiteName(toLocationName)
-                ?: throw RuntimeException("Missing to location $toLocationName for supplier $supplier")
+                ?: throw NullPointerException("To location '$toLocationName' for supplier '$supplier' not found")
+
+        priceRepository.findByFromLocationNameAndToLocationName(fromLocation.siteName, toLocation.siteName)?.let {
+            throw IllegalArgumentException("Duplicate price with from location '$fromLocationName' and to location '$toLocationName' for supplier '$supplier'")
+        }
 
         return Price(
                 supplier = supplier,
@@ -47,7 +63,8 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
                 priceInPence = (price * 100).toInt())
     }
 
-    fun addError(row: Row, error: Throwable) = errors.add(PricesSpreadsheetError(supplier, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
+    fun addError(row: Row, error: Throwable) = errors.add(PricesSpreadsheetError(supplier, row.rowNum + ROW_OFFSET, error.cause?.cause
+            ?: error))
 
     override fun close() {
         spreadsheet.close()

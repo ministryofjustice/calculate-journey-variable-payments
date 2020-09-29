@@ -1,9 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
@@ -35,7 +32,7 @@ internal class LocationsSpreadsheetTest {
             }
 
             assertThatThrownBy { LocationsSpreadsheet(workbook, locationRepository) }
-                    .isInstanceOf(IllegalStateException::class.java)
+                    .isInstanceOf(NullPointerException::class.java)
                     .hasMessage("The following tabs are missing from the locations spreadsheet: Courts, Immigration")
         }
 
@@ -74,14 +71,14 @@ internal class LocationsSpreadsheetTest {
         @Test
         internal fun `throws error if agency id is blank`() {
             assertThatThrownBy { spreadsheet.mapToLocation(listOf(ignored, supportedLocationType, site, blankCell)) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(NullPointerException::class.java)
                     .hasMessage("Agency id cannot be blank")
         }
 
         @Test
         internal fun `throws error if site name is blank`() {
             assertThatThrownBy { spreadsheet.mapToLocation(listOf(ignored, supportedLocationType, blankCell, agency)) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(NullPointerException::class.java)
                     .hasMessage("Site name cannot be blank")
         }
 
@@ -98,12 +95,12 @@ internal class LocationsSpreadsheetTest {
     @Nested
     inner class RecordingErrors {
         @Test
-        fun `no errors by default`() {
+        internal fun `no errors by default`() {
             assertThat(spreadsheet.errors).isEmpty()
         }
 
         @Test
-        fun `errors are recorded correctly`() {
+        internal fun `errors are recorded correctly`() {
             val row: Row = mock { on { it.rowNum } doReturn 1 }
 
             val exception = RuntimeException("something went wrong")
@@ -112,5 +109,12 @@ internal class LocationsSpreadsheetTest {
 
             assertThat(spreadsheet.errors).containsOnly(LocationsSpreadsheetError(LocationsSpreadsheet.Tab.COURT , row.rowNum + 1, exception))
         }
+    }
+
+    @Test
+    internal fun `locations spreadsheet is closed cleanly`() {
+        spreadsheet.close()
+
+        verify(workbook).close()
     }
 }

@@ -41,7 +41,7 @@ class PriceImporter(private val priceRepo: PriceRepository,
     }
 
     private fun import(prices: InputStream, supplier: Supplier) {
-        PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository).use {
+        PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository, priceRepo).use {
             import(it)
         }
     }
