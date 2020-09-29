@@ -20,9 +20,8 @@ private const val ROW_OFFSET = 1
 class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locationRepository: LocationRepository) : Closeable {
 
     init {
-        Tab.values().toList().filter { spreadsheet.getSheet(it.label) == null }.joinToString { it.label }.let {
-            if (it.isNotBlank()) throw IllegalStateException("The following tabs are missing from the locations spreadsheet: $it")
-        }
+        Tab.values().toList().filter { spreadsheet.getSheet(it.label) == null }.joinToString { it.label }
+                .takeIf { it.isNotBlank() }?.let { throw NullPointerException("The following tabs are missing from the locations spreadsheet: $it") }
     }
 
     enum class Tab(val label: String) {
@@ -46,11 +45,11 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
         val locationType = LocationType.map(cells[TYPE].stringCellValue.toUpperCase().trim())
                 ?: throw IllegalArgumentException("Unsupported location type: " + cells[TYPE].stringCellValue)
 
-        val agency = cells[AGENCY].stringCellValue.toUpperCase().trim().takeUnless { it == "" }
-                ?: throw IllegalArgumentException("Agency id cannot be blank")
+        val agency = cells[AGENCY].stringCellValue.toUpperCase().trim().takeUnless { it.isBlank() }
+                ?: throw NullPointerException("Agency id cannot be blank")
 
-        val site = cells[SITE].stringCellValue.toUpperCase().trim().takeUnless { it == "" }
-                ?: throw IllegalArgumentException("Site name cannot be blank")
+        val site = cells[SITE].stringCellValue.toUpperCase().trim().takeUnless { it.isBlank() }
+                ?: throw NullPointerException("Site name cannot be blank")
 
         locationRepository.findByNomisAgencyId(agency).let { if (it != null) throw IllegalArgumentException("Agency id '$agency' already exists") }
 
@@ -62,7 +61,8 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
 
     fun mapToLocation(row: Row): Location = mapToLocation(row.toList())
 
-    fun addError(tab: Tab, row: Row, error: Throwable) = errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
+    fun addError(tab: Tab, row: Row, error: Throwable) = errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause
+            ?: error))
 
     override fun close() {
         spreadsheet.close()
