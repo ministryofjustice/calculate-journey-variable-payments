@@ -1,1 +1,1 @@
-rootProject.name = "calculate-people-move-prices"
+rootProject.name = "calculate-journey-variable-payments"
