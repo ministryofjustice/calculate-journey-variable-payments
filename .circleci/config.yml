@@ -36,8 +36,8 @@ workflows:
           name: helm_lint
       - hmpps/build_docker:
           name: build_docker
-          filters:
-            branches:
+#          filters:
+#            branches:
 #              only:
 #                - main
       - hmpps/deploy_env:
