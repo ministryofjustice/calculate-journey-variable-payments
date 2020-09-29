@@ -38,8 +38,8 @@ workflows:
           name: build_docker
           filters:
             branches:
-              only:
-                - main
+#              only:
+#                - main
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
