@@ -48,4 +48,5 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(pricesResponse.body).isEqualTo(ImportStatus.DONE.name)
         assertThat(priceRepository.count()).isEqualTo(2)
     }
+
 }

@@ -61,14 +61,15 @@ class ImportService(
 
     fun importReports() = importUnlessLocked(reportingImporter)
 
-    fun spreadsheet(): File? {
+    fun spreadsheet(supplierName: String): File? {
         return if (importLocations().second == ImportStatus.IN_PROGRESS) null
         else if (importPrices().second == ImportStatus.IN_PROGRESS) null
         else {
+            val supplier = Supplier.valueOf(supplierName.toUpperCase())
             val (reports, status) = importReports()
             if (reports != null) {
                 val calculator = calculatorFactory.calculator(reports.toList())
-                val prices = calculator.standardPrices(Supplier.SERCO)
+                val prices = calculator.standardPrices(supplier)
                 OutputSpreadsheet().generateSpreadsheet(prices)
             } else {
                 null

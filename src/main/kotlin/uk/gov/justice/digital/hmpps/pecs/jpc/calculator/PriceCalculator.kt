@@ -34,7 +34,7 @@ class PriceCalculator(val nomisAgencyId2Location: Map<String, Location>,
     fun priceKey(journey: Journey) =
             "${nomisAgencyId2Location[journey.fromLocation]?.siteName}-${nomisAgencyId2Location[journey.toLocation]?.siteName}"
 
-    fun standardPrices(supplier: Supplier): List<MovePrice> {
+    fun standardPrices(supplier: Supplier): Sequence<MovePrice> {
         val standardMoves = MoveFilterer.standardMoves(supplier, allMoves)
         return standardMoves.map {
             val journeyPrice = when (supplier) {

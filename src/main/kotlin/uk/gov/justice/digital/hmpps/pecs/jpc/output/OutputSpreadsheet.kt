@@ -7,7 +7,7 @@ import java.io.FileOutputStream
 
 class OutputSpreadsheet {
 
-    fun generateSpreadsheet(prices: List<MovePrice>) : File {
+    fun generateSpreadsheet(prices: Sequence<MovePrice>) : File {
         val workbook = XSSFWorkbook()
         val sheet = workbook.createSheet("Standard Moves")
 
