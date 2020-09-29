@@ -12,7 +12,7 @@ ingress:
   enabled: true
   enable_whitelist: true
   hosts:
-    - host: calculate-journey-variable-staging.hmpps.service.justice.gov.uk
+    - host: calculate-journey-variable-payments-staging.hmpps.service.justice.gov.uk
       cert_secret: calculate-journey-variable-payments-cert
   path: /
 
