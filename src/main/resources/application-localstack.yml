@@ -10,3 +10,11 @@ BASM_BUCKET_NAME:
 
 JPC_BUCKET_NAME:
   jpc
+
+import-files:
+  locations: "schedule_34_locations_sample.xlsx"
+  serco-prices: "serco_sample.xlsx"
+  geo-prices: "geoamey_sample.xlsx"
+
+export-files:
+  template: classpath:/spreadsheets/JCP_template.xlsx

@@ -1,5 +1,4 @@
 # To access SQL At command line - $ docker exec -it jpc-database psql -U jpc
-# You can access the database via the browser using adminer see - http://localhost:8080
 
 version: '3.1'
 
@@ -15,17 +14,6 @@ services:
       POSTGRES_DB: jpc
       POSTGRES_USER: jpc
       POSTGRES_PASSWORD: letmein
-    networks:
-      - hmpps
-
-  adminer:
-    image: adminer
-    depends_on:
-      - db
-    container_name: jpc-browser-sql-tool
-    restart: always
-    ports:
-      - 8081:8080
     networks:
       - hmpps
 

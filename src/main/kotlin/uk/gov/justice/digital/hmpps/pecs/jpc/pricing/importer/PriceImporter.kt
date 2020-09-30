@@ -29,9 +29,7 @@ class PriceImporter(private val priceRepo: PriceRepository,
     internal fun import(spreadsheet: PricesSpreadsheet) {
         val count = priceRepo.count()
 
-        spreadsheet.getRows().forEach { row ->
-            Result.runCatching { spreadsheet.mapToPrice(row).let { priceRepo.save(it) } }.onFailure { spreadsheet.addError(row, it) }
-        }
+        spreadsheet.forEachRow { priceRepo.save(it) }
 
         spreadsheet.errors.forEach { logger.info(it.toString()) }
 
@@ -48,7 +46,11 @@ class PriceImporter(private val priceRepo: PriceRepository,
 
     override fun import() {
         priceRepo.deleteAll()
+
+        logger.info("Using Serco file: $sercoPricesFile")
         sercoPrices.get(sercoPricesFile).use { import(it, Supplier.SERCO) }
+
+        logger.info("Using Geoamey file: $sercoPricesFile")
         geoameyPrices.get(geoPricesFile).use { import(it, Supplier.GEOAMEY) }
     }
 }
