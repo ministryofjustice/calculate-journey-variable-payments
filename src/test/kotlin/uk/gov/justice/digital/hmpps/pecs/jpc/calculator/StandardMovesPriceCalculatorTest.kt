@@ -53,7 +53,7 @@ internal class StandardMovesPriceCalculatorTest{
 
 
         val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedJourney, completedMoveWithUnpricedJourney))
-        val prices = calculator.standardPrices(Supplier.SERCO)
+        val prices = calculator.standardPrices(Supplier.SERCO).toList()
 
         // Both moves should be standard moves
         assertThat(prices.map { it.movePersonJourneysEvents.move.id }).isEqualTo(listOf("M1", "M2"))

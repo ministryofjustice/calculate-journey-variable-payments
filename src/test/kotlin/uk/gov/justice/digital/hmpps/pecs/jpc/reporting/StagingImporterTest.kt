@@ -13,13 +13,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 
 @ActiveProfiles("dev")
-@SpringBootTest
+//@SpringBootTest
 internal class StagingImporterTest {
 
     @Autowired
     lateinit var importer: ReportingImporter
 
-    @Test
     fun `Standard moves should only include completed moves with one billable journey`() {
         val allMoves = importer.import(LocalDate.of(2020, 9, 24), 1)
         val standardMoves = MoveFilterer.standardMoves(Supplier.GEOAMEY, allMoves)

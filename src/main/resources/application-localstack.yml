@@ -5,5 +5,8 @@ resources:
 server:
   shutdown: immediate
 
-S3_REPORTING_BUCKET_NAME:
+BASM_BUCKET_NAME:
+  basm
+
+JPC_BUCKET_NAME:
   jpc

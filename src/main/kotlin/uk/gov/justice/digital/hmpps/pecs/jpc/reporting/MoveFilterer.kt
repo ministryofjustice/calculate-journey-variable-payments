@@ -9,8 +9,8 @@ object MoveFilterer {
      * To be priced as a standard move, the journey as well as the move must be completed
      * There also should be no redirects after the move starts, but shouldn't need to check for this
      */
-    fun standardMoves(supplier: Supplier, allMoves: Collection<MovePersonJourneysEvents>): Collection<MovePersonJourneysEvents> {
-        return allMoves.filter {
+    fun standardMoves(supplier: Supplier, allMoves: Collection<MovePersonJourneysEvents>): Sequence<MovePersonJourneysEvents> {
+        return allMoves.asSequence().filter {
             it.move.supplier == supplier.reportingName() &&
             it.move.status == MoveStatus.COMPLETED.value && with(it.journeysWithEvents) {
                 count { it.journey.state == JourneyState.COMPLETED.value } == 1 &&

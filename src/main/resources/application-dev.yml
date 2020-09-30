@@ -3,3 +3,14 @@ resources:
 
 server:
   shutdown: immediate
+
+BASM_BUCKET_NAME:
+  cloud-platform-f30ef0342f96d401948ead568276b0b6
+
+JPC_BUCKET_NAME:
+  cloud-platform-d87ddf81041945c4d24effc3896ed4f6
+
+import-files:
+  locations: "schedule_34_locations.xlsx"
+  serco-prices: "serco_prices.xlsx"
+  geo-prices: "geoamey_prices.xlsx"
