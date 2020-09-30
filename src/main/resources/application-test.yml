@@ -1,10 +1,10 @@
 info.app:
-  name: Calculate People Move Prices
+  name: Calculate Journey Variable Payments
   version: 1.0
 
 spring:
   application:
-    name: calculate-people-move-prices
+    name: calculate-journey-variable-payments
   codec:
     max-in-memory-size: 50MB
   jpa:

@@ -4,7 +4,7 @@
 replicaCount: 2
 
 image:
-  repository: quay.io/hmpps/calculate-people-move-prices
+  repository: quay.io/hmpps/calculate-journey-variable-payments
   tag: latest
   port: 8080
 
@@ -12,8 +12,8 @@ ingress:
   enabled: true
   enable_whitelist: true
   hosts:
-    - host: calculate-people-move-prices-dev.hmpps.service.justice.gov.uk
-      cert_secret: calculate-people-move-prices-cert
+    - host: calculate-journey-variable-payments-staging.hmpps.service.justice.gov.uk
+      cert_secret: calculate-journey-variable-payments-cert
   path: /
 
 env:
