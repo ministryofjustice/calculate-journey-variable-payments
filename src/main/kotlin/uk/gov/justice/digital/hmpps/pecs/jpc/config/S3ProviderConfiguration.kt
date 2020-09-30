@@ -43,11 +43,16 @@ class S3ProviderConfiguration {
 
     private fun amazonS3 (endpoint: String, region: String, accessKey: String, secretKey: String) : AmazonS3{
         logger.info("Using AWS configuration.")
-        val builder = if(endpoint.isNotEmpty())
-        // Localstack
+        val builder = if(endpoint.isNotEmpty()) {
+            // Localstack
+            logger.info("Using localstack")
+
             AmazonS3ClientBuilder.standard().withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpoint, region))
+        }
         else {
             // Real AWS S3
+            logger.info("Using S3")
+
             val awsCreds = BasicAWSCredentials(accessKey, secretKey)
             AmazonS3ClientBuilder.standard()
                     .withRegion(region)

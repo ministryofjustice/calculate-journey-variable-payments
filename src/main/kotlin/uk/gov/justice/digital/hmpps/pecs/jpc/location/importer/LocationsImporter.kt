@@ -18,13 +18,9 @@ class LocationsImporter(private val locationRepo: LocationRepository,
     private lateinit var locationsFile: String
 
     fun import(spreadsheet: LocationsSpreadsheet) {
-        val count = locationRepo.count();
+        val count = locationRepo.count()
 
-        LocationsSpreadsheet.Tab.values().forEach { tab ->
-            spreadsheet.getRowsFrom(tab).forEach { row ->
-                Result.runCatching { spreadsheet.mapToLocation(row).let { locationRepo.save(it) } }.onFailure { spreadsheet.addError(tab, row, it) }
-            }
-        }
+        LocationsSpreadsheet.Tab.values().forEach { tab -> spreadsheet.forEachRowOn(tab) { locationRepo.save(it) } }
 
         spreadsheet.errors.forEach { logger.info(it.toString()) }
 
@@ -35,6 +31,8 @@ class LocationsImporter(private val locationRepo: LocationRepository,
 
     override fun import() {
         locationRepo.deleteAll()
+
+        logger.info("Using locations file: $locationsFile")
 
         schedule34LocationsProvider.get(locationsFile).use { locations ->
             LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {

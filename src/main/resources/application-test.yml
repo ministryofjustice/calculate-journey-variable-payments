@@ -52,5 +52,8 @@ import-files:
   serco-prices: classpath:/spreadsheets/supplier_b_prices.xlsx
   geo-prices: classpath:/spreadsheets/supplier_a_prices.xlsx
 
+export-files:
+  template: classpath:/spreadsheets/JCP_template.xlsx
+
 resources:
   provider: test

@@ -1,18 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Import
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculatorFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.OutputSpreadsheet
+import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.io.File
-import java.io.OutputStream
 import java.time.Clock
 import java.time.Duration
 import java.time.LocalDateTime
@@ -24,7 +20,8 @@ class ImportService(
         private val locationsImporter: LocationsImporter,
         private val priceImporter: PriceImporter,
         private val reportingImporter: ReportingImporter,
-        private val calculatorFactory: PriceCalculatorFactory) {
+        private val calculatorFactory: PriceCalculatorFactory,
+        private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -70,7 +67,7 @@ class ImportService(
             if (reports != null) {
                 val calculator = calculatorFactory.calculator(reports.toList())
                 val prices = calculator.standardPrices(supplier)
-                OutputSpreadsheet().generateSpreadsheet(prices)
+                pricesSpreadsheetGenerator.generateSpreadsheet(supplier, prices)
             } else {
                 null
             }
