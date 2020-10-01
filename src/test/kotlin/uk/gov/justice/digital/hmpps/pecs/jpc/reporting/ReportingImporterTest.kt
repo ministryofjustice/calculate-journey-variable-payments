@@ -26,9 +26,6 @@ internal class ReportingImporterTest {
     @Autowired
     lateinit var importer: ReportingImporter
 
-    @Autowired
-    lateinit var provider: ReportingProvider
-
     @Test
     fun `For the 3rd of the month, starting on the 2nd should return 2 file names`() {
         val from =  LocalDate.of(2020, 8, 30)

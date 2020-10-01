@@ -15,11 +15,11 @@ import java.time.LocalDate
 class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-template") private val template: File,
                                  @Autowired private val clock: Clock) {
 
-    fun generateSpreadsheet(supplier: Supplier, prices: Sequence<MovePrice>): File {
-        val date = LocalDate.now(clock)
+    fun generateSpreadsheet(from: LocalDate, to: LocalDate, supplier: Supplier, prices: Sequence<MovePrice>): File {
+        val dateRun = LocalDate.now(clock)
 
         XSSFWorkbook(template).use { workbook ->
-            StandardMovesSheet(workbook, date, supplier).apply { add(prices) }
+            StandardMovesSheet(workbook, PriceSheet.Header(dateRun, PriceSheet.DateRange(from, to), supplier)).apply { add(prices) }
 
             return createTempFile(suffix = "xlsx").apply {
                 FileOutputStream(this).use {
