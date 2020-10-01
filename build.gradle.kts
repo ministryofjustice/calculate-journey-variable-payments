@@ -1,7 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-	id("uk.gov.justice.hmpps.gradle-spring-boot") version "1.0.4"
+	id("uk.gov.justice.hmpps.gradle-spring-boot") version "1.0.6"
 	kotlin("plugin.spring") version "1.4.10"
 	kotlin("plugin.jpa") version "1.4.10"
 	kotlin("plugin.allopen") version "1.4.10"
@@ -19,7 +17,7 @@ dependencies {
 	implementation("com.github.kittinunf.result:result:3.1.0")
 	implementation("com.github.kittinunf.result:result-coroutines:3.1.0")
 	implementation("com.beust:klaxon:5.4")
-	implementation("com.amazonaws:aws-java-sdk-s3:1.11.863")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.11.873")
 
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql:42.2.16")

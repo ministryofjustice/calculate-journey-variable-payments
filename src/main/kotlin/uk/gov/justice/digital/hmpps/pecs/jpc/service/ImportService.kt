@@ -72,7 +72,7 @@ class ImportService(
             if (reports != null) {
                 val calculator = calculatorFactory.calculator(reports.toList())
                 val prices = calculator.standardPrices(MoveFiltererParams(supplier, movesFrom, movesTo))
-                pricesSpreadsheetGenerator.generateSpreadsheet(supplier, prices)
+                pricesSpreadsheetGenerator.generateSpreadsheet(movesFrom, movesTo, supplier, prices)
             } else {
                 null
             }
