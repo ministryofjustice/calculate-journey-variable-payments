@@ -21,6 +21,8 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
 
     private val workbook: Workbook = XSSFWorkbook(template)
 
+    private val date: LocalDate = LocalDate.now()
+
     @Test
     internal fun `fails to instantiate if expected sheet is missing`() {
         assertThatThrownBy { StandardMovesSheet(XSSFWorkbook(), PriceSheet.Header(LocalDate.now(), PriceSheet.DateRange(LocalDate.now(), LocalDate.now()), Supplier.SERCO)) }.isInstanceOf(NullPointerException::class.java)
@@ -28,17 +30,17 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
 
     @Test
     internal fun `default headings are applied for Serco`() {
-        val sms = StandardMovesSheet(workbook, PriceSheet.Header(LocalDate.now(), PriceSheet.DateRange(LocalDate.now(), LocalDate.now()), Supplier.SERCO))
+        val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, PriceSheet.DateRange(date, date), Supplier.SERCO))
 
-        assertThat(sms.sheet.getRow(0).getCell(1).localDateTimeCellValue.toLocalDate()).isEqualTo(LocalDate.of(2020, 10, 1))
+        assertThat(sms.sheet.getRow(0).getCell(1).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
         assertThat(sms.sheet.getRow(4).getCell(1).stringCellValue.toUpperCase()).isEqualTo(Supplier.SERCO.name)
     }
 
     @Test
     internal fun `default headings are applied for Geoamey`() {
-        val sms = StandardMovesSheet(workbook, PriceSheet.Header(LocalDate.now(), PriceSheet.DateRange(LocalDate.now(), LocalDate.now()), Supplier.GEOAMEY))
+        val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, PriceSheet.DateRange(date, date), Supplier.GEOAMEY))
 
-        assertThat(sms.sheet.getRow(0).getCell(1).localDateTimeCellValue.toLocalDate()).isEqualTo(LocalDate.of(2020, 10, 1))
+        assertThat(sms.sheet.getRow(0).getCell(1).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
         assertThat(sms.sheet.getRow(4).getCell(1).stringCellValue.toUpperCase()).isEqualTo(Supplier.GEOAMEY.name)
     }
 
