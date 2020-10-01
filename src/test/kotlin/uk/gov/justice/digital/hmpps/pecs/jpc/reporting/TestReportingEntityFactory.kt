@@ -84,7 +84,8 @@ fun moveEventFactory(
         eventId : String = defaultMoveEventId,
         moveId: String = defaultMoveId,
         type: String = EventType.MOVE_CANCEL.value,
-        supplier: String = defaultSupplier
+        supplier: String = defaultSupplier,
+        occurredAt: LocalDateTime = defaultDateTime
 ): Event{
     val event = Event(
             id=eventId,
@@ -93,7 +94,7 @@ fun moveEventFactory(
             eventableType="move",
             eventableId= moveId,
             details= mapOf("string_key" to "string_val", "int_key" to 3, "bool_key" to true),
-            occurredAt=defaultDateTime,
+            occurredAt=occurredAt,
             recordedAt=defaultDateTime,
             notes="")
     return event
@@ -126,7 +127,9 @@ fun journeyEventFactory(
         journeyEventId: String = defaultJourneyEventId,
         journeyId: String = defaultJourneyId,
         type: String = EventType.JOURNEY_START.value,
-        supplier: String = defaultSupplier): Event{
+        supplier: String = defaultSupplier,
+        occurredAt: LocalDateTime = defaultDateTime
+): Event{
     val event = Event(
             id=journeyEventId,
             type=type,
@@ -134,7 +137,7 @@ fun journeyEventFactory(
             eventableType="journey",
             eventableId= journeyId,
             details= mapOf(),
-            occurredAt=defaultDateTime,
+            occurredAt=occurredAt,
             recordedAt=defaultDateTime,
             notes="")
     return event

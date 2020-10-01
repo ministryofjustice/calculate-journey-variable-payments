@@ -4,25 +4,23 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
+import java.time.Clock
 import java.time.LocalDate
+import kotlin.streams.toList
 
 @Component
-class ReportingImporter : Importer<Collection<MovePersonJourneysEvents>> {
+class ReportingImporter(
+        @Autowired val provider: ReportingProvider,
+        @Autowired val clock: Clock) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @Autowired
-    lateinit var provider: ReportingProvider
-
-    override fun import() = import(LocalDate.now().minusDays(1))
-
-    fun import(date: LocalDate, startDayOfMonth: Int = 1): Collection<MovePersonJourneysEvents>{
-        val movesContent = getContents("moves", date, startDayOfMonth)
-        val journeysContent = getContents("journeys", date, startDayOfMonth)
-        val eventsContent = getContents("events", date, startDayOfMonth)
-        val profilesContent = getContents("profiles", date, startDayOfMonth)
-        val peopleContent = getContents("people", date, startDayOfMonth)
+    fun import(from: LocalDate, to: LocalDate = LocalDate.now(clock)): Collection<MovePersonJourneysEvents>{
+        val movesContent = getContents("moves", from, to)
+        val journeysContent = getContents("journeys", from, to)
+        val eventsContent = getContents("events", from, to)
+        val profilesContent = getContents("profiles", from, to)
+        val peopleContent = getContents("people", from, to)
         return ReportingParser.parseAll(
                 moveFiles = movesContent,
                 journeyFiles = journeysContent,
@@ -31,12 +29,12 @@ class ReportingImporter : Importer<Collection<MovePersonJourneysEvents>> {
                 peopleFiles = peopleContent)
     }
 
-    private fun getContents(entity: String, date: LocalDate, startDayOfMonth: Int): List<String>{
+    private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{
         // TODO better validation / error handling - it just currently logs the error and ignores it
-        val fileNames = fileNamesForDate(entity, date, startDayOfMonth)
+        val fileNames = fileNamesForDate(entity, from, to)
         return fileNames.map {
             try {
-                logger.info("Retrieveing file $it")
+                logger.info("Retrieving file $it")
                 provider.get(it)
             }
             catch (e: Exception){
@@ -47,10 +45,11 @@ class ReportingImporter : Importer<Collection<MovePersonJourneysEvents>> {
     }
 
     companion object{
-        fun fileNamesForDate(entity: String, endDate: LocalDate, startDayOfMonth: Int): List<String> {
-            return (startDayOfMonth..endDate.dayOfMonth).map {
-                day -> "${endDate.year}/${padZero(endDate.monthValue)}/${padZero(day)}/${endDate.year}-${padZero(endDate.monthValue)}-${padZero(day)}-$entity.jsonl"
-            }
+        fun fileNamesForDate(entity: String, from: LocalDate, to: LocalDate): List<String> {
+            return from.datesUntil(to.plusDays(1)).map {d ->
+                "${d.year}/${padZero(d.monthValue)}/${padZero(d.dayOfMonth)}/${d.year}-${padZero(d.monthValue)}-${padZero(d.dayOfMonth)}-$entity.jsonl"
+            }.toList()
+
         }
 
         private fun padZero(value: Int) = if (value < 10) "0${value}" else value.toString()

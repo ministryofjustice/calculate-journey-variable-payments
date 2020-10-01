@@ -7,10 +7,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.io.File
 import java.time.Clock
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -33,12 +35,12 @@ class ImportService(
      * @param importer - the importer to perform the actual import
      * @return a pair representing the return result of the importer or null if unsuccessful, and an import status
      */
-    fun <T> importUnlessLocked(importer: Importer<T>): Pair<T?, ImportStatus> {
+    fun <T> importUnlessLocked(import: () -> T): Pair<T?, ImportStatus> {
         val statusAndResult = if (lock.compareAndSet(false, true)) {
-            logger.info("Attempting import of ${importer.javaClass}")
+            logger.info("Attempting import of ${import.javaClass}")
             val start = LocalDateTime.now(clock)
             try {
-                Pair(importer.import(), ImportStatus.DONE)
+                Pair(import(), ImportStatus.DONE)
             } finally {
                 lock.set(false)
                 val end = LocalDateTime.now(clock)
@@ -52,21 +54,24 @@ class ImportService(
         return statusAndResult
     }
 
-    fun importLocations() = importUnlessLocked(locationsImporter)
+    fun importLocations() = importUnlessLocked(locationsImporter::import)
 
-    fun importPrices() = importUnlessLocked(priceImporter)
+    fun importPrices() = importUnlessLocked(priceImporter::import)
 
-    fun importReports() = importUnlessLocked(reportingImporter)
+    fun spreadsheet(
+            supplierName: String,
+            movesFrom: LocalDate,
+            movesTo: LocalDate,
+            reportsTo: LocalDate): File? {
 
-    fun spreadsheet(supplierName: String): File? {
         return if (importLocations().second == ImportStatus.IN_PROGRESS) null
         else if (importPrices().second == ImportStatus.IN_PROGRESS) null
         else {
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importReports()
+            val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo) }
             if (reports != null) {
                 val calculator = calculatorFactory.calculator(reports.toList())
-                val prices = calculator.standardPrices(supplier)
+                val prices = calculator.standardPrices(MoveFiltererParams(supplier, movesFrom, movesTo))
                 pricesSpreadsheetGenerator.generateSpreadsheet(supplier, prices)
             } else {
                 null

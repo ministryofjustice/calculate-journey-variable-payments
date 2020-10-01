@@ -9,14 +9,13 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 import java.io.InputStream
 
 @Component
 class PriceImporter(private val priceRepo: PriceRepository,
                     private val sercoPrices: SercoPricesProvider,
                     private val geoameyPrices: GeoamyPricesProvider,
-                    private val locationRepository: LocationRepository) : Importer<Unit> {
+                    private val locationRepository: LocationRepository) {
 
     @Value("\${import-files.geo-prices}")
     private lateinit var geoPricesFile: String
@@ -44,7 +43,7 @@ class PriceImporter(private val priceRepo: PriceRepository,
         }
     }
 
-    override fun import() {
+    fun import() {
         priceRepo.deleteAll()
 
         logger.info("Using Serco file: $sercoPricesFile")
