@@ -33,9 +33,13 @@ data class Journey(
         val fromLocation: String,
 
         @Json(name = "to_location")
-        val toLocation: String? = null,
+        val toLocation: String? = null
 
-) {
+)
+
+{
+    fun hasState(vararg states: JourneyState) = states.map{it.value}.contains(state)
+
     companion object {
         fun fromJson(json: String): Journey? {
             return Klaxon().

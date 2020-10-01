@@ -34,6 +34,9 @@ data class Event constructor(
 
         val notes: String?,
 ) {
+
+    fun hasType(et: EventType) = type == et.value
+
     companion object {
         fun fromJson(json: String): Event? {
             return Klaxon().

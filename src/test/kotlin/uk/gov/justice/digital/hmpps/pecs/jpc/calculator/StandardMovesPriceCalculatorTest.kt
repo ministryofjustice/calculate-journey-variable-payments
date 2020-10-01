@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import org.assertj.core.api.Assertions.assertThat
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
+import java.time.LocalDate
 
 
 @ActiveProfiles("test")
@@ -37,23 +38,31 @@ internal class StandardMovesPriceCalculatorTest{
 
     @Test
     fun `Standard moves priced correctly`() {
+        val movesFrom = LocalDate.of(2020, 9, 10)
+        val movesTo = LocalDate.of(2020, 9, 11)
+
         val completedMoveWithPricedJourney = MovePersonJourneysEvents(
                 move = moveFactory(),
                 person = personFactory(),
-                events = listOf(),
+                events = listOf(moveEventFactory(
+                        type = EventType.MOVE_COMPLETE.value, occurredAt = movesFrom.atStartOfDay())
+                ),
                 journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(billable = true), listOf()))
         )
 
         val completedMoveWithUnpricedJourney = MovePersonJourneysEvents(
                 move = moveFactory(moveId = "M2", fromLocation = "NOTPRICED"),
                 person = personFactory(),
-                events = listOf(),
+                events =  listOf(moveEventFactory(
+                        type = EventType.MOVE_COMPLETE.value, moveId = "M2", occurredAt = movesTo.atStartOfDay())
+                ),
                 journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(billable = true, fromLocation = "NOTPRICED"), listOf()))
         )
 
 
         val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedJourney, completedMoveWithUnpricedJourney))
-        val prices = calculator.standardPrices(Supplier.SERCO).toList()
+
+        val prices = calculator.standardPrices(MoveFiltererParams(Supplier.SERCO, movesFrom, movesTo)).toList()
 
         // Both moves should be standard moves
         assertThat(prices.map { it.movePersonJourneysEvents.move.id }).isEqualTo(listOf("M1", "M2"))

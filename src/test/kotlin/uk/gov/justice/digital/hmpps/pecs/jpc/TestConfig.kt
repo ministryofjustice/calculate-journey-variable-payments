@@ -42,5 +42,5 @@ class TestConfig {
     }
 
     @Bean
-    fun reportImporter() = ReportingImporter()
+    fun reportImporter() = ReportingImporter(reportingResourceProvider(), clock())
 }

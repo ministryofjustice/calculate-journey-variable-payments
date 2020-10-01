@@ -20,8 +20,10 @@ internal class StagingImporterTest {
     lateinit var importer: ReportingImporter
 
     fun `Standard moves should only include completed moves with one billable journey`() {
-        val allMoves = importer.import(LocalDate.of(2020, 9, 24), 1)
-        val standardMoves = MoveFilterer.standardMoves(Supplier.GEOAMEY, allMoves)
+        val movesFrom = LocalDate.of(2020, 9, 24)
+        val movesTo = LocalDate.of(2020, 9, 24)
+        val allMoves = importer.import(movesFrom, movesTo)
+        val standardMoves = MoveFilterer.standardMoves(MoveFiltererParams(Supplier.GEOAMEY, movesFrom, movesTo), allMoves)
     }
 
 }

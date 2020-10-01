@@ -6,11 +6,10 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.Importer
 
 @Component
 class LocationsImporter(private val locationRepo: LocationRepository,
-                        private val schedule34LocationsProvider: Schedule34LocationsProvider) : Importer<Unit> {
+                        private val schedule34LocationsProvider: Schedule34LocationsProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -29,7 +28,7 @@ class LocationsImporter(private val locationRepo: LocationRepository,
         logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
     }
 
-    override fun import() {
+     fun import() {
         locationRepo.deleteAll()
 
         logger.info("Using locations file: $locationsFile")

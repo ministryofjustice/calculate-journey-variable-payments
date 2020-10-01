@@ -9,7 +9,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFilterer
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MovePersonJourneysEvents
+import java.time.LocalDate
 
 @Component
 class PriceCalculatorFactory(
@@ -34,10 +36,10 @@ class PriceCalculator(val nomisAgencyId2Location: Map<String, Location>,
     fun priceKey(journey: Journey) =
             "${nomisAgencyId2Location[journey.fromLocation]?.siteName}-${nomisAgencyId2Location[journey.toLocation]?.siteName}"
 
-    fun standardPrices(supplier: Supplier): Sequence<MovePrice> {
-        val standardMoves = MoveFilterer.standardMoves(supplier, allMoves)
+    fun standardPrices(params: MoveFiltererParams): Sequence<MovePrice> {
+        val standardMoves = MoveFilterer.standardMoves(params, allMoves)
         return standardMoves.map {
-            val journeyPrice = when (supplier) {
+            val journeyPrice = when (params.supplier) {
                 Supplier.SERCO -> sercoJourney2price[priceKey(it.journeysWithEvents[0].journey)]
                 Supplier.GEOAMEY -> geoJourney2price[priceKey(it.journeysWithEvents[0].journey)]
             }
