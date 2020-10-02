@@ -25,19 +25,19 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spr
 
     @Test
     internal fun `standards moves are called for Serco`() {
-        val dateRange = ClosedRangeLocalDate(LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
+        val filter = MoveFiltererParams(Supplier.SERCO, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 
-        generator.generate(dateRange, Supplier.SERCO, calculator)
+        generator.generate(filter, calculator)
 
-        verify(calculator).standardPrices(eq(MoveFiltererParams(Supplier.SERCO, dateRange.start, dateRange.endInclusive)))
+        verify(calculator).standardPrices(eq(MoveFiltererParams(filter.supplier, filter.movesFrom, filter.movesTo)))
     }
 
     @Test
     internal fun `standards moves are called for Geoamey`() {
-        val dateRange = ClosedRangeLocalDate(LocalDate.now(clock), LocalDate.now(clock).plusDays(2))
+        val filter = MoveFiltererParams(Supplier.GEOAMEY, LocalDate.now(clock), LocalDate.now(clock).plusDays(2))
 
-        generator.generate(dateRange, Supplier.GEOAMEY, calculator)
+        generator.generate(filter, calculator)
 
-        verify(calculator).standardPrices(eq(MoveFiltererParams(Supplier.GEOAMEY, dateRange.start, dateRange.endInclusive)))
+        verify(calculator).standardPrices(eq(MoveFiltererParams(filter.supplier, filter.movesFrom, filter.movesTo)))
     }
 }

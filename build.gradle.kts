@@ -17,7 +17,9 @@ dependencies {
 	implementation("com.github.kittinunf.result:result:3.1.0")
 	implementation("com.github.kittinunf.result:result-coroutines:3.1.0")
 	implementation("com.beust:klaxon:5.4")
-	implementation("com.amazonaws:aws-java-sdk-s3:1.11.873")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.11.874")
+
+	testImplementation("org.mockito:mockito-inline:3.5.13")
 
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql:42.2.16")

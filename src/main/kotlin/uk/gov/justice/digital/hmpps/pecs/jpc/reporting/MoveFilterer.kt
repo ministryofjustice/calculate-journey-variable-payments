@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.output.ClosedRangeLocalDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 
@@ -55,5 +56,7 @@ object MoveFilterer {
 data class MoveFiltererParams(
         val supplier: Supplier,
         val movesFrom: LocalDate,
-        val movesTo: LocalDate,
-)
+        val movesTo: LocalDate) {
+
+    fun dateRange() = ClosedRangeLocalDate(movesFrom, movesTo)
+}

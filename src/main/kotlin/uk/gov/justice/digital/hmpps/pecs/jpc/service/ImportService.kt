@@ -4,10 +4,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculatorFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.ClosedRangeLocalDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.io.File
 import java.time.Clock
@@ -68,7 +68,7 @@ class ImportService(
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
             val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo) }
             if (reports != null) {
-                pricesSpreadsheetGenerator.generate(ClosedRangeLocalDate(movesFrom, movesTo), supplier, calculatorFactory.calculator(reports.toList()))
+                pricesSpreadsheetGenerator.generate(MoveFiltererParams(supplier, movesFrom, movesTo), calculatorFactory.calculator(reports.toList()))
             } else {
                 null
             }
