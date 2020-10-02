@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.io.File
 import java.time.Clock
@@ -32,11 +31,11 @@ class ImportService(
 
     /**
      * Attempts to import using the importer passed in checking if there's an import in progress
-     * @param importer - the importer to perform the actual import
+     * @param import - the importer to perform the actual import
      * @return a pair representing the return result of the importer or null if unsuccessful, and an import status
      */
     fun <T> importUnlessLocked(import: () -> T): Pair<T?, ImportStatus> {
-        val statusAndResult = if (lock.compareAndSet(false, true)) {
+        return if (lock.compareAndSet(false, true)) {
             logger.info("Attempting import of ${import.javaClass}")
             val start = LocalDateTime.now(clock)
             try {
@@ -50,8 +49,6 @@ class ImportService(
             logger.warn("Import already in progress.")
             Pair(null, ImportStatus.IN_PROGRESS)
         }
-
-        return statusAndResult
     }
 
     fun importLocations() = importUnlessLocked(locationsImporter::import)
@@ -70,9 +67,7 @@ class ImportService(
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
             val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo) }
             if (reports != null) {
-                val calculator = calculatorFactory.calculator(reports.toList())
-                val prices = calculator.standardPrices(MoveFiltererParams(supplier, movesFrom, movesTo))
-                pricesSpreadsheetGenerator.generateSpreadsheet(movesFrom, movesTo, supplier, prices)
+                pricesSpreadsheetGenerator.generate(movesFrom, movesTo, supplier, calculatorFactory.calculator(reports.toList()))
             } else {
                 null
             }
