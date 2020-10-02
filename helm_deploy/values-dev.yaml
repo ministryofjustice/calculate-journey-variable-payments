@@ -1,18 +1,21 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: quay.io/hmpps/calculate-journey-variable-payments
   tag: latest
   port: 8080
 
+db:
+  secret_name:
+
 ingress:
   enabled: true
   enable_whitelist: true
   hosts:
-    - host: calculate-journey-variable-payments-staging.hmpps.service.justice.gov.uk
+    - host: calculate-journey-variable-payments-dev.hmpps.service.justice.gov.uk
       cert_secret: calculate-journey-variable-payments-cert
   path: /
 
