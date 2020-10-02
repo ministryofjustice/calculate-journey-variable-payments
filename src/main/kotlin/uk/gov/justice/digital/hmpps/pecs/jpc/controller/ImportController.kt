@@ -22,6 +22,7 @@ class ImportController(private val importService: ImportService) {
     @PostMapping("/prices/import")
     fun prices(): String = importService.importPrices().second.name
 
+    @GetMapping("/generate-prices-spreadsheet/{supplier}")
     @Throws(IOException::class)
     fun generateSpreadsheet(
         @PathVariable supplier: String,

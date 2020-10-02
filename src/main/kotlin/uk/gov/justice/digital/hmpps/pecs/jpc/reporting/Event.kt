@@ -38,12 +38,16 @@ data class Event constructor(
     fun hasType(et: EventType) = type == et.value
 
     companion object {
+        fun     getLatestByType(events: List<Event>, eventType: EventType): Event? =
+                events.sortedByDescending { it.occurredAt }. find { it.hasType(eventType) }
+
         fun fromJson(json: String): Event? {
             return Klaxon().
             fieldConverter(EventDateTime::class, dateTimeConverter).
             parse<Event>(json)
         }
     }
+
 }
 
 enum class EventType(val value: String) {
