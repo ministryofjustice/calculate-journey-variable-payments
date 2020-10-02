@@ -9,7 +9,7 @@ image:
   port: 8080
 
 db:
-  secret_name:
+  secret_name: rds-instance-calculate-journey-variable-payments-dev
 
 ingress:
   enabled: true
