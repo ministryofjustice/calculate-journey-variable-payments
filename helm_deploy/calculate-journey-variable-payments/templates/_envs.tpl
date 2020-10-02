@@ -22,6 +22,18 @@ env:
   - name: AWS_DEFAULT_REGION
     value: "eu-west-2"
 
+  - name: resources.provider
+    value: "s3"
+
+  - name: import-files.locations
+    value: "schedule_34_locations.xlsx"
+
+  - name: import-files.serco-prices
+    value: "serco_prices.xlsx"
+
+  - name: import-files.geo-prices
+    value: "geoamey_prices.xlsx"
+
   - name: JPC_AWS_ACCESS_KEY_ID
     valueFrom:
       secretKeyRef:
