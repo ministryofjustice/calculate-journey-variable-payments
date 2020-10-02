@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.io.File
@@ -64,16 +65,33 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
                 journeysWithEvents = listOf(journeyWithEvents)
         )
 
-        val standardPrice = MovePrice(standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
+        val standardPrice = MovePrice(LocationType.AP, LocationType.CC, standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
         sms.add(listOf(standardPrice).asSequence())
 
-        assertCellEquals(sms, 10, 0, standardMove.move.reference) // Move ref
+        assertCellEquals(sms, 10, 0, standardMove.move.reference)
+        assertCellEquals(sms, 10, 1, standardMove.move.fromLocation)
+        assertCellEquals(sms, 10, 2, "AP") // pick up location type
+
+        assertCellEquals(sms, 10, 3, standardMove.move.toLocation)
+        assertCellEquals(sms, 10, 4, "CC") // drop off location type
+
         assertCellEquals(sms, 10, 5, "10/09/2020") // Pick up date
+        assertCellEquals(sms, 10, 6, "05:00") // Pick up time
+        assertCellEquals(sms, 10, 7, "10/09/2020") // Drop off date
+        assertCellEquals(sms, 10, 8, "10:00") // Drop off time
+
+        assertCellEquals(sms, 10, 9, "JOURNEY 1: " + journeyWithEvents.journey.vehicleRegistration)
+
+        assertCellEquals(sms, 10, 10, standardMove.person?.prisonNumber)
+
+        assertThat(sms.sheet.getRow(10).getCell(11).numericCellValue).isEqualTo(standardPrice.totalInPence()?.toDouble())
+
+
 
     }
 
-    fun assertCellEquals(sms: StandardMovesSheet, row: Int, col: Int, expectedVal: String) =
+    fun assertCellEquals(sms: StandardMovesSheet, row: Int, col: Int, expectedVal: String?) =
             assertThat(sms.sheet.getRow(row).getCell(col).stringCellValue.toUpperCase()).isEqualTo(expectedVal)
 }

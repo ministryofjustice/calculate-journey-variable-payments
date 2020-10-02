@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import org.assertj.core.api.Assertions.assertThat
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.time.LocalDate
 
@@ -16,8 +17,8 @@ import java.time.LocalDate
 internal class StandardMovesPriceCalculatorTest{
 
     private val locationRepository: LocationRepository = mock { on {findAll()} doReturn listOf(
-            locationFactory(nomisAgencyId = "WYI", siteName = "from"),
-            locationFactory(nomisAgencyId = "GNI", siteName = "to")
+            locationFactory(locationType = LocationType.CC, nomisAgencyId = "WYI", siteName = "from"),
+            locationFactory(locationType = LocationType.AP, nomisAgencyId = "GNI", siteName = "to")
             )
         }
 
@@ -69,6 +70,10 @@ internal class StandardMovesPriceCalculatorTest{
 
         // M1 price should be 101p
         assertThat(prices[0].totalInPence()).isEqualTo(101)
+
+        // M1 from and to location type should be set
+        assertThat(prices[0].fromLocationType).isEqualTo(LocationType.CC)
+        assertThat(prices[0].toLocationType).isEqualTo(LocationType.AP)
 
         // M2 price should not be set
         assertThat(prices[1].totalInPence()).isNull()

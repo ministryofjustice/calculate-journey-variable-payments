@@ -1,9 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.calculator
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyWithEvents
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MovePersonJourneysEvents
 
 data class MovePrice(
+        val fromLocationType: LocationType?,
+        val toLocationType: LocationType?,
         val movePersonJourneysEvents: MovePersonJourneysEvents,
         val journeyPrices: List<JourneyPrice>
 ){
@@ -17,4 +20,6 @@ data class MovePrice(
     }
 }
 
-data class JourneyPrice(val journeyWithEvents: JourneyWithEvents, val priceInPence: Int?)
+data class JourneyPrice(
+        val journeyWithEvents: JourneyWithEvents,
+        val priceInPence: Int?)
