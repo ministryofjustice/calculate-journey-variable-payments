@@ -43,7 +43,11 @@ class PriceCalculator(val nomisAgencyId2Location: Map<String, Location>,
                 Supplier.SERCO -> sercoJourney2price[priceKey(it.journeysWithEvents[0].journey)]
                 Supplier.GEOAMEY -> geoJourney2price[priceKey(it.journeysWithEvents[0].journey)]
             }
-            MovePrice(it, listOf(JourneyPrice(it.journeysWithEvents[0], journeyPrice?.priceInPence)))
+
+            val fromLocationType = nomisAgencyId2Location.get(it.move.fromLocation)?.locationType
+            val toLocationType = nomisAgencyId2Location.get(it.move.toLocation)?.locationType
+
+            MovePrice(fromLocationType, toLocationType, it, listOf(JourneyPrice(it.journeysWithEvents[0], journeyPrice?.priceInPence)))
         }
     }
 }
