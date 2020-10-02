@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.assertj.core.api.Assertions.*
@@ -10,7 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculatorFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.io.File
 import java.time.LocalDate
 
@@ -44,6 +52,32 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
         assertThat(sms.sheet.getRow(4).getCell(1).stringCellValue.toUpperCase()).isEqualTo(Supplier.GEOAMEY.name)
     }
 
-    // TODO still need to populate and test additional standard fields e.g. from and to, version..
-    // TODO test moves prices are applied
+
+    @Test
+    internal fun `test prices`(){
+        val movesDate = LocalDate.of(2020, 9, 10)
+
+        val journeyWithEvents = JourneyWithEvents(journeyFactory(billable = true), listOf())
+        val standardMove = MovePersonJourneysEvents(
+                move = moveFactory(),
+                person = personFactory(),
+                events = listOf(
+                        moveEventFactory(type = EventType.MOVE_START.value, occurredAt = movesDate.atStartOfDay().plusHours(5)),
+                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = movesDate.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf(journeyWithEvents)
+        )
+
+        val standardPrice = MovePrice(standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
+
+        val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, PriceSheet.DateRange(movesDate, movesDate), Supplier.SERCO))
+        sms.add(listOf(standardPrice).asSequence())
+
+        assertCellEquals(sms, 10, 0, standardMove.move.reference) // Move ref
+        assertCellEquals(sms, 10, 5, "10/09/2020") // Pick up date
+
+    }
+
+    fun assertCellEquals(sms: StandardMovesSheet, row: Int, col: Int, expectedVal: String) =
+            assertThat(sms.sheet.getRow(row).getCell(col).stringCellValue.toUpperCase()).isEqualTo(expectedVal)
 }
