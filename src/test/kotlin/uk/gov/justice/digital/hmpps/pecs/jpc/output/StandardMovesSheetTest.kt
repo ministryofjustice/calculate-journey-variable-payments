@@ -55,7 +55,7 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
         val movesDate = LocalDate.of(2020, 9, 10)
 
         val journeyWithEvents = JourneyWithEvents(journeyFactory(billable = true), listOf())
-        val standardMove = MovePersonJourneysEvents(
+        val standardMove = MoveReport(
                 move = moveFactory(),
                 person = personFactory(),
                 events = listOf(
@@ -68,7 +68,7 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
         val standardPrice = MovePrice(LocationType.AP, LocationType.CC, standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
-        sms.add(listOf(standardPrice).asSequence())
+        sms.addPrices(listOf(standardPrice).asSequence())
 
         assertCellEquals(sms, 10, 0, standardMove.move.reference)
         assertCellEquals(sms, 10, 1, standardMove.move.fromLocation)

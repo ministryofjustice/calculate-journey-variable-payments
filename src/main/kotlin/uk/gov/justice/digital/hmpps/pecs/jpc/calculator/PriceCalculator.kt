@@ -8,17 +8,16 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFilterer
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MovePersonJourneysEvents
-import java.time.LocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReportFilterer
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReport
 
 @Component
 class PriceCalculatorFactory(
         @Autowired val locationRepository: LocationRepository,
         @Autowired val priceRepository: PriceRepository) {
 
-    fun calculator(moves: List<MovePersonJourneysEvents>): PriceCalculator {
+    fun calculator(moves: List<MoveReport>): PriceCalculator {
         val nomisAgencyId2Location = locationRepository.findAll().associateBy(Location::nomisAgencyId)
         val (sercoPrices, geoPrices) = priceRepository.findAll().partition { it.supplier == Supplier.SERCO }
         val sercoJourney2price = sercoPrices.associateBy { priceKey(it) }
@@ -28,26 +27,33 @@ class PriceCalculatorFactory(
     }
 }
 
-class PriceCalculator(val nomisAgencyId2Location: Map<String, Location>,
+class PriceCalculator(val agencyId2Location: Map<String, Location>,
                       val sercoJourney2price: Map<String, Price>,
                       val geoJourney2price: Map<String, Price>,
-                      val allMoves: List<MovePersonJourneysEvents>) {
+                      val moves: List<MoveReport>) {
 
     fun priceKey(journey: Journey) =
-            "${nomisAgencyId2Location[journey.fromLocation]?.siteName}-${nomisAgencyId2Location[journey.toLocation]?.siteName}"
+            "${agencyId2Location[journey.fromLocation]?.siteName}-${agencyId2Location[journey.toLocation]?.siteName}"
 
-    fun standardPrices(params: MoveFiltererParams): Sequence<MovePrice> {
-        val standardMoves = MoveFilterer.standardMoves(params, allMoves)
-        return standardMoves.map {
-            val journeyPrice = when (params.supplier) {
-                Supplier.SERCO -> sercoJourney2price[priceKey(it.journeysWithEvents[0].journey)]
-                Supplier.GEOAMEY -> geoJourney2price[priceKey(it.journeysWithEvents[0].journey)]
+    fun standardPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::standardMoveReports)
+
+    fun redirectionPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::redirectionReports)
+
+    private fun movePrices(params: FilterParams,
+                           f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
+        return f(params, moves).map {
+            val fromLocationType = agencyId2Location.get(it.move.fromLocation)?.locationType
+            val toLocationType = agencyId2Location.get(it.move.toLocation)?.locationType
+
+            val journeyPrices = it.journeysWithEvents.map {
+                JourneyPrice(it,
+                        when (params.supplier) {
+                            Supplier.SERCO -> sercoJourney2price[priceKey(it.journey)]
+                            Supplier.GEOAMEY -> geoJourney2price[priceKey(it.journey)]
+                        }?.priceInPence
+                )
             }
-
-            val fromLocationType = nomisAgencyId2Location.get(it.move.fromLocation)?.locationType
-            val toLocationType = nomisAgencyId2Location.get(it.move.toLocation)?.locationType
-
-            MovePrice(fromLocationType, toLocationType, it, listOf(JourneyPrice(it.journeysWithEvents[0], journeyPrice?.priceInPence)))
+            MovePrice(fromLocationType, toLocationType, it, journeyPrices)
         }
     }
 }

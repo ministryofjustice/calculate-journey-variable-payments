@@ -24,7 +24,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         // TODO need to add version as well.
     }
 
-    fun addStandardRow(row: Row, price: MovePrice) {
+    fun writeStandardRow(row: Row, price: MovePrice) {
 
         with(StandardValues.fromMovePrice(price)) {
             row.addCell(0, ref)
@@ -49,15 +49,15 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     fun Row.addCell(col: Int, value: String?) = createCell(col).setCellValue(value)
 
-    fun add(prices: Sequence<MovePrice>) {
+    fun addPrices(prices: Sequence<MovePrice>) {
         prices.forEach { addPrice(it) }
     }
 
     private fun addPrice(price: MovePrice) {
-        add(sheet.createRow(index.getAndIncrement()), price)
+        writeRow(sheet.createRow(index.getAndIncrement()), price)
     }
 
-    protected abstract fun add(row: Row, price: MovePrice)
+    protected abstract fun writeRow(row: Row, price: MovePrice)
 
     data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
 }

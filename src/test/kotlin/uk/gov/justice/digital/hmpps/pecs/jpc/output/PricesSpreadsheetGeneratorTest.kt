@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import java.io.File
 import java.time.Clock
 import java.time.LocalDate
@@ -20,24 +20,19 @@ import java.time.LocalDate
 @ContextConfiguration(classes = [TestConfig::class])
 internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spreadsheet-template") template: File, @Autowired private val clock: Clock) {
 
-    private val calculator: PriceCalculator = mock { onGeneric { standardPrices(any()) } doReturn sequenceOf() }
+    private val calculator: PriceCalculator = mock()
+
     private val generator: PricesSpreadsheetGenerator = PricesSpreadsheetGenerator(template, clock)
 
     @Test
     internal fun `standards moves are called for Serco`() {
-        val filter = MoveFiltererParams(Supplier.SERCO, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
+        whenever(calculator.standardPrices(any())).thenReturn(sequenceOf())
+        whenever(calculator.redirectionPrices(any())).thenReturn(sequenceOf())
+
+        val filter = FilterParams(Supplier.SERCO, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 
         generator.generate(filter, calculator)
 
-        verify(calculator).standardPrices(eq(MoveFiltererParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-    }
-
-    @Test
-    internal fun `standards moves are called for Geoamey`() {
-        val filter = MoveFiltererParams(Supplier.GEOAMEY, LocalDate.now(clock), LocalDate.now(clock).plusDays(2))
-
-        generator.generate(filter, calculator)
-
-        verify(calculator).standardPrices(eq(MoveFiltererParams(filter.supplier, filter.movesFrom, filter.movesTo)))
+        verify(calculator).standardPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
     }
 }

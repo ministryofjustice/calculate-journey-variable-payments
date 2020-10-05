@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveFiltererParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import java.io.File
 import java.io.FileOutputStream
 import java.time.Clock
@@ -18,13 +18,19 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    internal fun generate(filter: MoveFiltererParams, calculator: PriceCalculator): File {
+    internal fun generate(filter: FilterParams, calculator: PriceCalculator): File {
         val dateGenerated = LocalDate.now(clock)
 
-        XSSFWorkbook(template).use { workbook ->
-            StandardMovesSheet(workbook, PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier))
+        XSSFWorkbook(template.inputStream()).use { workbook ->
+            val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
+
+            StandardMovesSheet(workbook, header)
                     .also { logger.info("Adding standard prices.") }
-                    .apply { add(calculator.standardPrices(filter)) }
+                    .apply { addPrices(calculator.standardPrices(filter)) }
+
+            RedirectMovesSheet(workbook, header)
+                    .also { logger.info("Adding redirect prices.") }
+                    .apply { addPrices(calculator.redirectionPrices(filter)) }
 
             return createTempFile(suffix = "xlsx").apply {
                 FileOutputStream(this).use {

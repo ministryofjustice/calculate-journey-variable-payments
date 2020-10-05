@@ -21,7 +21,7 @@ class OutputSpreadsheet {
         prices.forEachIndexed{i, p ->
             val row = sheet.createRow(i+1)
 
-            with(p.movePersonJourneysEvents.move){
+            with(p.moveReport.move){
                 row.createCell(0).setCellValue(reference)
                 row.createCell(1).setCellValue(fromLocation)
                 row.createCell(2).setCellValue(toLocation)
