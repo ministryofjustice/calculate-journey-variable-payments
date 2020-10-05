@@ -16,12 +16,6 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 class ImportController(private val importService: ImportService) {
 
-    @PostMapping("/locations/import")
-    fun locations(): String = importService.importLocations().second.name
-
-    @PostMapping("/prices/import")
-    fun prices(): String = importService.importPrices().second.name
-
     @GetMapping("/generate-prices-spreadsheet/{supplier}")
     @Throws(IOException::class)
     fun generateSpreadsheet(

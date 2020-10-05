@@ -65,32 +65,35 @@ class S3ProviderConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun locationsResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String): Schedule34LocationsProvider {
-        logger.info("Using AWS S3 provider for Schedule 34 locations.")
+    fun locationsResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
+                                  @Value("\${import-files.locations}") locationsFile: String): Schedule34LocationsProvider {
+        logger.info("Using AWS S3 provider for Schedule 34 locations file: $locationsFile")
 
         return Schedule34LocationsProvider {
             logger.info("Getting locations using bucket $bucketName")
-            client.getObject(GetObjectRequest(bucketName, it)).objectContent
+            client.getObject(GetObjectRequest(bucketName, locationsFile)).objectContent
         }
     }
 
     @Bean
     @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun sercoPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String): SercoPricesProvider {
-        logger.info("Using AWS S3 provider for Serco prices.")
+    fun sercoPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
+                                    @Value("\${import-files.serco-prices}") sercoPricesFile: String): SercoPricesProvider {
+        logger.info("Using AWS S3 provider for Serco prices file: $sercoPricesFile")
         return SercoPricesProvider {
             logger.info("getting serco")
-            client.getObject(GetObjectRequest(bucketName, it)).objectContent
+            client.getObject(GetObjectRequest(bucketName, sercoPricesFile)).objectContent
         }
     }
 
     @Bean
     @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun geoameyPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String): GeoamyPricesProvider {
-        logger.info("Using AWS S3 provider for Geoamey prices.")
+    fun geoameyPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
+                                      @Value("\${import-files.geo-prices}") geoPricesFile: String): GeoamyPricesProvider {
+        logger.info("Using AWS S3 provider for Geoamey prices file: $geoPricesFile")
         return GeoamyPricesProvider {
             logger.info("getting geo")
-            client.getObject(GetObjectRequest(bucketName, it)).objectContent
+            client.getObject(GetObjectRequest(bucketName, geoPricesFile)).objectContent
         }
     }
 

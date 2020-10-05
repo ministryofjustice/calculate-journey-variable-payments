@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
@@ -23,18 +24,18 @@ class TestConfig {
     fun clock(): Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
     @Bean
-    fun locationsResourceProvider(): Schedule34LocationsProvider {
-        return Schedule34LocationsProvider { resourceLoader.getResource(it).inputStream }
+    fun locationsResourceProvider(@Value("\${import-files.locations}") locationsFile: String): Schedule34LocationsProvider {
+        return Schedule34LocationsProvider { resourceLoader.getResource(locationsFile).inputStream }
     }
 
     @Bean
-    fun sercoPricesResourceProvider(): SercoPricesProvider {
-        return SercoPricesProvider { resourceLoader.getResource(it).inputStream }
+    fun sercoPricesResourceProvider(@Value("\${import-files.serco-prices}") sercoPricesFile: String): SercoPricesProvider {
+        return SercoPricesProvider { resourceLoader.getResource(sercoPricesFile).inputStream }
     }
 
     @Bean
-    fun geoameyPricesResourceProvider(): GeoamyPricesProvider {
-        return GeoamyPricesProvider { resourceLoader.getResource(it).inputStream }
+    fun geoameyPricesResourceProvider(@Value("\${import-files.geo-prices}") geoPricesFile: String): GeoamyPricesProvider {
+        return GeoamyPricesProvider { resourceLoader.getResource(geoPricesFile).inputStream }
     }
 
     @Bean

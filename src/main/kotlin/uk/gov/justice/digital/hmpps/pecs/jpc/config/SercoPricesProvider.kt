@@ -5,4 +5,6 @@ import java.io.InputStream
 /**
  * Responsible for providing the Serco prices Excel spreadsheet via an [InputStream].
  */
-fun interface SercoPricesProvider : Provider<InputStream>
+fun interface SercoPricesProvider{
+    fun get(): InputStream
+}
