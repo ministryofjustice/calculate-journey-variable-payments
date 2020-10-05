@@ -18,12 +18,12 @@ class PriceCalculatorFactory(
         @Autowired val priceRepository: PriceRepository) {
 
     fun calculator(moves: List<MoveReport>): PriceCalculator {
-        val nomisAgencyId2Location = locationRepository.findAll().associateBy(Location::nomisAgencyId)
+        val agencyId2Location = locationRepository.findAll().associateBy(Location::nomisAgencyId)
         val (sercoPrices, geoPrices) = priceRepository.findAll().partition { it.supplier == Supplier.SERCO }
         val sercoJourney2price = sercoPrices.associateBy { priceKey(it) }
         val geoJourney2price = geoPrices.associateBy { priceKey(it) }
 
-        return PriceCalculator(nomisAgencyId2Location, sercoJourney2price, geoJourney2price, moves)
+        return PriceCalculator(agencyId2Location, sercoJourney2price, geoJourney2price, moves)
     }
 }
 

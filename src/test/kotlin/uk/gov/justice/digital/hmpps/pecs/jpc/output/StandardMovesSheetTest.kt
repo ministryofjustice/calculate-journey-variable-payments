@@ -84,7 +84,7 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
         assertCellEquals(sms, 10, 7, "10/09/2020") // Drop off date
         assertCellEquals(sms, 10, 8, "10:00") // Drop off time
 
-        assertCellEquals(sms, 10, 9, "JOURNEY 1: " + journeyWithEvents.journey.vehicleRegistration)
+        assertCellEquals(sms, 10, 9, journeyWithEvents.journey.vehicleRegistration)
 
         assertCellEquals(sms, 10, 10, standardMove.person?.prisonNumber)
 

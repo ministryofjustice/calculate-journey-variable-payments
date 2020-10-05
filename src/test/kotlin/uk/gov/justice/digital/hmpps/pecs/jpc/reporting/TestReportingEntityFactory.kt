@@ -26,7 +26,7 @@ fun json(vararg x: Any) = x.joinToString("\n") { Klaxon().toJsonString(it) }
 
 fun fromLocationFactory(
         locationType: LocationType = LocationType.PR,
-        nomisAgencyId : String = "WYU",
+        nomisAgencyId : String = "WYI",
         siteName: String = "from"
 ): Location{
     return Location(locationType, nomisAgencyId, siteName)
