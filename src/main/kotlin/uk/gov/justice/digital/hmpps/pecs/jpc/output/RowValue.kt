@@ -25,10 +25,10 @@ data class StandardValues(
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
         fun fromMovePrice(price: MovePrice): StandardValues {
-            val pickUpDate = Event.getLatestByType(price.movePersonJourneysEvents.events, EventType.MOVE_START)?.occurredAt
-            val dropOffDate = Event.getLatestByType(price.movePersonJourneysEvents.events, EventType.MOVE_COMPLETE)?.occurredAt
+            val pickUpDate = Event.getLatestByType(price.moveReport.events, EventType.MOVE_START)?.occurredAt
+            val dropOffDate = Event.getLatestByType(price.moveReport.events, EventType.MOVE_COMPLETE)?.occurredAt
 
-            return with(price.movePersonJourneysEvents.move) {
+            return with(price.moveReport.move) {
                 StandardValues(
                         reference,
                         fromLocation,
@@ -39,9 +39,9 @@ data class StandardValues(
                         pickUpDate?.format(timeFormatter),
                         dropOffDate?.format(dateFormatter),
                         dropOffDate?.format(timeFormatter),
-                        price.movePersonJourneysEvents.journeysWithEvents.withIndex().joinToString(separator = ", ") {
+                        price.moveReport.journeysWithEvents.withIndex().joinToString(separator = ", ") {
                             "Journey ${(it.index+1).toString()}: " + it.value.journey.vehicleRegistration},
-                        price.movePersonJourneysEvents.person?.prisonNumber,
+                        price.moveReport.person?.prisonNumber,
                         price.totalInPence()
                 )
             }

@@ -1,11 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import org.junit.Ignore
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
@@ -23,7 +18,7 @@ internal class StagingImporterTest {
         val movesFrom = LocalDate.of(2020, 9, 24)
         val movesTo = LocalDate.of(2020, 9, 24)
         val allMoves = importer.import(movesFrom, movesTo)
-        val standardMoves = MoveFilterer.standardMoves(MoveFiltererParams(Supplier.GEOAMEY, movesFrom, movesTo), allMoves)
+        val standardMoves = MoveReportFilterer.standardMoveReports(FilterParams(Supplier.GEOAMEY, movesFrom, movesTo), allMoves)
     }
 
 }

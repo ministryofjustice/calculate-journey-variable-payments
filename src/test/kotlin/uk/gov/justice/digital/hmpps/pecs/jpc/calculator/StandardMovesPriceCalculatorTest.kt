@@ -42,7 +42,7 @@ internal class StandardMovesPriceCalculatorTest{
         val movesFrom = LocalDate.of(2020, 9, 10)
         val movesTo = LocalDate.of(2020, 9, 11)
 
-        val completedMoveWithPricedJourney = MovePersonJourneysEvents(
+        val completedMoveWithPricedJourney = MoveReport(
                 move = moveFactory(),
                 person = personFactory(),
                 events = listOf(moveEventFactory(
@@ -51,7 +51,7 @@ internal class StandardMovesPriceCalculatorTest{
                 journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(billable = true), listOf()))
         )
 
-        val completedMoveWithUnpricedJourney = MovePersonJourneysEvents(
+        val completedMoveWithUnpricedJourney = MoveReport(
                 move = moveFactory(moveId = "M2", fromLocation = "NOTPRICED"),
                 person = personFactory(),
                 events =  listOf(moveEventFactory(
@@ -63,10 +63,10 @@ internal class StandardMovesPriceCalculatorTest{
 
         val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedJourney, completedMoveWithUnpricedJourney))
 
-        val prices = calculator.standardPrices(MoveFiltererParams(Supplier.SERCO, movesFrom, movesTo)).toList()
+        val prices = calculator.standardPrices(FilterParams(Supplier.SERCO, movesFrom, movesTo)).toList()
 
         // Both moves should be standard moves
-        assertThat(prices.map { it.movePersonJourneysEvents.move.id }).isEqualTo(listOf("M1", "M2"))
+        assertThat(prices.map { it.moveReport.move.id }).isEqualTo(listOf("M1", "M2"))
 
         // M1 price should be 101p
         assertThat(prices[0].totalInPence()).isEqualTo(101)

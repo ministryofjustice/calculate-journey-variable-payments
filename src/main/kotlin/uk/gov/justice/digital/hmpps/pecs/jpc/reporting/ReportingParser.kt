@@ -53,7 +53,7 @@ object ReportingParser {
         groupBy(Event::eventableId)
     }
 
-    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<MovePersonJourneysEvents> {
+    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<MoveReport> {
         val moves = parseAsMoves(moveFiles)
         val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
         val people = parseAsPersonIdToPerson(peopleFiles)
@@ -61,7 +61,7 @@ object ReportingParser {
         val events = parseAsEventableIdToEvents(eventFiles)
 
         val movesWithJourneysAndEvents = moves.map { move ->
-            MovePersonJourneysEvents(
+            MoveReport(
                     move = move,
                     person = if (move.profileId == null) null else people[profileId2PersonId[move.profileId]],
                     journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey ->
