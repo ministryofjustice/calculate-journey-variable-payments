@@ -49,7 +49,7 @@ class PriceImporter(private val priceRepo: PriceRepository,
         logger.info("Using Serco file: $sercoPricesFile")
         sercoPrices.get(sercoPricesFile).use { import(it, Supplier.SERCO) }
 
-        logger.info("Using Geoamey file: $sercoPricesFile")
+        logger.info("Using Geoamey file: $geoPricesFile")
         geoameyPrices.get(geoPricesFile).use { import(it, Supplier.GEOAMEY) }
     }
 }
