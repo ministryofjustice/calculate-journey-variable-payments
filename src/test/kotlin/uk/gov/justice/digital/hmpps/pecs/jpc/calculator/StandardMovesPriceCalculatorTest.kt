@@ -16,11 +16,9 @@ import java.time.LocalDate
 @ActiveProfiles("test")
 internal class StandardMovesPriceCalculatorTest{
 
-    private val locationRepository: LocationRepository = mock { on {findAll()} doReturn listOf(
-            locationFactory(locationType = LocationType.CC, nomisAgencyId = "WYI", siteName = "from"),
-            locationFactory(locationType = LocationType.AP, nomisAgencyId = "GNI", siteName = "to")
-            )
-        }
+    private val locationRepository: LocationRepository = mock {
+        on {findAll()} doReturn listOf(fromLocationFactory(), toLocationFactory())
+    }
 
     private val standardMovePrice = priceFactory(fromSiteName = "from", toSiteName = "to", priceInPence = 101)
     private val priceRepository: PriceRepository = mock { on {findAll()} doReturn listOf(standardMovePrice)}
@@ -72,8 +70,8 @@ internal class StandardMovesPriceCalculatorTest{
         assertThat(prices[0].totalInPence()).isEqualTo(101)
 
         // M1 from and to location type should be set
-        assertThat(prices[0].fromLocationType).isEqualTo(LocationType.CC)
-        assertThat(prices[0].toLocationType).isEqualTo(LocationType.AP)
+        assertThat(prices[0].fromLocation).isEqualTo(LocationType.CC)
+        assertThat(prices[0].toLocation).isEqualTo(LocationType.AP)
 
         // M2 price should not be set
         assertThat(prices[1].totalInPence()).isNull()

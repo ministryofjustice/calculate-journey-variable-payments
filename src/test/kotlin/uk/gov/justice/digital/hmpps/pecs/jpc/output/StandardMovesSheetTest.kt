@@ -65,17 +65,19 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
                 journeysWithEvents = listOf(journeyWithEvents)
         )
 
-        val standardPrice = MovePrice(LocationType.AP, LocationType.CC, standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
+        val fromLocation = fromLocationFactory()
+        val toLocation = toLocationFactory()
+        val standardPrice = MovePrice(fromLocation, toLocation, standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
         sms.addPrices(listOf(standardPrice).asSequence())
 
         assertCellEquals(sms, 10, 0, standardMove.move.reference)
-        assertCellEquals(sms, 10, 1, standardMove.move.fromLocation)
-        assertCellEquals(sms, 10, 2, "AP") // pick up location type
+        assertCellEquals(sms, 10, 1, fromLocation.siteName.toUpperCase())
+        assertCellEquals(sms, 10, 2, fromLocation.locationType.name) // pick up location type
 
-        assertCellEquals(sms, 10, 3, standardMove.move.toLocation)
-        assertCellEquals(sms, 10, 4, "CC") // drop off location type
+        assertCellEquals(sms, 10, 3, toLocation.siteName.toUpperCase())
+        assertCellEquals(sms, 10, 4, toLocation.locationType.name) // drop off location type
 
         assertCellEquals(sms, 10, 5, "10/09/2020") // Pick up date
         assertCellEquals(sms, 10, 6, "05:00") // Pick up time

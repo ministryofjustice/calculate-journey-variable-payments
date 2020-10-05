@@ -42,8 +42,8 @@ class PriceCalculator(val agencyId2Location: Map<String, Location>,
     private fun movePrices(params: FilterParams,
                            f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
         return f(params, moves).map {
-            val fromLocationType = agencyId2Location.get(it.move.fromLocation)?.locationType
-            val toLocationType = agencyId2Location.get(it.move.toLocation)?.locationType
+            val fromLocation = agencyId2Location.get(it.move.fromLocation)
+            val toLocation = agencyId2Location.get(it.move.toLocation)
 
             val journeyPrices = it.journeysWithEvents.map {
                 JourneyPrice(it,
@@ -53,7 +53,7 @@ class PriceCalculator(val agencyId2Location: Map<String, Location>,
                         }?.priceInPence
                 )
             }
-            MovePrice(fromLocationType, toLocationType, it, journeyPrices)
+            MovePrice(fromLocation, toLocation, it, journeyPrices)
         }
     }
 }

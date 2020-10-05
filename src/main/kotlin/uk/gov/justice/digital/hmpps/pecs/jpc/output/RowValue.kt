@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 
 data class StandardValues(
         val ref: String,
-        val pickUp: String,
+        val pickUp: String?,
         val pickUpLocationType: String?,
         val dropOff: String?,
         val dropOffLocationType: String?,
@@ -28,21 +28,21 @@ data class StandardValues(
             val pickUpDate = Event.getLatestByType(price.moveReport.events, EventType.MOVE_START)?.occurredAt
             val dropOffDate = Event.getLatestByType(price.moveReport.events, EventType.MOVE_COMPLETE)?.occurredAt
 
-            return with(price.moveReport.move) {
+            return with(price) {
                 StandardValues(
-                        reference,
-                        fromLocation,
-                        price.fromLocationType?.name,
-                        toLocation,
-                        price.toLocationType?.name,
+                        moveReport.move.reference,
+                        fromLocation?.siteName ?: moveReport.move.fromLocation,
+                        fromLocation?.locationType?.name ?: "NOT MAPPED",
+                        toLocation?.siteName ?: moveReport.move.toLocation,
+                        toLocation?.locationType?.name ?: "NOT MAPPED",
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         dropOffDate?.format(dateFormatter),
                         dropOffDate?.format(timeFormatter),
-                        price.moveReport.journeysWithEvents.withIndex().joinToString(separator = ", ") {
-                            "Journey ${(it.index+1).toString()}: " + it.value.journey.vehicleRegistration},
-                        price.moveReport.person?.prisonNumber,
-                        price.totalInPence()
+                        moveReport.journeysWithEvents.withIndex().joinToString(separator = ", ") {
+                            it.value.journey.vehicleRegistration ?: "NOT GIVEN"},
+                        moveReport.person?.prisonNumber,
+                        totalInPence()
                 )
             }
         }
