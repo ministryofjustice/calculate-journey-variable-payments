@@ -5,4 +5,6 @@ import java.io.InputStream
 /**
  * Responsible for providing the Schedule 34 locations Excel spreadsheet via an [InputStream].
  */
-fun interface Schedule34LocationsProvider : Provider<InputStream>
+fun interface Schedule34LocationsProvider {
+    fun get(): InputStream
+}

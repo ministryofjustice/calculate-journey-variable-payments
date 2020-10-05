@@ -2,19 +2,14 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.location.importer
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 
 @Component
-class LocationsImporter(private val locationRepo: LocationRepository,
-                        private val schedule34LocationsProvider: Schedule34LocationsProvider) {
+class LocationsImporter(private val locationRepo: LocationRepository, private val schedule34LocationsProvider: Schedule34LocationsProvider) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
-
-    @Value("\${import-files.locations}")
-    private lateinit var locationsFile: String
 
     fun import(spreadsheet: LocationsSpreadsheet) {
         val count = locationRepo.count()
@@ -31,9 +26,7 @@ class LocationsImporter(private val locationRepo: LocationRepository,
      fun import() {
         locationRepo.deleteAll()
 
-        logger.info("Using locations file: $locationsFile")
-
-        schedule34LocationsProvider.get(locationsFile).use { locations ->
+        schedule34LocationsProvider.get().use { locations ->
             LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {
                 import(it)
             }

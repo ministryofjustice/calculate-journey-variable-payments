@@ -54,7 +54,7 @@ class ImportService(
 
     fun importLocations() = importUnlessLocked(locationsImporter::import)
 
-    fun importPrices() = importUnlessLocked(priceImporter::import)
+    fun importPrices(supplier: Supplier) = importUnlessLocked { priceImporter.import(supplier) }
 
     fun spreadsheet(
             supplierName: String,
@@ -63,7 +63,7 @@ class ImportService(
             reportsTo: LocalDate): File? {
 
         return if (importLocations().second == ImportStatus.IN_PROGRESS) null
-        else if (importPrices().second == ImportStatus.IN_PROGRESS) null
+        else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
         else {
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
             val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo) }
