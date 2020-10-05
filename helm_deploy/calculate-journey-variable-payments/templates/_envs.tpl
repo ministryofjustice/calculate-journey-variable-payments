@@ -22,23 +22,38 @@ env:
   - name: AWS_DEFAULT_REGION
     value: "eu-west-2"
 
+  - name: resources.provider
+    value: "s3"
+
+  - name: import-files.locations
+    value: "schedule_34_locations.xlsx"
+
+  - name: import-files.serco-prices
+    value: "serco_prices.xlsx"
+
+  - name: import-files.geo-prices
+    value: "geoamey_prices.xlsx"
+
+  - name: export-files.template
+    value: "/app/resources/spreadsheets/JCP_template.xlsx"
+
   - name: JPC_AWS_ACCESS_KEY_ID
     valueFrom:
       secretKeyRef:
         name: {{ template "app.name" . }}-bucket
-        key: ACCESS_KEY_ID
+        key: access_key_id
 
   - name: JPC_AWS_SECRET_ACCESS_KEY
     valueFrom:
       secretKeyRef:
         name: {{ template "app.name" . }}-bucket
-        key: SECRET_ACCESS_KEY
+        key: secret_access_key
 
   - name: JPC_BUCKET_NAME
     valueFrom:
       secretKeyRef:
         name: {{ template "app.name" . }}-bucket
-        key: BUCKET_NAME
+        key: bucket_name
 
   - name: BASM_BUCKET_NAME
     valueFrom:
