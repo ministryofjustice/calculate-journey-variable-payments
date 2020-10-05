@@ -35,7 +35,7 @@ env:
     value: "geoamey_prices.xlsx"
 
   - name: export-files.template
-    value: "classpath:/spreadsheets/JCP_template.xlsx"
+    value: "/app/resources/spreadsheets/JCP_template.xlsx"
 
   - name: JPC_AWS_ACCESS_KEY_ID
     valueFrom:
