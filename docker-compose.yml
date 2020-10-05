@@ -7,10 +7,24 @@ services:
   jpc:
     image: quay.io/hmpps/calculate-journey-variable-payments:latest
     container_name: jpc
-    restart: never
     environment:
-
-
+      resources.provider: "s3"
+      import-files.locations: "schedule_34_locations.xlsx"
+      import-files.serco-prices: "serco_prices.xlsx"
+      import-files.geo-prices: "geoamey_prices.xlsx"
+      export-files.template: "src/main/resources/spreadsheets/JCP_template.xlsx"
+      SERVER_PORT: "8080"
+      APP_DB_URL: "postgres://jpc:letmein@db:5432/jpc"
+      JPC_AWS_ACCESS_KEY_ID: "localstack"
+      JPC_AWS_SECRET_ACCESS_KEY: "localstack"
+      JPC_BUCKET_NAME": "jpc"
+      BASM_AWS_ACCESS_KEY_ID: "localstack"
+      BASM_AWS_SECRET_ACCESS_KEY: "localstack"
+      BASM_BUCKET_NAME: "basm"
+    networks:
+      - hmpps
+    ports:
+      - "8080:8080"
   db:
     image: postgres:latest
     container_name: jpc-database
