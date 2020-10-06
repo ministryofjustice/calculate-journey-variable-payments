@@ -48,7 +48,8 @@ internal class PricesSpreadsheetTest {
     inner class MappingRowToPrice {
 
         private val price: Price = mock()
-        private val location: Location = Location(LocationType.CC, "agency id", "site name")
+        private val fromLocation: Location = Location(LocationType.CC, "from agency id", "site name")
+        private val toLocation: Location = Location(LocationType.CC, "from agency id", "site name")
 
         private val row: Row = sheet.createRow(1).apply {
             this.createCell(0).setCellValue(1.0)
@@ -59,10 +60,17 @@ internal class PricesSpreadsheetTest {
 
         @Test
         internal fun `can map row to price`() {
-            whenever(locationRepository.findBySiteName(any())).thenReturn(location)
-            whenever(priceRepository.findByFromLocationNameAndToLocationName(any(), any())).thenReturn(null)
+            whenever(locationRepository.findBySiteName("FROM SITE")).thenReturn(fromLocation)
+            whenever(locationRepository.findBySiteName("TO SITE")).thenReturn(toLocation)
+            whenever(priceRepository.findByFromLocationNameAndToLocationName("FROM SITE", "TO SITE")).thenReturn(null)
 
-            assertThatCode { spreadsheet.mapToPrice(row) }.doesNotThrowAnyException()
+            val price = spreadsheet.mapToPrice(row)
+
+            assertThat(price.fromLocationId).isEqualTo(fromLocation.id)
+            assertThat(price.fromLocationName).isEqualTo("FROM SITE")
+            assertThat(price.toLocationId).isEqualTo(toLocation.id)
+            assertThat(price.toLocationName).isEqualTo("TO SITE")
+            assertThat(price.priceInPence).isEqualTo(10000)
         }
 
         @Test
@@ -70,17 +78,26 @@ internal class PricesSpreadsheetTest {
             row.getCell(1).setCellValue("")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("From location name cannot be blank")
         }
 
         @Test
+        internal fun `throws error if price is zero`() {
+            row.getCell(3).setCellValue(0.0)
+
+            assertThatThrownBy { spreadsheet.mapToPrice(row) }
+                    .isInstanceOf(RuntimeException::class.java)
+                    .hasMessage("Price must be greater than zero")
+        }
+
+        @Test
         internal fun `cannot map row to price when from site not found`() {
-            whenever(locationRepository.findBySiteName("FROM SITE")).thenReturn(location)
+            whenever(locationRepository.findBySiteName("FROM SITE")).thenReturn(fromLocation)
             row.getCell(1).setCellValue("unknown from site")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("From location 'UNKNOWN FROM SITE' for supplier 'GEOAMEY' not found")
         }
 
@@ -89,7 +106,7 @@ internal class PricesSpreadsheetTest {
             row.getCell(2).setCellValue("")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("To location name cannot be blank")
         }
 
@@ -98,7 +115,7 @@ internal class PricesSpreadsheetTest {
             row.getCell(3).setCellValue("string instead of numeric")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Error retrieving price for supplier 'GEOAMEY'")
         }
 
@@ -107,28 +124,28 @@ internal class PricesSpreadsheetTest {
             row.getCell(0).setCellValue("string instead of numeric")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Error retrieving journey id for supplier 'GEOAMEY'")
         }
 
         @Test
         internal fun `cannot map row to price when to site not found`() {
-            whenever(locationRepository.findBySiteName(any())).thenReturn(location)
+            whenever(locationRepository.findBySiteName(any())).thenReturn(fromLocation)
             whenever(locationRepository.findBySiteName("UNKNOWN TO SITE")).thenReturn(null)
             row.getCell(2).setCellValue("unknown to site")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("To location 'UNKNOWN TO SITE' for supplier 'GEOAMEY' not found")
         }
 
         @Test
         internal fun `cannot map row to price when duplicate price entry`() {
-            whenever(locationRepository.findBySiteName(any())).thenReturn(location)
+            whenever(locationRepository.findBySiteName(any())).thenReturn(fromLocation)
             whenever(priceRepository.findByFromLocationNameAndToLocationName(any(), any())).thenReturn(price)
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Duplicate price with from location 'FROM SITE' and to location 'TO SITE' for supplier 'GEOAMEY'")
         }
     }

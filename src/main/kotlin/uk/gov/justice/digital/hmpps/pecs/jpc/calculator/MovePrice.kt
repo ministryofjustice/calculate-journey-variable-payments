@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.calculator
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyWithEvents
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReport
 

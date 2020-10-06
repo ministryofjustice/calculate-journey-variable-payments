@@ -21,7 +21,7 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
     init {
         val missingTabs = Tab.values().filter { spreadsheet.getSheet(it.label) == null }.toList()
 
-        if (missingTabs.isNotEmpty()) throw NullPointerException("The following tabs are missing from the locations spreadsheet: ${missingTabs.joinToString { it.label }}")
+        if (missingTabs.isNotEmpty()) throw RuntimeException("The following tabs are missing from the locations spreadsheet: ${missingTabs.joinToString { it.label }}")
     }
 
     enum class Tab(val label: String) {
@@ -49,12 +49,11 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
     private fun getRowsFrom(tab: Tab): List<Row> = spreadsheet.getSheet(tab.label).drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
 
     fun toLocation(row: Row): Location {
-        val locationType = LocationType.map(row.getFormattedStringCell(TYPE)!!)
-                ?: throw IllegalArgumentException("Unsupported location type: " + row.getFormattedStringCell(TYPE))
-        val agency = row.getFormattedStringCell(AGENCY) ?: throw NullPointerException("Agency id cannot be blank")
-        val site = row.getFormattedStringCell(SITE) ?: throw NullPointerException("Site name cannot be blank")
+        val locationType = LocationType.map(row.getFormattedStringCell(TYPE)!!) ?: throw RuntimeException("Unsupported location type: " + row.getFormattedStringCell(TYPE))
+        val agency = row.getFormattedStringCell(AGENCY) ?: throw RuntimeException("Agency id cannot be blank")
+        val site = row.getFormattedStringCell(SITE) ?: throw RuntimeException("Site name cannot be blank")
 
-        locationRepository.findByNomisAgencyId(agency).let { if (it != null) throw IllegalArgumentException("Agency id '$agency' already exists") }
+        locationRepository.findByNomisAgencyId(agency).let { if (it != null) throw RuntimeException("Agency id '$agency' already exists") }
 
         return Location(
                 locationType = locationType,
@@ -62,6 +61,5 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
                 siteName = site)
     }
 
-    fun addError(tab: Tab, row: Row, error: Throwable) = errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause
-            ?: error))
+    fun addError(tab: Tab, row: Row, error: Throwable) = errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
 }

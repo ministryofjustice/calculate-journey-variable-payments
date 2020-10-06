@@ -17,7 +17,7 @@ dependencies {
 	implementation("com.github.kittinunf.result:result:3.1.0")
 	implementation("com.github.kittinunf.result:result-coroutines:3.1.0")
 	implementation("com.beust:klaxon:5.4")
-	implementation("com.amazonaws:aws-java-sdk-s3:1.11.874")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.11.876")
 
 	testImplementation("org.mockito:mockito-inline:3.5.13")
 

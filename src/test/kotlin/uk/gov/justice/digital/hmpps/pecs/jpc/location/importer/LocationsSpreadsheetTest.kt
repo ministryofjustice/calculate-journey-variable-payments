@@ -30,9 +30,8 @@ internal class LocationsSpreadsheetTest {
                 this.createSheet(LocationsSpreadsheet.Tab.IMMIGRATION.label)
             }
 
-
             assertThatThrownBy { LocationsSpreadsheet(workbookWithMissingSheets, locationRepository) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("The following tabs are missing from the locations spreadsheet: Hospitals, Other, Police, Prisons, STC&SCH")
         }
 
@@ -57,7 +56,7 @@ internal class LocationsSpreadsheetTest {
             row.getCell(1).setCellValue("bad location type")
 
             assertThatThrownBy { spreadsheet.toLocation(row) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Unsupported location type: BAD LOCATION TYPE")
         }
 
@@ -73,7 +72,7 @@ internal class LocationsSpreadsheetTest {
             row.getCell(3).setCellValue("")
 
             assertThatThrownBy { spreadsheet.toLocation(row) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Agency id cannot be blank")
         }
 
@@ -82,7 +81,7 @@ internal class LocationsSpreadsheetTest {
             row.getCell(2).setCellValue("")
 
             assertThatThrownBy { spreadsheet.toLocation(row) }
-                    .isInstanceOf(NullPointerException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Site name cannot be blank")
         }
 
@@ -91,7 +90,7 @@ internal class LocationsSpreadsheetTest {
             whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(location)
 
             assertThatThrownBy { spreadsheet.toLocation(row) }
-                    .isInstanceOf(IllegalArgumentException::class.java)
+                    .isInstanceOf(RuntimeException::class.java)
                     .hasMessage("Agency id 'AGENCY_ID' already exists")
         }
     }
