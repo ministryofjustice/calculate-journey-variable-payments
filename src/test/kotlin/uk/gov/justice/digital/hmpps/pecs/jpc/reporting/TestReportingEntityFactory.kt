@@ -24,10 +24,18 @@ val defaultSupplier =  Supplier.SERCO.reportingName()
 
 fun json(vararg x: Any) = x.joinToString("\n") { Klaxon().toJsonString(it) }
 
-fun locationFactory(
+fun fromLocationFactory(
         locationType: LocationType = LocationType.PR,
-        nomisAgencyId : String = "WYU",
+        nomisAgencyId : String = "WYI",
         siteName: String = "from"
+): Location{
+    return Location(locationType, nomisAgencyId, siteName)
+}
+
+fun toLocationFactory(
+        locationType: LocationType = LocationType.CO,
+        nomisAgencyId : String = "GNI",
+        siteName: String = "to"
 ): Location{
     return Location(locationType, nomisAgencyId, siteName)
 }
@@ -107,7 +115,8 @@ fun journeyFactory(
         supplier: String = defaultSupplier,
         billable: Boolean = false,
         fromLocation: String = "WYI",
-        toLocation : String = "GNI"
+        toLocation : String = "GNI",
+        vehicleRegistration: String? ="UHE-92"
 
 ): Journey{
     val journey = Journey(
@@ -117,7 +126,7 @@ fun journeyFactory(
             billable=billable,
             state=state,
             supplier= supplier,
-            vehicleRegistration="UHE-92",
+            vehicleRegistration=vehicleRegistration,
             fromLocation=fromLocation,
             toLocation=toLocation)
     return journey

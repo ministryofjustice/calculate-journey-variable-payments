@@ -21,8 +21,8 @@ object MoveReportFilterer {
     private fun completedMoves(params: FilterParams, reports: Collection<MoveReport>): Sequence<MoveReport> {
         return reports.asSequence().filter {
             it.hasSupplier(params.supplier) &&
-            it.events.hasEventInDateRange(EventType.MOVE_COMPLETE, params.movesFrom, params.movesTo) &&
-            it.hasStatus(MoveStatus.COMPLETED)
+            it.hasStatus(MoveStatus.COMPLETED) &&
+            it.events.hasEventInDateRange(EventType.MOVE_COMPLETE, params.movesFrom, params.movesTo)
         }
     }
 
@@ -61,6 +61,7 @@ object MoveReportFilterer {
      */
     fun redirectionReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
         return completedMoves(params, moves).filter { report ->
+            if(report.hasEvent(EventType.MOVE_REDIRECT)) logger.info("***REDIRECT EVENT***$report")
             when (val moveStartDate = report.events.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
                 null -> {
                     logger.warn("No move start date event found for move $report")

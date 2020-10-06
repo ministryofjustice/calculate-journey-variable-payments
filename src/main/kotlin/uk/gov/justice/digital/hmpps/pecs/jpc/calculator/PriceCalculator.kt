@@ -18,12 +18,12 @@ class PriceCalculatorFactory(
         @Autowired val priceRepository: PriceRepository) {
 
     fun calculator(moves: List<MoveReport>): PriceCalculator {
-        val nomisAgencyId2Location = locationRepository.findAll().associateBy(Location::nomisAgencyId)
+        val agencyId2Location = locationRepository.findAll().associateBy(Location::nomisAgencyId)
         val (sercoPrices, geoPrices) = priceRepository.findAll().partition { it.supplier == Supplier.SERCO }
         val sercoJourney2price = sercoPrices.associateBy { priceKey(it) }
         val geoJourney2price = geoPrices.associateBy { priceKey(it) }
 
-        return PriceCalculator(nomisAgencyId2Location, sercoJourney2price, geoJourney2price, moves)
+        return PriceCalculator(agencyId2Location, sercoJourney2price, geoJourney2price, moves)
     }
 }
 
@@ -42,8 +42,8 @@ class PriceCalculator(val agencyId2Location: Map<String, Location>,
     private fun movePrices(params: FilterParams,
                            f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
         return f(params, moves).map {
-            val fromLocationType = agencyId2Location.get(it.move.fromLocation)?.locationType
-            val toLocationType = agencyId2Location.get(it.move.toLocation)?.locationType
+            val fromLocation = agencyId2Location.get(it.move.fromLocation)
+            val toLocation = agencyId2Location.get(it.move.toLocation)
 
             val journeyPrices = it.journeysWithEvents.map {
                 JourneyPrice(it,
@@ -53,7 +53,7 @@ class PriceCalculator(val agencyId2Location: Map<String, Location>,
                         }?.priceInPence
                 )
             }
-            MovePrice(fromLocationType, toLocationType, it, journeyPrices)
+            MovePrice(fromLocation, toLocation, it, journeyPrices)
         }
     }
 }

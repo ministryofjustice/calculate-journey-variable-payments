@@ -1,12 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.calculator
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyWithEvents
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReport
 
 data class MovePrice(
-        val fromLocationType: LocationType?,
-        val toLocationType: LocationType?,
+        val fromLocation: Location?,
+        val toLocation: Location?,
         val moveReport: MoveReport,
         val journeyPrices: List<JourneyPrice>
 ){
