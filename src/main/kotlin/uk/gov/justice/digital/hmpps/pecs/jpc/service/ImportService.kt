@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculatorFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
@@ -23,7 +24,8 @@ class ImportService(
         private val priceImporter: PriceImporter,
         private val reportingImporter: ReportingImporter,
         private val calculatorFactory: PriceCalculatorFactory,
-        private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator) {
+        private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator,
+        private val locationsRepository: LocationRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -66,7 +68,7 @@ class ImportService(
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
         else {
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo, locationsImporter.allImported().toList()) }
+            val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo, locationsRepository.findAll().toList()) }
             if (reports != null) {
                 pricesSpreadsheetGenerator.generate(FilterParams(supplier, movesFrom, movesTo), calculatorFactory.calculator(reports.toList()))
             } else {
