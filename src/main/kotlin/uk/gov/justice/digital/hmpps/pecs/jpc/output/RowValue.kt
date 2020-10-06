@@ -31,10 +31,10 @@ data class StandardValues(
             return with(price) {
                 StandardValues(
                         moveReport.move.reference,
-                        fromLocation?.siteName ?: moveReport.move.fromLocation,
-                        fromLocation?.locationType?.name ?: "NOT MAPPED",
-                        toLocation?.siteName ?: moveReport.move.toLocation,
-                        toLocation?.locationType?.name ?: "NOT MAPPED",
+                        moveReport.move.fromLocation?.siteName,
+                        moveReport.move.fromLocation?.locationType?.name,
+                        moveReport.move.toLocation?.siteName,
+                        moveReport.move.toLocation?.locationType?.name,
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         dropOffDate?.format(dateFormatter),

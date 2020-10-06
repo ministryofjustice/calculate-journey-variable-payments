@@ -66,7 +66,7 @@ class ImportService(
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
         else {
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo) }
+            val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo, locationsImporter.allImported().toList()) }
             if (reports != null) {
                 pricesSpreadsheetGenerator.generate(FilterParams(supplier, movesFrom, movesTo), calculatorFactory.calculator(reports.toList()))
             } else {

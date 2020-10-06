@@ -67,7 +67,7 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
 
         val fromLocation = fromLocationFactory()
         val toLocation = toLocationFactory()
-        val standardPrice = MovePrice(fromLocation, toLocation, standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
+        val standardPrice = MovePrice(standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
         sms.addPrices(listOf(standardPrice).asSequence())

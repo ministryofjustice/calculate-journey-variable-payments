@@ -32,4 +32,6 @@ class LocationsImporter(private val locationRepo: LocationRepository, private va
             }
         }
     }
+
+    fun allImported() = locationRepo.findAll()
 }

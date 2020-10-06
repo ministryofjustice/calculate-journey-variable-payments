@@ -23,8 +23,8 @@ class OutputSpreadsheet {
 
             with(p.moveReport.move){
                 row.createCell(0).setCellValue(reference)
-                row.createCell(1).setCellValue(fromLocation)
-                row.createCell(2).setCellValue(toLocation)
+                row.createCell(1).setCellValue(fromLocation?.siteName)
+                row.createCell(2).setCellValue(toLocation?.siteName)
             }
 
             p.totalInPence()?.let{

@@ -13,16 +13,16 @@ object MoveReportFilterer {
 
     private fun MoveReport.hasStatus(status: MoveStatus) = move.status == status.value
 
-    private fun List<Event>.hasEventInDateRange(eventType: EventType, from: LocalDate, to: LocalDate) =
+    private fun List<Event>.hasEventInDateRange(eventType: EventType, dateRange: ClosedRangeLocalDate) =
             with(this.find { it.hasType(eventType) }?.occurredAt?.toLocalDate()) {
-                this != null && isAfter(from.minusDays(1)) && isBefore(to.plusDays(1))
+                this != null && dateRange.contains(this)
             }
 
     private fun completedMoves(params: FilterParams, reports: Collection<MoveReport>): Sequence<MoveReport> {
         return reports.asSequence().filter {
             it.hasSupplier(params.supplier) &&
             it.hasStatus(MoveStatus.COMPLETED) &&
-            it.events.hasEventInDateRange(EventType.MOVE_COMPLETE, params.movesFrom, params.movesTo)
+            it.events.hasEventInDateRange(EventType.MOVE_COMPLETE, params.dateRange())
         }
     }
 
@@ -35,8 +35,8 @@ object MoveReportFilterer {
         return completedMoves(params, reports).filter { report ->
             with(report.journeysWithEvents.map { it.journey }) {
                 count { it.hasState(JourneyState.COMPLETED) } == 1 &&
-                        count { it.hasState(JourneyState.COMPLETED) && it.billable } == 1 &&
-                        count { it.hasState(JourneyState.CANCELLED) } == 0
+                count { it.hasState(JourneyState.COMPLETED) && it.billable } == 1 &&
+                count { it.hasState(JourneyState.CANCELLED) } == 0
             }
         }
     }
@@ -46,8 +46,11 @@ object MoveReportFilterer {
      * It must also have 2 billable, completed journeys
      */
     fun lodgingReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
-        return completedMoves(params, moves).filter { report ->
-            report.hasEvent(EventType.JOURNEY_LODGING) || (report.hasEvent(EventType.MOVE_LODGING_START) && report.hasEvent(EventType.MOVE_LODGING_END)) &&
+        return completedMoves(params, moves).filter { report -> (
+            report.hasEvent(EventType.JOURNEY_LODGING) ||
+            report.hasEvent(EventType.MOVE_LODGING_START) ||
+            report.hasEvent(EventType.MOVE_LODGING_END)
+            ) &&
             with(report.journeysWithEvents.map { it.journey }) {
                 count { it.hasState(JourneyState.COMPLETED) && it.billable } == 2
             }
