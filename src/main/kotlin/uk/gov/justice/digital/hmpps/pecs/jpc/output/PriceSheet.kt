@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
+import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
@@ -10,6 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger
 abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     private val index: AtomicInteger = AtomicInteger(10)
+
+    protected fun createRow() = sheet.createRow(index.getAndIncrement())
 
     init {
         applyHeader()
@@ -24,9 +27,8 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         // TODO need to add version as well.
     }
 
-    fun writeStandardRow(row: Row, price: MovePrice) {
-
-        with(StandardValues.fromMovePrice(price)) {
+    private fun writeRow(row: Row, rowValue: RowValue){
+        with(rowValue) {
             row.addCell(0, ref)
             row.addCell(1, pickUp)
             row.addCell(2, pickUpLocationType)
@@ -39,11 +41,18 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             row.addCell(9, vehicleReg)
             row.addCell(10, prisonNumber)
 
-            totalInPence?.let {
+            priceInPence?.let {
                 row.createCell(11).setCellValue(it.toDouble())
             } ?: row.createCell(11).setCellValue("NOT PRESENT")
         }
+    }
 
+    fun writeMoveRow(price: MovePrice) = writeRow(createRow(), RowValue.forMovePrice(price))
+
+    fun writeJourneyRows(prices: List<JourneyPrice>) {
+        prices.forEachIndexed {i, j ->
+            writeRow(createRow(), RowValue.forJourneyPrices(i, j))
+        }
 
     }
 
@@ -54,10 +63,10 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
     private fun addPrice(price: MovePrice) {
-        writeRow(sheet.createRow(index.getAndIncrement()), price)
+        writeMove(price)
     }
 
-    protected abstract fun writeRow(row: Row, price: MovePrice)
+    protected abstract fun writeMove(price: MovePrice)
 
     data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
 }

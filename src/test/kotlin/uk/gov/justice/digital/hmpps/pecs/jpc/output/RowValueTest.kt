@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.time.LocalDate
 
-internal class StandardValuesTest {
+internal class RowValueTest {
     val from = LocalDate.of(2020, 9, 10)
     val to = LocalDate.of(2020, 9, 11)
 
@@ -32,9 +32,9 @@ internal class StandardValuesTest {
                 JourneyPrice(journey2, 50)
 
         ))
-        val vals = StandardValues.fromMovePrice(price)
+        val moveRow = RowValue.forMovePrice(price)
 
-        assertThat(vals).isEqualTo(StandardValues(
+        assertThat(moveRow).isEqualTo(RowValue(
                 "UKW4591N",
                 "from",
                 "PR",
@@ -68,9 +68,9 @@ internal class StandardValuesTest {
         )
         val price = MovePrice(moveWithMappedLocations, listOf(JourneyPrice(journey, 80)))
 
-        val vals = StandardValues.fromMovePrice(price)
+        val vals = RowValue.forMovePrice(price)
 
-        assertThat(vals).isEqualTo(StandardValues(
+        assertThat(vals).isEqualTo(RowValue(
                 "UKW4591N",
                 "NOT_MAPPED_AGENCY_ID",
                 "UNKNOWN",
