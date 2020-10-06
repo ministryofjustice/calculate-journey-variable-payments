@@ -40,6 +40,9 @@ fun toLocationFactory(
     return Location(locationType, nomisAgencyId, siteName)
 }
 
+fun noLocationFactory() =  Location(LocationType.UNKNOWN, "NOT_MAPPED_AGENCY_ID", "NOT_MAPPED_AGENCY_ID")
+
+
 fun priceFactory(
         supplier: Supplier = Supplier.SERCO,
         fromSiteName: String = "from",
@@ -62,8 +65,8 @@ fun moveFactory(
         supplier: String = defaultSupplier,
         profileId: String = defaultProfileId,
         status: String = MoveStatus.COMPLETED.value,
-        fromLocation: String = "WYI",
-        toLocation : String = "GNI"
+        fromLocation: Location = fromLocationFactory(),
+        toLocation : Location = toLocationFactory()
     ): Move {
     val move = Move(
             id = moveId,
@@ -114,8 +117,8 @@ fun journeyFactory(
         state: String = JourneyState.COMPLETED.value,
         supplier: String = defaultSupplier,
         billable: Boolean = false,
-        fromLocation: String = "WYI",
-        toLocation : String = "GNI",
+        fromLocation: Location = fromLocationFactory(),
+        toLocation : Location = toLocationFactory(),
         vehicleRegistration: String? ="UHE-92"
 
 ): Journey{

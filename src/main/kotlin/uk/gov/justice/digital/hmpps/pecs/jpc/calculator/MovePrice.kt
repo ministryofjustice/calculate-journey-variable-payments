@@ -6,8 +6,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyWithEvents
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReport
 
 data class MovePrice(
-        val fromLocation: Location?,
-        val toLocation: Location?,
         val moveReport: MoveReport,
         val journeyPrices: List<JourneyPrice>
 ){

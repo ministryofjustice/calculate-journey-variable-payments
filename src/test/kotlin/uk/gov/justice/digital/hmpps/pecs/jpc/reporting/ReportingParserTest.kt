@@ -15,6 +15,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 @ActiveProfiles("test")
 internal class ReportingParserTest {
 
+    val locations = listOf(fromLocationFactory(), toLocationFactory())
+
     fun profileReports() : List<String> {
         val report1 = """{"id":"PR1","person_id":"PE1"}""".trimIndent()
         return listOf(report1)
@@ -79,7 +81,7 @@ internal class ReportingParserTest {
     @Test
     fun `Get import moves should return only unique, completed moves`() {
 
-        val moves = ReportingParser.parseAsMoves(moveReports())
+        val moves = ReportingParser.parseAsMoves(moveReports(), locations)
         Assertions.assertEquals(1, moves.size)
 
         // M1 should be complete
@@ -90,7 +92,7 @@ internal class ReportingParserTest {
     fun `Assert no Move created from bad json and no exception generated`() {
         val moveJsonWithNullFromLocation = """{"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null, "rejection_reason":null,"from_location_type":"prison","from_location":null,"to_location_type":"prison","to_location":"GNI","supplier":"geoamey"}
 """
-        val moves = ReportingParser.parseAsMoves(listOf(moveJsonWithNullFromLocation))
+        val moves = ReportingParser.parseAsMoves(listOf(moveJsonWithNullFromLocation), locations)
 
         Assertions.assertEquals(0, moves.size)
     }
@@ -98,7 +100,7 @@ internal class ReportingParserTest {
     @Test
     fun `Get import journeys`() {
 
-        val journeys = ReportingParser.parseAsMoveIdToJourneys(journeyReports())
+        val journeys = ReportingParser.parseAsMoveIdToJourneys(journeyReports(), listOf())
 
         // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
         Assertions.assertEquals(setOf("M1", "M2", "M3"), journeys.keys)

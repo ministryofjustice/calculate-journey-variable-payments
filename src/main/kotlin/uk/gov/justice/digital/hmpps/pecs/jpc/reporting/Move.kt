@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
+import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import java.time.LocalDate
 import javax.validation.constraints.NotBlank
 
@@ -26,16 +28,16 @@ data class Move(
         val status: String,
 
         @Json(name = "from_location")
-        @get: NotBlank(message = "from location cannot be blank")
-        val fromLocation: String,
+        val fromLocation: Location,
 
         @Json(name = "to_location")
-        val toLocation: String? = null,
+        val toLocation: Location? = null
 
 ) {
     companion object {
-        fun fromJson(json: String): Move? {
+        fun fromJson(json: String, locationConverter: Converter): Move? {
             return Klaxon().
+            converter(locationConverter).
             fieldConverter(EventDate::class, dateConverter).
             parse<Move>(json)
         }

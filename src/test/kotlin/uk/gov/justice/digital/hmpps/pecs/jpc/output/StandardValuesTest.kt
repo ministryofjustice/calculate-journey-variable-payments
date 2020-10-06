@@ -11,24 +11,23 @@ internal class StandardValuesTest {
     val from = LocalDate.of(2020, 9, 10)
     val to = LocalDate.of(2020, 9, 11)
 
-    val journey1 = JourneyWithEvents(journeyFactory(journeyId = "J1M1", billable = true, vehicleRegistration = "V1"))
-    val journey2 = JourneyWithEvents(journeyFactory(journeyId = "J2M1", billable = true, vehicleRegistration = null))
-
-    private val standardInDateRange = MoveReport(
-            move = moveFactory(),
-            person = personFactory(),
-            events = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-            ),
-            journeysWithEvents = listOf(journey1, journey2)
-    )
 
     @Test
     fun `MovePrice with sitenames and 2 journeys, one with no vehicle id, rendered correctly`() {
-        val from = fromLocationFactory()
-        val to = toLocationFactory()
-        val price = MovePrice(from, to, standardInDateRange, listOf(
+        val journey1 = JourneyWithEvents(journeyFactory(journeyId = "J1M1", billable = true, vehicleRegistration = "V1"))
+        val journey2 = JourneyWithEvents(journeyFactory(journeyId = "J2M1", billable = true, vehicleRegistration = null))
+
+        val moveWithMappedLocations = MoveReport(
+                move = moveFactory(),
+                person = personFactory(),
+                events = listOf(
+                        moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf(journey1, journey2)
+        )
+
+        val price = MovePrice(moveWithMappedLocations, listOf(
                 JourneyPrice(journey1, 100),
                 JourneyPrice(journey2, 50)
 
@@ -37,10 +36,10 @@ internal class StandardValuesTest {
 
         assertThat(vals).isEqualTo(StandardValues(
                 "UKW4591N",
-                from.siteName,
-                from.locationType.name,
-                to.siteName,
-                to.locationType.name,
+                "from",
+                "PR",
+                "to",
+                "CO",
                 "10/09/2020",
                 "05:00",
                 "10/09/2020",
@@ -54,21 +53,34 @@ internal class StandardValuesTest {
 
     @Test
     fun `MovePrice without sitenames rendered correctly`() {
-        val price = MovePrice(null, null, standardInDateRange, listOf(JourneyPrice(journey1, 80)))
+        val noMappedFrom = noLocationFactory()
+        val noMappedTo = noLocationFactory()
+        val journey = JourneyWithEvents(journeyFactory(journeyId = "J1M1", fromLocation = noMappedFrom, toLocation = noMappedTo, billable = true, vehicleRegistration = "V1"))
+
+        val moveWithMappedLocations = MoveReport(
+                move = moveFactory(fromLocation = noMappedFrom, toLocation = noMappedTo),
+                person = personFactory(),
+                events = listOf(
+                        moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf(journey)
+        )
+        val price = MovePrice(moveWithMappedLocations, listOf(JourneyPrice(journey, 80)))
 
         val vals = StandardValues.fromMovePrice(price)
 
         assertThat(vals).isEqualTo(StandardValues(
                 "UKW4591N",
-                "WYI",
-                "NOT MAPPED",
-                "GNI",
-                "NOT MAPPED",
+                "NOT_MAPPED_AGENCY_ID",
+                "UNKNOWN",
+                "NOT_MAPPED_AGENCY_ID",
+                "UNKNOWN",
                 "10/09/2020",
                 "05:00",
                 "10/09/2020",
                 "10:00",
-                "V1, NOT GIVEN",
+                "V1",
                 "PRISON1",
                 80
         ))

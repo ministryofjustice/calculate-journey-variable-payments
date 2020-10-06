@@ -1,7 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 
+@Component
 object ReportingParser {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -34,15 +37,17 @@ object ReportingParser {
         return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
     }
 
-    fun parseAsMoves(moveFiles: List<String>): Collection<Move> {
-        return read(moveFiles) { Move.fromJson(it) }.
+    fun parseAsMoves(moveFiles: List<String>, locations: List<Location>): Collection<Move> {
+        val locationConverter = LocationConverter(locations)
+        return read(moveFiles) { Move.fromJson(it, locationConverter) }.
         filter { MoveStatus.statuses.contains(it.status) }.
         associateBy(Move::id).values
     }
 
 
-    fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
-        return read(journeyFiles) { Journey.fromJson(it) }.
+    fun parseAsMoveIdToJourneys(journeyFiles: List<String>, locations: List<Location>): Map<String, List<Journey>> {
+        val locationConverter = LocationConverter(locations)
+        return read(journeyFiles) { Journey.fromJson(it, locationConverter) }.
         filter { JourneyState.states.contains(it.state) }.
         associateBy(Journey::id).values.groupBy(Journey::moveId)
     }
@@ -53,11 +58,11 @@ object ReportingParser {
         groupBy(Event::eventableId)
     }
 
-    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<MoveReport> {
-        val moves = parseAsMoves(moveFiles)
+    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>, locations: List<Location> = listOf()): List<MoveReport> {
+        val moves = parseAsMoves(moveFiles, locations)
         val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
         val people = parseAsPersonIdToPerson(peopleFiles)
-        val journeys = parseAsMoveIdToJourneys(journeyFiles)
+        val journeys = parseAsMoveIdToJourneys(journeyFiles, locations)
         val events = parseAsEventableIdToEvents(eventFiles)
 
         val movesWithJourneysAndEvents = moves.map { move ->
