@@ -37,20 +37,22 @@ class PricesSpreadsheet(private val spreadsheet: Workbook,
     fun mapToPrice(row: Row) = getPrice(supplier, row)
 
     private fun getPrice(supplier: Supplier, row: Row): Price {
-        val journeyId = Result.runCatching { row.getCell(JOURNEY_ID).numericCellValue }.getOrElse { throw IllegalArgumentException("Error retrieving journey id for supplier '$supplier'", it) }
+        val journeyId = Result.runCatching { row.getCell(JOURNEY_ID).numericCellValue }.getOrElse { throw RuntimeException("Error retrieving journey id for supplier '$supplier'", it) }
         val fromLocationName = row.getFormattedStringCell(FROM_LOCATION)
-                ?: throw NullPointerException("From location name cannot be blank")
+                ?: throw RuntimeException("From location name cannot be blank")
         val toLocationName = row.getFormattedStringCell(TO_LOCATION)
-                ?: throw NullPointerException("To location name cannot be blank")
-        val price = Result.runCatching { row.getCell(PRICE).numericCellValue }.getOrElse { throw IllegalArgumentException("Error retrieving price for supplier '$supplier'", it) }
+                ?: throw RuntimeException("To location name cannot be blank")
+        val price = Result.runCatching { (row.getCell(PRICE).numericCellValue * 100).toInt() }
+                .onSuccess { if (it == 0) throw RuntimeException("Price must be greater than zero") }
+                .getOrElse { throw RuntimeException("Error retrieving price for supplier '$supplier'", it) }
 
         val fromLocation = locationRepo.findBySiteName(fromLocationName)
-                ?: throw NullPointerException("From location '$fromLocationName' for supplier '$supplier' not found")
+                ?: throw RuntimeException("From location '$fromLocationName' for supplier '$supplier' not found")
         val toLocation = locationRepo.findBySiteName(toLocationName)
-                ?: throw NullPointerException("To location '$toLocationName' for supplier '$supplier' not found")
+                ?: throw RuntimeException("To location '$toLocationName' for supplier '$supplier' not found")
 
         priceRepository.findByFromLocationNameAndToLocationName(fromLocation.siteName, toLocation.siteName)?.let {
-            throw IllegalArgumentException("Duplicate price with from location '$fromLocationName' and to location '$toLocationName' for supplier '$supplier'")
+            throw RuntimeException("Duplicate price with from location '$fromLocationName' and to location '$toLocationName' for supplier '$supplier'")
         }
 
         return Price(
@@ -60,7 +62,7 @@ class PricesSpreadsheet(private val spreadsheet: Workbook,
                 toLocationName = toLocationName,
                 toLocationId = toLocation.id,
                 journeyId = journeyId.toInt(),
-                priceInPence = (price * 100).toInt())
+                priceInPence = price)
     }
 
     fun addError(row: Row, error: Throwable) = errors.add(PricesSpreadsheetError(supplier, row.rowNum + ROW_OFFSET, error.cause?.cause

@@ -11,7 +11,17 @@ class LocationsImporter(private val locationRepo: LocationRepository, private va
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(spreadsheet: LocationsSpreadsheet) {
+    fun import() {
+        locationRepo.deleteAll()
+
+        schedule34LocationsProvider.get().use { locations ->
+            LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {
+                import(it)
+            }
+        }
+    }
+
+    private fun import(spreadsheet: LocationsSpreadsheet) {
         val count = locationRepo.count()
 
         LocationsSpreadsheet.Tab.values().forEach { tab -> spreadsheet.forEachRowOn(tab) { locationRepo.save(it) } }
@@ -21,15 +31,5 @@ class LocationsImporter(private val locationRepo: LocationRepository, private va
         val inserted = locationRepo.count() - count
 
         logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
-    }
-
-     fun import() {
-        locationRepo.deleteAll()
-
-        schedule34LocationsProvider.get().use { locations ->
-            LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {
-                import(it)
-            }
-        }
     }
 }
