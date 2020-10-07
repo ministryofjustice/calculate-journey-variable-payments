@@ -19,8 +19,9 @@ data class RowValue(
         val dropOffTime: String?,
         val vehicleReg: String?,
         val prisonNumber: String?,
-        val priceInPence: Int?,
-        val billable: String?
+        val priceInPounds: Double?,
+        val billable: String?,
+        val notes: String
 ){
 
     companion object {
@@ -45,8 +46,9 @@ data class RowValue(
                         moveReport.journeysWithEvents.withIndex().joinToString(separator = ", ") {
                             it.value.journey.vehicleRegistration ?: "NOT GIVEN"},
                         moveReport.person?.prisonNumber,
-                        totalInPence(),
-                        null
+                        totalInPence()?.let{it.toDouble() / 100},
+                        null,
+                        ""
                 )
             }
         }
@@ -69,10 +71,13 @@ data class RowValue(
                         if(cancelled) "CANCELLED" else dropOffDate?.format(timeFormatter),
                         journeyWithEvents.journey.vehicleRegistration,
                         null,
-                        priceInPence,
-                        if(journeyWithEvents.journey.billable) "YES" else "NO"
+                        priceInPence?.let { it.toDouble() / 100 },
+                        if(journeyWithEvents.journey.billable) "YES" else "NO",
+                        journeyWithEvents.events.notes()
                 )
             }
         }
     }
 }
+
+fun List<Event>.notes() = this.filter { !it.notes.isNullOrBlank() }.joinToString(separator = "\n") {"* " + it.notes}

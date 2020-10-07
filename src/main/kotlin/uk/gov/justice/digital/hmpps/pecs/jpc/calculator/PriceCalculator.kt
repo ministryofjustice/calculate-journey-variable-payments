@@ -34,10 +34,10 @@ class PriceCalculator(val sercoJourney2price: Map<String, Price>,
 
     fun longHaulPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::longHaulReports)
 
-    private fun movePrices(params: FilterParams,
-                           f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
-        return f(params, moves).map {
+    fun multiTypePrices(params: FilterParams) = movePrices(params, MoveReportFilterer::multiTypeReports)
 
+    private fun movePrices(params: FilterParams, f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
+        return f(params, moves).map {
             val journeyPrices = it.journeysWithEvents.map {
                 JourneyPrice(it,
                         if(it.journey.billable) {

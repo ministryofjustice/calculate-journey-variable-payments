@@ -38,6 +38,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spr
         whenever(calculator.standardPrices(any())).thenReturn(sequenceOf())
         whenever(calculator.redirectionPrices(any())).thenReturn(sequenceOf())
         whenever(calculator.longHaulPrices(any())).thenReturn(sequenceOf())
+        whenever(calculator.multiTypePrices(any())).thenReturn(sequenceOf())
 
         val filter = FilterParams(Supplier.SERCO, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 
@@ -46,6 +47,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spr
         verify(calculator).standardPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
         verify(calculator).redirectionPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
         verify(calculator).longHaulPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
+        verify(calculator).multiTypePrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
         verify(sercoProviderSpy).get()
     }
 
@@ -54,6 +56,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spr
         whenever(calculator.standardPrices(any())).thenReturn(sequenceOf())
         whenever(calculator.redirectionPrices(any())).thenReturn(sequenceOf())
         whenever(calculator.longHaulPrices(any())).thenReturn(sequenceOf())
+        whenever(calculator.multiTypePrices(any())).thenReturn(sequenceOf())
 
         val filter = FilterParams(Supplier.GEOAMEY, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 
@@ -62,6 +65,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spr
         verify(calculator).standardPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
         verify(calculator).redirectionPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
         verify(calculator).longHaulPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
+        verify(calculator).multiTypePrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
         verify(geoProviderSpy).get()
     }
 }

@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 class RedirectMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Redirections")!!, header) {
 
     override fun writeMove(price: MovePrice) {
-        writeMoveRow(price)
+        writeMoveRow(price, true)
         writeJourneyRows(price.journeyPrices)
     }
 }

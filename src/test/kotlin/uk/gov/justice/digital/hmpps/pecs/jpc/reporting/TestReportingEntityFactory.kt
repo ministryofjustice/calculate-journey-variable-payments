@@ -140,7 +140,8 @@ fun journeyEventFactory(
         journeyId: String = defaultJourneyId,
         type: String = EventType.JOURNEY_START.value,
         supplier: String = defaultSupplier,
-        occurredAt: LocalDateTime = defaultDateTime
+        occurredAt: LocalDateTime = defaultDateTime,
+        notes: String = ""
 ): Event{
     val event = Event(
             id=journeyEventId,
@@ -151,7 +152,7 @@ fun journeyEventFactory(
             details= mapOf(),
             occurredAt=occurredAt,
             recordedAt=defaultDateTime,
-            notes="")
+            notes=notes)
     return event
 }
 

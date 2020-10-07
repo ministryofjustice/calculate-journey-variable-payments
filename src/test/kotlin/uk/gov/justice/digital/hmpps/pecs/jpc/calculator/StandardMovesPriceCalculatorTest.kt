@@ -71,7 +71,22 @@ internal class StandardMovesPriceCalculatorTest{
                         JourneyWithEvents(journeyFactory(moveId = "M3", billable = false), listOf()))
         )
 
-        val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedBillableJourney, redirectMoveWithUnbillableJourney, completedMoveWithUnpricedJourney))
+
+        val complexMove = MoveReport(
+                move = moveFactory(moveId = "M4"),
+                person = personFactory(),
+                events = listOf(
+                        moveEventFactory(moveId = "M4", type = EventType.MOVE_START.value, occurredAt = movesFrom.atStartOfDay()),
+                        moveEventFactory(moveId = "M4", type = EventType.MOVE_REDIRECT.value, occurredAt = movesFrom.atStartOfDay().plusHours(5)),
+                        moveEventFactory(moveId = "M4", type = EventType.MOVE_LODGING_START.value, occurredAt = movesFrom.atStartOfDay().plusHours(5)),
+                        moveEventFactory(moveId = "M4", type = EventType.MOVE_COMPLETE.value, occurredAt = movesFrom.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf(
+                        JourneyWithEvents(journeyFactory(moveId = "M4", billable = true), listOf()),
+                        JourneyWithEvents(journeyFactory(moveId = "M4", billable = false), listOf()))
+        )
+
+        val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedBillableJourney, redirectMoveWithUnbillableJourney, completedMoveWithUnpricedJourney, complexMove))
 
         val standardPrices = calculator.standardPrices(FilterParams(Supplier.SERCO, movesFrom, movesTo)).toList()
 
@@ -87,8 +102,8 @@ internal class StandardMovesPriceCalculatorTest{
         // M2 price should not be set
         assertThat(standardPrices[1].totalInPence()).isNull()
 
-        // TODO test non billable journeys are priced correctly (i.e. have null for their price)
-        // Need to incorporate this into the Complex moves (not implemented yet)
+        val multiTypePrices = calculator.multiTypePrices(FilterParams(Supplier.SERCO, movesFrom, movesTo))
 
+        assertThat(multiTypePrices.map{it.moveReport.move.id}.toSet()).isEqualTo(setOf("M3", "M4"))
     }
 }

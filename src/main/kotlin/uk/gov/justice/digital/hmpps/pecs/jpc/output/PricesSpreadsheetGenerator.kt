@@ -37,10 +37,14 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
             RedirectMovesSheet(workbook, header)
                     .also { logger.info("Adding redirect prices.") }
                     .apply { addPrices(calculator.redirectionPrices(filter)) }
-
+    
             LongHaulMovesSheet(workbook, header)
                     .also { logger.info("Adding long haul prices.") }
                     .apply { addPrices(calculator.longHaulPrices(filter)) }
+
+            MultiTypeMovesSheet(workbook, header)
+                    .also { logger.info("Adding multitype prices.") }
+                    .apply { addPrices(calculator.multiTypePrices(filter)) }
 
             JPCPriceBookSheet(workbook)
                     .also { logger.info("Adding supplier JPC price book used.") }

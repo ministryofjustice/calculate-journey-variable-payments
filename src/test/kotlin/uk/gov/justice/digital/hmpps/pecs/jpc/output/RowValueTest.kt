@@ -12,7 +12,13 @@ internal class RowValueTest {
     val to = LocalDate.of(2020, 9, 11)
 
     val cancelledJourney = JourneyWithEvents(journeyFactory(journeyId = "J1M1", state = JourneyState.CANCELLED.value, billable = false, vehicleRegistration = "V1"),
-            listOf(journeyEventFactory(type = EventType.JOURNEY_START.value)))
+            listOf(
+                    journeyEventFactory(type = EventType.JOURNEY_START.value),
+                    journeyEventFactory(type = EventType.JOURNEY_CANCEL.value, notes = "cancelled due to fog"),
+                    journeyEventFactory(type = EventType.JOURNEY_CANCEL.value, notes = "off because of sun")
+            )
+
+    )
     val cancelledJourneyPrice = JourneyPrice(cancelledJourney, null)
 
 
@@ -25,8 +31,8 @@ internal class RowValueTest {
             move = moveFactory(),
             person = personFactory(),
             events = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                    moveEventFactory(eventId = "1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                    moveEventFactory(eventId = "2", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
             ),
             journeysWithEvents = listOf(cancelledJourney, completedJourney)
     )
@@ -52,7 +58,8 @@ internal class RowValueTest {
                 "V1, NOT GIVEN",
                 "PRISON1",
                 null,
-                null
+                null,
+                ""
         ))
     }
 
@@ -74,7 +81,8 @@ internal class RowValueTest {
                 "V1",
                 null,
                 null,
-                "NO"
+                "NO",
+                "* cancelled due to fog\n* off because of sun"
         ))
     }
 
@@ -96,8 +104,9 @@ internal class RowValueTest {
                 "10:20",
                 null,
                 null,
-                50,
-                "YES"
+                0.5,
+                "YES",
+                ""
         ))
     }
 
@@ -133,8 +142,9 @@ internal class RowValueTest {
                 "10:00",
                 "V1",
                 "PRISON1",
-                80,
-                null
+                0.8,
+                null,
+                ""
         ))
     }
 }
