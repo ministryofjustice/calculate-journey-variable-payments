@@ -32,16 +32,20 @@ class PriceCalculator(val sercoJourney2price: Map<String, Price>,
 
     fun redirectionPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::redirectionReports)
 
+    fun longHaulPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::longHaulReports)
+
     private fun movePrices(params: FilterParams,
                            f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
         return f(params, moves).map {
 
             val journeyPrices = it.journeysWithEvents.map {
                 JourneyPrice(it,
-                        when (params.supplier) {
-                            Supplier.SERCO -> sercoJourney2price[priceKey(it.journey)]
-                            Supplier.GEOAMEY -> geoJourney2price[priceKey(it.journey)]
-                        }?.priceInPence
+                        if(it.journey.billable) {
+                            when (params.supplier) {
+                                Supplier.SERCO -> sercoJourney2price[priceKey(it.journey)]
+                                Supplier.GEOAMEY -> geoJourney2price[priceKey(it.journey)]
+                            }?.priceInPence
+                        } else null
                 )
             }
             MovePrice(it, journeyPrices)

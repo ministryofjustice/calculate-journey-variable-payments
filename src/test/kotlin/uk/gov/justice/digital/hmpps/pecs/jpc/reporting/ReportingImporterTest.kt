@@ -25,8 +25,8 @@ internal class ReportingImporterTest {
     @Autowired
     lateinit var importer: ReportingImporter
 
-    val from = LocalDate.of(2020, 9, 2)
-    val to = LocalDate.of(2020, 9, 2)
+    val from = LocalDate.of(2020, 9, 1)
+    val to = LocalDate.of(2020, 9, 3)
 
     @Test
     fun `For the 3rd of the month, starting on the 2nd should return 2 file names`() {
@@ -44,28 +44,34 @@ internal class ReportingImporterTest {
                 LocalDate.of(2020, 9, 3))
 
         // This should only pick up the completed moves
-        Assertions.assertEquals(setOf("M1", "M3",  "M5", "M6"), content.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M2", "M20",  "M3", "M30"), content.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Standard moves should only include completed moves with one billable, completed journey`() {
 
         val moves = importer.import(from, to)
-
         val standardReports = MoveReportFilterer.standardMoveReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
 
-        // M1 should be the only standard move
-        Assertions.assertEquals(setOf("M1"), standardReports.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.move.id }.toSet())
     }
 
     @Test
-    fun `Simple redirect moves should only include completed moves with two billable journeys`() {
+    fun `Redirect moves should only include completed moves with two billable journeys`() {
 
         val moves = importer.import(from, to)
-
         val redirectionReports = MoveReportFilterer.redirectionReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
 
-        Assertions.assertEquals(setOf("M6"), redirectionReports.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.move.id }.toSet())
+    }
+
+    @Test
+    fun `Long haul moves should only include completed moves with two billable journeys`() {
+
+        val moves = importer.import(from, to)
+        val longHaulReports = MoveReportFilterer.longHaulReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
+
+        Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.move.id }.toSet())
     }
 
 }

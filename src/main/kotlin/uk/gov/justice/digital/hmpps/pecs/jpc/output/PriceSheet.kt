@@ -12,7 +12,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     private val index: AtomicInteger = AtomicInteger(10)
 
-    protected fun createRow() = sheet.createRow(index.getAndIncrement())
+    private fun createRow(): Row = sheet.createRow(index.getAndIncrement())
 
     init {
         applyHeader()
@@ -42,29 +42,27 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             row.addCell(10, prisonNumber)
 
             priceInPence?.let {
-                row.createCell(11).setCellValue(it.toDouble())
+                row.createCell(11).setCellValue(it.toDouble() / 100)
             } ?: row.createCell(11).setCellValue("NOT PRESENT")
+
+            row.addCell(12, billable)
         }
     }
 
     fun writeMoveRow(price: MovePrice) = writeRow(createRow(), RowValue.forMovePrice(price))
 
     fun writeJourneyRows(prices: List<JourneyPrice>) {
-        prices.forEachIndexed {i, j ->
-            writeRow(createRow(), RowValue.forJourneyPrices(i, j))
+        prices.forEachIndexed {i, jp ->
+            writeRow(createRow(), RowValue.forJourneyPrice(i +1, jp))
         }
 
     }
 
-    fun Row.addCell(col: Int, value: String?) = createCell(col).setCellValue(value)
+    private fun Row.addCell(col: Int, value: String?) = createCell(col).setCellValue(value)
 
-    fun addPrices(prices: Sequence<MovePrice>) {
-        prices.forEach { addPrice(it) }
-    }
+    fun addPrices(prices: Sequence<MovePrice>) = prices.forEach { addPrice(it) }
 
-    private fun addPrice(price: MovePrice) {
-        writeMove(price)
-    }
+    private fun addPrice(price: MovePrice) = writeMove(price)
 
     protected abstract fun writeMove(price: MovePrice)
 

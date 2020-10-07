@@ -88,7 +88,7 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
 
         assertCellEquals(sms, 10, 10, standardMove.person?.prisonNumber)
 
-        assertThat(sms.sheet.getRow(10).getCell(11).numericCellValue).isEqualTo(standardPrice.totalInPence()?.toDouble())
+        assertThat(sms.sheet.getRow(10).getCell(11).numericCellValue).isEqualTo(10.01)
 
 
 

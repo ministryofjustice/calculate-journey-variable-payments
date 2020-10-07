@@ -94,7 +94,7 @@ internal class MoveReportFiltererTest{
     @Test
     fun `Only lodging moves within date range are filtered`() {
 
-        val lodgingReports = MoveReportFilterer.lodgingReports(filter, reports).toSet()
+        val lodgingReports = MoveReportFilterer.longHaulReports(filter, reports).toSet()
         assertThat(lodgingReports).isEqualTo(setOf(completedLodging))
     }
 }

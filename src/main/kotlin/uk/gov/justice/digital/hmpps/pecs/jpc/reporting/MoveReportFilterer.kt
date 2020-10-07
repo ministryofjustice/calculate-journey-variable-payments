@@ -45,7 +45,7 @@ object MoveReportFilterer {
      * A simple lodging move must be a completed move with one journey lodging event OR 1 move lodging start and 1 move lodging end event
      * It must also have 2 billable, completed journeys
      */
-    fun lodgingReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+    fun longHaulReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
         return completedMoves(params, moves).filter { report -> (
             report.hasEvent(EventType.JOURNEY_LODGING) ||
             report.hasEvent(EventType.MOVE_LODGING_START) ||
