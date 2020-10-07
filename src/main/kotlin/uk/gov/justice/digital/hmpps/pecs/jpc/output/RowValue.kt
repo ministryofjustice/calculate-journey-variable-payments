@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyState
 import java.time.format.DateTimeFormatter
 
 data class RowValue(
@@ -18,7 +19,8 @@ data class RowValue(
         val dropOffTime: String?,
         val vehicleReg: String?,
         val prisonNumber: String?,
-        val priceInPence: Int?
+        val priceInPence: Int?,
+        val billable: String?
 ){
 
     companion object {
@@ -43,29 +45,32 @@ data class RowValue(
                         moveReport.journeysWithEvents.withIndex().joinToString(separator = ", ") {
                             it.value.journey.vehicleRegistration ?: "NOT GIVEN"},
                         moveReport.person?.prisonNumber,
-                        totalInPence()
+                        totalInPence(),
+                        null
                 )
             }
         }
 
-        fun forJourneyPrices(journeyNumber: Int, price: JourneyPrice): RowValue {
+        fun forJourneyPrice(journeyNumber: Int, price: JourneyPrice): RowValue {
             with(price) {
-                val pickUpDate = Event.getLatestByType(price.journeyWithEvents.events, EventType.MOVE_START)?.occurredAt
-                val dropOffDate = Event.getLatestByType(price.journeyWithEvents.events, EventType.MOVE_COMPLETE)?.occurredAt
+                val pickUpDate = Event.getLatestByType(price.journeyWithEvents.events, EventType.JOURNEY_START)?.occurredAt
+                val dropOffDate = Event.getLatestByType(price.journeyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
+                val cancelled = journeyWithEvents.journey.state == JourneyState.CANCELLED.value
 
                 return RowValue(
-                        "Journey $journeyNumber ",
+                        "Journey $journeyNumber",
                         journeyWithEvents.journey.fromLocation.siteName,
                         journeyWithEvents.journey.fromLocation.locationType.name,
                         journeyWithEvents.journey.toLocation.siteName,
                         journeyWithEvents.journey.toLocation.locationType.name,
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
-                        dropOffDate?.format(dateFormatter),
-                        dropOffDate?.format(timeFormatter),
+                        if(cancelled) "CANCELLED" else dropOffDate?.format(dateFormatter),
+                        if(cancelled) "CANCELLED" else dropOffDate?.format(timeFormatter),
                         journeyWithEvents.journey.vehicleRegistration,
                         null,
-                        priceInPence
+                        priceInPence,
+                        if(journeyWithEvents.journey.billable) "YES" else "NO"
                 )
             }
         }

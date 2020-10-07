@@ -21,6 +21,8 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
     internal fun generate(filter: FilterParams, calculator: PriceCalculator): File {
         val dateGenerated = LocalDate.now(clock)
 
+        val x = calculator.longHaulPrices(filter)
+
         XSSFWorkbook(template.inputStream()).use { workbook ->
             val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
 
@@ -31,6 +33,10 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
             RedirectMovesSheet(workbook, header)
                     .also { logger.info("Adding redirect prices.") }
                     .apply { addPrices(calculator.redirectionPrices(filter)) }
+
+            LongHaulMovesSheet(workbook, header)
+                    .also { logger.info("Adding long haul prices.") }
+                    .apply { addPrices(calculator.longHaulPrices(filter)) }
 
             return createTempFile(suffix = "xlsx").apply {
                 FileOutputStream(this).use {

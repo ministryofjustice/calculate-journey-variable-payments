@@ -11,28 +11,33 @@ internal class RowValueTest {
     val from = LocalDate.of(2020, 9, 10)
     val to = LocalDate.of(2020, 9, 11)
 
+    val cancelledJourney = JourneyWithEvents(journeyFactory(journeyId = "J1M1", state = JourneyState.CANCELLED.value, billable = false, vehicleRegistration = "V1"),
+            listOf(journeyEventFactory(type = EventType.JOURNEY_START.value)))
+    val cancelledJourneyPrice = JourneyPrice(cancelledJourney, null)
+
+
+    val completedJourney = JourneyWithEvents(journeyFactory(journeyId = "J2M1", billable = true, vehicleRegistration = null),
+            listOf(journeyEventFactory(type = EventType.JOURNEY_COMPLETE.value)))
+    val completedJourneyPrice = JourneyPrice(completedJourney, 50)
+
+
+    val moveWith2Journeys = MoveReport(
+            move = moveFactory(),
+            person = personFactory(),
+            events = listOf(
+                    moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+            ),
+            journeysWithEvents = listOf(cancelledJourney, completedJourney)
+    )
+
+
 
     @Test
-    fun `MovePrice with sitenames and 2 journeys, one with no vehicle id, rendered correctly`() {
-        val journey1 = JourneyWithEvents(journeyFactory(journeyId = "J1M1", billable = true, vehicleRegistration = "V1"))
-        val journey2 = JourneyWithEvents(journeyFactory(journeyId = "J2M1", billable = true, vehicleRegistration = null))
+    fun `Render MovePrice with sitenames and 2 journeys, one with no vehicle id`() {
 
-        val moveWithMappedLocations = MoveReport(
-                move = moveFactory(),
-                person = personFactory(),
-                events = listOf(
-                        moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-                ),
-                journeysWithEvents = listOf(journey1, journey2)
-        )
-
-        val price = MovePrice(moveWithMappedLocations, listOf(
-                JourneyPrice(journey1, 100),
-                JourneyPrice(journey2, 50)
-
-        ))
-        val moveRow = RowValue.forMovePrice(price)
+        val priceForMoveWith2Journeys = MovePrice(moveWith2Journeys, listOf(cancelledJourneyPrice, completedJourneyPrice))
+        val moveRow = RowValue.forMovePrice(priceForMoveWith2Journeys)
 
         assertThat(moveRow).isEqualTo(RowValue(
                 "UKW4591N",
@@ -46,13 +51,59 @@ internal class RowValueTest {
                 "10:00",
                 "V1, NOT GIVEN",
                 "PRISON1",
-                150
+                null,
+                null
+        ))
+    }
+
+    @Test
+    fun `Render JourneyPrice for cancelled journey`() {
+
+        val cancelledJourneyRow = RowValue.forJourneyPrice(1, cancelledJourneyPrice)
+
+        assertThat(cancelledJourneyRow).isEqualTo(RowValue(
+                "Journey 1",
+                "from",
+                "PR",
+                "to",
+                "CO",
+                "16/06/2020",
+                "10:20",
+                "CANCELLED",
+                "CANCELLED",
+                "V1",
+                null,
+                null,
+                "NO"
         ))
     }
 
 
     @Test
-    fun `MovePrice without sitenames rendered correctly`() {
+    fun `Render JourneyPrice for completed journey`() {
+
+        val completedJourneyRow = RowValue.forJourneyPrice(2, completedJourneyPrice)
+
+        assertThat(completedJourneyRow).isEqualTo(RowValue(
+                "Journey 2",
+                "from",
+                "PR",
+                "to",
+                "CO",
+                null,
+                null,
+                "16/06/2020",
+                "10:20",
+                null,
+                null,
+                50,
+                "YES"
+        ))
+    }
+
+
+    @Test
+    fun `Render MovePrice without sitenames`() {
         val noMappedFrom = noLocationFactory()
         val noMappedTo = noLocationFactory()
         val journey = JourneyWithEvents(journeyFactory(journeyId = "J1M1", fromLocation = noMappedFrom, toLocation = noMappedTo, billable = true, vehicleRegistration = "V1"))
@@ -68,9 +119,9 @@ internal class RowValueTest {
         )
         val price = MovePrice(moveWithMappedLocations, listOf(JourneyPrice(journey, 80)))
 
-        val vals = RowValue.forMovePrice(price)
+        val rowValue = RowValue.forMovePrice(price)
 
-        assertThat(vals).isEqualTo(RowValue(
+        assertThat(rowValue).isEqualTo(RowValue(
                 "UKW4591N",
                 "NOT_MAPPED_AGENCY_ID",
                 "UNKNOWN",
@@ -82,7 +133,8 @@ internal class RowValueTest {
                 "10:00",
                 "V1",
                 "PRISON1",
-                80
+                80,
+                null
         ))
     }
 }

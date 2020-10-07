@@ -37,7 +37,7 @@ internal class StandardMovesPriceCalculatorTest{
         val movesFrom = LocalDate.of(2020, 9, 10)
         val movesTo = LocalDate.of(2020, 9, 11)
 
-        val completedMoveWithPricedJourney = MoveReport(
+        val completedMoveWithPricedBillableJourney = MoveReport(
                 move = moveFactory(),
                 person = personFactory(),
                 events = listOf(moveEventFactory(
@@ -46,31 +46,49 @@ internal class StandardMovesPriceCalculatorTest{
                 journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(billable = true), listOf()))
         )
 
+
         val completedMoveWithUnpricedJourney = MoveReport(
                 move = moveFactory(moveId = "M2", fromLocation = fromLocationFactory(nomisAgencyId = "NOTPRICED")),
                 person = personFactory(),
                 events =  listOf(moveEventFactory(
                         type = EventType.MOVE_COMPLETE.value, moveId = "M2", occurredAt = movesTo.atStartOfDay())
                 ),
-                journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(billable = true,
-                        fromLocation = fromLocationFactory(nomisAgencyId = "NOTPRICED", siteName = "Not priced site")), listOf()))
+                journeysWithEvents = listOf(
+                        JourneyWithEvents(journeyFactory(billable = true, fromLocation = fromLocationFactory(nomisAgencyId = "NOTPRICED", siteName = "Not priced site")), listOf())
+                )
         )
 
+        val redirectMoveWithUnbillableJourney = MoveReport(
+                move = moveFactory(moveId = "M3"),
+                person = personFactory(),
+                events = listOf(
+                        moveEventFactory(moveId = "M3", type = EventType.MOVE_START.value, occurredAt = movesFrom.atStartOfDay()),
+                        moveEventFactory(moveId = "M3", type = EventType.MOVE_REDIRECT.value, occurredAt = movesFrom.atStartOfDay().plusHours(5)),
+                        moveEventFactory(moveId = "M3", type = EventType.MOVE_COMPLETE.value, occurredAt = movesFrom.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf(
+                        JourneyWithEvents(journeyFactory(moveId = "M3", billable = true), listOf()),
+                        JourneyWithEvents(journeyFactory(moveId = "M3", billable = false), listOf()))
+        )
 
-        val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedJourney, completedMoveWithUnpricedJourney))
+        val calculator = calculatorFactory.calculator(listOf(completedMoveWithPricedBillableJourney, redirectMoveWithUnbillableJourney, completedMoveWithUnpricedJourney))
 
-        val prices = calculator.standardPrices(FilterParams(Supplier.SERCO, movesFrom, movesTo)).toList()
+        val standardPrices = calculator.standardPrices(FilterParams(Supplier.SERCO, movesFrom, movesTo)).toList()
 
-        // Both moves should be standard moves
-        assertThat(prices.map { it.moveReport.move.id }).isEqualTo(listOf("M1", "M2"))
+        // M1 and M2 should be standard moves
+        assertThat(standardPrices.map { it.moveReport.move.id }).isEqualTo(listOf("M1", "M2"))
 
-        with(prices[0]){ // M1
+        with(standardPrices[0]){ // M1
             assertThat(totalInPence()).isEqualTo(101)
             assertThat(moveReport.move.fromLocation.siteName).isEqualTo(from.siteName)
             assertThat(moveReport.move.toLocation?.siteName).isEqualTo(to.siteName)
         }
 
         // M2 price should not be set
-        assertThat(prices[1].totalInPence()).isNull()
+        assertThat(standardPrices[1].totalInPence()).isNull()
+
+        // TODO test non billable journeys are priced correctly (i.e. have null for their price)
+        // Need to incorporate this into the Complex moves (not implemented yet)
+
     }
 }

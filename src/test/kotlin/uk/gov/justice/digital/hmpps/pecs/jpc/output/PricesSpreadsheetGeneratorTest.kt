@@ -28,6 +28,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired @Qualifier(value = "spr
     internal fun `standards moves are called for Serco`() {
         whenever(calculator.standardPrices(any())).thenReturn(sequenceOf())
         whenever(calculator.redirectionPrices(any())).thenReturn(sequenceOf())
+        whenever(calculator.longHaulPrices(any())).thenReturn(sequenceOf())
 
         val filter = FilterParams(Supplier.SERCO, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 

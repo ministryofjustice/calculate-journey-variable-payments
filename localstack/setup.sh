@@ -23,4 +23,10 @@ aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-people.jsonl s3://basm/2020/09/02/2020-09-02-people.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-profiles.jsonl s3://basm/2020/09/02/2020-09-02-profiles.jsonl
 
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-events.jsonl s3://basm/2020/09/03/2020-09-03-events.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-journeys.jsonl s3://basm/2020/09/03/2020-09-03-journeys.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-moves.jsonl s3://basm/2020/09/03/2020-09-03-moves.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-people.jsonl s3://basm/2020/09/03/2020-09-03-people.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-profiles.jsonl s3://basm/2020/09/03/2020-09-03-profiles.jsonl
+
 echo "Buckets and seed data configured for schedule 34 locations and suppliers."
