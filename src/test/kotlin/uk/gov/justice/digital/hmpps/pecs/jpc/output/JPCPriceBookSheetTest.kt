@@ -35,9 +35,11 @@ internal class JPCPriceBookSheetTest {
 
     private fun assertOnPriceRow(row: Row, priceRow: PriceRow) {
         assertThat(row.getCell(0).numericCellValue).isEqualTo(priceRow.journeyId)
+        assertThat(row.getCell(0).cellStyle.dataFormatString).isEqualTo("\"JID_\"00000")
         assertThat(row.getCell(1).stringCellValue).isEqualTo(priceRow.fromSite)
         assertThat(row.getCell(2).stringCellValue).isEqualTo(priceRow.toSite)
         assertThat(row.getCell(3).numericCellValue).isEqualTo(priceRow.price)
+        assertThat(row.getCell(3).cellStyle.dataFormatString).isEqualTo("£#,##0.00")
     }
 
     private fun originalPricesSpreadsheet(vararg priceRows: PriceRow): Sheet {

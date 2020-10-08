@@ -12,7 +12,7 @@ open class InboundSpreadsheet(private val spreadsheet: Workbook): Closeable {
     /**
      * Strips all whitespace and converts to uppercase.  If blank then returns null.
      */
-    infix fun Row.getFormattedStringCell(cell: Int): String? {
+    fun Row.getFormattedStringCell(cell: Int): String? {
         return getCell(cell).stringCellValue.toUpperCase().trim().takeIf { it.isNotBlank() }
     }
 
