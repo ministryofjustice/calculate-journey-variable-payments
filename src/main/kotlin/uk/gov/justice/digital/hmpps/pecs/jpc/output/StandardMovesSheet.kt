@@ -5,6 +5,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 
 class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Standard")!!, header) {
 
-    override fun writeMove(price: MovePrice) = writeMoveRow(price)
+    override fun writeMove(price: MovePrice) = writeMoveRow(price,rowIndex.get() % 2 == 0, false)
 
 }

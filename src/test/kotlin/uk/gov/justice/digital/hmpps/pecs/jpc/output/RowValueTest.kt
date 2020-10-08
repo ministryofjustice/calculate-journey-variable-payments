@@ -32,7 +32,7 @@ internal class RowValueTest {
             person = personFactory(),
             events = listOf(
                     moveEventFactory(eventId = "1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                    moveEventFactory(eventId = "2", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                    moveEventFactory(eventId = "2", type = EventType.MOVE_COMPLETE.value, notes = "finished", occurredAt = from.atStartOfDay().plusHours(10))
             ),
             journeysWithEvents = listOf(cancelledJourney, completedJourney)
     )
@@ -58,8 +58,8 @@ internal class RowValueTest {
                 "V1, NOT GIVEN",
                 "PRISON1",
                 null,
-                null,
-                ""
+                "",
+                "* finished"
         ))
     }
 
@@ -143,7 +143,7 @@ internal class RowValueTest {
                 "V1",
                 "PRISON1",
                 0.8,
-                null,
+                "",
                 ""
         ))
     }

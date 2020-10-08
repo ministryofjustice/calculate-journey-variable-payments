@@ -60,7 +60,7 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
                 person = personFactory(),
                 events = listOf(
                         moveEventFactory(type = EventType.MOVE_START.value, occurredAt = movesDate.atStartOfDay().plusHours(5)),
-                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = movesDate.atStartOfDay().plusHours(10))
+                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, notes = "completed", occurredAt = movesDate.atStartOfDay().plusHours(10))
                 ),
                 journeysWithEvents = listOf(journeyWithEvents)
         )
@@ -89,6 +89,10 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
         assertCellEquals(sms, 10, 10, standardMove.person?.prisonNumber)
 
         assertThat(sms.sheet.getRow(10).getCell(11).numericCellValue).isEqualTo(10.01)
+
+        assertCellEquals(sms, 10, 12, "") // billable shouldn't be shown
+        assertCellEquals(sms, 10, 13, "") // notes shouldn't be shown
+
 
 
 

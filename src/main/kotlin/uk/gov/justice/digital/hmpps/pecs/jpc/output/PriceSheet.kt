@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
-    private val rowIndex: AtomicInteger = AtomicInteger(10)
+    protected val rowIndex: AtomicInteger = AtomicInteger(10)
 
     private fun createRow(): Row = sheet.createRow(rowIndex.getAndIncrement())
 
@@ -35,7 +35,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         // TODO need to add version as well.
     }
 
-    private fun writeRow(row: Row, rowValue: RowValue, isShaded: Boolean = false){
+    private fun writeRow(row: Row, rowValue: RowValue, isShaded: Boolean = false, showNotes: Boolean = true){
         with(rowValue) {
             row.addCell(0, ref, isShaded)
             row.addCell(1, pickUp, isShaded)
@@ -50,12 +50,11 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             row.addCell(10, prisonNumber, isShaded)
             row.addCell(11, priceInPounds ?: "NOT PRESENT", isShaded)
             row.addCell(12, billable, isShaded)
-            row.addCell(13, notes, isShaded)
+            row.addCell(13, if(showNotes) notes else "", isShaded)
         }
     }
 
-    fun writeMoveRow(price: MovePrice, isShaded: Boolean? = null) = writeRow(createRow(), RowValue.forMovePrice(price),
-            isShaded ?: (rowIndex.get() % 2 == 0))
+    fun writeMoveRow(price: MovePrice, isShaded: Boolean, showNotes: Boolean = true) = writeRow(createRow(), RowValue.forMovePrice(price), isShaded, showNotes )
 
     fun writeJourneyRows(prices: List<JourneyPrice>) {
         prices.forEachIndexed { i, jp ->

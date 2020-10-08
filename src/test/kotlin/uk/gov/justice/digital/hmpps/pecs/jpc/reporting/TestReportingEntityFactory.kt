@@ -96,7 +96,8 @@ fun moveEventFactory(
         moveId: String = defaultMoveId,
         type: String = EventType.MOVE_CANCEL.value,
         supplier: String = defaultSupplier,
-        occurredAt: LocalDateTime = defaultDateTime
+        occurredAt: LocalDateTime = defaultDateTime,
+        notes: String = ""
 ): Event{
     val event = Event(
             id=eventId,
@@ -107,7 +108,7 @@ fun moveEventFactory(
             details= mapOf("string_key" to "string_val", "int_key" to 3, "bool_key" to true),
             occurredAt=occurredAt,
             recordedAt=defaultDateTime,
-            notes="")
+            notes=notes)
     return event
 }
 

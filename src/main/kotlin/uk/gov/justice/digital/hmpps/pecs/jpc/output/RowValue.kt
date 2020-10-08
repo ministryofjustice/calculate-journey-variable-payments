@@ -20,7 +20,7 @@ data class RowValue(
         val vehicleReg: String?,
         val prisonNumber: String?,
         val priceInPounds: Double?,
-        val billable: String?,
+        val billable: String,
         val notes: String
 ){
 
@@ -47,8 +47,8 @@ data class RowValue(
                             it.value.journey.vehicleRegistration ?: "NOT GIVEN"},
                         moveReport.person?.prisonNumber,
                         totalInPence()?.let{it.toDouble() / 100},
-                        null,
-                        ""
+                        "",
+                        moveReport.events.notes()
                 )
             }
         }
