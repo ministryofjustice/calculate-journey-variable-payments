@@ -34,6 +34,8 @@ class PriceCalculator(val sercoJourney2price: Map<String, Price>,
 
     fun longHaulPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::longHaulReports)
 
+    fun lockoutPrices(params: FilterParams) = movePrices(params, MoveReportFilterer::lockoutReports)
+
     fun multiTypePrices(params: FilterParams) = movePrices(params, MoveReportFilterer::multiTypeReports)
 
     private fun movePrices(params: FilterParams, f: (p: FilterParams, m: Collection<MoveReport>) -> Sequence<MoveReport>): Sequence<MovePrice>{
