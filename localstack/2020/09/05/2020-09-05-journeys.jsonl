@@ -1,0 +1,2 @@
+{"id":"J50","move_id":"M50","billable":true,"state":"completed","client_timestamp":"2020-09-08T12:49:00+01:00","from_location":"WYI","to_location":"GNI","supplier":"geoamey","vehicle_registration":"123"}
+{"id":"J51","move_id":"M50","billable":true,"state":"completed","client_timestamp":"2020-09-08T12:49:00+01:00","from_location":"WYI","to_location":"GNI","supplier":"geoamey","vehicle_registration":"456"}

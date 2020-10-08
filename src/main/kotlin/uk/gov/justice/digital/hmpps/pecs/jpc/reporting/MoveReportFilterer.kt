@@ -46,15 +46,21 @@ object MoveReportFilterer {
      * It must also have 2 billable, completed journeys
      */
     fun longHaulReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
-        return completedMoves(params, moves).filter { report -> (
-            report.hasEvent(EventType.JOURNEY_LODGING) ||
-            report.hasEvent(EventType.MOVE_LODGING_START) ||
-            report.hasEvent(EventType.MOVE_LODGING_END)
-            ) &&
+        return completedMoves(params, moves).filter { report ->
+            report.hasAnyOf(EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END) &&
+            report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
             with(report.journeysWithEvents.map { it.journey }) {
                 count { it.hasState(JourneyState.COMPLETED) && it.billable } == 2
             }
         }
+    }
+
+    fun multiTypeReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+        return (completedMoves(params, moves) -
+                (standardMoveReports(params, moves) +
+                redirectionReports(params, moves) +
+                longHaulReports(params, moves)
+                )).asSequence()
     }
 
     /**
@@ -64,7 +70,11 @@ object MoveReportFilterer {
      */
     fun redirectionReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
         return completedMoves(params, moves).filter { report ->
-            if(report.hasEvent(EventType.MOVE_REDIRECT)) logger.info("***REDIRECT EVENT***$report")
+            report.hasAnyOf(EventType.MOVE_REDIRECT) &&
+            report.hasNoneOf(
+                    EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END,
+                    EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT
+            ) &&
             when (val moveStartDate = report.events.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
                 null -> {
                     logger.warn("No move start date event found for move $report")

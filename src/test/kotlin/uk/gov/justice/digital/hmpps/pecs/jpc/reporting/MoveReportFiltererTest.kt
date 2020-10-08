@@ -52,7 +52,7 @@ internal class MoveReportFiltererTest{
             )
     )
 
-    private val completedLodging = MoveReport(
+    private val completedLongHaul = MoveReport(
             move = moveFactory(moveId = "M6"),
             person = personFactory(),
             events = listOf(
@@ -66,13 +66,30 @@ internal class MoveReportFiltererTest{
             )
     )
 
+
+    private val multiTypeMove = MoveReport(
+            move = moveFactory(moveId = "M7"),
+            person = personFactory(),
+            events = listOf(
+                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
+                    moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
+                    moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
+                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(4))
+            ),
+            journeysWithEvents = listOf(
+                    JourneyWithEvents(journeyFactory(journeyId = "J1M6", moveId = "M7", billable = true)),
+                    JourneyWithEvents(journeyFactory(journeyId = "J2M6", moveId = "M7", billable = true))
+            )
+    )
+
     private val reports = listOf(
             standardInDateRange,
             cancelled,
             standardOutsideDateRange,
             completedUnbillable,
             completedRedirection,
-            completedLodging
+            completedLongHaul,
+            multiTypeMove
     )
 
     private val filter = FilterParams(Supplier.SERCO, from, to)
@@ -92,9 +109,16 @@ internal class MoveReportFiltererTest{
     }
 
     @Test
-    fun `Only lodging moves within date range are filtered`() {
+    fun `Only long haul moves within date range are filtered`() {
 
-        val lodgingReports = MoveReportFilterer.longHaulReports(filter, reports).toSet()
-        assertThat(lodgingReports).isEqualTo(setOf(completedLodging))
+        val longHaulReports = MoveReportFilterer.longHaulReports(filter, reports).toSet()
+        assertThat(longHaulReports).isEqualTo(setOf(completedLongHaul))
     }
+
+//    @Test
+//    fun `Unbillable and multi-type moves`() {
+//
+//        val multiTypeReports = MoveReportFilterer.longHaulReports(filter, reports).toSet()
+//        assertThat(lodgingReports).isEqualTo(setOf(completedLodging))
+//    }
 }

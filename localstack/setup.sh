@@ -29,4 +29,16 @@ aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-people.jsonl s3://basm/2020/09/03/2020-09-03-people.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-profiles.jsonl s3://basm/2020/09/03/2020-09-03-profiles.jsonl
 
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-events.jsonl s3://basm/2020/09/04/2020-09-04-events.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-journeys.jsonl s3://basm/2020/09/04/2020-09-04-journeys.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-moves.jsonl s3://basm/2020/09/04/2020-09-04-moves.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-people.jsonl s3://basm/2020/09/04/2020-09-04-people.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-profiles.jsonl s3://basm/2020/09/04/2020-09-04-profiles.jsonl
+
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-events.jsonl s3://basm/2020/09/05/2020-09-05-events.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-journeys.jsonl s3://basm/2020/09/05/2020-09-05-journeys.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-moves.jsonl s3://basm/2020/09/05/2020-09-05-moves.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-people.jsonl s3://basm/2020/09/05/2020-09-05-people.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-profiles.jsonl s3://basm/2020/09/05/2020-09-05-profiles.jsonl
+
 echo "Buckets and seed data configured for schedule 34 locations and suppliers."
