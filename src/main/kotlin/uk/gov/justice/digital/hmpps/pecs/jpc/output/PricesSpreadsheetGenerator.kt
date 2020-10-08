@@ -43,7 +43,7 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
                     .apply { addPrices(calculator.longHaulPrices(filter)) }
 
             LockoutMovesSheet(workbook, header)
-                    .also { logger.info("Adding long haul prices.") }
+                    .also { logger.info("Adding lockout prices.") }
                     .apply { addPrices(calculator.lockoutPrices(filter)) }
 
             MultiTypeMovesSheet(workbook, header)

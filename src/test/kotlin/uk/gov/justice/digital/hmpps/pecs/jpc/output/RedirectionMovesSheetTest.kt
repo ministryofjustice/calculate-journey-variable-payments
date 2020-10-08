@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
-import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -16,7 +14,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.io.File
-import java.lang.RuntimeException
 import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,9 +22,6 @@ import java.time.LocalDate
 internal class RedirectionMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet-template") template: File) {
 
     private val workbook: Workbook = XSSFWorkbook(template)
-
-    private val date: LocalDate = LocalDate.now()
-
 
     @Test
     internal fun `test redirection prices`() {
