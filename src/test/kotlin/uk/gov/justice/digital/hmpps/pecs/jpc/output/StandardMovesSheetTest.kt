@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.io.File
+import java.lang.RuntimeException
 import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,10 +74,10 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
         sms.addPrices(listOf(standardPrice).asSequence())
 
         assertCellEquals(sms, 10, 0, standardMove.move.reference)
-        assertCellEquals(sms, 10, 1, fromLocation.siteName.toUpperCase())
+        assertCellEquals(sms, 10, 1, fromLocation.siteName)
         assertCellEquals(sms, 10, 2, fromLocation.locationType.name) // pick up location type
 
-        assertCellEquals(sms, 10, 3, toLocation.siteName.toUpperCase())
+        assertCellEquals(sms, 10, 3, toLocation.siteName)
         assertCellEquals(sms, 10, 4, toLocation.locationType.name) // drop off location type
 
         assertCellEquals(sms, 10, 5, "10/09/2020") // Pick up date
@@ -88,16 +89,18 @@ internal class StandardMovesSheetTest(@Autowired @Qualifier(value = "spreadsheet
 
         assertCellEquals(sms, 10, 10, standardMove.person?.prisonNumber)
 
-        assertThat(sms.sheet.getRow(10).getCell(11).numericCellValue).isEqualTo(10.01)
+        assertCellEquals(sms, 10, 11, 10.01) // price
 
         assertCellEquals(sms, 10, 12, "") // billable shouldn't be shown
         assertCellEquals(sms, 10, 13, "") // notes shouldn't be shown
-
-
-
-
     }
+}
 
-    fun assertCellEquals(sms: StandardMovesSheet, row: Int, col: Int, expectedVal: String?) =
-            assertThat(sms.sheet.getRow(row).getCell(col).stringCellValue.toUpperCase()).isEqualTo(expectedVal)
+fun <T>assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?) {
+    val actualValue = when(expectedVal){
+        is String -> sheet.sheet.getRow(row).getCell(col).stringCellValue
+        is Double -> sheet.sheet.getRow(row).getCell(col).numericCellValue
+        else -> throw RuntimeException("Must be a string or numeric value")
+    }
+    assertThat(actualValue).isEqualTo(expectedVal)
 }

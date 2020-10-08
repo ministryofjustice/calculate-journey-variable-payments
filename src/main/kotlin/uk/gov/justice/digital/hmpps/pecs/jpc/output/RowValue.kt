@@ -80,4 +80,9 @@ data class RowValue(
     }
 }
 
-fun List<Event>.notes() = this.filter { !it.notes.isNullOrBlank() }.joinToString(separator = "\n") {"* " + it.notes}
+private val noteworthyEvents = listOf(
+        EventType.MOVE_REDIRECT, EventType.JOURNEY_LOCKOUT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_CANCEL,
+        EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END, EventType.JOURNEY_LODGING).map { it.value }
+
+fun List<Event>.notes() = filter { it.type in noteworthyEvents && !it.notes.isNullOrBlank() }.
+    joinToString() {"${it.type}: ${it.notes}"}

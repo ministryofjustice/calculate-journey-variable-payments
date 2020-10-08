@@ -34,13 +34,17 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
                     .also { logger.info("Adding standard prices.") }
                     .apply { addPrices(calculator.standardPrices(filter)) }
 
-            RedirectMovesSheet(workbook, header)
+            RedirectionMovesSheet(workbook, header)
                     .also { logger.info("Adding redirect prices.") }
                     .apply { addPrices(calculator.redirectionPrices(filter)) }
     
             LongHaulMovesSheet(workbook, header)
                     .also { logger.info("Adding long haul prices.") }
                     .apply { addPrices(calculator.longHaulPrices(filter)) }
+
+            LockoutMovesSheet(workbook, header)
+                    .also { logger.info("Adding long haul prices.") }
+                    .apply { addPrices(calculator.lockoutPrices(filter)) }
 
             MultiTypeMovesSheet(workbook, header)
                     .also { logger.info("Adding multitype prices.") }

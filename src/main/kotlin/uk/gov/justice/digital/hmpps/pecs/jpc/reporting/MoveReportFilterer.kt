@@ -34,32 +34,51 @@ object MoveReportFilterer {
     fun standardMoveReports(params: FilterParams, reports: Collection<MoveReport>): Sequence<MoveReport> {
         return completedMoves(params, reports).filter { report ->
             with(report.journeysWithEvents.map { it.journey }) {
-                count { it.hasState(JourneyState.COMPLETED) } == 1 &&
-                count { it.hasState(JourneyState.COMPLETED) && it.billable } == 1 &&
-                count { it.hasState(JourneyState.CANCELLED) } == 0
+                count { it.stateIsAnyOf(JourneyState.COMPLETED) } == 1 &&
+                count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 1 &&
+                count { it.stateIsAnyOf(JourneyState.CANCELLED) } == 0
             }
         }
     }
 
     /**
      * A simple lodging move must be a completed move with one journey lodging event OR 1 move lodging start and 1 move lodging end event
-     * It must also have 2 billable, completed journeys
+     * It must also have at 2 billable, completed journeys
      */
     fun longHaulReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
         return completedMoves(params, moves).filter { report ->
             report.hasAnyOf(EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END) &&
             report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
             with(report.journeysWithEvents.map { it.journey }) {
-                count { it.hasState(JourneyState.COMPLETED) && it.billable } == 2
+                count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 2
             }
         }
     }
 
+    /**
+     * A simple lockout move must be a completed move with one journey lockout event OR 1 move lockout event
+     * And no redirect event. It must also have 2 or 3 completed, billable journeys
+     */
+    fun lockoutReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+        return completedMoves(params, moves).filter { report ->
+            report.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
+                    report.hasNoneOf(EventType.MOVE_REDIRECT) &&
+                    with(report.journeysWithEvents.map { it.journey }) {
+                        count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } in 2..3
+                    }
+        }   
+    }
+
+    /**
+     * All other completed reports not covered by standard, redirect, long haul or lockout reports
+     */
     fun multiTypeReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
-        return (completedMoves(params, moves) -
-                (standardMoveReports(params, moves) +
-                redirectionReports(params, moves) +
-                longHaulReports(params, moves)
+        return (
+                completedMoves(params, moves) - (
+                    standardMoveReports(params, moves) +
+                    redirectionReports(params, moves) +
+                    longHaulReports(params, moves) +
+                    lockoutReports(params, moves)
                 )).asSequence()
     }
 
@@ -83,7 +102,7 @@ object MoveReportFilterer {
                 else -> {
                     report.events.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
                     with(report.journeysWithEvents.map { it.journey }) {
-                        count { it.hasState(JourneyState.COMPLETED, JourneyState.CANCELLED) && it.billable } == 2
+                        count { it.stateIsAnyOf(JourneyState.COMPLETED, JourneyState.CANCELLED) && it.billable } == 2
                     }
                 }
             }

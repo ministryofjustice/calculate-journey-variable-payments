@@ -31,8 +31,9 @@ internal class RowValueTest {
             move = moveFactory(),
             person = personFactory(),
             events = listOf(
-                    moveEventFactory(eventId = "1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                    moveEventFactory(eventId = "2", type = EventType.MOVE_COMPLETE.value, notes = "finished", occurredAt = from.atStartOfDay().plusHours(10))
+                    moveEventFactory(eventId = "1", type = EventType.MOVE_START.value, notes = "started", occurredAt = from.atStartOfDay().plusHours(5)),
+                    moveEventFactory(eventId = "2", type = EventType.MOVE_REDIRECT.value, notes = "redirected", occurredAt = from.atStartOfDay().plusHours(5)),
+                    moveEventFactory(eventId = "3", type = EventType.MOVE_COMPLETE.value, notes = "finished", occurredAt = from.atStartOfDay().plusHours(10))
             ),
             journeysWithEvents = listOf(cancelledJourney, completedJourney)
     )
@@ -59,7 +60,7 @@ internal class RowValueTest {
                 "PRISON1",
                 null,
                 "",
-                "* finished"
+                "MoveRedirect: redirected"
         ))
     }
 
@@ -82,7 +83,7 @@ internal class RowValueTest {
                 null,
                 null,
                 "NO",
-                "* cancelled due to fog\n* off because of sun"
+                "JourneyCancel: cancelled due to fog, JourneyCancel: off because of sun"
         ))
     }
 

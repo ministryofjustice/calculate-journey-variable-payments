@@ -38,7 +38,7 @@ data class Journey(
 )
 
 {
-    fun hasState(vararg states: JourneyState) = states.map{it.value}.contains(state)
+    fun stateIsAnyOf(vararg states: JourneyState) = states.map{it.value}.contains(state)
 
     companion object {
         fun fromJson(json: String, locationConverter: Converter): Journey? {
