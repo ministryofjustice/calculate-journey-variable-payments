@@ -19,6 +19,9 @@ dependencies {
 	implementation("com.beust:klaxon:5.4")
 	implementation("com.amazonaws:aws-java-sdk-s3:1.11.874")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("org.springframework:spring-webflux")
+	implementation("io.projectreactor.netty:reactor-netty")
 
 	testImplementation("org.mockito:mockito-inline:3.5.13")
 
