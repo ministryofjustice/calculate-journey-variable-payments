@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.io.ByteArrayInputStream
@@ -21,10 +22,6 @@ internal class PriceImportTest {
 
     private val locationRepo: LocationRepository = mock()
 
-    private val fromLocation: Location = mock { on { id } doReturn UUID.randomUUID() }
-
-    private val toLocation: Location = mock { on { id } doReturn UUID.randomUUID() }
-
     private val sercoPricesProvider: SercoPricesProvider = mock()
 
     private val geoamyPricesProvider: GeoamyPricesProvider = mock()
@@ -34,11 +31,13 @@ internal class PriceImportTest {
     @Test
     internal fun `verify import interactions for serco`() {
         whenever(sercoPricesProvider.get()).thenReturn(priceSheetWithRow(1.0, "SERCO FROM", "SERCO TO", 100.00))
-        whenever(locationRepo.findBySiteName("SERCO FROM")).thenReturn(fromLocation)
-        whenever(locationRepo.findBySiteName("SERCO TO")).thenReturn(toLocation)
+        val fromLocation = Location(LocationType.PR, "ID1", "SERCO FROM")
+        val toLocation = Location(LocationType.CC, "ID2", "SERCO TO")
+        whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
         import.import(Supplier.SERCO)
 
+        verify(locationRepo).findAll()
         verify(sercoPricesProvider).get()
         verify(priceRepo).deleteAll()
         verify(priceRepo, times(2)).count()
@@ -48,11 +47,13 @@ internal class PriceImportTest {
     @Test
     internal fun `verify import interactions for geoamey`() {
         whenever(geoamyPricesProvider.get()).thenReturn(priceSheetWithRow(2.0, "GEO FROM", "GEO TO", 101.00))
-        whenever(locationRepo.findBySiteName("GEO FROM")).thenReturn(fromLocation)
-        whenever(locationRepo.findBySiteName("GEO TO")).thenReturn(toLocation)
+        val fromLocation = Location(LocationType.PR, "ID1", "GEO FROM")
+        val toLocation = Location(LocationType.CC, "ID2", "GEO TO")
+        whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
         import.import(Supplier.GEOAMEY)
 
+        verify(locationRepo).findAll()
         verify(geoamyPricesProvider).get()
         verify(priceRepo).deleteAll()
         verify(priceRepo, times(2)).count()

@@ -19,6 +19,8 @@ class PriceImporter(private val priceRepo: PriceRepository,
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun import(supplier: Supplier) {
+        val start = System.currentTimeMillis()
+
         logger.info("Importing prices for $supplier")
 
         priceRepo.deleteAll()
@@ -27,9 +29,11 @@ class PriceImporter(private val priceRepo: PriceRepository,
             Supplier.SERCO -> sercoPrices.get().use { import(it, Supplier.SERCO) }
             Supplier.GEOAMEY -> geoameyPrices.get().use { import(it, Supplier.GEOAMEY) }
         }
+
+        logger.info("Supplier $supplier prices import finished in '${(System.currentTimeMillis() - start) / 1000}' seconds.")
     }
 
-    private fun import(prices: InputStream, supplier: Supplier) = PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository, priceRepo).use { import(it) }
+    private fun import(prices: InputStream, supplier: Supplier) = PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository.findAll().toList()).use { import(it) }
 
     private fun import(spreadsheet: PricesSpreadsheet) {
         val count = priceRepo.count()
