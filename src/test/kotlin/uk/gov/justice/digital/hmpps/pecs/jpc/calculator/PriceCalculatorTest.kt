@@ -79,7 +79,7 @@ internal class PriceCalculatorTest{
 
     @Test
     fun `price key for Price should be $fromSiteName-$SiteName`(){
-        assertThat(standardMovePrice.journey).isEqualTo("from-to")
+        assertThat(standardMovePrice.journey()).isEqualTo("from-to")
     }
 
     @Test

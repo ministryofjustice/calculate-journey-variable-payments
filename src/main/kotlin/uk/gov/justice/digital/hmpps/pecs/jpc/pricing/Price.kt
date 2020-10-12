@@ -43,10 +43,9 @@ data class Price(
 
         @NotNull
         val addedAt: LocalDateTime = LocalDateTime.now(),
-
-        @Transient
-        val journey: String = "${fromLocationName}-${toLocationName}"
-)
+){
+        fun journey() = "${fromLocationName}-${toLocationName}"
+}
 
 enum class Supplier {
         SERCO,

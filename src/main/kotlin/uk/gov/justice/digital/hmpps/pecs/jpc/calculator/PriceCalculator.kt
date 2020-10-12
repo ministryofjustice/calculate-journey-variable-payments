@@ -17,7 +17,7 @@ class PriceCalculator(@Autowired val priceRepository: PriceRepository) {
 
     fun allPrices(params: FilterParams, moves: List<Report>): List<MovePrices>{
 
-        val journeysToPrice = priceRepository.findAllBySupplier(params.supplier).associateBy { it.journey }
+        val journeysToPrice = priceRepository.findAllBySupplier(params.supplier).associateBy { it.journey() }
         val completedMoves = MoveReportFilterer.completedMoves(params, moves).toList()
 
         return MovePriceType.values().map {
