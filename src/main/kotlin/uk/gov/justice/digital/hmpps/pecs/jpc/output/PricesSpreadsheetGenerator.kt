@@ -62,11 +62,11 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplatePro
 
             SummarySheet(workbook, header)
                     .also { logger.info("Adding summaries.") }
-                    .apply { writeSummaries(allPrices) }
+                    .apply { writeSummaries(allPrices.map{it.summary}) }
 
-//            JPCPriceBookSheet(workbook)
-//                    .also { logger.info("Adding supplier JPC price book used.") }
-//                    .apply { copyPricesFrom(originalPricesSheetFor(header.supplier)) }
+            JPCPriceBookSheet(workbook)
+                    .also { logger.info("Adding supplier JPC price book used.") }
+                    .apply { copyPricesFrom(originalPricesSheetFor(header.supplier)) }
 
             return createTempFile(suffix = "xlsx").apply {
                 FileOutputStream(this).use {

@@ -122,7 +122,7 @@ internal class PriceCalculatorTest{
 
     @Test
     fun `Summary calculated correctly`(){
-        val summary = movePrices.summary()
+        val summary = movePrices.map{it.summary}.summary()
         assertThat(summary.percentage).isEqualTo(1.0)
         assertThat(summary.volume).isEqualTo(4)
         assertThat(summary.volumeUnpriced).isEqualTo(3)

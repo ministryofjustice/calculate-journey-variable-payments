@@ -12,7 +12,9 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     protected val rowIndex: AtomicInteger = AtomicInteger(10)
 
-    protected fun createRow(): Row = sheet.createRow(rowIndex.getAndIncrement())
+    protected fun createRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.createRow(rIndex)
+
+    protected fun getRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.getRow(rIndex)
 
     protected fun fillBlue(cellStyle: CellStyle){
         cellStyle.fillForegroundColor = IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex()
@@ -80,7 +82,6 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             writeRow(createRow(), RowValue.forJourneyPrice(i + 1, jp))
         }
     }
-
 
     /**
      * Write the value to the cell for the given col index

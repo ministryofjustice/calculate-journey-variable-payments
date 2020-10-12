@@ -46,12 +46,12 @@ data class JourneyPrice(
         val priceInPence: Int?)
 
 
-fun List<MovePrices>.summary(): PriceSummary {
+fun List<PriceSummary>.summary(): PriceSummary {
     return PriceSummary(
-            sumByDouble { it.summary.percentage },
-            sumBy { it.summary.volume },
-            sumBy { it.summary.volumeUnpriced },
-            sumBy { it.summary.totalPriceInPence }
+            sumByDouble { it.percentage },
+            sumBy { it.volume },
+            sumBy { it.volumeUnpriced },
+            sumBy { it.totalPriceInPence }
     )
 }
 

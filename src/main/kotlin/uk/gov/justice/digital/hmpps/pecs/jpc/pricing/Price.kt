@@ -31,7 +31,7 @@ data class Price(
 
         @get: NotNull(message = "Price from location identifier cannot be null.")
         val fromLocationId: UUID,
-
+                
         @get: NotBlank(message = "Price to location name cannot be empty.")
         val toLocationName: String,
 

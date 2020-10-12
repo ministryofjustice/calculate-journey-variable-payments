@@ -42,7 +42,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: J
         generator.generate(filter, listOf())
 
         verify(calculator).allPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)), eq(listOf()))
-        // verify(sercoProviderSpy).get()
+         verify(sercoProviderSpy).get()
     }
 
     @Test
@@ -55,6 +55,6 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: J
 
         verify(calculator).allPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)), eq(listOf()))
 
-        // verify(geoProviderSpy).get()
+         verify(geoProviderSpy).get()
     }
 }

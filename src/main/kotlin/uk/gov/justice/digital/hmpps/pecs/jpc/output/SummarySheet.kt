@@ -8,15 +8,15 @@ class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(workbook.get
 
     override fun writeMove(price: MovePrice) {}
 
-    fun writeSummaries(allPrices: List<MovePrices>) {
-        MovePriceType.values().forEach {
-            writeSummary(allPrices.withType(it).summary)
+    fun writeSummaries(summaries: List<PriceSummary>) {
+        summaries.forEachIndexed {i,summary ->
+            writeSummary(3 * i + 9, summary)
         }
-        writeSummary(allPrices.summary())
+        writeSummary(25, summaries.summary())
     }
 
-    private fun writeSummary(summary: PriceSummary){
-        val row = createRow()
+    private fun writeSummary(rIndex: Int, summary: PriceSummary){
+        val row = getRow(rIndex)
         row.addCell(1, summary.percentage, ::dataFormatPercentage)
         row.addCell(2, summary.volume)
         row.addCell(3, summary.volumeUnpriced)

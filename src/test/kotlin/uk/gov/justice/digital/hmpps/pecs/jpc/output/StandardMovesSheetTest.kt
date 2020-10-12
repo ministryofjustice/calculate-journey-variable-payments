@@ -97,6 +97,7 @@ fun <T>assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?) 
     val actualValue = when(expectedVal){
         is String -> sheet.sheet.getRow(row).getCell(col).stringCellValue
         is Double -> sheet.sheet.getRow(row).getCell(col).numericCellValue
+        is Int -> sheet.sheet.getRow(row).getCell(col).numericCellValue
         else -> throw RuntimeException("Must be a string or numeric value")
     }
     assertThat(actualValue).isEqualTo(expectedVal)
