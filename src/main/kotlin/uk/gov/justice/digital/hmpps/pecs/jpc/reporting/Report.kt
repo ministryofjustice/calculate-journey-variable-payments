@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-data class MoveReport(
+data class Report(
         val move: Move,
         val person: Person?,
         val events: List<Event> = listOf(),

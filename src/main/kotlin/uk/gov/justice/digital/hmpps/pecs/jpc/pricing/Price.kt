@@ -42,7 +42,10 @@ data class Price(
         val priceInPence: Int,
 
         @NotNull
-        val addedAt: LocalDateTime = LocalDateTime.now()
+        val addedAt: LocalDateTime = LocalDateTime.now(),
+
+        @Transient
+        val journey: String = "${fromLocationName}-${toLocationName}"
 )
 
 enum class Supplier {

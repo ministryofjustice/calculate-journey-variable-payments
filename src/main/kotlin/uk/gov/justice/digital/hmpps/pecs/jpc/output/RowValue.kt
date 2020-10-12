@@ -29,26 +29,26 @@ data class RowValue(
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
         fun forMovePrice(price: MovePrice): RowValue {
-            val pickUpDate = Event.getLatestByType(price.moveReport.events, EventType.MOVE_START)?.occurredAt
-            val dropOffDate = Event.getLatestByType(price.moveReport.events, EventType.MOVE_COMPLETE)?.occurredAt
+            val pickUpDate = Event.getLatestByType(price.report.events, EventType.MOVE_START)?.occurredAt
+            val dropOffDate = Event.getLatestByType(price.report.events, EventType.MOVE_COMPLETE)?.occurredAt
 
             return with(price) {
                 RowValue(
-                        moveReport.move.reference,
-                        moveReport.move.fromLocation.siteName,
-                        moveReport.move.fromLocation.locationType.name,
-                        moveReport.move.toLocation?.siteName,
-                        moveReport.move.toLocation?.locationType?.name,
+                        report.move.reference,
+                        report.move.fromLocation.siteName,
+                        report.move.fromLocation.locationType.name,
+                        report.move.toLocation?.siteName,
+                        report.move.toLocation?.locationType?.name,
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         dropOffDate?.format(dateFormatter),
                         dropOffDate?.format(timeFormatter),
-                        moveReport.journeysWithEvents.withIndex().joinToString(separator = ", ") {
+                        report.journeysWithEvents.withIndex().joinToString(separator = ", ") {
                             it.value.journey.vehicleRegistration ?: "NOT GIVEN"},
-                        moveReport.person?.prisonNumber,
+                        report.person?.prisonNumber,
                         totalInPence()?.let{it.toDouble() / 100},
                         "",
-                        moveReport.events.notes()
+                        report.events.notes()
                 )
             }
         }

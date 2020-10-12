@@ -32,7 +32,7 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JCPTem
         ))
         val journey2WithEvents = JourneyWithEvents(journeyFactory(journeyId = "J2", billable = true), listOf())
 
-        val redirectMove = MoveReport(
+        val redirectMove = Report(
                 move = moveFactory(),
                 person = personFactory(),
                 events = listOf(
@@ -52,7 +52,7 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JCPTem
         ))
 
         val sheet = RedirectionMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
-        sheet.addPrices(listOf(redirectPrice).asSequence())
+        sheet.writeMoves(listOf(redirectPrice))
 
         assertCellEquals(sheet, 10, 0, redirectMove.move.reference)
         assertCellEquals(sheet, 10, 1, fromLocation.siteName)

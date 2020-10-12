@@ -24,51 +24,37 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: J
                                               @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                               @Autowired private val geoamyPricesProvider: GeoamyPricesProvider) {
 
-    private val calculator: PriceCalculator = mock()
+
+    private val calculator: PriceCalculator = mock { on { allPrices(any(), any()) } doReturn listOf() }
 
     private val sercoProviderSpy: SercoPricesProvider = mock { on { get() } doReturn sercoPricesProvider.get() }
 
     private val geoProviderSpy: GeoamyPricesProvider = mock { on { get() } doReturn geoamyPricesProvider.get() }
 
-    private val generator: PricesSpreadsheetGenerator = PricesSpreadsheetGenerator(template, clock, sercoProviderSpy, geoProviderSpy)
+    private val generator: PricesSpreadsheetGenerator = PricesSpreadsheetGenerator(template, clock, sercoProviderSpy, geoProviderSpy, calculator)
 
     @Test
     internal fun `verify interactions for Serco`() {
-        whenever(calculator.standardPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.redirectionPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.longHaulPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.lockoutPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.multiTypePrices(any())).thenReturn(sequenceOf())
+        whenever(calculator.allPrices(any(), any())).thenReturn(listOf())
 
         val filter = FilterParams(Supplier.SERCO, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 
-        generator.generate(filter, calculator)
+        generator.generate(filter, listOf())
 
-        verify(calculator).standardPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).redirectionPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).longHaulPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).lockoutPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).multiTypePrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(sercoProviderSpy).get()
+        verify(calculator).allPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)), eq(listOf()))
+        // verify(sercoProviderSpy).get()
     }
 
     @Test
     internal fun `verify interactions for Geoamey`() {
-        whenever(calculator.standardPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.redirectionPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.longHaulPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.lockoutPrices(any())).thenReturn(sequenceOf())
-        whenever(calculator.multiTypePrices(any())).thenReturn(sequenceOf())
+        whenever(calculator.allPrices(any(), any())).thenReturn(listOf())
 
         val filter = FilterParams(Supplier.GEOAMEY, LocalDate.now(clock), LocalDate.now(clock).plusDays(1))
 
-        generator.generate(filter, calculator)
+        generator.generate(filter, listOf())
 
-        verify(calculator).standardPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).redirectionPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).longHaulPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).lockoutPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(calculator).multiTypePrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)))
-        verify(geoProviderSpy).get()
+        verify(calculator).allPrices(eq(FilterParams(filter.supplier, filter.movesFrom, filter.movesTo)), eq(listOf()))
+
+        // verify(geoProviderSpy).get()
     }
 }
