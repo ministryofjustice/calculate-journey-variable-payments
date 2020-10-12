@@ -24,7 +24,6 @@ WORKDIR /app
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/calculate-journey-variable*.jar /app/app.jar
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/applicationinsights-agent*.jar /app/agent.jar
 COPY --from=builder --chown=appuser:appgroup /app/AI-Agent.xml /app
-COPY --from=builder --chown=appuser:appgroup /app/src/main/resources/spreadsheets/JCP_template.xlsx /app/resources/spreadsheets/JCP_template.xlsx
 
 USER 2000
 

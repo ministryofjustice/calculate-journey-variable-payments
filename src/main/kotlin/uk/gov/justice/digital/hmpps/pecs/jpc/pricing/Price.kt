@@ -1,15 +1,20 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.pricing
 
 import java.time.LocalDateTime
-import java.util.*
-import javax.persistence.*
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Size
+import java.util.UUID
+import javax.persistence.Column
+import javax.persistence.Enumerated
+import javax.persistence.EnumType
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Index
+import javax.persistence.Table
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 @Entity
-@Table(name = "PRICES")
+@Table(name = "PRICES", indexes = [Index(name = "supplier_from_to_index", columnList = "supplier, fromLocationName, toLocationName", unique = true)])
 data class Price(
         @Id
         @Column(name = "price_id", nullable = false)

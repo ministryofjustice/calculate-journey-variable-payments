@@ -8,16 +8,18 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.JCPTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.time.Clock
 import java.time.LocalDate
 
 @Component
-class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-template") private val template: File,
+class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplateProvider,
                                  @Autowired private val clock: Clock,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                  @Autowired private val geoamyPricesProvider: GeoamyPricesProvider) {
@@ -27,7 +29,7 @@ class PricesSpreadsheetGenerator(@Autowired @Qualifier(value = "spreadsheet-temp
     internal fun generate(filter: FilterParams, calculator: PriceCalculator): File {
         val dateGenerated = LocalDate.now(clock)
 
-        XSSFWorkbook(template.inputStream()).use { workbook ->
+        XSSFWorkbook(template.get()).use { workbook ->
             val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
 
             StandardMovesSheet(workbook, header)
