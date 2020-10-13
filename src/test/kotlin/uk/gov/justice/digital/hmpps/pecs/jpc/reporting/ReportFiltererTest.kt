@@ -5,40 +5,40 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 
-internal class MoveReportFiltererTest{
+internal class ReportFiltererTest{
 
     val from = LocalDate.of(2020, 9, 10)
     val to = LocalDate.of(2020, 9, 11)
 
-    private val standardInDateRange = MoveReport(
+    private val standardInDateRange = Report(
             move = moveFactory(),
             person = personFactory(),
             events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
             journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(journeyId = "J1M1", billable = true)))
     )
 
-    private val cancelled = MoveReport(
+    private val cancelled = Report(
             move = moveFactory(moveId = "M2"),
             person = personFactory(),
             events =  listOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
             journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(journeyId = "J1M2", moveId = "M2", billable = true)))
     )
 
-    private val standardOutsideDateRange = MoveReport(
+    private val standardOutsideDateRange = Report(
             move = moveFactory(moveId = "M3"),
             person = personFactory(),
             events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M3", occurredAt = LocalDate.of(2020, 9, 9).atStartOfDay())),
             journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(journeyId = "J1M3", moveId = "M3", billable = true)))
     )
 
-    private val completedUnbillable = MoveReport(
+    private val completedUnbillable = Report(
             move = moveFactory(moveId = "M4"),
             person = personFactory(),
             events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
             journeysWithEvents = listOf(JourneyWithEvents(journeyFactory(journeyId = "J1M4", moveId = "M4", billable = false)))
     )
 
-    private val completedRedirection = MoveReport(
+    private val completedRedirection = Report(
             move = moveFactory(moveId = "M5"),
             person = personFactory(),
             events = listOf(
@@ -52,7 +52,7 @@ internal class MoveReportFiltererTest{
             )
     )
 
-    private val completedLongHaul = MoveReport(
+    private val completedLongHaul = Report(
             move = moveFactory(moveId = "M6"),
             person = personFactory(),
             events = listOf(
@@ -67,7 +67,7 @@ internal class MoveReportFiltererTest{
     )
 
 
-    private val multiTypeMove = MoveReport(
+    private val multiTypeMove = Report(
             move = moveFactory(moveId = "M7"),
             person = personFactory(),
             events = listOf(
@@ -82,7 +82,7 @@ internal class MoveReportFiltererTest{
             )
     )
 
-    private val completedLockout = MoveReport(
+    private val completedLockout = Report(
             move = moveFactory(moveId = "M8"),
             person = personFactory(),
             events = listOf(

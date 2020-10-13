@@ -31,7 +31,7 @@ data class Price(
 
         @get: NotNull(message = "Price from location identifier cannot be null.")
         val fromLocationId: UUID,
-
+                
         @get: NotBlank(message = "Price to location name cannot be empty.")
         val toLocationName: String,
 
@@ -42,8 +42,10 @@ data class Price(
         val priceInPence: Int,
 
         @NotNull
-        val addedAt: LocalDateTime = LocalDateTime.now()
-)
+        val addedAt: LocalDateTime = LocalDateTime.now(),
+){
+        fun journey() = "${fromLocationName}-${toLocationName}"
+}
 
 enum class Supplier {
         SERCO,

@@ -53,7 +53,7 @@ internal class StandardMovesSheetTest(@Autowired private val template: JCPTempla
         val movesDate = LocalDate.of(2020, 9, 10)
 
         val journeyWithEvents = JourneyWithEvents(journeyFactory(billable = true), listOf())
-        val standardMove = MoveReport(
+        val standardMove = Report(
                 move = moveFactory(),
                 person = personFactory(),
                 events = listOf(
@@ -68,7 +68,7 @@ internal class StandardMovesSheetTest(@Autowired private val template: JCPTempla
         val standardPrice = MovePrice(standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
-        sms.addPrices(listOf(standardPrice).asSequence())
+        sms.writeMoves(listOf(standardPrice))
 
         assertCellEquals(sms, 10, 0, standardMove.move.reference)
         assertCellEquals(sms, 10, 1, fromLocation.siteName)
@@ -97,6 +97,7 @@ fun <T>assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?) 
     val actualValue = when(expectedVal){
         is String -> sheet.sheet.getRow(row).getCell(col).stringCellValue
         is Double -> sheet.sheet.getRow(row).getCell(col).numericCellValue
+        is Int -> sheet.sheet.getRow(row).getCell(col).numericCellValue
         else -> throw RuntimeException("Must be a string or numeric value")
     }
     assertThat(actualValue).isEqualTo(expectedVal)

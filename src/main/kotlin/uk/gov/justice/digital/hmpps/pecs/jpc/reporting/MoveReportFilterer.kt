@@ -9,16 +9,16 @@ object MoveReportFilterer {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private fun MoveReport.hasSupplier(s: Supplier) = move.supplier == s.reportingName()
+    private fun Report.hasSupplier(s: Supplier) = move.supplier == s.reportingName()
 
-    private fun MoveReport.hasStatus(status: MoveStatus) = move.status == status.value
+    private fun Report.hasStatus(status: MoveStatus) = move.status == status.value
 
     private fun List<Event>.hasEventInDateRange(eventType: EventType, dateRange: ClosedRangeLocalDate) =
             with(this.find { it.hasType(eventType) }?.occurredAt?.toLocalDate()) {
                 this != null && dateRange.contains(this)
             }
 
-    private fun completedMoves(params: FilterParams, reports: Collection<MoveReport>): Sequence<MoveReport> {
+    fun completedMoves(params: FilterParams, reports: Collection<Report>): Sequence<Report> {
         return reports.asSequence().filter {
             it.hasSupplier(params.supplier) &&
             it.hasStatus(MoveStatus.COMPLETED) &&
@@ -31,7 +31,7 @@ object MoveReportFilterer {
      * To be priced as a standard move, the journey as well as the move must be completed
      * There also should be no redirects after the move starts, but shouldn't need to check for this
      */
-    fun standardMoveReports(params: FilterParams, reports: Collection<MoveReport>): Sequence<MoveReport> {
+    fun standardMoveReports(params: FilterParams, reports: Collection<Report>): Sequence<Report> {
         return completedMoves(params, reports).filter { report ->
             with(report.journeysWithEvents.map { it.journey }) {
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) } == 1 &&
@@ -45,7 +45,7 @@ object MoveReportFilterer {
      * A simple lodging move must be a completed move with one journey lodging event OR 1 move lodging start and 1 move lodging end event
      * It must also have at 2 billable, completed journeys
      */
-    fun longHaulReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+    fun longHaulReports(params: FilterParams, moves: Collection<Report>): Sequence<Report> {
         return completedMoves(params, moves).filter { report ->
             report.hasAnyOf(EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END) &&
             report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
@@ -59,7 +59,7 @@ object MoveReportFilterer {
      * A simple lockout move must be a completed move with one journey lockout event OR 1 move lockout event
      * And no redirect event. It must also have 2 or 3 completed, billable journeys
      */
-    fun lockoutReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+    fun lockoutReports(params: FilterParams, moves: Collection<Report>): Sequence<Report> {
         return completedMoves(params, moves).filter { report ->
             report.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
                     report.hasNoneOf(EventType.MOVE_REDIRECT) &&
@@ -72,7 +72,7 @@ object MoveReportFilterer {
     /**
      * All other completed reports not covered by standard, redirect, long haul or lockout reports
      */
-    fun multiTypeReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+    fun multiTypeReports(params: FilterParams, moves: Collection<Report>): Sequence<Report> {
         return (
                 completedMoves(params, moves) - (
                     standardMoveReports(params, moves) +
@@ -87,7 +87,7 @@ object MoveReportFilterer {
      * exactly one move redirect event that happened after the move started
      * If there is no move start event, it logs a warning and continues
      */
-    fun redirectionReports(params: FilterParams, moves: Collection<MoveReport>): Sequence<MoveReport> {
+    fun redirectionReports(params: FilterParams, moves: Collection<Report>): Sequence<Report> {
         return completedMoves(params, moves).filter { report ->
             report.hasAnyOf(EventType.MOVE_REDIRECT) &&
             report.hasNoneOf(

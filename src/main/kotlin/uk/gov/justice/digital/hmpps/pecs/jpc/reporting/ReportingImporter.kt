@@ -16,7 +16,7 @@ class ReportingImporter(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(from: LocalDate, to: LocalDate = LocalDate.now(clock), locations: List<Location> = listOf()): Collection<MoveReport>{
+    fun import(from: LocalDate, to: LocalDate = LocalDate.now(clock), locations: List<Location> = listOf()): Collection<Report>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)

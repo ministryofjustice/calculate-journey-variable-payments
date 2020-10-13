@@ -27,7 +27,7 @@ internal class RowValueTest {
     val completedJourneyPrice = JourneyPrice(completedJourney, 50)
 
 
-    val moveWith2Journeys = MoveReport(
+    val moveWith2Journeys = Report(
             move = moveFactory(),
             person = personFactory(),
             events = listOf(
@@ -118,7 +118,7 @@ internal class RowValueTest {
         val noMappedTo = noLocationFactory()
         val journey = JourneyWithEvents(journeyFactory(journeyId = "J1M1", fromLocation = noMappedFrom, toLocation = noMappedTo, billable = true, vehicleRegistration = "V1"))
 
-        val moveWithMappedLocations = MoveReport(
+        val moveWithMappedLocations = Report(
                 move = moveFactory(fromLocation = noMappedFrom, toLocation = noMappedTo),
                 person = personFactory(),
                 events = listOf(

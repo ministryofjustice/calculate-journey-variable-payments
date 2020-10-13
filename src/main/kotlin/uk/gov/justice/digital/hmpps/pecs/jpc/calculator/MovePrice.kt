@@ -1,10 +1,34 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.calculator
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyWithEvents
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReport
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Report
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReportFilterer
+import java.lang.RuntimeException
+
+enum class MovePriceType(val filterer: (p: FilterParams, m: Collection<Report>) -> Sequence<Report>){
+    STANDARD(MoveReportFilterer::standardMoveReports),
+    LONG_HAUL(MoveReportFilterer::longHaulReports),
+    REDIRECTION(MoveReportFilterer::redirectionReports),
+    LOCKOUT(MoveReportFilterer::lockoutReports),
+    MULTI(MoveReportFilterer::multiTypeReports)
+}
+
+data class PriceSummary(
+        val percentage: Double = 0.0,
+        val volume: Int = 0,
+        val volumeUnpriced: Int = 0,
+        val totalPriceInPence: Int = 0) {
+    val totalPriceInPounds = totalPriceInPence.toDouble() / 100
+}
+
+data class MovePrices(
+        val movePriceType: MovePriceType,
+        val prices: List<MovePrice>,
+        val summary: PriceSummary)
 
 data class MovePrice(
-        val moveReport: MoveReport,
+        val report: Report,
         val journeyPrices: List<JourneyPrice>
 ){
     /**
@@ -20,3 +44,17 @@ data class MovePrice(
 data class JourneyPrice(
         val journeyWithEvents: JourneyWithEvents,
         val priceInPence: Int?)
+
+
+fun List<PriceSummary>.summary(): PriceSummary {
+    return PriceSummary(
+            sumByDouble { it.percentage },
+            sumBy { it.volume },
+            sumBy { it.volumeUnpriced },
+            sumBy { it.totalPriceInPence }
+    )
+}
+
+fun List<MovePrices>.withType(movePriceType: MovePriceType) =
+        find { it.movePriceType == movePriceType } ?: MovePrices(movePriceType, listOf(), PriceSummary())
+
