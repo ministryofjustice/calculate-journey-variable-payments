@@ -3,9 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.output
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
@@ -16,9 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import java.time.Clock
 import java.time.LocalDate
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ContextConfiguration(classes = [TestConfig::class])
+@SpringJUnitConfig(TestConfig::class)
 internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: JCPTemplateProvider,
                                               @Autowired private val clock: Clock,
                                               @Autowired private val sercoPricesProvider: SercoPricesProvider,

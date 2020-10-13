@@ -6,9 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
@@ -17,9 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.time.LocalDate
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ContextConfiguration(classes = [TestConfig::class])
+@SpringJUnitConfig(TestConfig::class)
 internal class StandardMovesSheetTest(@Autowired private val template: JCPTemplateProvider) {
 
     private val workbook: Workbook = XSSFWorkbook(template.get())
