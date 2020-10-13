@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
 import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,7 +32,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplatePro
     internal fun generate(filter: FilterParams, moves: List<Report>): File {
         val dateGenerated = LocalDate.now(clock)
 
-        XSSFWorkbook(template.get()).use { workbook ->
+        WorkbookFactory.create(template.get()).use { workbook ->
             val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
 
             val allPrices = calculator.allPrices(filter, moves)
