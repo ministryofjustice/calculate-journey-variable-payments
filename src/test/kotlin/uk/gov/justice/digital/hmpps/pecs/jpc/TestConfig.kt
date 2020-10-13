@@ -1,14 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.time.Clock
 import java.time.Instant
@@ -24,18 +20,18 @@ class TestConfig {
     fun clock(): Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
     @Bean
-    fun locationsResourceProvider(@Value("\${import-files.locations}") locationsFile: String): Schedule34LocationsProvider {
-        return Schedule34LocationsProvider { resourceLoader.getResource(locationsFile).inputStream }
+    fun locationsResourceProvider(): Schedule34LocationsProvider {
+        return Schedule34LocationsProvider { resourceLoader.getResource("classpath:/spreadsheets/locations.xlsx").inputStream }
     }
 
     @Bean
-    fun sercoPricesResourceProvider(@Value("\${import-files.serco-prices}") sercoPricesFile: String): SercoPricesProvider {
-        return SercoPricesProvider { resourceLoader.getResource(sercoPricesFile).inputStream }
+    fun sercoPricesResourceProvider(): SercoPricesProvider {
+        return SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
     }
 
     @Bean
-    fun geoameyPricesResourceProvider(@Value("\${import-files.geo-prices}") geoPricesFile: String): GeoamyPricesProvider {
-        return GeoamyPricesProvider { resourceLoader.getResource(geoPricesFile).inputStream }
+    fun geoameyPricesResourceProvider(): GeoamyPricesProvider {
+        return GeoamyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
     }
 
     @Bean
@@ -45,4 +41,9 @@ class TestConfig {
 
     @Bean
     fun reportImporter() = ReportingImporter(reportingResourceProvider(), clock())
+
+    @Bean
+    fun jcpTemplateProvider(): JCPTemplateProvider {
+        return JCPTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JCP_template.xlsx").inputStream }
+    }
 }

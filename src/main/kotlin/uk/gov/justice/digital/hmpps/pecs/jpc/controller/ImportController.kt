@@ -9,12 +9,15 @@ import org.springframework.web.bind.annotation.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.io.FileInputStream
 import java.io.IOException
+import java.time.Clock
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-class ImportController(private val importService: ImportService) {
+class ImportController(private val importService: ImportService, private val clock: Clock) {
 
     @GetMapping("/generate-prices-spreadsheet/{supplier}")
     @Throws(IOException::class)
@@ -26,10 +29,13 @@ class ImportController(private val importService: ImportService) {
             response: HttpServletResponse?): ResponseEntity<InputStreamResource?>? {
 
         return importService.spreadsheet(supplier, movesFrom, movesTo, reportsTo)?.let { file ->
+            val uploadDateTime = LocalDateTime.now(clock).format(DateTimeFormatter.ofPattern("YYYY-MM-DD_HH_MM"))
+            val filename = "Journey_Variable_Payment_Output_${supplier}_${uploadDateTime}.xlsx"
             val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")
             val resource = InputStreamResource(FileInputStream(file))
+
             ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=$supplier-prices.xlsx")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=$filename")
                     .contentType(mediaType)
                     .contentLength(file.length())
                     .body(resource)
