@@ -20,4 +20,4 @@ ingress:
   path: /
 
 env:
-  JAVA_OPTS: "-Xmx512m"
+  JAVA_OPTS: "-Xmx1024m"
