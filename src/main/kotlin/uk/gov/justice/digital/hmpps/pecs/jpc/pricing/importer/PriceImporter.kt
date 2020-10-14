@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
@@ -13,7 +13,7 @@ import java.io.InputStream
 @Component
 class PriceImporter(private val priceRepo: PriceRepository,
                     private val sercoPrices: SercoPricesProvider,
-                    private val geoameyPrices: GeoamyPricesProvider,
+                    private val geoameyPrices: GeoameyPricesProvider,
                     private val locationRepository: LocationRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)

@@ -8,30 +8,30 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.withType
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JCPTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Report
 import java.io.File
 import java.io.FileOutputStream
-import java.time.Clock
-import java.time.LocalDate
 
 @Component
 class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplateProvider,
-                                 @Autowired private val clock: Clock,
+                                 @Autowired private val timeSource: TimeSource,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
-                                 @Autowired private val geoamyPricesProvider: GeoamyPricesProvider,
+                                 @Autowired private val geoameyPricesProvider: GeoameyPricesProvider,
                                  @Autowired private val calculator: PriceCalculator) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     internal fun generate(filter: FilterParams, moves: List<Report>): File {
-        val dateGenerated = LocalDate.now(clock)
+        val dateGenerated = timeSource.date()
 
         XSSFWorkbook(template.get()).use { workbook ->
+
             val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
 
             val allPrices = calculator.allPrices(filter, moves)
@@ -44,7 +44,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplatePro
             RedirectionMovesSheet(workbook, header)
                     .also { logger.info("Adding redirect prices.") }
                     .apply { add(MovePriceType.REDIRECTION) }
-    
+
             LongHaulMovesSheet(workbook, header)
                     .also { logger.info("Adding long haul prices.") }
                     .apply { add(MovePriceType.LONG_HAUL) }
@@ -60,7 +60,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplatePro
 
             SummarySheet(workbook, header)
                     .also { logger.info("Adding summaries.") }
-                    .apply { writeSummaries(allPrices.map{it.summary}) }
+                    .apply { writeSummaries(allPrices.map { it.summary }) }
 
             JPCPriceBookSheet(workbook)
                     .also { logger.info("Adding supplier JPC price book used.") }
@@ -76,7 +76,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplatePro
 
     private fun originalPricesSheetFor(supplier: Supplier): Sheet {
         return when (supplier) {
-            Supplier.GEOAMEY -> XSSFWorkbook(geoamyPricesProvider.get()).use { it.getSheetAt(0)!! }
+            Supplier.GEOAMEY -> XSSFWorkbook(geoameyPricesProvider.get()).use { it.getSheetAt(0)!! }
             Supplier.SERCO -> XSSFWorkbook(sercoPricesProvider.get()).use { it.getSheetAt(0)!! }
         }
     }

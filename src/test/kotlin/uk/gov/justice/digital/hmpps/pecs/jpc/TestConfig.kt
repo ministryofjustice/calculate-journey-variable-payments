@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 
 @TestConfiguration
@@ -20,6 +21,13 @@ class TestConfig {
     fun clock(): Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
     @Bean
+    fun timeSource(): TimeSource {
+        val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+
+        return TimeSource { LocalDateTime.now(clock) }
+    }
+
+    @Bean
     fun locationsResourceProvider(): Schedule34LocationsProvider {
         return Schedule34LocationsProvider { resourceLoader.getResource("classpath:/spreadsheets/locations.xlsx").inputStream }
     }
@@ -30,8 +38,8 @@ class TestConfig {
     }
 
     @Bean
-    fun geoameyPricesResourceProvider(): GeoamyPricesProvider {
-        return GeoamyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
+    fun geoameyPricesResourceProvider(): GeoameyPricesProvider {
+        return GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
     }
 
     @Bean
@@ -40,7 +48,7 @@ class TestConfig {
     }
 
     @Bean
-    fun reportImporter() = ReportingImporter(reportingResourceProvider(), clock())
+    fun reportImporter() = ReportingImporter(reportingResourceProvider(), timeSource())
 
     @Bean
     fun jcpTemplateProvider(): JCPTemplateProvider {

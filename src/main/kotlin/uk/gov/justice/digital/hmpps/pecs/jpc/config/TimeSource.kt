@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -7,4 +8,6 @@ import java.time.LocalDateTime
  */
 fun interface TimeSource {
     fun dateTime() : LocalDateTime
+
+    fun date(): LocalDate = dateTime().toLocalDate()
 }

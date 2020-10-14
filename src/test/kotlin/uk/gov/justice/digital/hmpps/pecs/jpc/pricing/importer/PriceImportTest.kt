@@ -4,7 +4,7 @@ import com.nhaarman.mockitokotlin2.*
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoamyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.util.*
 
 internal class PriceImportTest {
 
@@ -24,9 +23,9 @@ internal class PriceImportTest {
 
     private val sercoPricesProvider: SercoPricesProvider = mock()
 
-    private val geoamyPricesProvider: GeoamyPricesProvider = mock()
+    private val geoameyPricesProvider: GeoameyPricesProvider = mock()
 
-    private val import: PriceImporter = PriceImporter(priceRepo, sercoPricesProvider, geoamyPricesProvider, locationRepo)
+    private val import: PriceImporter = PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
 
     @Test
     internal fun `verify import interactions for serco`() {
@@ -46,7 +45,7 @@ internal class PriceImportTest {
 
     @Test
     internal fun `verify import interactions for geoamey`() {
-        whenever(geoamyPricesProvider.get()).thenReturn(priceSheetWithRow(2.0, "GEO FROM", "GEO TO", 101.00))
+        whenever(geoameyPricesProvider.get()).thenReturn(priceSheetWithRow(2.0, "GEO FROM", "GEO TO", 101.00))
         val fromLocation = Location(LocationType.PR, "ID1", "GEO FROM")
         val toLocation = Location(LocationType.CC, "ID2", "GEO TO")
         whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
@@ -54,7 +53,7 @@ internal class PriceImportTest {
         import.import(Supplier.GEOAMEY)
 
         verify(locationRepo).findAll()
-        verify(geoamyPricesProvider).get()
+        verify(geoameyPricesProvider).get()
         verify(priceRepo).deleteAll()
         verify(priceRepo, times(2)).count()
         verify(priceRepo).save(any())
