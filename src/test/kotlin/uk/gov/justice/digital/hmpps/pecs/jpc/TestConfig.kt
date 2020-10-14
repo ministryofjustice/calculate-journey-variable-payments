@@ -52,6 +52,6 @@ class TestConfig {
 
     @Bean
     fun jcpTemplateProvider(): JCPTemplateProvider {
-        return JCPTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JCP_template.xlsx").inputStream }
+        return JCPTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JPC_template.xlsx").inputStream }
     }
 }
