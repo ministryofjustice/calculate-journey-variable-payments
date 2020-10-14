@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ResourceLoader
 import java.time.Clock
+import java.time.LocalDateTime
 
 @Configuration
 class ImporterConfiguration {
@@ -19,5 +20,10 @@ class ImporterConfiguration {
     @Bean
     fun jcpTemplateProvider(@Value("\${export-files.template}") templateFileLocation: String): JCPTemplateProvider {
         return JCPTemplateProvider { resourceLoader.getResource(templateFileLocation).inputStream }
+    }
+
+    @Bean
+    fun timeSource(): TimeSource {
+        return TimeSource { LocalDateTime.now(clock()) }
     }
 }
