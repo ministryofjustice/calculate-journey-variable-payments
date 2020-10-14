@@ -17,4 +17,4 @@ import-files:
   geo-prices: "geoamey_sample.xlsx"
 
 export-files:
-  template: classpath:/spreadsheets/JCP_template.xlsx
+  template: classpath:/spreadsheets/JPC_template.xlsx
