@@ -5,7 +5,7 @@ import java.io.InputStream
 /**
  * Responsible for providing the Geoamey prices Excel spreadsheet via an [InputStream].
  */
-fun interface GeoamyPricesProvider {
+fun interface GeoameyPricesProvider {
     /**
      * The caller is responsible for closing the [InputStream].
      */

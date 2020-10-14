@@ -73,4 +73,11 @@ env:
         name: {{ template "app.name" . }}
         key: BASM_AWS_SECRET_ACCESS_KEY
 
+  - name: SPREADSHEET_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "app.name" . }}
+        key: SPREADSHEET_PASSWORD
+
+
 {{- end -}}

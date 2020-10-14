@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
@@ -10,15 +11,13 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.io.File
-import java.time.Clock
 import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Service
 class ImportService(
-        private val clock: Clock,
+        private val timeSource: TimeSource,
         private val locationsImporter: LocationsImporter,
         private val priceImporter: PriceImporter,
         private val reportingImporter: ReportingImporter,
@@ -38,12 +37,12 @@ class ImportService(
     fun <T> importUnlessLocked(import: () -> T): Pair<T?, ImportStatus> {
         return if (lock.compareAndSet(false, true)) {
             logger.info("Attempting import of ${import.javaClass}")
-            val start = LocalDateTime.now(clock)
+            val start = timeSource.dateTime()
             try {
                 Pair(import(), ImportStatus.DONE)
             } finally {
                 lock.set(false)
-                val end = LocalDateTime.now(clock)
+                val end = timeSource.dateTime()
                 logger.info("Import ended: $end. Time taken (in seconds): ${Duration.between(start, end).seconds}")
             }
         } else {

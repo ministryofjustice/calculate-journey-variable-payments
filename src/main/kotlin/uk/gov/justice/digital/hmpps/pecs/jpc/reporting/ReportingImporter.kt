@@ -4,19 +4,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import java.time.Clock
 import java.time.LocalDate
 import kotlin.streams.toList
 
 @Component
 class ReportingImporter(
         @Autowired val provider: ReportingProvider,
-        @Autowired val clock: Clock) {
+        @Autowired val timeSource: TimeSource) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(from: LocalDate, to: LocalDate = LocalDate.now(clock), locations: List<Location> = listOf()): Collection<Report>{
+    fun import(from: LocalDate, to: LocalDate = timeSource.date(), locations: List<Location> = listOf()): Collection<Report>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)

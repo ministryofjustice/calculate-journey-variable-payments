@@ -89,9 +89,9 @@ class S3ProviderConfiguration {
     @Bean
     @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
     fun geoameyPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-                                      @Value("\${import-files.geo-prices}") geoPricesFile: String): GeoamyPricesProvider {
+                                      @Value("\${import-files.geo-prices}") geoPricesFile: String): GeoameyPricesProvider {
         logger.info("Using AWS S3 provider for Geoamey prices file: $geoPricesFile")
-        return GeoamyPricesProvider {
+        return GeoameyPricesProvider {
             logger.info("getting geo")
             client.getObject(GetObjectRequest(bucketName, geoPricesFile)).objectContent
         }
