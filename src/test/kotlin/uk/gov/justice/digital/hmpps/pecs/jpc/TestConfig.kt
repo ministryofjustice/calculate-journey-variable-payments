@@ -22,9 +22,7 @@ class TestConfig {
 
     @Bean
     fun timeSource(): TimeSource {
-        val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-
-        return TimeSource { LocalDateTime.now(clock) }
+        return TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
     }
 
     @Bean
@@ -51,7 +49,7 @@ class TestConfig {
     fun reportImporter() = ReportingImporter(reportingResourceProvider(), timeSource())
 
     @Bean
-    fun jcpTemplateProvider(): JCPTemplateProvider {
-        return JCPTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JPC_template.xlsx").inputStream }
+    fun jpcTemplateProvider(): JPCTemplateProvider {
+        return JPCTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JPC_template.xlsx").inputStream }
     }
 }

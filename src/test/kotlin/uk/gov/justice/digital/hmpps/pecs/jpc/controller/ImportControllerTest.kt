@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.SpreadsheetProtection
@@ -50,12 +51,26 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(locationRepository.count()).isEqualTo(0)
         assertThat(priceRepository.count()).isEqualTo(0)
 
-        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-10-01&reports_to=2020-10-01", InputStreamResource::class.java)
+        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-10-30&reports_to=2020-10-01", InputStreamResource::class.java)
 
         verify(spreadsheetProtection).protectAndGet(any())
         assertThat(response.headers.contentDisposition.filename).isEqualTo("Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(locationRepository.count()).isEqualTo(2)
         assertThat(priceRepository.count()).isEqualTo(1)
+    }
+
+    @Test
+    fun `fails if more than one months data is requested`() {
+        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
+        whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
+
+        assertThat(locationRepository.count()).isEqualTo(0)
+        assertThat(priceRepository.count()).isEqualTo(0)
+
+        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-11-02&reports_to=2020-10-01", ErrorResponse::class.java)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(response?.body?.developerMessage).isEqualTo("A maximum of one months data can be queried at a time.")
     }
 }

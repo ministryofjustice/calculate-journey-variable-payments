@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: calculate-journey-variable-payments
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      remote-ip-header: x-forwarded-for
+      protocol_header: x-forwarded-proto
+  shutdown: graceful
+  error:
+    include-message: always
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: 'info, health'
+
+  endpoint:
+    health:
+      cache:
+        time-to-live: 2000ms
+      show-components: always
+      show-details: always
+      probes:
+        enabled: true
+    info:
+      cache:
+        time-to-live: 2000ms

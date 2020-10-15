@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.withType
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JCPTemplateProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
@@ -19,7 +19,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 @Component
-class PricesSpreadsheetGenerator(@Autowired private val template: JCPTemplateProvider,
+class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplateProvider,
                                  @Autowired private val timeSource: TimeSource,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                  @Autowired private val geoameyPricesProvider: GeoameyPricesProvider,

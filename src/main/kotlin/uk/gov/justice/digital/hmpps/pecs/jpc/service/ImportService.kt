@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
 import java.io.File
+import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,6 +61,10 @@ class ImportService(
             movesFrom: LocalDate,
             movesTo: LocalDate,
             reportsTo: LocalDate): File? {
+
+        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo' and reports to '$reportsTo'.")
+
+        if (movesFrom.plusMonths(1).isBefore(movesTo)) throw IllegalArgumentException("A maximum of one months data can be queried at a time.")
 
         return if (importLocations().second == ImportStatus.IN_PROGRESS) null
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null

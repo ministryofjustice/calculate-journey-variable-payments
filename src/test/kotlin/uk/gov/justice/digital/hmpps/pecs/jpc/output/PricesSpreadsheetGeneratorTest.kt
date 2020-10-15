@@ -7,16 +7,14 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JCPTemplateProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
-import java.time.Clock
-import java.time.LocalDate
 
 @SpringJUnitConfig(TestConfig::class)
-internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: JCPTemplateProvider,
+internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: JPCTemplateProvider,
                                               @Autowired private val timeSource: TimeSource,
                                               @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                               @Autowired private val geoameyPricesProvider: GeoameyPricesProvider) {
