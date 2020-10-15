@@ -17,7 +17,7 @@ ingress:
   path: /
 
 env:
-  JAVA_OPTS: "-Xmx512m"
+  JAVA_OPTS: "-Xmx2048m"
 
 whitelist:
   office: "217.33.148.210/32"
