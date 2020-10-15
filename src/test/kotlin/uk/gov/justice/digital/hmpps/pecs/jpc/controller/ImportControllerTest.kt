@@ -51,7 +51,7 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(locationRepository.count()).isEqualTo(0)
         assertThat(priceRepository.count()).isEqualTo(0)
 
-        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-10-30&reports_to=2020-10-01", InputStreamResource::class.java)
+        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-12-01&reports_to=2020-10-01", InputStreamResource::class.java)
 
         verify(spreadsheetProtection).protectAndGet(any())
         assertThat(response.headers.contentDisposition.filename).isEqualTo("Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
@@ -68,9 +68,9 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
         assertThat(locationRepository.count()).isEqualTo(0)
         assertThat(priceRepository.count()).isEqualTo(0)
 
-        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-11-02&reports_to=2020-10-01", ErrorResponse::class.java)
+        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-12-02&reports_to=2020-10-01", ErrorResponse::class.java)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertThat(response?.body?.developerMessage).isEqualTo("A maximum of one months data can be queried at a time.")
+        assertThat(response?.body?.developerMessage).isEqualTo("A maximum of two months data can be queried at a time.")
     }
 }

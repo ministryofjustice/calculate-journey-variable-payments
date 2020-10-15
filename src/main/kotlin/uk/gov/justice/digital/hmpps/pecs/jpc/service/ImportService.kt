@@ -64,7 +64,7 @@ class ImportService(
 
         logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo' and reports to '$reportsTo'.")
 
-        if (movesFrom.plusMonths(1).isBefore(movesTo)) throw IllegalArgumentException("A maximum of one months data can be queried at a time.")
+        if (movesFrom.plusMonths(2).isBefore(movesTo)) throw IllegalArgumentException("A maximum of two months data can be queried at a time.")
 
         return if (importLocations().second == ImportStatus.IN_PROGRESS) null
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
