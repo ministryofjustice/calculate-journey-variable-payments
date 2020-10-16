@@ -10,6 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger
 
 abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
+    private val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
+
+    private val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat( 10 ))
+
     protected val rowIndex: AtomicInteger = AtomicInteger(10)
 
     protected fun createRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.createRow(rIndex)
@@ -24,11 +28,11 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     protected fun fillWhite(cellStyle: CellStyle){  } // do nothing
 
     protected fun dataFormatPercentage(cellStyle: CellStyle){
-        cellStyle.dataFormat = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat( 10 ))
+        cellStyle.dataFormat = formatPercentage
     }
 
     protected fun dataFormatPound(cellStyle: CellStyle){
-        cellStyle.dataFormat = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
+        cellStyle.dataFormat = formatPound
     }
 
 
@@ -41,13 +45,11 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         sheet.getRow(4).createCell(1).setCellValue(header.supplier.reportingName().capitalize())
         sheet.getRow(5).getCell(1).setCellValue(header.dateRange.start)
         sheet.getRow(5).getCell(3).setCellValue(header.dateRange.endInclusive)
-
-        // TODO need to add version as well.
     }
 
     /**
      * Write the Row using the RowValue value object
-     * @param showNotes - Boolean indicating whether the notes column should be displated
+     * @param showNotes - Boolean indicating whether the notes column should be displayed
      * @param styleAppliers - vararg of style functions to apply to each cell
      */
     private fun writeRow(row: Row, rowValue: RowValue, showNotes: Boolean = true, vararg styleAppliers: (cs: CellStyle) -> Unit){
