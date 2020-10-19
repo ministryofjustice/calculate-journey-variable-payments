@@ -8,21 +8,24 @@ image:
   tag: latest
   port: 8080
 
+db:
+  secret_name: rds-instance-calculate-journey-variable-payments-preprod
+
 ingress:
   enabled: true
-  enable_whitelist: true
+  enable_whitelist: false
   hosts:
-    - host: calculate-journey-variable-payments-preprod.hmpps.service.justice.gov.uk
-      cert_secret: calculate-journey-variable-payments-cert
+    - host: calculate-journey-variable-payments-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
+#      cert_secret: calculate-journey-variable-payments-cert
   path: /
 
 env:
   JAVA_OPTS: "-Xmx2048m"
 
-whitelist:
-  office: "217.33.148.210/32"
-  health-kick: "35.177.252.195/32"
-  mojvpn: "81.134.202.29/32"
-  cloudplatform-live1-1: "35.178.209.113/32"
-  cloudplatform-live1-2: "3.8.51.207/32"
-  cloudplatform-live1-3: "35.177.252.54/32"
+#whitelist:
+#  office: "217.33.148.210/32"
+#  health-kick: "35.177.252.195/32"
+#  mojvpn: "81.134.202.29/32"
+#  cloudplatform-live1-1: "35.178.209.113/32"
+#  cloudplatform-live1-2: "3.8.51.207/32"
+#  cloudplatform-live1-3: "35.177.252.54/32"
