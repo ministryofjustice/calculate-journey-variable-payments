@@ -53,6 +53,7 @@ data class Event constructor(
 enum class EventType(val value: String) {
 
 MOVE_START("MoveStart"),
+    MOVE_ACCEPT("MoveAccept"),
     MOVE_CANCEL("MoveCancel"),
     MOVE_COMPLETE("MoveComplete"),
     MOVE_LOCKOUT("MoveLockout"),

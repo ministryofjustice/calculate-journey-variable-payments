@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -8,12 +9,13 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 
 
 @ExtendWith(SpringExtension::class)
 @Import(TestConfig::class)
 @ActiveProfiles("test")
-internal class ReportingParserTest {
+internal class ReportParserTest {
 
     val locations = listOf(fromLocationFactory(), toLocationFactory())
 
@@ -40,7 +42,9 @@ internal class ReportingParserTest {
             {"id":"M1","date":"2021-02-28","status":"completed","created_at":"2020-09-07T15:30:48+01:00","updated_at":"2020-09-07T15:30:59+01:00","reference":"C","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null,"allocation_id":"e05ee488-33a2-489f-9e57-5cab1871e2a0","rejection_reason":null,"from_location_type":"prison","from_location":"WYI","to_location_type":"prison","to_location":"GNI","supplier":"geoamey"}
             {"id":"M3","date":"2020-09-07","status":"requested","created_at":"2020-09-07T15:44:08+01:00","updated_at":"2020-09-07T15:44:08+01:00","reference":"D","move_type":"court_appearance","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"d4168c75-21da-4694-866e-8fae71f327e6","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null,"allocation_id":null,"rejection_reason":null,"from_location_type":"prison","from_location":"WYI","to_location_type":"court","to_location":"BATHYC","supplier":"geoamey"}
             {"id":"M4","date":"2020-09-07","status":"cancelled","created_at":"2020-09-07T15:44:08+01:00","updated_at":"2020-09-07T15:44:08+01:00","reference":"E","move_type":"court_appearance","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"d4168c75-21da-4694-866e-8fae71f327e6","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null,"allocation_id":null,"rejection_reason":null,"from_location_type":"prison","from_location":"WYI","to_location_type":"court","to_location":"BATHYC","supplier":"geoamey"}
+            {"id":"M5","date":"2021-02-28","status":"completed","created_at":"2020-09-07T15:30:48+01:00","updated_at":"2020-09-07T15:30:59+01:00","reference":"F","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null,"allocation_id":"e05ee488-33a2-489f-9e57-5cab1871e2a0","rejection_reason":null,"from_location_type":"prison","from_location":"WYI","to_location_type":"prison","to_location":"GNI","supplier":"serco"}
         """.trimIndent()
+
 
         return listOf(report1, report2)
     }
@@ -81,18 +85,18 @@ internal class ReportingParserTest {
     @Test
     fun `Get import moves should return only unique, completed moves`() {
 
-        val moves = ReportingParser.parseAsMoves(moveReports(), locations)
-        Assertions.assertEquals(1, moves.size)
+        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, moveReports(), locations)
+        assertThat(moves.map { it.id }).containsExactly("M1", "M4")
 
         // M1 should be complete
-        Assertions.assertEquals(MoveStatus.COMPLETED.value, moves.find{it.id == "M1"}?.status)
+        assertThat(MoveStatus.COMPLETED.value).isEqualTo(moves.find{it.id == "M1"}?.status)
     }
 
     @Test
     fun `Assert no Move created from bad json and no exception generated`() {
         val moveJsonWithNullFromLocation = """{"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null, "rejection_reason":null,"from_location_type":"prison","from_location":null,"to_location_type":"prison","to_location":"GNI","supplier":"geoamey"}
 """
-        val moves = ReportingParser.parseAsMoves(listOf(moveJsonWithNullFromLocation), locations)
+        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, listOf(moveJsonWithNullFromLocation), locations)
 
         Assertions.assertEquals(0, moves.size)
     }
@@ -100,7 +104,7 @@ internal class ReportingParserTest {
     @Test
     fun `Get import journeys`() {
 
-        val journeys = ReportingParser.parseAsMoveIdToJourneys(journeyReports(), listOf())
+        val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports(), listOf())
 
         // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
         Assertions.assertEquals(setOf("M1", "M2", "M3"), journeys.keys)
@@ -118,7 +122,7 @@ internal class ReportingParserTest {
     @Test
     fun `Get import events`() {
 
-        val events = ReportingParser.parseAsEventableIdToEvents(eventReports())
+        val events = ReportParser.parseAsEventableIdToEvents(eventReports())
 
         // There should be 3 unique eventable Ids
         Assertions.assertEquals(3, events.size)
@@ -133,7 +137,8 @@ internal class ReportingParserTest {
 
     @Test
     fun `import all`() {
-        val movesWithJourneysAndEvents = ReportingParser.parseAll(
+        val movesWithJourneysAndEvents = ReportParser.parseAll(
+                Supplier.GEOAMEY,
                 moveFiles = moveReports(),
                 peopleFiles = personReports(),
                 profileFiles = profileReports(),
@@ -141,19 +146,19 @@ internal class ReportingParserTest {
                 eventFiles = eventReports()
         )
 
-        // There should be 1 unique move (completed) from the 5 in the files
-        Assertions.assertEquals(1, movesWithJourneysAndEvents.size)
+        // There should be 1 unique completed move and 1 cancelled move from the 6 in the files
+        assertThat(movesWithJourneysAndEvents.map { it.move.id }).containsExactly("M1", "M4")
 
         val move1 = movesWithJourneysAndEvents.find { it.move.id == "M1" }!!
 
         // Move1 should have two events
-        Assertions.assertEquals(listOf("E1", "E4"), move1.events.map{it.id})
+        assertThat(move1.events.map{it.id}).isEqualTo(listOf("E1", "E4"))
 
         // Move1's first journey should have event 3
-        Assertions.assertEquals(listOf("E3"), move1.journeysWithEvents[0].events.map { it.id })
+        assertThat(move1.journeysWithEvents[0].events.map { it.id }).isEqualTo(listOf("E3"))
 
         // Move 1 should have Person PE1
-        Assertions.assertEquals("PE1", move1.person?.id)
+        assertThat(move1.person?.id).isEqualTo("PE1")
     }
 }
 

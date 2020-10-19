@@ -7,6 +7,7 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import org.assertj.core.api.Assertions.assertThat
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.time.LocalDate
 
@@ -24,7 +25,7 @@ internal class PriceCalculatorTest{
     val movesFrom = LocalDate.of(2020, 9, 10)
     val movesTo = LocalDate.of(2020, 9, 11)
 
-    val completedMoveWithPricedBillableJourney = Report(
+    private val completedMoveWithPricedBillableJourney = Report(
             move = moveFactory(),
             person = personFactory(),
             events = listOf(moveEventFactory(
@@ -34,7 +35,7 @@ internal class PriceCalculatorTest{
     )
 
 
-    val completedMoveWithUnpricedJourney = Report(
+    private val completedMoveWithUnpricedJourney = Report(
             move = moveFactory(moveId = "M2", fromLocation = fromLocationFactory(nomisAgencyId = "NOTPRICED")),
             person = personFactory(),
             events =  listOf(moveEventFactory(
@@ -45,7 +46,7 @@ internal class PriceCalculatorTest{
             )
     )
 
-    val redirectMoveWithUnbillableJourney = Report(
+    private val redirectMoveWithUnbillableJourney = Report(
             move = moveFactory(moveId = "M3"),
             person = personFactory(),
             events = listOf(
@@ -59,7 +60,9 @@ internal class PriceCalculatorTest{
     )
 
 
-    val complexMove = Report(
+
+
+    private val mutliTypeMove = Report(
             move = moveFactory(moveId = "M4"),
             person = personFactory(),
             events = listOf(
@@ -73,9 +76,26 @@ internal class PriceCalculatorTest{
                     JourneyWithEvents(journeyFactory(moveId = "M4", billable = false), listOf()))
     )
 
-    val moves = listOf(completedMoveWithPricedBillableJourney, redirectMoveWithUnbillableJourney, completedMoveWithUnpricedJourney, complexMove)
-    val params = FilterParams(Supplier.SERCO, movesFrom, movesTo)
-    val movePrices = calculator.allPrices(params, moves)
+    private val cancelledBillable = Report(
+            move = moveFactory(
+                    moveId = "M9",
+                    status = MoveStatus.CANCELLED.value,
+                    fromLocation = fromLocationFactory(locationType = LocationType.PR),
+                    toLocation = toLocationFactory(locationType = LocationType.PR),
+                    cancellationReason = "cancelled_by_pmu",
+                    date = movesTo
+            ),
+            person = personFactory(),
+            events = listOf(
+                    moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = movesTo.atStartOfDay().minusHours(24)),
+                    moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = movesTo.atStartOfDay().minusHours(2))
+            ),
+            journeysWithEvents = listOf()
+    )
+
+    private val moves = listOf(completedMoveWithPricedBillableJourney, redirectMoveWithUnbillableJourney, completedMoveWithUnpricedJourney, mutliTypeMove, cancelledBillable)
+    private val params = FilterParams(Supplier.SERCO, movesFrom, movesTo)
+    private val movePrices = calculator.allPrices(params, moves)
 
     @Test
     fun `price key for Price should be $fromSiteName-$SiteName`(){
@@ -105,7 +125,7 @@ internal class PriceCalculatorTest{
         assertThat(standardPrices[1].totalInPence()).isNull()
 
         // Summary values
-        assertThat(standardPricesWithSummary.summary.percentage).isEqualTo(0.5)
+        assertThat(standardPricesWithSummary.summary.percentage).isEqualTo(0.4)
         assertThat(standardPricesWithSummary.summary.volume).isEqualTo(2)
     }
 
@@ -114,20 +134,29 @@ internal class PriceCalculatorTest{
 
         val multi = movePrices.withType(MovePriceType.MULTI)
         assertThat(multi.prices.map{it.report.move.id}).containsExactly("M3", "M4")
-        assertThat(multi.summary.percentage).isEqualTo(0.5)
+        assertThat(multi.summary.percentage).isEqualTo(0.4)
         assertThat(multi.summary.volume).isEqualTo(2)
         assertThat(multi.summary.volumeUnpriced).isEqualTo(2)
         assertThat(multi.summary.totalPriceInPence).isEqualTo(0)
     }
 
     @Test
+    fun `Cancelled moves priced correctly`() {
+        val cancelled = movePrices.withType(MovePriceType.CANCELLED)
+
+        assertThat(cancelled.prices[0].report.move.id).isEqualTo("M9")
+        assertThat(cancelled.prices[0].totalInPence()).isEqualTo(101)
+
+    }
+
+    @Test
     fun `Summary calculated correctly`(){
         val summary = movePrices.map{it.summary}.summary()
         assertThat(summary.percentage).isEqualTo(1.0)
-        assertThat(summary.volume).isEqualTo(4)
+        assertThat(summary.volume).isEqualTo(5)
         assertThat(summary.volumeUnpriced).isEqualTo(3)
-        assertThat(summary.totalPriceInPence).isEqualTo(101)
-        assertThat(summary.totalPriceInPounds).isEqualTo(1.01)
+        assertThat(summary.totalPriceInPence).isEqualTo(202) // standard and cancelled move
+        assertThat(summary.totalPriceInPounds).isEqualTo(2.02)
     }
 
 }

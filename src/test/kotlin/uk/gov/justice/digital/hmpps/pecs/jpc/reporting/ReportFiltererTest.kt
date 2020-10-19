@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 
@@ -96,6 +97,24 @@ internal class ReportFiltererTest{
             )
     )
 
+    private val cancelledBillable = Report(
+            move = moveFactory(
+                    moveId = "M9",
+                    status = MoveStatus.CANCELLED.value,
+                    fromLocation = fromLocationFactory(locationType = LocationType.PR),
+                    toLocation = toLocationFactory(locationType = LocationType.PR),
+                    cancellationReason = "cancelled_by_pmu",
+                    date = to
+            ),
+            person = personFactory(),
+            events = listOf(
+                    moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
+                    moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
+            ),
+            journeysWithEvents = listOf()
+    )
+
+
     private val reports = listOf(
             standardInDateRange,
             cancelled,
@@ -104,7 +123,8 @@ internal class ReportFiltererTest{
             completedRedirection,
             completedLongHaul,
             completedLockout,
-            multiTypeMove
+            multiTypeMove,
+            cancelledBillable
     )
 
     private val filter = FilterParams(Supplier.SERCO, from, to)
@@ -112,35 +132,42 @@ internal class ReportFiltererTest{
     @Test
     fun `Only standard moves within date range are filtered`() {
 
-        val standardReports = MoveReportFilterer.standardMoveReports(filter, reports).toSet()
+        val standardReports = ReportFilterer.standardMoveReports(filter, reports).toList()
         assertThat(standardReports).containsOnly(standardInDateRange)
     }
 
     @Test
     fun `Only redirection moves within date range are filtered`() {
 
-        val redirectReports = MoveReportFilterer.redirectionReports(filter, reports).toSet()
+        val redirectReports = ReportFilterer.redirectionReports(filter, reports).toList()
         assertThat(redirectReports).containsOnly(completedRedirection)
     }
 
     @Test
     fun `Only long haul moves within date range are filtered`() {
 
-        val longHaulReports = MoveReportFilterer.longHaulReports(filter, reports).toSet()
+        val longHaulReports = ReportFilterer.longHaulReports(filter, reports).toList()
         assertThat(longHaulReports).containsOnly(completedLongHaul)
     }
 
     @Test
     fun `Only lockout moves within date range are filtered`() {
 
-        val lockoutReports = MoveReportFilterer.lockoutReports(filter, reports).toSet()
+        val lockoutReports = ReportFilterer.lockoutReports(filter, reports).toList()
         assertThat(lockoutReports).containsOnly(completedLockout)
     }
 
     @Test
     fun `Unbillable and multi-type moves`() {
 
-        val multiTypeReports = MoveReportFilterer.multiTypeReports(filter, reports).toSet()
+        val multiTypeReports = ReportFilterer.multiTypeReports(filter, reports).toList()
         assertThat(multiTypeReports).containsExactlyInAnyOrder(multiTypeMove, completedUnbillable)
+    }
+
+    @Test
+    fun `Cancelled billable moves`() {
+
+        val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(filter, reports).toList()
+        assertThat(cancelledBillableReports.map{it.move}).containsExactlyInAnyOrder(cancelledBillable.move)
     }
 }

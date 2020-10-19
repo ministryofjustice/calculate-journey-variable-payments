@@ -66,17 +66,20 @@ fun moveFactory(
         profileId: String = defaultProfileId,
         status: String = MoveStatus.COMPLETED.value,
         fromLocation: Location = fromLocationFactory(),
-        toLocation : Location = toLocationFactory()
+        toLocation : Location = toLocationFactory(),
+        cancellationReason: String = "",
+        date: LocalDate = defaultDate
     ): Move {
     val move = Move(
             id = moveId,
             supplier = supplier,
             profileId = profileId,
             reference = "UKW4591N",
-            date = defaultDate,
+            date = date,
             status = status,
             fromLocation = fromLocation,
-            toLocation = toLocation
+            toLocation = toLocation,
+            cancellationReason = cancellationReason
     )
     return move
 }

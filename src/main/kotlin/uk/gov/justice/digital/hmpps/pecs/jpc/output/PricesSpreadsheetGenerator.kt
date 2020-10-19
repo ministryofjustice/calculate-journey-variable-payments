@@ -57,6 +57,9 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
                     .also { logger.info("Adding multi-type prices.") }
                     .apply { add(MovePriceType.MULTI) }
 
+            CancelledMovesSheet(workbook, header)
+                    .also { logger.info("Adding cancelled moves.") }
+                    .apply { add(MovePriceType.CANCELLED) }
 
             SummarySheet(workbook, header)
                     .also { logger.info("Adding summaries.") }

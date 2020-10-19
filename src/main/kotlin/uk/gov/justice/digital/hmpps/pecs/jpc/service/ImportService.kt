@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportingImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
 import java.io.File
 import java.lang.IllegalArgumentException
 import java.time.Duration
@@ -21,7 +21,7 @@ class ImportService(
         private val timeSource: TimeSource,
         private val locationsImporter: LocationsImporter,
         private val priceImporter: PriceImporter,
-        private val reportingImporter: ReportingImporter,
+        private val reportImporter: ReportImporter,
         private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator,
         private val locationsRepository: LocationRepository) {
 
@@ -70,7 +70,7 @@ class ImportService(
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
         else {
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importUnlessLocked { reportingImporter.import(movesFrom, reportsTo, locationsRepository.findAll().toList()) }
+            val (reports, status) = importUnlessLocked { reportImporter.import(supplier, movesFrom, reportsTo, locationsRepository.findAll().toList()) }
             if (reports != null) {
                 pricesSpreadsheetGenerator.generate(FilterParams(supplier, movesFrom, movesTo), reports.toList())
             } else {

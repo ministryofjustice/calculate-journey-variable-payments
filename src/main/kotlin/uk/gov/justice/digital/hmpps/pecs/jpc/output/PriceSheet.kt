@@ -75,7 +75,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
     fun writeMoveRow(price: MovePrice, isShaded: Boolean, showNotes: Boolean = true) {
-        val fill = if(isShaded) :: fillBlue else ::fillWhite
+        val fill = if(isShaded) ::fillBlue else ::fillWhite
         writeRow(createRow(), RowValue.forMovePrice(price), showNotes, fill )
     }
 

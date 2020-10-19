@@ -3,9 +3,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 
 @Component
-object ReportingParser {
+object ReportParser {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -37,10 +38,10 @@ object ReportingParser {
         return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
     }
 
-    fun parseAsMoves(moveFiles: List<String>, locations: List<Location>): Collection<Move> {
+    fun parseAsMoves(supplier: Supplier, moveFiles: List<String>, locations: List<Location>): Collection<Move> {
         val locationConverter = LocationConverter(locations)
         return read(moveFiles) { Move.fromJson(it, locationConverter) }.
-        filter { MoveStatus.statuses.contains(it.status) }.
+        filter { it.supplier == supplier.reportingName() && MoveStatus.statuses.contains(it.status) }.
         associateBy(Move::id).values
     }
 
@@ -58,8 +59,8 @@ object ReportingParser {
         groupBy(Event::eventableId)
     }
 
-    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>, locations: List<Location> = listOf()): List<Report> {
-        val moves = parseAsMoves(moveFiles, locations)
+    fun parseAll(supplier: Supplier, moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>, locations: List<Location> = listOf()): List<Report> {
+        val moves = parseAsMoves(supplier, moveFiles, locations)
         val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
         val people = parseAsPersonIdToPerson(peopleFiles)
         val journeys = parseAsMoveIdToJourneys(journeyFiles, locations)
@@ -78,4 +79,5 @@ object ReportingParser {
         }
         return movesWithJourneysAndEvents
     }
+
 }
