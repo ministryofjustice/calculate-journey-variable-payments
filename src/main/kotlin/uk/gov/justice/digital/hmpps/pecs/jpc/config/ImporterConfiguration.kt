@@ -20,8 +20,8 @@ class ImporterConfiguration {
     private lateinit var resourceLoader: ResourceLoader
 
     @Bean
-    fun jcpTemplateProvider(@Value("\${export-files.template}") templateFileLocation: String): JCPTemplateProvider {
-        return JCPTemplateProvider { resourceLoader.getResource(templateFileLocation).inputStream }
+    fun jpcTemplateProvider(@Value("\${export-files.template}") templateFileLocation: String): JPCTemplateProvider {
+        return JPCTemplateProvider { resourceLoader.getResource(templateFileLocation).inputStream }
     }
 
     @Bean

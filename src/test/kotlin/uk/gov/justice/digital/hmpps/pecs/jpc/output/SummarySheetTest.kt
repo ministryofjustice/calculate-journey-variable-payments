@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceSummary
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JCPTemplateProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 
 @SpringJUnitConfig(TestConfig::class)
-internal class SummarySheetTest(@Autowired private val template: JCPTemplateProvider) {
+internal class SummarySheetTest(@Autowired private val template: JPCTemplateProvider) {
 
     private val workbook: Workbook = XSSFWorkbook(template.get())
 
