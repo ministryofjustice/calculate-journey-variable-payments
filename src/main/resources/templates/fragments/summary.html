@@ -1,0 +1,41 @@
+<div class="bg-govuk-colour-blue govuk-grid-row mt3" th:fragment="summary">
+    <ul class="list ph0 bg-govuk-colour-blue govuk-grid-column-three-quarters mv3">
+        <li class="govuk-grid-column-one-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total moves for</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">[[${#dates.monthName(summary.month)}]] [[${#dates.format(summary.month, 'yyyy')}]]</p></div>
+        </li>
+        <li class="govuk-grid-column-one-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Moves without prices</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+                [[${#numbers.formatDecimal(summary.movesWithoutPrices, 0, 'COMMA', 0, 'POINT')}]]</p></div>
+        </li>
+        <li class="govuk-grid-column-one-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total moves</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+                [[${#numbers.formatDecimal(summary.totalMoves, 0, 'COMMA', 0, 'POINT')}]]</p></div>
+        </li>
+        <li class="govuk-grid-column-one-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total price</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+                £[[${#numbers.formatDecimal(summary.totalPrice, 0, 'COMMA', 2, 'POINT')}]]</p></div>
+        </li>
+        <li class="govuk-grid-column-one-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Supplier</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:text="${summary.supplier}">SERCO</p></div>
+        </li>
+        <li class="govuk-grid-column-one-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">JPC Version</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:text="${summary.jpcVersion}">JPC_SERCO_310320</p></div>
+        </li>
+    </ul>
+    <div class="govuk-grid-column-one-quarter mv3">
+        <div class="pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total price</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+                £[[${#numbers.formatDecimal(summary.totalPrice, 0, 'COMMA', 2, 'POINT')}]]</p></div>
+            <div class="pt3">
+                <span class="ttu govuk-body govuk-!-font-weight-bold white ba bw1 b--white pa1">Pending price</span>
+            </div>
+        </div>
+    </div>
+</div>
