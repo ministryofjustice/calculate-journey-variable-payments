@@ -15,8 +15,8 @@ ingress:
   enabled: true
   enable_whitelist: false
   hosts:
-    - host: calculate-journey-variable-payments-prod.apps.live-1.cloud-platform.service.justice.gov.uk
-#      cert_secret: calculate-journey-variable-payments-cert
+    - host: calculate-journey-variable-payments.hmpps.service.justice.gov.uk
+      cert_secret: calculate-journey-variable-payments-cert
   path: /
 
 env:
