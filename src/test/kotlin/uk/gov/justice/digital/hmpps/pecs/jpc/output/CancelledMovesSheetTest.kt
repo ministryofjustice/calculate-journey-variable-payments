@@ -22,26 +22,28 @@ import java.time.LocalDate
 internal class CancelledMovesSheetTest(@Autowired private val template: JPCTemplateProvider) {
 
     private val workbook: Workbook = XSSFWorkbook(template.get())
-    private val date: LocalDate = LocalDate.now()
 
     @Test
     internal fun `test cancelled prices`() {
-        val movesDate = LocalDate.of(2020, 9, 10)
+        val moveDate = LocalDate.of(2020, 9, 10)
+        val move = moveFactory(
+                moveId = "M9",
+                status = MoveStatus.CANCELLED.value,
+                fromLocation = fromLocationFactory(locationType = LocationType.PR),
+                toLocation = toLocationFactory(locationType = LocationType.PR),
+                cancellationReason = "cancelled_by_pmu",
+                date = moveDate
+        )
+
+        val person = personFactory()
 
         val journeyWithEvents = JourneyWithEvents(journeyFactory(billable = true), listOf())
         val cancelledBillable = Report(
-                move = moveFactory(
-                        moveId = "M9",
-                        status = MoveStatus.CANCELLED.value,
-                        fromLocation = fromLocationFactory(locationType = LocationType.PR),
-                        toLocation = toLocationFactory(locationType = LocationType.PR),
-                        cancellationReason = "cancelled_by_pmu",
-                        date = date
-                ),
-                person = personFactory(),
+                move = move,
+                person = person,
                 events = listOf(
-                        moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = date.atStartOfDay().minusHours(24)),
-                        moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = date.atStartOfDay().minusHours(2))
+                        moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = moveDate.atStartOfDay().minusHours(24)),
+                        moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", notes = "Cancelled due to snow", occurredAt = moveDate.atStartOfDay().minusHours(2))
                 ),
                 journeysWithEvents = listOf()
         )
@@ -50,14 +52,25 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
         val toLocation = toLocationFactory(locationType = LocationType.PR)
         val price = MovePrice(cancelledBillable, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
-        val sms = CancelledMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
-        sms.writeMoves(listOf(price))
+        val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
+        sheet.writeMoves(listOf(price))
 
-        assertCellEquals(sms, 10, 0, cancelledBillable.move.reference)
-        assertCellEquals(sms, 10, 1, fromLocation.siteName)
-        assertCellEquals(sms, 10, 2, fromLocation.locationType.name) // pick up location type
+        assertCellEquals(sheet, 10, 0, cancelledBillable.move.reference)
+        assertCellEquals(sheet, 10, 1, fromLocation.siteName)
+        assertCellEquals(sheet, 10, 2, fromLocation.locationType.name) // pick up location type
 
-        assertCellEquals(sms, 10, 3, toLocation.siteName)
-        assertCellEquals(sms, 10, 4, toLocation.locationType.name) // drop off location type
+        assertCellEquals(sheet, 10, 3, toLocation.siteName)
+        assertCellEquals(sheet, 10, 4, toLocation.locationType.name) // drop off location type
+
+        assertCellEquals(sheet, 10, 5, "10/09/2020") // move date
+
+        assertCellEquals(sheet, 10, 6, "09/09/2020") // cancellation date
+        assertCellEquals(sheet, 10, 7, "22:00") // cancellation time
+
+        assertCellEquals(sheet, 10, 8, person.prisonNumber)
+        assertCellEquals(sheet, 10, 9, 10.01) // price
+        assertCellEquals(sheet, 10, 10, "MoveCancel: Cancelled due to snow") // notes
+
+
     }
 }
