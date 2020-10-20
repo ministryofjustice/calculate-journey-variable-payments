@@ -6,13 +6,13 @@ data class Report(
         val events: List<Event> = listOf(),
         val journeysWithEvents: List<JourneyWithEvents> = listOf()) {
 
-    fun hasAnyOf(vararg ets: EventType) =
-            ets.sumBy { et ->
-                this.events.count { it.hasType(et) } +
-                this.journeysWithEvents.flatMap { it.events }.count { it.hasType(et) }
-            } > 0
+    fun hasAnyOf(vararg ets: EventType) = getEvents(*ets).isNotEmpty()
 
     fun hasNoneOf(vararg ets: EventType) = !hasAnyOf(*ets)
+
+    fun getEvents(vararg ets: EventType) =
+            this.events.filter { ets.map{it.value}.contains(it.type) } +
+            this.journeysWithEvents.flatMap { it.events }.filter{ ets.map{it.value}.contains(it.type)  }
 
 }
 

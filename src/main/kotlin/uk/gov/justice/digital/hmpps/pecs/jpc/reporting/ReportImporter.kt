@@ -6,23 +6,26 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import java.time.Clock
 import java.time.LocalDate
 import kotlin.streams.toList
 
 @Component
-class ReportingImporter(
+class ReportImporter(
         @Autowired val provider: ReportingProvider,
         @Autowired val timeSource: TimeSource) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(from: LocalDate, to: LocalDate = timeSource.date(), locations: List<Location> = listOf()): Collection<Report>{
+    fun import(supplier: Supplier, from: LocalDate, to: LocalDate = timeSource.date(), locations: List<Location> = listOf()): Collection<Report>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)
         val profilesContent = getContents("profiles", from, to)
         val peopleContent = getContents("people", from, to)
-        return ReportingParser.parseAll(
+        return ReportParser.parseAll(
+                supplier,
                 moveFiles = movesContent,
                 journeyFiles = journeysContent,
                 eventFiles = eventsContent,

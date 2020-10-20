@@ -60,7 +60,8 @@ internal class RowValueTest {
                 "PRISON1",
                 null,
                 "",
-                "MoveRedirect: redirected"
+                "MoveRedirect: redirected",
+                "28/02/2021"
         ))
     }
 
@@ -83,7 +84,8 @@ internal class RowValueTest {
                 null,
                 null,
                 "NO",
-                "JourneyCancel: cancelled due to fog, JourneyCancel: off because of sun"
+                "JourneyCancel: cancelled due to fog, JourneyCancel: off because of sun",
+                null
         ))
     }
 
@@ -107,7 +109,8 @@ internal class RowValueTest {
                 null,
                 0.5,
                 "YES",
-                ""
+                "",
+                null
         ))
     }
 
@@ -145,7 +148,8 @@ internal class RowValueTest {
                 "PRISON1",
                 0.8,
                 "",
-                ""
+                "",
+                "28/02/2021"
         ))
     }
 }

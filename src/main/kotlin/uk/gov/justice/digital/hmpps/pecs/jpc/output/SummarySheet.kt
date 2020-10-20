@@ -12,7 +12,7 @@ class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(workbook.get
         summaries.forEachIndexed {i,summary ->
             writeSummary(3 * i + 9, summary)
         }
-        writeSummary(25, summaries.summary())
+        writeSummary(28, summaries.summary())
     }
 
     private fun writeSummary(rIndex: Int, summary: PriceSummary){

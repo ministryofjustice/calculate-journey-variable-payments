@@ -52,7 +52,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
      * @param showNotes - Boolean indicating whether the notes column should be displayed
      * @param styleAppliers - vararg of style functions to apply to each cell
      */
-    private fun writeRow(row: Row, rowValue: RowValue, showNotes: Boolean = true, vararg styleAppliers: (cs: CellStyle) -> Unit){
+    protected open fun writeRow(row: Row, rowValue: RowValue, showNotes: Boolean = true, vararg styleAppliers: (cs: CellStyle) -> Unit){
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, *styleAppliers)
         with(rowValue) {
             add(0, ref)
@@ -75,7 +75,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
     fun writeMoveRow(price: MovePrice, isShaded: Boolean, showNotes: Boolean = true) {
-        val fill = if(isShaded) :: fillBlue else ::fillWhite
+        val fill = if(isShaded) ::fillBlue else ::fillWhite
         writeRow(createRow(), RowValue.forMovePrice(price), showNotes, fill )
     }
 

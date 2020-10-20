@@ -3,15 +3,15 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.calculator
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyWithEvents
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Report
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveReportFilterer
-import java.lang.RuntimeException
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportFilterer
 
 enum class MovePriceType(val filterer: (p: FilterParams, m: Collection<Report>) -> Sequence<Report>){
-    STANDARD(MoveReportFilterer::standardMoveReports),
-    LONG_HAUL(MoveReportFilterer::longHaulReports),
-    REDIRECTION(MoveReportFilterer::redirectionReports),
-    LOCKOUT(MoveReportFilterer::lockoutReports),
-    MULTI(MoveReportFilterer::multiTypeReports)
+    STANDARD(ReportFilterer::standardMoveReports),
+    LONG_HAUL(ReportFilterer::longHaulReports),
+    REDIRECTION(ReportFilterer::redirectionReports),
+    LOCKOUT(ReportFilterer::lockoutReports),
+    MULTI(ReportFilterer::multiTypeReports),
+    CANCELLED(ReportFilterer::cancelledBillableMoves)
 }
 
 data class PriceSummary(

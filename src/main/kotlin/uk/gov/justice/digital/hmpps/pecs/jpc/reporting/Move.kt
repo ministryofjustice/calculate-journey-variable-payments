@@ -31,10 +31,18 @@ data class Move(
         val fromLocation: Location,
 
         @Json(name = "to_location")
-        val toLocation: Location? = null
+        val toLocation: Location? = null,
+
+        @Json(name = "cancellation_reason")
+        val cancellationReason: String? = null,
+
+        @Json(name = "cancellation_reason_comment")
+        val cancellationReasonComment: String? = null
 
 ) {
     companion object {
+        val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
+
         fun fromJson(json: String, locationConverter: Converter): Move? {
             return Klaxon().
             converter(locationConverter).
@@ -45,7 +53,8 @@ data class Move(
 }
 
 enum class MoveStatus(val value: String) {
-    COMPLETED("completed");
+    COMPLETED("completed"),
+    CANCELLED("cancelled");
 
     companion object{
         val statuses = values().map { it.value }

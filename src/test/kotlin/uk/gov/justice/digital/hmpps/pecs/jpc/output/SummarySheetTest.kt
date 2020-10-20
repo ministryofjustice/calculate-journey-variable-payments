@@ -36,10 +36,10 @@ internal class SummarySheetTest(@Autowired private val template: JPCTemplateProv
         assertCellEquals(sheet, 12, 1, longHaulSummary.percentage)
 
         // Summary of summaries at row 25
-        assertCellEquals(sheet, 25, 1, 100.0) // overall %
-        assertCellEquals(sheet, 25, 2, 110.0) // overall volume
-        assertCellEquals(sheet, 25, 3, 10.0) // overall volume unpriced
-        assertCellEquals(sheet, 25, 4, 6.0) // overall total in £
+        assertCellEquals(sheet, 28, 1, 100.0) // overall %
+        assertCellEquals(sheet, 28, 2, 110.0) // overall volume
+        assertCellEquals(sheet, 28, 3, 10.0) // overall volume unpriced
+        assertCellEquals(sheet, 28, 4, 6.0) // overall total in £
 
 
     }

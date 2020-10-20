@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import org.slf4j.LoggerFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.ClosedRangeLocalDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
 import java.time.LocalDate
+import java.time.LocalDateTime
 
-object MoveReportFilterer {
+object ReportFilterer {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -13,7 +16,10 @@ object MoveReportFilterer {
 
     private fun Report.hasStatus(status: MoveStatus) = move.status == status.value
 
-    private fun List<Event>.hasEventInDateRange(eventType: EventType, dateRange: ClosedRangeLocalDate) =
+    private fun List<Event>.hasEventType(eventType: EventType) =
+            this.find { it.hasType(eventType) } != null
+
+    private fun List<Event>.hasEventTypeInDateRange(eventType: EventType, dateRange: ClosedRangeLocalDate) =
             with(this.find { it.hasType(eventType) }?.occurredAt?.toLocalDate()) {
                 this != null && dateRange.contains(this)
             }
@@ -22,7 +28,38 @@ object MoveReportFilterer {
         return reports.asSequence().filter {
             it.hasSupplier(params.supplier) &&
             it.hasStatus(MoveStatus.COMPLETED) &&
-            it.events.hasEventInDateRange(EventType.MOVE_COMPLETE, params.dateRange())
+            it.events.hasEventTypeInDateRange(EventType.MOVE_COMPLETE, params.dateRange())
+        }
+    }
+
+    /**
+     * For a cancelled move to be billable it must be a previously accepted prison to prison move in a cancelled state.
+     * It must have a cancellation reason of cancelled_by_pmu and have been cancelled after 3pm the day before the move date
+     */
+    fun cancelledBillableMoves(params: FilterParams, reports: Collection<Report>): Sequence<Report> {
+        return reports.asSequence().filter {
+            it.hasSupplier(params.supplier) &&
+            it.hasStatus(MoveStatus.CANCELLED) &&
+            CANCELLATION_REASON_CANCELLED_BY_PMU == it.move.cancellationReason &&
+            it.move.fromLocation.locationType == LocationType.PR &&
+            it.move.toLocation != null &&
+            it.move.toLocation.locationType == LocationType.PR &&
+            it.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
+            it.events.hasEventTypeInDateRange(EventType.MOVE_CANCEL, params.dateRange()) && // cancel event within date range
+            it.events.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.date?.atStartOfDay()) ?: false
+        }.map { it.copy(journeysWithEvents = listOf(JourneyWithEvents( // fake journey with events
+                Journey(
+                        id = "FAKE",
+                        moveId = it.move.id,
+                        billable = true,
+                        supplier = it.move.supplier,
+                        clientTimestamp = LocalDateTime.now(),
+                        fromLocation = it.move.fromLocation,
+                        toLocation = it.move.toLocation!!,
+                        state = JourneyState.CANCELLED.value,
+                        vehicleRegistration = null
+                ),
+                listOf())))
         }
     }
 
@@ -108,6 +145,8 @@ object MoveReportFilterer {
             }
         }
     }
+
+
 }
 
 data class FilterParams(
