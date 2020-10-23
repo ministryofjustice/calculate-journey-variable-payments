@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelJdbcRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
@@ -17,10 +20,15 @@ import java.time.ZoneId
 import javax.sql.DataSource
 
 @TestConfiguration
-class TestConfig {
+class TestConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     private lateinit var resourceLoader: ResourceLoader
+
+    // Putting this here until we have the framework in place for supplying credentials.
+    override fun configure(web: WebSecurity) {
+        web.ignoring().antMatchers("/**")
+    }
 
     @Bean
     fun moveModelSelectRepository(@Qualifier("dataSource") dataSource: DataSource): MoveModelJdbcRepository{
