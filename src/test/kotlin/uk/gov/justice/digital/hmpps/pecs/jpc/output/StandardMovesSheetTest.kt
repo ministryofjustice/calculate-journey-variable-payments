@@ -59,19 +59,19 @@ internal class StandardMovesSheetTest(@Autowired private val template: JPCTempla
                 journeysWithEvents = listOf(journeyWithEvents)
         )
 
-        val fromLocation = fromLocationFactory()
-        val toLocation = toLocationFactory()
+        val fromLocation = fromPrisonNomisAgencyId()
+        val toLocation = toCourtNomisAgencyId()
         val standardPrice = MovePrice(standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
         sms.writeMoves(listOf(standardPrice))
 
         assertCellEquals(sms, 10, 0, standardMove.move.reference)
-        assertCellEquals(sms, 10, 1, fromLocation.siteName)
-        assertCellEquals(sms, 10, 2, fromLocation.locationType.name) // pick up location type
+        assertCellEquals(sms, 10, 1, "from") // pick up sitename
+        assertCellEquals(sms, 10, 2, "PR") // pick up location type
 
-        assertCellEquals(sms, 10, 3, toLocation.siteName)
-        assertCellEquals(sms, 10, 4, toLocation.locationType.name) // drop off location type
+        assertCellEquals(sms, 10, 3, "to") // drop off sitename
+        assertCellEquals(sms, 10, 4, "CO") // drop off location type
 
         assertCellEquals(sms, 10, 5, "10/09/2020") // Pick up date
         assertCellEquals(sms, 10, 6, "05:00") // Pick up time

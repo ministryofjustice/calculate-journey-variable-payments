@@ -28,10 +28,16 @@ data class Move(
         val status: String,
 
         @Json(name = "from_location")
-        val fromLocation: Location,
+        val fromLocation: String,
+
+        @Json(name = "from_location_type")
+        val fromLocationType: String,
 
         @Json(name = "to_location")
-        val toLocation: Location? = null,
+        val toLocation: String? = null,
+
+        @Json(name = "to_location_type")
+        val toLocationType: String? = null,
 
         @Json(name = "cancellation_reason")
         val cancellationReason: String? = null,
@@ -40,15 +46,21 @@ data class Move(
         val cancellationReasonComment: String? = null
 
 ) {
+    fun toJson() : String{
+        return Klaxon().
+        fieldConverter(EventDate::class, dateConverter).
+        toJsonString(this)
+    }
     companion object {
         val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
 
-        fun fromJson(json: String, locationConverter: Converter): Move? {
+        fun fromJson(json: String): Move? {
             return Klaxon().
-            converter(locationConverter).
             fieldConverter(EventDate::class, dateConverter).
+            fieldConverter(EventDateTime::class, dateTimeConverter).
             parse<Move>(json)
         }
+
     }
 }
 

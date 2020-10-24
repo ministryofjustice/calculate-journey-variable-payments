@@ -31,19 +31,18 @@ data class Journey(
         val vehicleRegistration: String?,
 
         @Json(name = "from_location")
-        val fromLocation: Location,
+        val fromLocation: String,
 
         @Json(name = "to_location")
-        val toLocation: Location
+        val toLocation: String
 )
 
 {
     fun stateIsAnyOf(vararg states: JourneyState) = states.map{it.value}.contains(state)
 
     companion object {
-        fun fromJson(json: String, locationConverter: Converter): Journey? {
+        fun fromJson(json: String): Journey? {
             return Klaxon().
-            converter(locationConverter).
             fieldConverter(EventDateTime::class, dateTimeConverter).
             parse<Journey>(json)
         }

@@ -19,6 +19,9 @@ class LocationConverter(val locations: Collection<Location>): Converter {
             jv.string?.let{agencyId2Location[jv.string] ?: Location(LocationType.UNKNOWN, jv.string!!, jv.string!!)}
 
 
-    override fun toJson(o: Any)
-            = """ { "location" : $o } """
+    override fun toJson(o: Any) : String{
+        val location = o as Location
+        return """"${location.nomisAgencyId}""""
+
+    }
 }

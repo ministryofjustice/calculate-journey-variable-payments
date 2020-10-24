@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyState
@@ -33,7 +34,7 @@ data class RowValue(
         private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-        fun forMovePrice(price: MovePrice): RowValue {
+        fun forMovePrice(price: MovePrice, agencyId2Location: (nomisAgencyId : String) -> Location?): RowValue {
             val pickUpDate = Event.getLatestByType(price.report.events, EventType.MOVE_START)?.occurredAt
             val dropOffDate = Event.getLatestByType(price.report.events, EventType.MOVE_COMPLETE)?.occurredAt
             val cancelledDate = Event.getLatestByType(price.report.events, EventType.MOVE_CANCEL)?.occurredAt
@@ -41,10 +42,10 @@ data class RowValue(
             return with(price) {
                 RowValue(
                         report.move.reference,
-                        report.move.fromLocation.siteName,
-                        report.move.fromLocation.locationType.name,
-                        report.move.toLocation?.siteName,
-                        report.move.toLocation?.locationType?.name,
+                        agencyId2Location(report.move.fromLocation)?.siteName,
+                        agencyId2Location(report.move.fromLocation)?.locationType?.name,
+                        report.move.toLocation?.let{agencyId2Location(it)?.siteName},
+                        report.move.toLocation?.let{agencyId2Location(it)?.locationType?.name},
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         dropOffDate?.format(dateFormatter),
@@ -62,7 +63,7 @@ data class RowValue(
             }
         }
 
-        fun forJourneyPrice(journeyNumber: Int, price: JourneyPrice): RowValue {
+        fun forJourneyPrice(journeyNumber: Int, price: JourneyPrice, agencyId2Location: (nomisAgencyId : String) -> Location?): RowValue {
             with(price) {
                 val pickUpDate = Event.getLatestByType(price.journeyWithEvents.events, EventType.JOURNEY_START)?.occurredAt
                 val dropOffDate = Event.getLatestByType(price.journeyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
@@ -70,10 +71,10 @@ data class RowValue(
 
                 return RowValue(
                         "Journey $journeyNumber",
-                        journeyWithEvents.journey.fromLocation.siteName,
-                        journeyWithEvents.journey.fromLocation.locationType.name,
-                        journeyWithEvents.journey.toLocation.siteName,
-                        journeyWithEvents.journey.toLocation.locationType.name,
+                        agencyId2Location(journeyWithEvents.journey.fromLocation)?.siteName,
+                        agencyId2Location(journeyWithEvents.journey.fromLocation)?.locationType?.name,
+                        agencyId2Location(journeyWithEvents.journey.toLocation)?.siteName,
+                        agencyId2Location(journeyWithEvents.journey.toLocation)?.locationType?.name,
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         if(isCancelled) "CANCELLED" else dropOffDate?.format(dateFormatter),

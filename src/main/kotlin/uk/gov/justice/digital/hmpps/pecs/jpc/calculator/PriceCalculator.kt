@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 @Component
 class PriceCalculator(@Autowired val priceRepository: PriceRepository) {
 
-    fun priceKey(journey: Journey) = "${journey.fromLocation.siteName}-${journey.toLocation.siteName}"
+    fun priceKey(journey: Journey) = "${journey.fromLocation}-${journey.toLocation}"
 
     fun allPrices(params: FilterParams, moves: List<Report>): List<MovePrices> {
 

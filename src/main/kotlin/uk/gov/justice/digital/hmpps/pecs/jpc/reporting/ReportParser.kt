@@ -38,17 +38,15 @@ object ReportParser {
         return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
     }
 
-    fun parseAsMoves(supplier: Supplier, moveFiles: List<String>, locations: List<Location>): Collection<Move> {
-        val locationConverter = LocationConverter(locations)
-        return read(moveFiles) { Move.fromJson(it, locationConverter) }.
+    fun parseAsMoves(supplier: Supplier, moveFiles: List<String>): Collection<Move> {
+        return read(moveFiles) { Move.fromJson(it) }.
         filter { it.supplier == supplier.reportingName() && MoveStatus.statuses.contains(it.status) }.
         associateBy(Move::id).values
     }
 
 
-    fun parseAsMoveIdToJourneys(journeyFiles: List<String>, locations: List<Location>): Map<String, List<Journey>> {
-        val locationConverter = LocationConverter(locations)
-        return read(journeyFiles) { Journey.fromJson(it, locationConverter) }.
+    fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
+        return read(journeyFiles) { Journey.fromJson(it) }.
         filter { JourneyState.states.contains(it.state) }.
         associateBy(Journey::id).values.groupBy(Journey::moveId)
     }
@@ -60,10 +58,10 @@ object ReportParser {
     }
 
     fun parseAll(supplier: Supplier, moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>, locations: List<Location> = listOf()): List<Report> {
-        val moves = parseAsMoves(supplier, moveFiles, locations)
+        val moves = parseAsMoves(supplier, moveFiles)
         val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
         val people = parseAsPersonIdToPerson(peopleFiles)
-        val journeys = parseAsMoveIdToJourneys(journeyFiles, locations)
+        val journeys = parseAsMoveIdToJourneys(journeyFiles)
         val events = parseAsEventableIdToEvents(eventFiles)
 
         val movesWithJourneysAndEvents = moves.map { move ->

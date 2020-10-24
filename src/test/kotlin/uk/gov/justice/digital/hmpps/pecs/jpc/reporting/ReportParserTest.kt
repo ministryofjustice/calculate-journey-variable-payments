@@ -17,8 +17,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 @ActiveProfiles("test")
 internal class ReportParserTest {
 
-    val locations = listOf(fromLocationFactory(), toLocationFactory())
-
     fun profileReports() : List<String> {
         val report1 = """{"id":"PR1","person_id":"PE1"}""".trimIndent()
         return listOf(report1)
@@ -85,7 +83,7 @@ internal class ReportParserTest {
     @Test
     fun `Get import moves should return only unique, completed moves`() {
 
-        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, moveReports(), locations)
+        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, moveReports())
         assertThat(moves.map { it.id }).containsExactly("M1", "M4")
 
         // M1 should be complete
@@ -96,7 +94,7 @@ internal class ReportParserTest {
     fun `Assert no Move created from bad json and no exception generated`() {
         val moveJsonWithNullFromLocation = """{"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null, "rejection_reason":null,"from_location_type":"prison","from_location":null,"to_location_type":"prison","to_location":"GNI","supplier":"geoamey"}
 """
-        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, listOf(moveJsonWithNullFromLocation), locations)
+        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, listOf(moveJsonWithNullFromLocation))
 
         Assertions.assertEquals(0, moves.size)
     }
@@ -104,7 +102,7 @@ internal class ReportParserTest {
     @Test
     fun `Get import journeys`() {
 
-        val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports(), listOf())
+        val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports())
 
         // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
         Assertions.assertEquals(setOf("M1", "M2", "M3"), journeys.keys)

@@ -44,7 +44,7 @@ internal class RowValueTest {
     fun `Render MovePrice with sitenames and 2 journeys, one with no vehicle id`() {
 
         val priceForMoveWith2Journeys = MovePrice(moveWith2Journeys, listOf(cancelledJourneyPrice, completedJourneyPrice))
-        val moveRow = RowValue.forMovePrice(priceForMoveWith2Journeys)
+        val moveRow = RowValue.forMovePrice(priceForMoveWith2Journeys, ::testAgencyId2Location)
 
         assertThat(moveRow).isEqualTo(RowValue(
                 "UKW4591N",
@@ -68,7 +68,7 @@ internal class RowValueTest {
     @Test
     fun `Render JourneyPrice for cancelled journey`() {
 
-        val cancelledJourneyRow = RowValue.forJourneyPrice(1, cancelledJourneyPrice)
+        val cancelledJourneyRow = RowValue.forJourneyPrice(1, cancelledJourneyPrice, ::testAgencyId2Location)
 
         assertThat(cancelledJourneyRow).isEqualTo(RowValue(
                 "Journey 1",
@@ -93,7 +93,7 @@ internal class RowValueTest {
     @Test
     fun `Render JourneyPrice for completed journey`() {
 
-        val completedJourneyRow = RowValue.forJourneyPrice(2, completedJourneyPrice)
+        val completedJourneyRow = RowValue.forJourneyPrice(2, completedJourneyPrice, ::testAgencyId2Location)
 
         assertThat(completedJourneyRow).isEqualTo(RowValue(
                 "Journey 2",
@@ -117,8 +117,8 @@ internal class RowValueTest {
 
     @Test
     fun `Render MovePrice without sitenames`() {
-        val noMappedFrom = noLocationFactory()
-        val noMappedTo = noLocationFactory()
+        val noMappedFrom = notMappedNomisAgencyId()
+        val noMappedTo = notMappedNomisAgencyId()
         val journey = JourneyWithEvents(journeyFactory(journeyId = "J1M1", fromLocation = noMappedFrom, toLocation = noMappedTo, billable = true, vehicleRegistration = "V1"))
 
         val moveWithMappedLocations = Report(
@@ -132,7 +132,7 @@ internal class RowValueTest {
         )
         val price = MovePrice(moveWithMappedLocations, listOf(JourneyPrice(journey, 80)))
 
-        val rowValue = RowValue.forMovePrice(price)
+        val rowValue = RowValue.forMovePrice(price, ::testAgencyId2Location)
 
         assertThat(rowValue).isEqualTo(RowValue(
                 "UKW4591N",

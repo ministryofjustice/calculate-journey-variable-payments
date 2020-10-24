@@ -41,9 +41,9 @@ object ReportFilterer {
             it.hasSupplier(params.supplier) &&
             it.hasStatus(MoveStatus.CANCELLED) &&
             CANCELLATION_REASON_CANCELLED_BY_PMU == it.move.cancellationReason &&
-            it.move.fromLocation.locationType == LocationType.PR &&
+            it.move.fromLocationType == "prison" &&
             it.move.toLocation != null &&
-            it.move.toLocation.locationType == LocationType.PR &&
+            it.move.toLocationType == "prison" &&
             it.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
             it.events.hasEventTypeInDateRange(EventType.MOVE_CANCEL, params.dateRange()) && // cancel event within date range
             it.events.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.date?.atStartOfDay()) ?: false

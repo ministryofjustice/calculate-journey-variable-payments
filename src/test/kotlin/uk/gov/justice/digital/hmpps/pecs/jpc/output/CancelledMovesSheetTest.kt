@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.time.LocalDate
@@ -29,8 +28,10 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
         val move = moveFactory(
                 moveId = "M9",
                 status = MoveStatus.CANCELLED.value,
-                fromLocation = fromLocationFactory(locationType = LocationType.PR),
-                toLocation = toLocationFactory(locationType = LocationType.PR),
+                fromLocation = fromPrisonNomisAgencyId(),
+                fromLocationType = "prison",
+                toLocation = toCourtNomisAgencyId(),
+                toLocationType = "prison",
                 cancellationReason = "cancelled_by_pmu",
                 date = moveDate
         )
@@ -48,19 +49,17 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
                 journeysWithEvents = listOf()
         )
 
-        val fromLocation = fromLocationFactory(locationType = LocationType.PR)
-        val toLocation = toLocationFactory(locationType = LocationType.PR)
         val price = MovePrice(cancelledBillable, listOf(JourneyPrice(journeyWithEvents, 1001)))
 
         val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
         sheet.writeMoves(listOf(price))
 
         assertCellEquals(sheet, 10, 0, cancelledBillable.move.reference)
-        assertCellEquals(sheet, 10, 1, fromLocation.siteName)
-        assertCellEquals(sheet, 10, 2, fromLocation.locationType.name) // pick up location type
+        assertCellEquals(sheet, 10, 1, "from")
+        assertCellEquals(sheet, 10, 2, "PR") // pick up location type
 
-        assertCellEquals(sheet, 10, 3, toLocation.siteName)
-        assertCellEquals(sheet, 10, 4, toLocation.locationType.name) // drop off location type
+        assertCellEquals(sheet, 10, 3, "to")
+        assertCellEquals(sheet, 10, 4, "CO") // drop off location type
 
         assertCellEquals(sheet, 10, 5, "10/09/2020") // move date
 

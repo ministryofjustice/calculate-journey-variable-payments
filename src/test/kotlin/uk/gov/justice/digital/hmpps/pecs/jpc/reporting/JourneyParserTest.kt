@@ -8,9 +8,8 @@ class JourneyParserTest {
     @Test
     fun `Assert Journey can be created from json`() {
 
-        val from = fromLocationFactory()
-        val to = noLocationFactory()
-        val locationConverter = LocationConverter(listOf(from, to))
+        val from = fromPrisonNomisAgencyId()
+        val to = notMappedNomisAgencyId()
 
         val journeyJson = """
             {"id":"J1", "move_id":"M1", "billable": false, "state":"completed", "supplier":"serco", "client_timestamp":"2020-06-16T10:20:30",
@@ -18,10 +17,10 @@ class JourneyParserTest {
             """.trimIndent()
 
         val expectedJourney = journeyFactory(fromLocation = from, toLocation = to)
-        val parsedJourney = Journey.fromJson(journeyJson, locationConverter)
+        val parsedJourney = Journey.fromJson(journeyJson)
 
-        assertThat(parsedJourney!!.fromLocation.siteName).isEqualTo(expectedJourney.fromLocation.siteName)
-        assertThat(parsedJourney.toLocation.siteName).isEqualTo(expectedJourney.toLocation.siteName)
+        assertThat(parsedJourney!!.fromLocation).isEqualTo(expectedJourney.fromLocation)
+        assertThat(parsedJourney.toLocation).isEqualTo(expectedJourney.toLocation)
         assertThat(parsedJourney.vehicleRegistration).isEqualTo("UHE-92")
 
     }

@@ -3,8 +3,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.output
 import org.apache.poi.ss.usermodel.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -76,12 +79,12 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     fun writeMoveRow(price: MovePrice, isShaded: Boolean, showNotes: Boolean = true) {
         val fill = if(isShaded) ::fillBlue else ::fillWhite
-        writeRow(createRow(), RowValue.forMovePrice(price), showNotes, fill )
+        writeRow(createRow(), RowValue.forMovePrice(price, ::testAgencyId2Location), showNotes, fill )
     }
 
     fun writeJourneyRows(prices: List<JourneyPrice>) {
         prices.forEachIndexed { i, jp ->
-            writeRow(createRow(), RowValue.forJourneyPrice(i + 1, jp))
+            writeRow(createRow(), RowValue.forJourneyPrice(i + 1, jp, ::testAgencyId2Location))
         }
     }
 
@@ -112,4 +115,13 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     protected abstract fun writeMove(price: MovePrice)
 
     data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
+
+    // TODO FiXME replace with real implementation
+    fun testAgencyId2Location(agencyId: String) : Location?{
+        return when(agencyId){
+            "WYI" -> Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = agencyId, siteName = "from")
+            "GNI" -> Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = agencyId, siteName = "to")
+            else -> Location(id = UUID.randomUUID(), locationType = LocationType.UNKNOWN, nomisAgencyId = agencyId, siteName = agencyId)
+        }
+    }
 }

@@ -7,17 +7,16 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import org.assertj.core.api.Assertions.assertThat
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
 import java.time.LocalDate
 
 @ActiveProfiles("test")
 internal class PriceCalculatorTest{
 
-    private val from = fromLocationFactory()
-    private val to = toLocationFactory()
+    private val from = fromPrisonNomisAgencyId()
+    private val to = toCourtNomisAgencyId()
 
-    private val standardMovePrice = priceFactory(fromSiteName = "from", toSiteName = "to", priceInPence = 101)
+    private val standardMovePrice = priceFactory(priceInPence = 101)
     private val priceRepository: PriceRepository = mock { on {findAllBySupplier(Supplier.SERCO)} doReturn listOf(standardMovePrice)}
 
     private val calculator = PriceCalculator(priceRepository)
@@ -36,13 +35,13 @@ internal class PriceCalculatorTest{
 
 
     private val completedMoveWithUnpricedJourney = Report(
-            move = moveFactory(moveId = "M2", fromLocation = fromLocationFactory(nomisAgencyId = "NOTPRICED")),
+            move = moveFactory(moveId = "M2", fromLocation = "NOTPRICED"),
             person = personFactory(),
             events =  listOf(moveEventFactory(
                     type = EventType.MOVE_COMPLETE.value, moveId = "M2", occurredAt = movesTo.atStartOfDay())
             ),
             journeysWithEvents = listOf(
-                    JourneyWithEvents(journeyFactory(billable = true, fromLocation = fromLocationFactory(nomisAgencyId = "NOTPRICED", siteName = "Not priced site")), listOf())
+                    JourneyWithEvents(journeyFactory(billable = true, fromLocation = "NOTPRICED"), listOf())
             )
     )
 
@@ -80,8 +79,10 @@ internal class PriceCalculatorTest{
             move = moveFactory(
                     moveId = "M9",
                     status = MoveStatus.CANCELLED.value,
-                    fromLocation = fromLocationFactory(locationType = LocationType.PR),
-                    toLocation = toLocationFactory(locationType = LocationType.PR),
+                    fromLocation = fromPrisonNomisAgencyId(),
+                    fromLocationType = "prison",
+                    toLocation = toCourtNomisAgencyId(),
+                    toLocationType = "prison",
                     cancellationReason = "cancelled_by_pmu",
                     date = movesTo
             ),
@@ -99,12 +100,12 @@ internal class PriceCalculatorTest{
 
     @Test
     fun `price key for Price should be $fromSiteName-$SiteName`(){
-        assertThat(standardMovePrice.journey()).isEqualTo("from-to")
+        assertThat(standardMovePrice.journey()).isEqualTo("WYI-GNI")
     }
 
     @Test
     fun `price key for Journey should be $fromSiteName-$toSiteName`(){
-        assertThat(calculator.priceKey(journeyFactory())).isEqualTo("from-to")
+        assertThat(calculator.priceKey(journeyFactory())).isEqualTo("WYI-GNI")
     }
 
     @Test
@@ -117,8 +118,8 @@ internal class PriceCalculatorTest{
 
         with(standardPrices[0]) { // M1
             assertThat(totalInPence()).isEqualTo(101)
-            assertThat(report.move.fromLocation.siteName).isEqualTo(from.siteName)
-            assertThat(report.move.toLocation?.siteName).isEqualTo(to.siteName)
+            assertThat(report.move.fromLocation).isEqualTo(from)
+            assertThat(report.move.toLocation).isEqualTo(to)
         }
 
         // M2 price should not be set

@@ -20,6 +20,5 @@ val dateConverter = object: Converter {
                 null
             }
 
-    override fun toJson(o: Any)
-            = """ { "date" : $o } """
+    override fun toJson(o: Any) = """"$o""""
 }

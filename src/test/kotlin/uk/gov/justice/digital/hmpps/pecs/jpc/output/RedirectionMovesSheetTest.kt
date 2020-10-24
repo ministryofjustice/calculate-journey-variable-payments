@@ -39,8 +39,8 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
                 journeysWithEvents = listOf(journey1WithEvents, journey2WithEvents)
         )
 
-        val fromLocation = fromLocationFactory()
-        val toLocation = toLocationFactory()
+        val fromLocation = fromPrisonNomisAgencyId()
+        val toLocation = toCourtNomisAgencyId()
         val redirectPrice = MovePrice(redirectMove, listOf(
                 JourneyPrice(journey1WithEvents, 1001),
                 JourneyPrice(journey2WithEvents, 1001)
@@ -51,11 +51,11 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
         sheet.writeMoves(listOf(redirectPrice))
 
         assertCellEquals(sheet, 10, 0, redirectMove.move.reference)
-        assertCellEquals(sheet, 10, 1, fromLocation.siteName)
-        assertCellEquals(sheet, 10, 2, fromLocation.locationType.name) // pick up location type
+        assertCellEquals(sheet, 10, 1, "from")
+        assertCellEquals(sheet, 10, 2, "PR") // pick up location type
 
-        assertCellEquals(sheet, 10, 3, toLocation.siteName)
-        assertCellEquals(sheet, 10, 4, toLocation.locationType.name) // drop off location type
+        assertCellEquals(sheet, 10, 3, "to")
+        assertCellEquals(sheet, 10, 4, "CO") // drop off location type
 
         assertCellEquals(sheet, 10, 5, "10/09/2020") // Pick up date
         assertCellEquals(sheet, 10, 6, "05:00") // Pick up time
@@ -75,10 +75,10 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
         // Journey 1
         assertCellEquals(sheet, 11, 0, "Journey 1")
         with(journey1WithEvents.journey) {
-            assertCellEquals(sheet, 11, 1, fromLocation.siteName)
-            assertCellEquals(sheet, 11, 2, fromLocation.locationType.name)
-            assertCellEquals(sheet, 11, 3, toLocation.siteName)
-            assertCellEquals(sheet, 11, 4, toLocation.locationType.name)
+            assertCellEquals(sheet, 11, 1, "from")
+            assertCellEquals(sheet, 11, 2, "PR")
+            assertCellEquals(sheet, 11, 3, "to")
+            assertCellEquals(sheet, 11, 4, "CO")
         }
         assertCellEquals(sheet, 11, 5, "16/06/2020") // Pick up date
         assertCellEquals(sheet, 11, 6, "10:20") // Pick up time

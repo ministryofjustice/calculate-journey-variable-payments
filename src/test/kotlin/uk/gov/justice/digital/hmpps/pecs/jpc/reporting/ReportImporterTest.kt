@@ -30,12 +30,11 @@ internal class ReportImporterTest {
     val from = LocalDate.of(2020, 9, 1)
     val to = LocalDate.of(2020, 9, 6)
 
-    val locations = listOf(fromLocationFactory(locationType = LocationType.PR), toLocationFactory(locationType = LocationType.PR))
     private lateinit var moves: Collection<Report>
 
     @BeforeEach
     fun beforeEach() {
-     moves = importer.import(Supplier.GEOAMEY, from, to, locations)
+     moves = importer.import(Supplier.GEOAMEY, from, to)
     }
 
 
