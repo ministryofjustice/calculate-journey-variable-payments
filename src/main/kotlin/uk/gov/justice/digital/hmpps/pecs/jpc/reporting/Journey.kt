@@ -31,10 +31,10 @@ data class Journey(
         val vehicleRegistration: String?,
 
         @Json(name = "from_location")
-        val fromLocation: String,
+        val fromNomisAgencyId: String,
 
         @Json(name = "to_location")
-        val toLocation: String
+        val toNomisAgencyId: String
 )
 
 {

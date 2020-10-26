@@ -19,8 +19,8 @@ class JourneyParserTest {
         val expectedJourney = journeyFactory(fromLocation = from, toLocation = to)
         val parsedJourney = Journey.fromJson(journeyJson)
 
-        assertThat(parsedJourney!!.fromLocation).isEqualTo(expectedJourney.fromLocation)
-        assertThat(parsedJourney.toLocation).isEqualTo(expectedJourney.toLocation)
+        assertThat(parsedJourney!!.fromNomisAgencyId).isEqualTo(expectedJourney.fromNomisAgencyId)
+        assertThat(parsedJourney.toNomisAgencyId).isEqualTo(expectedJourney.toNomisAgencyId)
         assertThat(parsedJourney.vehicleRegistration).isEqualTo("UHE-92")
 
     }

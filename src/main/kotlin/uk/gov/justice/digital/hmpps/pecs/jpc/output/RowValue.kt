@@ -6,8 +6,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyState
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class RowValue(
@@ -42,10 +40,10 @@ data class RowValue(
             return with(price) {
                 RowValue(
                         report.move.reference,
-                        agencyId2Location(report.move.fromLocation)?.siteName,
-                        agencyId2Location(report.move.fromLocation)?.locationType?.name,
-                        report.move.toLocation?.let{agencyId2Location(it)?.siteName},
-                        report.move.toLocation?.let{agencyId2Location(it)?.locationType?.name},
+                        agencyId2Location(report.move.fromNomisAgencyId)?.siteName,
+                        agencyId2Location(report.move.fromNomisAgencyId)?.locationType?.name,
+                        report.move.toNomisAgencyId?.let{agencyId2Location(it)?.siteName},
+                        report.move.toNomisAgencyId?.let{agencyId2Location(it)?.locationType?.name},
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         dropOffDate?.format(dateFormatter),
@@ -56,7 +54,7 @@ data class RowValue(
                         totalInPence()?.let{it.toDouble() / 100},
                         "",
                         report.events.notes(),
-                        report.move.date?.format(dateFormatter),
+                        report.move.moveDate?.format(dateFormatter),
                         cancelledDate?.format(dateFormatter),
                         cancelledDate?.format(timeFormatter)
                 )
@@ -71,10 +69,10 @@ data class RowValue(
 
                 return RowValue(
                         "Journey $journeyNumber",
-                        agencyId2Location(journeyWithEvents.journey.fromLocation)?.siteName,
-                        agencyId2Location(journeyWithEvents.journey.fromLocation)?.locationType?.name,
-                        agencyId2Location(journeyWithEvents.journey.toLocation)?.siteName,
-                        agencyId2Location(journeyWithEvents.journey.toLocation)?.locationType?.name,
+                        agencyId2Location(journeyWithEvents.journey.fromNomisAgencyId)?.siteName,
+                        agencyId2Location(journeyWithEvents.journey.fromNomisAgencyId)?.locationType?.name,
+                        agencyId2Location(journeyWithEvents.journey.toNomisAgencyId)?.siteName,
+                        agencyId2Location(journeyWithEvents.journey.toNomisAgencyId)?.locationType?.name,
                         pickUpDate?.format(dateFormatter),
                         pickUpDate?.format(timeFormatter),
                         if(isCancelled) "CANCELLED" else dropOffDate?.format(dateFormatter),

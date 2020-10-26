@@ -118,8 +118,8 @@ internal class PriceCalculatorTest{
 
         with(standardPrices[0]) { // M1
             assertThat(totalInPence()).isEqualTo(101)
-            assertThat(report.move.fromLocation).isEqualTo(from)
-            assertThat(report.move.toLocation).isEqualTo(to)
+            assertThat(report.move.fromNomisAgencyId).isEqualTo(from)
+            assertThat(report.move.toNomisAgencyId).isEqualTo(to)
         }
 
         // M2 price should not be set

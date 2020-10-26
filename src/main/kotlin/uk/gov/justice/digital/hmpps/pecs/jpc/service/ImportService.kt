@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
 import java.io.File
 import java.lang.IllegalArgumentException
@@ -23,7 +24,8 @@ class ImportService(
         private val priceImporter: PriceImporter,
         private val reportImporter: ReportImporter,
         private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator,
-        private val locationsRepository: LocationRepository) {
+        private val locationsRepository: LocationRepository,
+        private val reportModelPersister: MoveModelPersister) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -56,6 +58,27 @@ class ImportService(
 
     fun importPrices(supplier: Supplier) = importUnlessLocked { priceImporter.import(supplier) }
 
+    fun importReports(
+            supplierName: String,
+            movesFrom: LocalDate,
+            movesTo: LocalDate,
+            reportsTo: LocalDate) {
+
+        logger.info("Importing reports for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo' and reports to '$reportsTo'.")
+
+        if (movesFrom.plusMonths(2).isBefore(movesTo)) throw IllegalArgumentException("A maximum of two months data can be queried at a time.")
+
+        if (importLocations().second == ImportStatus.IN_PROGRESS) return
+        else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) return
+        else {
+            val supplier = Supplier.valueOf(supplierName.toUpperCase())
+            val (reports, status) = importUnlessLocked { reportImporter.import(supplier, movesFrom, reportsTo) }
+            if (reports != null) {
+                  reportModelPersister.persist(FilterParams(supplier, movesFrom, movesTo), reports.toList())
+            }
+        }
+    }
+
     fun spreadsheet(
             supplierName: String,
             movesFrom: LocalDate,
@@ -70,7 +93,7 @@ class ImportService(
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
         else {
             val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importUnlessLocked { reportImporter.import(supplier, movesFrom, reportsTo, locationsRepository.findAll().toList()) }
+            val (reports, status) = importUnlessLocked { reportImporter.import(supplier, movesFrom, reportsTo) }
             if (reports != null) {
                 pricesSpreadsheetGenerator.generate(FilterParams(supplier, movesFrom, movesTo), reports.toList())
             } else {

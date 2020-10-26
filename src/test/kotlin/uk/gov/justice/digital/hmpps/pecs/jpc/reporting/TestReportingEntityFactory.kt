@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
@@ -68,11 +67,11 @@ fun moveFactory(
             supplier = supplier,
             profileId = profileId,
             reference = "UKW4591N",
-            date = date,
+            moveDate = date,
             status = status,
-            fromLocation = fromLocation,
+            fromNomisAgencyId = fromLocation,
             fromLocationType = fromLocationType,
-            toLocation = toLocation,
+            toNomisAgencyId = toLocation,
             toLocationType = toLocationType,
             cancellationReason = cancellationReason
     )
@@ -129,8 +128,8 @@ fun journeyFactory(
             state=state,
             supplier= supplier,
             vehicleRegistration=vehicleRegistration,
-            fromLocation=fromLocation,
-            toLocation=toLocation)
+            fromNomisAgencyId=fromLocation,
+            toNomisAgencyId=toLocation)
     return journey
 }
 

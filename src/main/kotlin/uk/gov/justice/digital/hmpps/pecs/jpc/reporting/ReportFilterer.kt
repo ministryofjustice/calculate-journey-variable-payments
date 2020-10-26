@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import org.slf4j.LoggerFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.ClosedRangeLocalDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
@@ -42,11 +41,11 @@ object ReportFilterer {
             it.hasStatus(MoveStatus.CANCELLED) &&
             CANCELLATION_REASON_CANCELLED_BY_PMU == it.move.cancellationReason &&
             it.move.fromLocationType == "prison" &&
-            it.move.toLocation != null &&
+            it.move.toNomisAgencyId != null &&
             it.move.toLocationType == "prison" &&
             it.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
             it.events.hasEventTypeInDateRange(EventType.MOVE_CANCEL, params.dateRange()) && // cancel event within date range
-            it.events.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.date?.atStartOfDay()) ?: false
+            it.events.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.moveDate?.atStartOfDay()) ?: false
         }.map { it.copy(journeysWithEvents = listOf(JourneyWithEvents( // fake journey with events
                 Journey(
                         id = "FAKE",
@@ -54,8 +53,8 @@ object ReportFilterer {
                         billable = true,
                         supplier = it.move.supplier,
                         clientTimestamp = LocalDateTime.now(),
-                        fromLocation = it.move.fromLocation,
-                        toLocation = it.move.toLocation!!,
+                        fromNomisAgencyId = it.move.fromNomisAgencyId,
+                        toNomisAgencyId = it.move.toNomisAgencyId!!,
                         state = JourneyState.CANCELLED.value,
                         vehicleRegistration = null
                 ),

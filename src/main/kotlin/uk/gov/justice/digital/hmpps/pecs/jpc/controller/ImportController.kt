@@ -24,6 +24,19 @@ class ImportController(private val importService: ImportService,
                        private val timeSource: TimeSource,
                        private val spreadsheetProtection: SpreadsheetProtection) {
 
+    @GetMapping("/import/{supplier}")
+    fun import(
+            @PathVariable supplier: String,
+            @RequestParam(name = "moves_from", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
+            @RequestParam(name = "moves_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesTo: LocalDate,
+            @RequestParam(name = "reports_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) reportsTo: LocalDate,
+            response: HttpServletResponse?): String {
+
+        importService.importReports(supplier, movesFrom, movesTo, reportsTo)
+
+        return "Done"
+    }
+
     @GetMapping("/generate-prices-spreadsheet/{supplier}")
     @Throws(IOException::class)
     fun generateSpreadsheet(

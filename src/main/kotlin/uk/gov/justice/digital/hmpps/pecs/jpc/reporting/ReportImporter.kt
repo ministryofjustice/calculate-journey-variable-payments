@@ -18,7 +18,7 @@ class ReportImporter(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(supplier: Supplier, from: LocalDate, to: LocalDate = timeSource.date(), locations: List<Location> = listOf()): Collection<Report>{
+    fun import(supplier: Supplier, from: LocalDate, to: LocalDate = timeSource.date()): Collection<Report>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)
@@ -30,8 +30,8 @@ class ReportImporter(
                 journeyFiles = journeysContent,
                 eventFiles = eventsContent,
                 profileFiles = profilesContent,
-                peopleFiles = peopleContent,
-                locations = locations)
+                peopleFiles = peopleContent
+        )
     }
 
     private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{

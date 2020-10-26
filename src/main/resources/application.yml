@@ -1,6 +1,18 @@
 spring:
   application:
     name: calculate-journey-variable-payments
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/jpc
+    username: jpc
+    password: letmein
+    driverClassName: org.postgresql.Driver
 
 server:
   port: 8080
@@ -33,3 +45,6 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+logging:
+  level:
+    ROOT: DEBUG

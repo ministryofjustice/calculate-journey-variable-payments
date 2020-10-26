@@ -22,19 +22,20 @@ data class Move(
         val reference: String,
 
         @EventDate
-        val date: LocalDate? = null,
+        @Json(name = "date")
+        val moveDate: LocalDate? = null,
 
         @get: NotBlank(message = "status cannot be blank")
         val status: String,
 
         @Json(name = "from_location")
-        val fromLocation: String,
+        val fromNomisAgencyId: String,
 
         @Json(name = "from_location_type")
         val fromLocationType: String,
 
         @Json(name = "to_location")
-        val toLocation: String? = null,
+        val toNomisAgencyId: String? = null,
 
         @Json(name = "to_location_type")
         val toLocationType: String? = null,

@@ -57,7 +57,7 @@ object ReportParser {
         groupBy(Event::eventableId)
     }
 
-    fun parseAll(supplier: Supplier, moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>, locations: List<Location> = listOf()): List<Report> {
+    fun parseAll(supplier: Supplier, moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Report> {
         val moves = parseAsMoves(supplier, moveFiles)
         val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
         val people = parseAsPersonIdToPerson(peopleFiles)

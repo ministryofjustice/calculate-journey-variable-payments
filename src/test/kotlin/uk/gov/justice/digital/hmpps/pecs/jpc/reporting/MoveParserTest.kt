@@ -16,12 +16,12 @@ class MoveParserTest {
         val moveJson = """{"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"from_location_type":"prison","from_location":"WYI","to_location_type":"prison","to_location":null,"supplier":"geoamey"}
 """
         val moveDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
-        val expectedMove = Move(id = "M1", supplier = "geoamey", profileId = "PR1", reference = "UKW4591N", date = moveDate, status = "requested", fromLocation = fromPrison, fromLocationType = "prison", toLocation = toCourt, toLocationType = "court")
+        val expectedMove = Move(id = "M1", supplier = "geoamey", profileId = "PR1", reference = "UKW4591N", moveDate = moveDate, status = "requested", fromNomisAgencyId = fromPrison, fromLocationType = "prison", toNomisAgencyId = toCourt, toLocationType = "court")
 
 
         val parsedMove = Move.fromJson(moveJson)
 
-        assertThat(parsedMove?.toLocation).isNull()
+        assertThat(parsedMove?.toNomisAgencyId).isNull()
         assertThat(parsedMove?.reference).isEqualTo("UKW4591N")
 
     }
