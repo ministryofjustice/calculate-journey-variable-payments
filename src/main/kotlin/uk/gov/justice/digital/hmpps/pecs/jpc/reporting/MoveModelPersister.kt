@@ -3,13 +3,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.notes
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import java.util.*
 
 @Component
-class MoveModelPersister(private val locationRepository: LocationRepository, private val moveModelRepository: MoveModelRepository) {
+class MoveModelPersister(private val moveModelRepository: MoveModelRepository, private val journeyModelRepository: JourneyModelRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -32,10 +30,6 @@ class MoveModelPersister(private val locationRepository: LocationRepository, pri
                         // delete any existing move / journeys
                         if (moveModelRepository.existsById(moveId)) moveModelRepository.deleteById(moveId)
 
-                        // get new from location and to location
-                        val fromLocation = locationRepository.findByNomisAgencyId(report.move.fromNomisAgencyId)
-                        val toLocation = report.move.toNomisAgencyId?.let { locationRepository.findByNomisAgencyId(it) }
-
                         // create new move model
                         val moveModel = MoveModel(
                                 moveId = moveId,
@@ -45,11 +39,9 @@ class MoveModelPersister(private val locationRepository: LocationRepository, pri
                                 reference = reference,
                                 moveDate = moveDate,
                                 fromNomisAgencyId = fromNomisAgencyId,
-                                fromLocation = fromLocation,
                                 toNomisAgencyId = toNomisAgencyId,
-                                toLocation = toLocation,
-                                pickUp = pickUp,
-                                dropOffOrCancelled = dropOff ?: cancelled,
+                                pickUpDateTime = pickUp,
+                                dropOffOrCancelledDateTime = dropOff ?: cancelled,
                                 vehicleRegistration = report.journeysWithEvents.withIndex().joinToString(separator = ", ") {
                                     it.value.journey.vehicleRegistration ?: "NOT GIVEN"
                                 },
@@ -58,11 +50,15 @@ class MoveModelPersister(private val locationRepository: LocationRepository, pri
                         )
 
                         // add journeys to move model
-                        val journeyModels = report.journeysWithEvents.map { journeyModel(moveModel, it) }
+                        val journeyModels = report.journeysWithEvents.map { journeyModel(moveModel.moveId, it) }
                         moveModel.addJourneys(*journeyModels.toTypedArray())
 
                         val saved = moveModelRepository.save(moveModel)
-                        logger.info("Saved: " + saved)
+
+                        // add journeys to move model
+                        //report.journeysWithEvents.forEach { journeyModelRepository.save(journeyModel(moveModel.moveId, it)) }
+
+                        logger.info("Saved: $saved")
 
                     }.onFailure { logger.warn(it.message) }
                 }
@@ -71,7 +67,7 @@ class MoveModelPersister(private val locationRepository: LocationRepository, pri
     }
 
 
-    fun journeyModel(moveModel: MoveModel, journeyWithEvents: JourneyWithEvents): JourneyModel {
+    fun journeyModel(moveId: String, journeyWithEvents: JourneyWithEvents): JourneyModel {
 
         val journeyId = journeyWithEvents.journey.id
 
@@ -80,22 +76,16 @@ class MoveModelPersister(private val locationRepository: LocationRepository, pri
             val dropOff = Event.getLatestByType(journeyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
             val isCancelled = journeyWithEvents.journey.state == JourneyState.CANCELLED.value
 
-            // get new from location and to location
-            val fromLocation = locationRepository.findByNomisAgencyId(journey.fromNomisAgencyId)
-            val toLocation = locationRepository.findByNomisAgencyId(journey.toNomisAgencyId)
-
             return JourneyModel(
                     journeyId = journeyId,
-                    move = moveModel,
+                    moveId = moveId,
                     state = JourneyState.valueOf(journey.state.toUpperCase()),
                     fromNomisAgencyId = journey.fromNomisAgencyId,
-                    fromLocation = fromLocation,
                     toNomisAgencyId = journey.toNomisAgencyId,
-                    toLocation = toLocation,
-                    pickUp = pickUp,
-                    dropOff = dropOff,
+                    pickUpDateTime = pickUp,
+                    dropOffDateTime = dropOff,
                     billable = journey.billable,
-                    vehicleRegistation = journey.vehicleRegistration,
+                    vehicleRegistration = journey.vehicleRegistration,
                     notes = journeyWithEvents.events.notes()
             )
         }

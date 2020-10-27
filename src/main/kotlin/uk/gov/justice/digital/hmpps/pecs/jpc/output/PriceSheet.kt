@@ -1,13 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
 import org.apache.poi.ss.usermodel.*
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.JourneyModel
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModel
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MovesAndSummary
 import java.time.LocalDate
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -55,36 +53,59 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
      * @param showNotes - Boolean indicating whether the notes column should be displayed
      * @param styleAppliers - vararg of style functions to apply to each cell
      */
-    protected open fun writeRow(row: Row, rowValue: RowValue, showNotes: Boolean = true, vararg styleAppliers: (cs: CellStyle) -> Unit){
-        fun <T>add(col: Int, value: T?) = row.addCell(col, value, *styleAppliers)
-        with(rowValue) {
-            add(0, ref)
-            add(1, pickUp)
-            add(2, pickUpLocationType)
-            add(3, dropOff)
-            add(4, dropOffLocationType)
-            add(5, pickUpDate)
-            add(6, pickUpTime)
-            add(7, dropOffDate)
-            add(8, dropOffTime)
-            add(9, vehicleReg)
+    protected open fun writeMoveRow(moveModel: MoveModel, isShaded: Boolean, showNotes: Boolean = true){
+        val fill = if(isShaded) ::fillBlue else ::fillWhite
+        val row = createRow()
+        fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
+        with(moveModel) {
+            add(0, reference)
+            add(1, fromSiteName)
+            add(2, fromLocationType?.name)
+            add(3, toSiteName)
+            add(4, toLocationType?.name)
+            add(5, pickUpDate())
+            add(6, pickUpTime())
+            add(7, dropOffOrCancelledDate())
+            add(8, dropOffOrCancelledTime())
+            add(9, vehicleRegistration)
             add(10, prisonNumber)
-            priceInPounds?.let{
-                row.addCell(11, priceInPounds, *styleAppliers, ::dataFormatPound) } ?:
+            totalInPounds()?.let{
+                row.addCell(11, totalInPounds(), fill, ::dataFormatPound) } ?:
                 add(11, "NOT PRESENT")
-            add(12, billable)
+            add(12, "") // billable is empty for a move
             add(13, if(showNotes) notes else "")
         }
     }
 
-    fun writeMoveRow(price: MovePrice, isShaded: Boolean, showNotes: Boolean = true) {
-        val fill = if(isShaded) ::fillBlue else ::fillWhite
-        writeRow(createRow(), RowValue.forMovePrice(price, ::testAgencyId2Location), showNotes, fill )
+    protected open fun writeJourneyRow(journeyNumber: Int, journeyModel: JourneyModel){
+        val fill = if(journeyNumber % 2 == 0) ::fillBlue else ::fillWhite
+        val row = createRow()
+        fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
+        with(journeyModel) {
+            add(0, "Journey ${journeyNumber + 1}")
+            add(1, fromSiteName)
+            add(2, fromLocationType?.name)
+            add(3, toSiteName)
+            add(4, toLocationType?.name)
+            add(5, pickUpDate())
+            add(6, pickUpTime())
+            add(7, dropOffDate())
+            add(8, dropOffOrTime())
+            add(9, vehicleRegistration)
+            add(10, "") // prison number is empty for a journey
+
+            priceInPounds()?.let{
+                row.addCell(11, priceInPounds(), fill, ::dataFormatPound) } ?:
+            add(11, "NOT PRESENT")
+            add(12, isBillable())
+            add(13, notes)
+        }
     }
 
-    fun writeJourneyRows(prices: List<JourneyPrice>) {
-        prices.forEachIndexed { i, jp ->
-            writeRow(createRow(), RowValue.forJourneyPrice(i + 1, jp, ::testAgencyId2Location))
+
+    fun writeJourneyRows(journeys: List<JourneyModel>) {
+        journeys.forEachIndexed { i, j ->
+            writeJourneyRow(i, j)
         }
     }
 
@@ -107,21 +128,13 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         }
     }
 
-    fun writeMoves(prices: List<MovePrice>) = prices.forEach { writeMove(it) }
+    fun writeMoves(movesAndSummary: MovesAndSummary) = movesAndSummary.moves.forEach { writeMove(it) }
 
     /**
      * Implemented in subclasses for specific move price type
      */
-    protected abstract fun writeMove(price: MovePrice)
+    protected abstract fun writeMove(moveModel: MoveModel)
 
     data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
 
-    // TODO FiXME replace with real implementation
-    fun testAgencyId2Location(agencyId: String) : Location?{
-        return when(agencyId){
-            "WYI" -> Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = agencyId, siteName = "from")
-            "GNI" -> Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = agencyId, siteName = "to")
-            else -> Location(id = UUID.randomUUID(), locationType = LocationType.UNKNOWN, nomisAgencyId = agencyId, siteName = agencyId)
-        }
-    }
 }

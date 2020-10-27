@@ -6,6 +6,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
@@ -46,46 +48,33 @@ internal class StandardMovesSheetTest(@Autowired private val template: JPCTempla
 
     @Test
     internal fun `test prices`() {
-        val movesDate = LocalDate.of(2020, 9, 10)
+        val sms = StandardMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
 
-        val journeyWithEvents = JourneyWithEvents(journeyFactory(billable = true), listOf())
-        val standardMove = Report(
-                move = moveFactory(),
-                person = personFactory(),
-                events = listOf(
-                        moveEventFactory(type = EventType.MOVE_START.value, occurredAt = movesDate.atStartOfDay().plusHours(5)),
-                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, notes = "completed", occurredAt = movesDate.atStartOfDay().plusHours(10))
-                ),
-                journeysWithEvents = listOf(journeyWithEvents)
-        )
+        val move = moveModel(journeys = mutableListOf(journeyModel()))
+        val moves = MovesAndSummary(listOf(move), Summary())
 
-        val fromLocation = fromPrisonNomisAgencyId()
-        val toLocation = toCourtNomisAgencyId()
-        val standardPrice = MovePrice(standardMove, listOf(JourneyPrice(journeyWithEvents, 1001)))
+        sms.writeMoves(moves)
 
-        val sms = StandardMovesSheet(workbook, PriceSheet.Header(movesDate, ClosedRangeLocalDate(movesDate, movesDate), Supplier.SERCO))
-        sms.writeMoves(listOf(standardPrice))
-
-        assertCellEquals(sms, 10, 0, standardMove.move.reference)
+        assertCellEquals(sms, 10, 0, "REF1")
         assertCellEquals(sms, 10, 1, "from") // pick up sitename
         assertCellEquals(sms, 10, 2, "PR") // pick up location type
 
         assertCellEquals(sms, 10, 3, "to") // drop off sitename
-        assertCellEquals(sms, 10, 4, "CO") // drop off location type
+        assertCellEquals(sms, 10, 4, "PR") // drop off location type
 
         assertCellEquals(sms, 10, 5, "10/09/2020") // Pick up date
-        assertCellEquals(sms, 10, 6, "05:00") // Pick up time
+        assertCellEquals(sms, 10, 6, "00:00") // Pick up time
         assertCellEquals(sms, 10, 7, "10/09/2020") // Drop off date
         assertCellEquals(sms, 10, 8, "10:00") // Drop off time
 
-        assertCellEquals(sms, 10, 9, journeyWithEvents.journey.vehicleRegistration)
+        assertCellEquals(sms, 10, 9, "reg100") // vehicle reg
 
-        assertCellEquals(sms, 10, 10, standardMove.person?.prisonNumber)
+        assertCellEquals(sms, 10, 10, "PR101") // prison number
 
-        assertCellEquals(sms, 10, 11, 10.01) // price
+        assertCellEquals(sms, 10, 11, 1.0) // price
 
         assertCellEquals(sms, 10, 12, "") // billable shouldn't be shown
-        assertCellEquals(sms, 10, 13, "") // notes shouldn't be shown
+        assertCellEquals(sms, 10, 13, "") // notes shouldn't be shown for a standard move
     }
 }
 

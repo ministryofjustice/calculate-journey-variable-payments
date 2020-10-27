@@ -22,15 +22,15 @@ const val defaultPersonId="PE1"
 val defaultSupplier =  Supplier.SERCO.reportingName()
 
 fun fromPrisonNomisAgencyId() = "WYI"
-fun fromPrisonLocationFactory() = Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
+fun WYIPrisonLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
 
 fun toCourtNomisAgencyId() = "GNI"
-fun toCourtLocationFactory() = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
+fun GNICourtLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
 
 fun testAgencyId2Location(agencyId: String) : Location?{
     return when(agencyId){
-        "WYI" -> fromPrisonLocationFactory()
-        "GNI" -> toCourtLocationFactory()
+        "WYI" -> WYIPrisonLocation()
+        "GNI" -> GNICourtLocation()
         else -> Location(id = UUID.randomUUID(), locationType = LocationType.UNKNOWN, nomisAgencyId = agencyId, siteName = agencyId)
     }
 }
@@ -44,8 +44,8 @@ fun priceFactory(
 
     return Price(
             supplier = supplier,
-            fromLocation = fromPrisonLocationFactory(),
-            toLocation = toCourtLocationFactory(),
+            fromLocation = WYIPrisonLocation(),
+            toLocation = GNICourtLocation(),
             priceInPence = priceInPence
     )
 }

@@ -1,9 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import java.time.LocalDateTime
-import java.util.*
+import java.time.format.DateTimeFormatter
 import javax.persistence.*
 
 @Entity
@@ -13,9 +12,8 @@ data class JourneyModel(
         @Column(name = "journey_id")
         val journeyId: String,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "move_id")
-        val move: MoveModel,
+        @Column(name = "move_id")
+        val moveId: String,
 
         @Enumerated(EnumType.STRING)
         val state: JourneyState,
@@ -23,39 +21,53 @@ data class JourneyModel(
         @Column(name = "from_nomis_agency_id", nullable = false)
         val fromNomisAgencyId: String,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "from_location_id")
-        val fromLocation: Location? = null,
+        @Transient
+        val fromSiteName: String? = null,
 
-        @Column(name = "to_nomis_agency_id", nullable = false)
-        val toNomisAgencyId: String,
+        @Transient
+        val fromLocationType: LocationType? = null,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "to_location_id")
-        val toLocation: Location? = null,
+        @Column(name = "to_nomis_agency_id", nullable = true)
+        val toNomisAgencyId: String?,
+
+        @Transient
+        val toSiteName: String? = null,
+
+        @Transient
+        val toLocationType: LocationType? = null,
 
         @Column(name = "pick_up", nullable = true)
-        val pickUp: LocalDateTime? = null,
+        val pickUpDateTime: LocalDateTime? = null,
 
         @Column(name = "drop_off", nullable = true)
-        val dropOff: LocalDateTime? = null,
+        val dropOffDateTime: LocalDateTime? = null,
 
         @Column(name = "vehicle_registration", nullable = true)
-        val vehicleRegistation: String? = null,
+        val vehicleRegistration: String? = null,
 
         val billable: Boolean,
 
         val notes: String? = null,
 
-        @ManyToOne
-        @JoinColumns(
-                JoinColumn(name = "from_location_id", referencedColumnName = "from_location_id", insertable = false, updatable = false),
-                JoinColumn(name = "to_location_id", referencedColumnName = "to_location_id", insertable = false, updatable = false)
-        )
-        val price: Price? = null
+        @Transient
+        val priceInPence: Int? = null
 
         ) {
+
         override fun toString(): String {
-                return "JourneyModel(journeyId=$journeyId, fromNomisAgencyId='$fromNomisAgencyId', fromLocation=$fromLocation, toNomisAgencyId='$toNomisAgencyId', toLocation=$toLocation, billable=$billable, notes=$notes)"
+                return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
+        }
+
+        fun isBillable() = if(billable) "YES" else "NO"
+        fun priceInPounds() = priceInPence?.let{it.toDouble() / 100}
+        fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
+        fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
+        fun dropOffDate() = dropOffDateTime?.format(dateFormatter)
+        fun dropOffOrTime() = dropOffDateTime?.format(timeFormatter)
+
+
+        companion object{
+                private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
         }
 }

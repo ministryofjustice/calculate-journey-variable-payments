@@ -2,11 +2,12 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.output
 
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.*
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModel
 
 
 class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Summary")!!, header) {
 
-    override fun writeMove(price: MovePrice) {}
+    override fun writeMove(moveModel: MoveModel) {}
 
     fun writeSummaries(summaries: List<PriceSummary>) {
         summaries.forEachIndexed {i,summary ->

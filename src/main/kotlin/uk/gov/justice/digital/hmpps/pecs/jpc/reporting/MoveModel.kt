@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.time.format.DateTimeFormatter
 import javax.persistence.*
 
 @Entity
@@ -19,6 +19,7 @@ data class MoveModel(
         val supplier: Supplier,
 
         @Enumerated(EnumType.STRING)
+        @Column(name = "move_price_type", nullable = false)
         val movePriceType: MovePriceType,
 
         @Enumerated(EnumType.STRING)
@@ -33,22 +34,26 @@ data class MoveModel(
         @Column(name = "from_nomis_agency_id", nullable = false)
         val fromNomisAgencyId: String,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "from_location_id")
-        val fromLocation: Location? = null,
+        @Transient
+        val fromSiteName: String? = null,
+
+        @Transient
+        val fromLocationType: LocationType? = null,
 
         @Column(name = "to_nomis_agency_id", nullable = true)
         val toNomisAgencyId: String?,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "to_location_id")
-        val toLocation: Location? = null,
+        @Transient
+        val toSiteName: String? = null,
+
+        @Transient
+        val toLocationType: LocationType? = null,
 
         @Column(name = "pick_up", nullable = true)
-        val pickUp: LocalDateTime? = null,
+        val pickUpDateTime: LocalDateTime? = null,
 
-        @Column(name = "move_completed_or_cancelled", nullable = true)
-        val dropOffOrCancelled: LocalDateTime?,
+        @Column(name = "drop_off_or_cancelled", nullable = true)
+        val dropOffOrCancelledDateTime: LocalDateTime?,
 
         val notes: String,
 
@@ -58,11 +63,8 @@ data class MoveModel(
         @Column(name = "vehicle_registration", nullable = true)
         val vehicleRegistration: String?,
 
-        @OneToMany(
-                mappedBy = "move",
-                cascade = arrayOf(CascadeType.ALL),
-                orphanRemoval = true
-        )
+        @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @JoinColumn(name="move_id")
         val journeys: MutableList<JourneyModel> = mutableListOf()
 
         ) {
@@ -70,6 +72,8 @@ data class MoveModel(
         fun addJourneys(vararg journeyModels: JourneyModel) {
                 journeys += journeyModels
         }
+
+        fun totalInPence() = if(journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy { it.priceInPence ?: 0 }
 
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -85,8 +89,8 @@ data class MoveModel(
                 if (moveDate != other.moveDate) return false
                 if (fromNomisAgencyId != other.fromNomisAgencyId) return false
                 if (toNomisAgencyId != other.toNomisAgencyId) return false
-                if (pickUp != other.pickUp) return false
-                if (dropOffOrCancelled != other.dropOffOrCancelled) return false
+                if (pickUpDateTime != other.pickUpDateTime) return false
+                if (dropOffOrCancelledDateTime != other.dropOffOrCancelledDateTime) return false
                 if (notes != other.notes) return false
                 if (prisonNumber != other.prisonNumber) return false
                 if (vehicleRegistration != other.vehicleRegistration) return false
@@ -103,8 +107,8 @@ data class MoveModel(
                 result = 31 * result + (moveDate?.hashCode() ?: 0)
                 result = 31 * result + fromNomisAgencyId.hashCode()
                 result = 31 * result + toNomisAgencyId.hashCode()
-                result = 31 * result + (pickUp?.hashCode() ?: 0)
-                result = 31 * result + dropOffOrCancelled.hashCode()
+                result = 31 * result + (pickUpDateTime?.hashCode() ?: 0)
+                result = 31 * result + dropOffOrCancelledDateTime.hashCode()
                 result = 31 * result + notes.hashCode()
                 result = 31 * result + (prisonNumber?.hashCode() ?: 0)
                 result = 31 * result + vehicleRegistration.hashCode()
@@ -112,8 +116,19 @@ data class MoveModel(
         }
 
         override fun toString(): String {
-                return "MoveModel(moveId=$moveId, supplier=$supplier, movePriceType=$movePriceType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromLocation=$fromLocation, toNomisAgencyId='$toNomisAgencyId', toLocation=$toLocation, moveStarted=$pickUp, moveCompletedOrCancelled=$dropOffOrCancelled, notes='$notes', prisonNumber=$prisonNumber, report='$vehicleRegistration')"
+                return "MoveModel(moveId='$moveId', supplier=$supplier, movePriceType=$movePriceType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOffOrCancelled=$dropOffOrCancelledDateTime, notes='$notes', prisonNumber=$prisonNumber, vehicleRegistration=$vehicleRegistration)"
         }
 
+        fun totalInPounds() = totalInPence()?.let{it.toDouble() / 100}
+        fun moveDate() = moveDate?.format(dateFormatter)
+        fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
+        fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
+        fun dropOffOrCancelledDate() = dropOffOrCancelledDateTime?.format(dateFormatter)
+        fun dropOffOrCancelledTime() = dropOffOrCancelledDateTime?.format(timeFormatter)
 
+
+        companion object{
+                private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        }
 }

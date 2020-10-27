@@ -89,16 +89,9 @@ class ImportService(
 
         if (movesFrom.plusMonths(2).isBefore(movesTo)) throw IllegalArgumentException("A maximum of two months data can be queried at a time.")
 
-        return if (importLocations().second == ImportStatus.IN_PROGRESS) null
-        else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
-        else {
-            val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importUnlessLocked { reportImporter.import(supplier, movesFrom, reportsTo) }
-            if (reports != null) {
-                pricesSpreadsheetGenerator.generate(FilterParams(supplier, movesFrom, movesTo), reports.toList())
-            } else {
-                null
-            }
-        }
+       // importReports(supplierName, movesFrom, movesTo, reportsTo)
+
+        return pricesSpreadsheetGenerator.generate(FilterParams(Supplier.valueOf(supplierName.toUpperCase()), movesFrom, movesTo))
+
     }
 }
