@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
+import junit.framework.Assert.assertFalse
+import junit.framework.Assert.assertTrue
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -47,15 +50,18 @@ internal class MoveModelJdbcRepositoryTest {
     val journeyModel1 = journeyModel()
     val journeyModel2 = journeyModel(journeyId = "J2")
 
-    @Test
-    fun `findAllForSupplierAndMovePriceTypeInDateRange`() {
+    @BeforeEach
+    fun beforeEach(){
 
         locationRepository.save(wyi)
         locationRepository.save(gni)
-
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO))
+    }
 
-        moveModelRepository.save(standardMoveWithoutJourneys)
+
+    @Test
+    fun `move should be priced if all journeys are billable`() {
+
         moveModelRepository.save(standardMoveWithJourneys)
 
         journeyModelRepository.save(journeyModel1)
@@ -63,25 +69,45 @@ internal class MoveModelJdbcRepositoryTest {
 
         entityManager.flush()
 
-        val moves = moveModelJdbcRepository.findAllForSupplierAndMovePriceTypeInDateRange(Supplier.SERCO, MovePriceType.STANDARD, moveDate, moveDate)
+        val move = moveModelJdbcRepository.findAllForSupplierAndMovePriceTypeInDateRange(Supplier.SERCO, MovePriceType.STANDARD, moveDate, moveDate)[0]
 
-        // Move with journeys should be first
-        assertThat(moves[0].moveId).isEqualTo(standardMoveWithJourneys.moveId)
-        assertThat(moves[0].journeys[0].journeyId).isEqualTo(journeyModel1.journeyId)
-        assertThat(moves[0].journeys[1].journeyId).isEqualTo(journeyModel2.journeyId)
+        // Move should be priced
+        assertTrue(move.hasPrice())
+    }
 
-        // Move without journeys should be second
-        assertThat(moves[1].moveId).isEqualTo(standardMoveWithoutJourneys.moveId)
+    @Test
+    fun `findAllForSupplierAndMovePriceTypeInDateRange a with non billable journey`() {
 
+
+        moveModelRepository.save(standardMoveWithJourneys)
+
+        val nonBillableJourney = journeyModel(journeyId = "J3", billable = false)
+        val journeyWithoutDropOffDate = journeyModel(journeyId = "J4", pickUpDateTime = null, dropOffDateTime = null)
+
+        journeyModelRepository.save(journeyModel1)
+        journeyModelRepository.save(journeyModel2)
+        journeyModelRepository.save(nonBillableJourney)
+        journeyModelRepository.save(journeyWithoutDropOffDate)
+
+        entityManager.flush()
+
+        val move = moveModelJdbcRepository.findAllForSupplierAndMovePriceTypeInDateRange(Supplier.SERCO, MovePriceType.STANDARD, moveDate, moveDate)[0]
+
+        assertThat(move.journeys.size).isEqualTo(4)
+
+        // Journey 1 should have a price because it's billable
+        assertTrue(move.journeys[0].hasPrice())
+
+        // Journey 3 should not have a price because it's not billable
+        assertFalse(move.journeys[2].hasPrice())
+
+
+       // Move should not be priced if one or more journeys is not priced
+        assertFalse(move.hasPrice())
     }
 
     @Test
     fun `findSummaryForSupplierInDateRange`() {
-
-        locationRepository.save(wyi)
-        locationRepository.save(gni)
-
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO))
 
         moveModelRepository.save(standardMoveWithJourneys)
 

@@ -53,7 +53,7 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                         vehicleRegistration = getString("vehicle_registration"),
                         billable = getBoolean("billable"),
                         notes = getString("journey_notes"),
-                        priceInPence = if (getInt("price_in_pence") == 0 && wasNull()) null else getInt("price_in_pence")
+                        priceInPence = getInt("price_in_pence")
                 )
             }
 
@@ -71,7 +71,7 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 "j.pick_up as journey_pick_up, j.drop_off as journey_drop_off, j.notes as journey_notes, " +
                 "jfl.site_name as journey_from_site_name, jfl.location_type as journey_from_location_type, " +
                 "jtl.site_name as journey_to_site_name, jtl.location_type as journey_to_location_type, " +
-                "p.price_in_pence " +
+                "CASE WHEN j.billable THEN p.price_in_pence ELSE 0 END as price_in_pence " +
                 "from MOVES m " +
                 "left join LOCATIONS fl on m.from_nomis_agency_id = fl.nomis_agency_id " +
                 "left join LOCATIONS tl on m.to_nomis_agency_id = tl.nomis_agency_id " +
@@ -80,7 +80,7 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 "left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
                 "left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id " +
                 "where m.supplier = ? and move_price_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
-                "order by m.drop_off_or_cancelled",
+                "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST",
                 arrayOf(
                         supplier.name,
                         movePriceType.name,
@@ -105,8 +105,8 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         fun getMovesAndSummary(moves: List<MoveModel>) : MovesAndSummary {
             val percentage = if(moves.isEmpty()) 0.0 else  moves.size.toDouble() / totalSize
             val volume = moves.size
-            val volumeUnpriced = moves.count { it.totalInPence() == null }
-            val totalPrice = moves.sumBy { it.totalInPence() ?: 0 }
+            val volumeUnpriced = moves.count { it.totalInPence() == 0 }
+            val totalPrice = moves.sumBy { it.totalInPence() }
 
             return MovesAndSummary(
                     moves,

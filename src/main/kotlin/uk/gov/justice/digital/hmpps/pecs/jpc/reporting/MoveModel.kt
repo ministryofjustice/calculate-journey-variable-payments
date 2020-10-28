@@ -73,7 +73,7 @@ data class MoveModel(
                 journeys += journeyModels
         }
 
-        fun totalInPence() = if(journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy { it.priceInPence ?: 0 }
+        fun totalInPence() = if(journeys.count{!it.hasPrice()} > 0) 0 else journeys.sumBy { it.priceInPence }
 
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -119,7 +119,8 @@ data class MoveModel(
                 return "MoveModel(moveId='$moveId', supplier=$supplier, movePriceType=$movePriceType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOffOrCancelled=$dropOffOrCancelledDateTime, notes='$notes', prisonNumber=$prisonNumber, vehicleRegistration=$vehicleRegistration)"
         }
 
-        fun totalInPounds() = totalInPence()?.let{it.toDouble() / 100}
+        fun hasPrice() = totalInPence() != 0
+        fun totalInPounds() = totalInPence().toDouble() / 100
         fun moveDate() = moveDate?.format(dateFormatter)
         fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
         fun pickUpTime() = pickUpDateTime?.format(timeFormatter)

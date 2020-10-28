@@ -31,14 +31,17 @@ object ReportParser {
     }
 
     fun parseAsProfileIdToPersonId(profileFiles: List<String>): Map<String, String> {
+        logger.info("Parsing profiles")
         return read(profileFiles) { Profile.fromJson(it) }.associateBy(keySelector = { it.id }, valueTransform = { it.personId })
     }
 
     fun parseAsPersonIdToPerson(peopleFiles: List<String>): Map<String, Person> {
+        logger.info("Parsing people")
         return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
     }
 
     fun parseAsMoves(supplier: Supplier, moveFiles: List<String>): Collection<Move> {
+        logger.info("Parsing moves")
         return read(moveFiles) { Move.fromJson(it) }.
         filter { it.supplier == supplier.reportingName() && MoveStatus.statuses.contains(it.status) }.
         associateBy(Move::id).values
@@ -46,12 +49,14 @@ object ReportParser {
 
 
     fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
+        logger.info("Parsing journeys")
         return read(journeyFiles) { Journey.fromJson(it) }.
         filter { JourneyState.states.contains(it.state) }.
         associateBy(Journey::id).values.groupBy(Journey::moveId)
     }
 
     fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
+        logger.info("Parsing events")
         return read(eventFiles) { Event.fromJson(it) }.
         filter { EventType.types.contains(it.type) }.
         groupBy(Event::eventableId)
@@ -77,5 +82,4 @@ object ReportParser {
         }
         return movesWithJourneysAndEvents
     }
-
 }

@@ -50,7 +50,7 @@ data class JourneyModel(
         val notes: String? = null,
 
         @Transient
-        val priceInPence: Int? = null
+        val priceInPence: Int = 0
 
         ) {
 
@@ -58,8 +58,9 @@ data class JourneyModel(
                 return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
         }
 
+        fun hasPrice() = priceInPence != 0
         fun isBillable() = if(billable) "YES" else "NO"
-        fun priceInPounds() = priceInPence?.let{it.toDouble() / 100}
+        fun priceInPounds() = priceInPence.toDouble() / 100
         fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
         fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
         fun dropOffDate() = dropOffDateTime?.format(dateFormatter)

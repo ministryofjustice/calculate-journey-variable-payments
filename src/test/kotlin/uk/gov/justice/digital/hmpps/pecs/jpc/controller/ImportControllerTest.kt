@@ -44,12 +44,33 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
     lateinit var priceRepository: PriceRepository
 
     @Test
+    fun `can import locations`() {
+        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
+
+        assertThat(locationRepository.count()).isEqualTo(0)
+
+        val response = restTemplate.getForEntity("/import-locations", InputStreamResource::class.java)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(locationRepository.count()).isEqualTo(2)
+    }
+
+    @Test
+    fun `can import prices`() {
+        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
+
+        assertThat(priceRepository.count()).isEqualTo(0)
+
+        val response = restTemplate.getForEntity("/import-prices/geoamey", InputStreamResource::class.java)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+//        assertThat(priceRepository.count()).isEqualTo(2)
+    }
+
+    @Test
     fun `can generate spreadsheet for serco`() {
         whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
         whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
-
-        assertThat(locationRepository.count()).isEqualTo(0)
-        assertThat(priceRepository.count()).isEqualTo(0)
 
         val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-10-31", InputStreamResource::class.java)
 
@@ -63,26 +84,9 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
         whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
         whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-        assertThat(locationRepository.count()).isEqualTo(0)
-        assertThat(priceRepository.count()).isEqualTo(0)
-
         val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-11-01", ErrorResponse::class.java)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
         assertThat(response?.body?.developerMessage).isEqualTo("A maximum of one month's data can be queried at a time.")
-    }
-
-    @Test
-    fun `import fails if more than two months data is requested`() {
-        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
-        whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
-
-        assertThat(locationRepository.count()).isEqualTo(0)
-        assertThat(priceRepository.count()).isEqualTo(0)
-
-        val response = restTemplate.getForEntity("/import/SERCO?moves_from=2020-10-01&moves_to=2020-12-01&reports_to=2020-12-01", ErrorResponse::class.java)
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertThat(response?.body?.developerMessage).isEqualTo("A maximum of two months' data can be retrieved at a time.")
     }
 }

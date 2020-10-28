@@ -35,7 +35,7 @@ class ReportImporter(
     }
 
     private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{
-        // TODO better validation / error handling - it just currently logs the error and ignores it
+        logger.info("Getting $entity between $from and $to")
         val fileNames = fileNamesForDate(entity, from, to)
         return fileNames.map {
             try {

@@ -45,7 +45,7 @@ object ReportFilterer {
             it.move.toLocationType == "prison" &&
             it.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
             it.events.hasEventTypeInDateRange(EventType.MOVE_CANCEL, params.dateRange()) && // cancel event within date range
-            it.events.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.moveDate?.atStartOfDay()) ?: false
+            it.move.moveDate != null && it.events.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.moveDate.atStartOfDay()) ?: false
         }.map { it.copy(journeysWithEvents = listOf(JourneyWithEvents( // fake journey with events
                 Journey(
                         id = "FAKE",

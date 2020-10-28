@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.SpreadsheetProtection
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.io.FileInputStream
 import java.io.IOException
@@ -24,17 +25,35 @@ class ImportController(private val importService: ImportService,
                        private val timeSource: TimeSource,
                        private val spreadsheetProtection: SpreadsheetProtection) {
 
-    @GetMapping("/import/{supplier}")
-    fun import(
+
+    @GetMapping("/import-locations")
+    fun importLocations(
+            response: HttpServletResponse?): String {
+
+        importService.importLocations()
+        return "Done import locations"
+    }
+
+    @GetMapping("/import-prices/{supplier}")
+    fun importPrices(
             @PathVariable supplier: String,
-            @RequestParam(name = "moves_from", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
-            @RequestParam(name = "moves_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesTo: LocalDate,
+            response: HttpServletResponse?): String {
+
+        importService.importPrices(Supplier.valueOf(supplier.toUpperCase()))
+
+        return "Done import prices for $supplier"
+    }
+
+    @GetMapping("/import-reports/{supplier}")
+    fun importReports(
+            @PathVariable supplier: String,
+            @RequestParam(name = "reports_from", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) reportsFrom: LocalDate,
             @RequestParam(name = "reports_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) reportsTo: LocalDate,
             response: HttpServletResponse?): String {
 
-        importService.importReports(supplier, movesFrom, movesTo, reportsTo)
+        importService.importReports(supplier, reportsFrom, reportsTo)
 
-        return "Done"
+        return "Done import reports for $supplier"
     }
 
     @GetMapping("/generate-prices-spreadsheet/{supplier}")

@@ -74,9 +74,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(8, dropOffOrCancelledTime())
             add(9, vehicleRegistration)
             add(10, prisonNumber)
-            totalInPounds()?.let{
-                row.addCell(11, totalInPounds(), fill, ::dataFormatPound) } ?:
-                add(11, "NOT PRESENT")
+            if(hasPrice()) row.addCell(11, totalInPounds(), fill, ::dataFormatPound) else add(11, "NOT PRESENT")
             add(12, "") // billable is empty for a move
             add(13, if(showNotes) notes else "")
         }
@@ -98,10 +96,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(8, dropOffOrTime())
             add(9, vehicleRegistration)
             add(10, "") // prison number is empty for a journey
-
-            priceInPounds()?.let{
-                row.addCell(11, priceInPounds(), fill, ::dataFormatPound) } ?:
-            add(11, "NOT PRESENT")
+            if(hasPrice()) row.addCell(11, priceInPounds(), fill, ::dataFormatPound) else add(11, "NOT PRESENT")
             add(12, isBillable())
             add(13, notes)
         }

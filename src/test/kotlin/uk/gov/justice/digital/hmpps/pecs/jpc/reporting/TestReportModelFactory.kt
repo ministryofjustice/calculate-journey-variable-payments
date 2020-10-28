@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
+import org.joda.time.DateTime
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
@@ -37,7 +38,10 @@ fun journeyModel(
         journeyId: String = "J1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
-        state: JourneyState = JourneyState.COMPLETED
+        state: JourneyState = JourneyState.COMPLETED,
+        billable: Boolean = true,
+        pickUpDateTime: LocalDateTime? = moveDate.atStartOfDay(),
+        dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
 ) = JourneyModel(
         journeyId = journeyId,
         state = state,
@@ -48,9 +52,9 @@ fun journeyModel(
         toNomisAgencyId = toNomisAgencyId,
         toSiteName = "to",
         toLocationType = LocationType.PR,
-        pickUpDateTime = moveDate.atStartOfDay(),
-        dropOffDateTime = moveDate.atStartOfDay().plusHours(10),
-        billable = true,
+        pickUpDateTime = pickUpDateTime,
+        dropOffDateTime = dropOffDateTime,
+        billable = billable,
         priceInPence = 100,
         vehicleRegistration = "REG200",
         notes = "some notes"

@@ -11,12 +11,14 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun persist(params: FilterParams, moves: List<Report>) {
+        logger.info("Persisting ${moves.size} moves")
 
         val completedMoves = ReportFilterer.completedMoves(params, moves).toList()
         val cancelledBillableMoves = ReportFilterer.cancelledBillableMoves(params, moves).toList()
         val completedAndCancelledMoves = completedMoves + cancelledBillableMoves
 
         MovePriceType.values().forEach { mpt ->
+            logger.info("Persisting $mpt moves")
             mpt.filterer(params, completedAndCancelledMoves).forEach { report ->
                 with(report.move) {
                     Result.runCatching {
@@ -54,8 +56,6 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
 
                         val saved = moveModelRepository.save(moveModel)
 
-                        logger.info("Saved: $saved")
-
                     }.onFailure { logger.warn(it.message) }
                 }
             }
@@ -82,7 +82,7 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
                     dropOffDateTime = dropOff,
                     billable = journey.billable,
                     vehicleRegistration = journey.vehicleRegistration,
-                    notes = journeyWithEvents.events.notes()
+                    notes = journeyWithEvents.events.notes(),
             )
         }
     }
