@@ -3,9 +3,9 @@ spring:
     name: calculate-journey-variable-payments
   jpa:
     database: POSTGRESQL
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     platform: postgres
@@ -47,4 +47,4 @@ management:
         time-to-live: 2000ms
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO

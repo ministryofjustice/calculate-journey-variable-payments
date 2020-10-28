@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.notes
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 
 @Component
@@ -43,7 +42,7 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
                                 pickUpDateTime = pickUp,
                                 dropOffOrCancelledDateTime = dropOff ?: cancelled,
                                 vehicleRegistration = report.journeysWithEvents.withIndex().joinToString(separator = ", ") {
-                                    it.value.journey.vehicleRegistration ?: "NOT GIVEN"
+                                    it.value.journey.vehicleRegistration ?: ""
                                 },
                                 notes = report.events.notes(),
                                 prisonNumber = report.person?.prisonNumber
@@ -54,9 +53,6 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
                         moveModel.addJourneys(*journeyModels.toTypedArray())
 
                         val saved = moveModelRepository.save(moveModel)
-
-                        // add journeys to move model
-                        //report.journeysWithEvents.forEach { journeyModelRepository.save(journeyModel(moveModel.moveId, it)) }
 
                         logger.info("Saved: $saved")
 

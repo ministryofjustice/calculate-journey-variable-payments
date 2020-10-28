@@ -66,7 +66,7 @@ class ImportService(
 
         logger.info("Importing reports for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo' and reports to '$reportsTo'.")
 
-        if (movesFrom.plusMonths(2).isBefore(movesTo)) throw IllegalArgumentException("A maximum of two months data can be queried at a time.")
+        if (reportsTo.plusDays(1).minusMonths(2).isAfter(movesFrom)) throw IllegalArgumentException("A maximum of two months' data can be retrieved at a time.")
 
         if (importLocations().second == ImportStatus.IN_PROGRESS) return
         else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) return
@@ -82,14 +82,12 @@ class ImportService(
     fun spreadsheet(
             supplierName: String,
             movesFrom: LocalDate,
-            movesTo: LocalDate,
-            reportsTo: LocalDate): File? {
+            movesTo: LocalDate
+            ): File? {
 
-        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo' and reports to '$reportsTo'.")
+        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo'")
 
-        if (movesFrom.plusMonths(2).isBefore(movesTo)) throw IllegalArgumentException("A maximum of two months data can be queried at a time.")
-
-       // importReports(supplierName, movesFrom, movesTo, reportsTo)
+        if (movesTo.plusDays(1).minusMonths(1).isAfter(movesFrom)) throw IllegalArgumentException("A maximum of one month's data can be queried at a time.")
 
         return pricesSpreadsheetGenerator.generate(FilterParams(Supplier.valueOf(supplierName.toUpperCase()), movesFrom, movesTo))
 

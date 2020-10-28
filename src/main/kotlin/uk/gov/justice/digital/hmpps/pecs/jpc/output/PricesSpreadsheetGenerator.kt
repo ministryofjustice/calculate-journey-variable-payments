@@ -5,9 +5,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.withType
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
@@ -15,8 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelJdbcRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MovesAndSummary
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Report
+
 import java.io.File
 import java.io.FileOutputStream
 
@@ -61,11 +57,11 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
 
                 CancelledMovesSheet(workbook, header)
                         .also { logger.info("Adding cancelled moves.") }
-                        .apply { standard }
+                        .apply { writeMoves(cancelled) }
 
-//                SummarySheet(workbook, header)
-//                        .also { logger.info("Adding summaries.") }
-//                        .apply { writeSummaries(allPrices.map { it.summary }) }
+                SummarySheet(workbook, header)
+                        .also { logger.info("Adding summaries.") }
+                        .apply { writeSummaries(moves) }
 
                 JPCPriceBookSheet(workbook)
                         .also { logger.info("Adding supplier JPC price book used.") }

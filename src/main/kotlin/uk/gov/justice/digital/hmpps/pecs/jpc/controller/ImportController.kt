@@ -43,10 +43,9 @@ class ImportController(private val importService: ImportService,
             @PathVariable supplier: String,
             @RequestParam(name = "moves_from", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
             @RequestParam(name = "moves_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesTo: LocalDate,
-            @RequestParam(name = "reports_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) reportsTo: LocalDate,
             response: HttpServletResponse?): ResponseEntity<InputStreamResource?>? {
 
-        return importService.spreadsheet(supplier, movesFrom, movesTo, reportsTo)?.let { file ->
+        return importService.spreadsheet(supplier, movesFrom, movesTo)?.let { file ->
             val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("YYYY-MM-dd_HH_mm"))
             val filename = "Journey_Variable_Payment_Output_${supplier}_${uploadDateTime}.xlsx"
             val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")

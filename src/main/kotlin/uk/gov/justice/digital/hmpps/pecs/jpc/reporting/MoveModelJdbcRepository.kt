@@ -36,8 +36,10 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                         prisonNumber = getString("prison_number"),
                         vehicleRegistration = getString("vehicle_registration")
                 )
-                val journeyModel = JourneyModel(
-                        journeyId = getString("journey_id"),
+                val journeyId = getString("journey_id")
+                val journeyModel = journeyId?.let{ // there is a journey for this move
+                JourneyModel(
+                        journeyId = journeyId,
                         moveId = getString("move_id"),
                         state = JourneyState.valueOf(getString("journey_state")),
                         fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
@@ -50,9 +52,10 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                         dropOffDateTime = getTimestamp("journey_drop_off")?.toLocalDateTime(),
                         vehicleRegistration = getString("vehicle_registration"),
                         billable = getBoolean("billable"),
-                        notes = getString("notes"),
+                        notes = getString("journey_notes"),
                         priceInPence = if (getInt("price_in_pence") == 0 && wasNull()) null else getInt("price_in_pence")
                 )
+            }
 
                 MoveAndJourneyModel(moveModel, journeyModel)
             }
@@ -72,11 +75,12 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 "from MOVES m " +
                 "left join LOCATIONS fl on m.from_nomis_agency_id = fl.nomis_agency_id " +
                 "left join LOCATIONS tl on m.to_nomis_agency_id = tl.nomis_agency_id " +
-                "join JOURNEYS j on j.move_id = m.move_id " +
+                "left join JOURNEYS j on j.move_id = m.move_id " +
                 "left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
                 "left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
                 "left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id " +
-                "where m.supplier = ? and move_price_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ?",
+                "where m.supplier = ? and move_price_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
+                "order by m.drop_off_or_cancelled",
                 arrayOf(
                         supplier.name,
                         movePriceType.name,
@@ -86,7 +90,8 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 rowMapper).groupBy { it.moveModel.moveId }
 
         return movesAndJourneys.keys.map { k ->
-            movesAndJourneys.getValue(k)[0].moveModel.copy(journeys = movesAndJourneys.getValue(k).map { it.journeyModel }.toMutableList())
+            val mjs = movesAndJourneys.getValue(k)
+            mjs[0].moveModel.copy(journeys = mjs.mapNotNull { it.journeyModel }.toMutableList())
         }
     }
 
@@ -98,7 +103,7 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         val totalSize = allMoves.flatten().size
 
         fun getMovesAndSummary(moves: List<MoveModel>) : MovesAndSummary {
-            val percentage = if(moves.isEmpty()) 0.0 else totalSize.toDouble() / moves.size
+            val percentage = if(moves.isEmpty()) 0.0 else  moves.size.toDouble() / totalSize
             val volume = moves.size
             val volumeUnpriced = moves.count { it.totalInPence() == null }
             val totalPrice = moves.sumBy { it.totalInPence() ?: 0 }
@@ -118,17 +123,28 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 cancelled = getMovesAndSummary(allMoves[5])
         )
     }
-    class MoveAndJourneyModel(val moveModel: MoveModel, val journeyModel: JourneyModel)
+    class MoveAndJourneyModel(val moveModel: MoveModel, val journeyModel: JourneyModel?)
 }
 
 data class MovePriceTypeWithMovesAndSummary(
         val standard: MovesAndSummary,
-        val redirection: MovesAndSummary,
         val longHaul: MovesAndSummary,
+        val redirection: MovesAndSummary,
         val lockout: MovesAndSummary,
         val multi: MovesAndSummary,
         val cancelled: MovesAndSummary
-)
+){
+    fun summary() : Summary {
+        return with(listOf(standard, longHaul, redirection, lockout, multi, cancelled)) {
+            Summary(
+                sumByDouble { it.summary.percentage },
+                sumBy { it.summary.volume },
+                sumBy { it.summary.volumeUnpriced },
+                sumBy { it.summary.totalPriceInPence }
+            )
+        }
+    }
+}
 
 data class MovesAndSummary(
         val moves: List<MoveModel>,

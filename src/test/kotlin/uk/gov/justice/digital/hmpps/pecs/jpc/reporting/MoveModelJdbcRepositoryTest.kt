@@ -42,7 +42,8 @@ internal class MoveModelJdbcRepositoryTest {
     val wyi = WYIPrisonLocation()
     val gni = GNICourtLocation()
 
-    val moveModel = moveModel()
+    val standardMoveWithoutJourneys = moveModel(moveId = "NOJOURNEYS", dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(20))
+    val standardMoveWithJourneys = moveModel( dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(5)) // should appear before the one above
     val journeyModel1 = journeyModel()
     val journeyModel2 = journeyModel(journeyId = "J2")
 
@@ -54,7 +55,8 @@ internal class MoveModelJdbcRepositoryTest {
 
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO))
 
-        moveModelRepository.save(moveModel)
+        moveModelRepository.save(standardMoveWithoutJourneys)
+        moveModelRepository.save(standardMoveWithJourneys)
 
         journeyModelRepository.save(journeyModel1)
         journeyModelRepository.save(journeyModel2)
@@ -63,9 +65,14 @@ internal class MoveModelJdbcRepositoryTest {
 
         val moves = moveModelJdbcRepository.findAllForSupplierAndMovePriceTypeInDateRange(Supplier.SERCO, MovePriceType.STANDARD, moveDate, moveDate)
 
-        assertThat(moves[0].moveId).isEqualTo(moveModel.moveId)
+        // Move with journeys should be first
+        assertThat(moves[0].moveId).isEqualTo(standardMoveWithJourneys.moveId)
         assertThat(moves[0].journeys[0].journeyId).isEqualTo(journeyModel1.journeyId)
         assertThat(moves[0].journeys[1].journeyId).isEqualTo(journeyModel2.journeyId)
+
+        // Move without journeys should be second
+        assertThat(moves[1].moveId).isEqualTo(standardMoveWithoutJourneys.moveId)
+
     }
 
     @Test
@@ -76,7 +83,7 @@ internal class MoveModelJdbcRepositoryTest {
 
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO))
 
-        moveModelRepository.save(moveModel)
+        moveModelRepository.save(standardMoveWithJourneys)
 
         journeyModelRepository.save(journeyModel1)
         journeyModelRepository.save(journeyModel2)
@@ -84,7 +91,7 @@ internal class MoveModelJdbcRepositoryTest {
         entityManager.flush()
 
         val summaries = moveModelJdbcRepository.findSummaryForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
-        assertThat(summaries.standard.moves[0].moveId).isEqualTo(moveModel.moveId)
+        assertThat(summaries.standard.moves[0].moveId).isEqualTo(standardMoveWithJourneys.moveId)
         assertThat(summaries.standard.summary).isEqualTo(Summary(1.0, 1, 0, 1998))
 
     }

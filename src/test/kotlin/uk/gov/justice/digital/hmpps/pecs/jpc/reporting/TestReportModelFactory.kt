@@ -4,12 +4,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 val moveDate = LocalDate.of(2020, 9, 10)
 
 fun moveModel(
         moveId: String = "M1",
+        dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
         journeys: MutableList<JourneyModel> = mutableListOf()
 ) = MoveModel(
         moveId = moveId,
@@ -25,7 +27,7 @@ fun moveModel(
         toSiteName = "to",
         toLocationType = LocationType.PR,
         pickUpDateTime = moveDate.atStartOfDay(),
-        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(10),
+        dropOffOrCancelledDateTime = dropOffOrCancelledDateTime,
         notes = "some notes",
         prisonNumber = "PR101",
         vehicleRegistration = "reg100",

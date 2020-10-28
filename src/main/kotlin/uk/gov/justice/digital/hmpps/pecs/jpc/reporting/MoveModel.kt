@@ -125,6 +125,12 @@ data class MoveModel(
         fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
         fun dropOffOrCancelledDate() = dropOffOrCancelledDateTime?.format(dateFormatter)
         fun dropOffOrCancelledTime() = dropOffOrCancelledDateTime?.format(timeFormatter)
+        fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
+        fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
+        fun toSiteName() = toSiteName ?: toNomisAgencyId
+        fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
+
+
 
 
         companion object{

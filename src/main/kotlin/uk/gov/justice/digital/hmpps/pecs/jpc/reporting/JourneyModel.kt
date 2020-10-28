@@ -64,6 +64,10 @@ data class JourneyModel(
         fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
         fun dropOffDate() = dropOffDateTime?.format(dateFormatter)
         fun dropOffOrTime() = dropOffDateTime?.format(timeFormatter)
+        fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
+        fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
+        fun toSiteName() = toSiteName ?: toNomisAgencyId
+        fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
 
 
         companion object{

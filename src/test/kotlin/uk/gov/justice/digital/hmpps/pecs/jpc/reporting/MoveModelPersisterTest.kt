@@ -54,12 +54,14 @@ internal class MoveModelPersisterTest {
 
         priceRepository.save(Price(id= UUID.randomUUID(), fromLocation = fromLocation, toLocation = toLocation, priceInPence = 999, supplier = Supplier.SERCO))
 
-        val move = moveFactory().copy(id = UUID.randomUUID().toString())
-        val journey1 = journeyFactory().copy(id = UUID.randomUUID().toString(), billable = true)
-        val journey2 = journeyFactory().copy(id = UUID.randomUUID().toString(), billable = true, fromNomisAgencyId = "NOT_MAPPED")
+        val redirectMove = moveFactory()
+        val noJourneyMove = moveFactory(moveId = "NOJOURNEY")
+
+        val journey1 = journeyFactory().copy(id = UUID.randomUUID().toString(), billable = true, vehicleRegistration = "REG1")
+        val journey2 = journeyFactory().copy(id = UUID.randomUUID().toString(), billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
 
         val completedMoveWithPricedBillableJourney = Report(
-                move = move,
+                move = redirectMove,
                 person = personFactory(),
                 events = listOf(
                         moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
@@ -80,20 +82,35 @@ internal class MoveModelPersisterTest {
                 )
         )
 
+        val multiMoveBecauseNoJourney = Report(
+                move = noJourneyMove,
+                person = personFactory(),
+                events = listOf(
+                        moveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                        moveEventFactory(type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7)),
+                        moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf()
+        )
+
         val persister = MoveModelPersister(moveModelRepository, journeyModelRepository)
         val params = FilterParams(Supplier.SERCO, from, to)
 
-        persister.persist(params, listOf(completedMoveWithPricedBillableJourney))
+        persister.persist(params, listOf(completedMoveWithPricedBillableJourney, multiMoveBecauseNoJourney))
 
         // persist again to check this works
-        persister.persist(params, listOf(completedMoveWithPricedBillableJourney.copy(move = move.copy(reference = "NEWREF"))))
+        persister.persist(params, listOf(completedMoveWithPricedBillableJourney.copy(move = redirectMove.copy(reference = "NEWREF"))))
 
         entityManager.flush()
 
-        val retrieved = moveModelRepository.findById(move.id)
+        val retrievedRedirectMove = moveModelRepository.findById(redirectMove.id).get()
 
-        assertThat(retrieved.get().reference).isEqualTo("NEWREF")
-        assertThat(retrieved.get().notes).isEqualTo("MoveRedirect: This was redirected.")
+        assertThat(retrievedRedirectMove.reference).isEqualTo("NEWREF")
+        assertThat(retrievedRedirectMove.notes).isEqualTo("MoveRedirect: This was redirected.")
+        assertThat(retrievedRedirectMove.vehicleRegistration).isEqualTo("REG1, REG2")
+
+        val retrievedNoJourneyMove = moveModelRepository.findById(noJourneyMove.id).get()
+        assertThat(retrievedNoJourneyMove.reference).isEqualTo("UKW4591N")
     }
 }
 

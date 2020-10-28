@@ -22,8 +22,13 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     protected fun getRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.getRow(rIndex)
 
     protected fun fillBlue(cellStyle: CellStyle){
-        cellStyle.fillForegroundColor = IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex()
-        cellStyle.fillPattern = FillPatternType.FINE_DOTS
+        cellStyle.fillForegroundColor = IndexedColors.BLUE.getIndex()
+        cellStyle.fillPattern = FillPatternType.SPARSE_DOTS
+    }
+
+    protected fun fillGrey(cellStyle: CellStyle){
+        cellStyle.fillForegroundColor = IndexedColors.GREY_25_PERCENT.getIndex()
+        cellStyle.fillPattern = FillPatternType.LEAST_DOTS
     }
 
     protected fun fillWhite(cellStyle: CellStyle){  } // do nothing
@@ -59,10 +64,10 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(moveModel) {
             add(0, reference)
-            add(1, fromSiteName)
-            add(2, fromLocationType?.name)
-            add(3, toSiteName)
-            add(4, toLocationType?.name)
+            add(1, fromSiteName())
+            add(2, fromLocationType())
+            add(3, toSiteName())
+            add(4, toLocationType())
             add(5, pickUpDate())
             add(6, pickUpTime())
             add(7, dropOffOrCancelledDate())
@@ -78,15 +83,15 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
     protected open fun writeJourneyRow(journeyNumber: Int, journeyModel: JourneyModel){
-        val fill = if(journeyNumber % 2 == 0) ::fillBlue else ::fillWhite
+        val fill = if(journeyNumber % 2 == 1) ::fillGrey else ::fillWhite
         val row = createRow()
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(journeyModel) {
             add(0, "Journey ${journeyNumber + 1}")
-            add(1, fromSiteName)
-            add(2, fromLocationType?.name)
-            add(3, toSiteName)
-            add(4, toLocationType?.name)
+            add(1, fromSiteName())
+            add(2, fromLocationType())
+            add(3, toSiteName())
+            add(4, toLocationType())
             add(5, pickUpDate())
             add(6, pickUpTime())
             add(7, dropOffDate())
