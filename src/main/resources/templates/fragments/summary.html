@@ -1,0 +1,38 @@
+<div class="bg-govuk-colour-blue ph3 mt3 flex" th:fragment="summary">
+
+    <ul class="list ph0 bg-govuk-colour-blue flex mv3 flex-wrap w-75">
+        <li class="w-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total moves for</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">[[${#dates.monthName(summary.date)}]]
+                [[${#dates.format(summary.date, 'yyyy')}]]</p></div>
+        </li>
+        <li class="w-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Moves without prices</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+                [[${#numbers.formatDecimal(summary.movesWithoutPrices, 0, 'COMMA', 0, 'POINT')}]]</p></div>
+        </li>
+        <li class="w-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total moves</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+                [[${#numbers.formatDecimal(summary.totalMoves, 0, 'COMMA', 0, 'POINT')}]]</p></div>
+        </li>
+        <li class="w-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Supplier</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:text="${summary.supplier}">SERCO</p></div>
+        </li>
+        <li class="w-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">JPC Version</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:text="${summary.jpcVersion}">JPC_SERCO_310320</p></div>
+        </li>
+    </ul>
+
+    <div class="w-25 pv2 mv2">
+        <p class="govuk-body govuk-!-font-weight-bold white ma0">Total price</p>
+        <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
+            £[[${#numbers.formatDecimal(summary.totalPrice, 0, 'COMMA', 2, 'POINT')}]]</p></div>
+        <div class="pt3">
+            <span class="ttu govuk-body-s govuk-!-font-weight-bold white ba bw1 b--white pa1">Pending price</span>
+        </div>
+    </div>
+
+</div>
