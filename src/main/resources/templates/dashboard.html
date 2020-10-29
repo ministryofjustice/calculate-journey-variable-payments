@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+
+    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#dates.monthName(currentDate)}]]
+        [[${#dates.format(currentDate, 'yyyy')}]]</h1>
+
+</div>
+
+</body>
+
+</html>
