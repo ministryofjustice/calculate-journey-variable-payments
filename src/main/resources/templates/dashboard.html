@@ -31,6 +31,11 @@
                     month</a></li>
             </ul>
         </div>
+        <div class="govuk-grid-column-one-third tr">
+            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplierName)}?moves_from=${#dates.format(months.previousMonth, 'yyyy-MM-dd')}&moves_to=${#dates.format(months.currentMonth, 'yyyy-MM-dd')}&reports_to=${#dates.format(months.currentMonth, 'yyyy-MM-dd')}|}"
+               th:attr="download=${'moves-' + #dates.monthName(currentDate) + '-' + #dates.format(currentDate, 'yyyy') + '.csv'}"
+               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
+        </div>
     </div>
 
 </div>
