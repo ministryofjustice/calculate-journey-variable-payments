@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+    <a href="/dashboard" class="govuk-back-link">Back</a>
+
+    <form th:action="@{/select-month}" th:object="${form}" method="post">
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('date')} ? 'govuk-form-group--error'">
+            <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="event-name">
+                Jump to month
+            </label>
+            </h1>
+            <div id="event-name-hint" class="govuk-hint">
+                <span class="db govuk-!-font-weight-bold">Enter month and year you want to view.</span>
+                For example 10/2019 or October 2019
+            </div>
+            <p th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Enter a National Insurance number in the correct
+                format
+            </p>
+            <input class="govuk-input govuk-input--width-20" id="event-name" name="date" type="text"
+                   aria-describedby="event-name-hint" th:field="*{date}"
+                   th:classappend="${#fields.hasErrors('date')} ? 'govuk-input--error'">
+        </div>
+        <div class="flex items-center">
+            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+                Go to month
+            </button>
+            <a href="/dashboard" class="govuk-link">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+
+</html>
