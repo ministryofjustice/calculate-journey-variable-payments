@@ -45,6 +45,13 @@
         <div th:replace="fragments/journey-summary.html :: journeySummary"></div>
     </section>
 
+    <section class="mt5">
+        <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
+        <div th:each="move: ${moves}">
+            <div th:replace="fragments/move-by-type.html :: move"></div>
+        </div>
+    </section>
+
 </div>
 
 </body>

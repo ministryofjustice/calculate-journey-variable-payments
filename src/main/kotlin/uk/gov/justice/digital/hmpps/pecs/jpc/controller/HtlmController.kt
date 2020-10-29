@@ -16,6 +16,7 @@ import javax.validation.Valid
 data class MonthsWidget(val currentMonth: Date, val nextMonth: Date, val previousMonth: Date)
 data class Summary(val date: Date, val movesWithoutPrices: Int, val totalMoves: Int, val supplier: String, val jpcVersion: String, val totalPrice: Double)
 data class JourneySummary(val movesWithoutPrices: Int, val movesWithoutLocations: Int, val totalUniqueJourneys: Int)
+data class Move(val type: String, val percentage: Double, val withoutPrices: Int, val total: Int, val pendingPrice: Double)
 
 @Controller
 class HtmlController {
@@ -33,6 +34,7 @@ class HtmlController {
         model.addAttribute("months", MonthsWidget(currentDate.toDate(), nextMonth = LocalDate(currentDate).plusMonths(1).toDate(), previousMonth = LocalDate(currentDate).minusMonths(1).toDate()))
         model.addAttribute("summary", Summary(date = currentDate.toDate(), movesWithoutPrices = 1, totalMoves = 100, supplier = supplierName, jpcVersion = "JPC_SERCO_310320", totalPrice = 100000.0))
         model.addAttribute("journeySummary", JourneySummary(movesWithoutPrices = 12, movesWithoutLocations = 24, totalUniqueJourneys = 48))
+        model.addAttribute("moves", listOf(Move("#1", 95.0, 2, 1000, 1000.0)))
         return "dashboard"
     }
 
