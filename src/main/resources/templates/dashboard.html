@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+
+    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#dates.monthName(currentDate)}]]
+        [[${#dates.format(currentDate, 'yyyy')}]]</h1>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <ul class="list pl0 ma0">
+                <li class="govuk-!-display-inline-block"><a
+                        th:href="@{/dashboard(date=${#dates.format(months.previousMonth, 'yyyy-MM-dd')})}"
+                        class="ma0 govuk-link govuk-heading-s right-arrow-left">Previous
+                    month</a></li>
+                <li class="govuk-!-display-inline-block"><a
+                        href="/select-month"
+                        class="ma0 govuk-link govuk-heading-s mh3">Jump to
+                    month</a></li>
+                <li class="govuk-!-display-inline-block"><a
+                        th:href="@{/dashboard(date=${#dates.format(months.nextMonth, 'yyyy-MM-dd')})}"
+                        class="ma0 govuk-link govuk-heading-s right-arrow-right">Next
+                    month</a></li>
+            </ul>
+        </div>
+        <div class="govuk-grid-column-one-third tr">
+            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplierName)}?moves_from=${#dates.format(months.previousMonth, 'yyyy-MM-dd')}&moves_to=${#dates.format(months.currentMonth, 'yyyy-MM-dd')}&reports_to=${#dates.format(months.currentMonth, 'yyyy-MM-dd')}|}"
+               th:attr="download=${'moves-' + #dates.monthName(currentDate) + '-' + #dates.format(currentDate, 'yyyy') + '.csv'}"
+               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
+        </div>
+    </div>
+
+    <div th:replace="fragments/summary.html :: summary"></div>
+
+    <section class="mt5">
+        <h2 class="govuk-heading-m pt1 bt bw2">Journey summary</h2>
+        <div th:replace="fragments/journey-summary.html :: journeySummary"></div>
+    </section>
+
+    <section class="mt5">
+        <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
+        <div th:each="move: ${moves}">
+            <div th:replace="fragments/move-by-type.html :: move"></div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+
+</html>

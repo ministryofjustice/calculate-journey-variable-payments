@@ -1,0 +1,47 @@
+<div th:fragment="move">
+    <div class="ba">
+        <ul class="list pl0 flex mv0">
+            <li class="flex-auto">
+                <div class="pa3">
+                    <a href="" class="govuk-heading-m govuk-link" th:text="${move.type}">Standard</a>
+                </div>
+            </li>
+            <li class="w-20 bl border-box">
+                <div class="pa3">
+                    <p class="govuk-heading-m mb1" th:inline="text">[[${#numbers.formatDecimal(move.percentage, 0,
+                        'COMMA', 0, 'POINT')}]]</p>
+                    <div>
+                        <p class="govuk-body mv0">Percentage</p>
+                    </div>
+                </div>
+            </li>
+            <li class="w-20 bl border-box">
+                <div class="pa3">
+                    <p class="govuk-heading-m mb1" th:inline="text">[[${#numbers.formatDecimal(move.withoutPrices, 0,
+                        'COMMA', 0, 'POINT')}]]</p>
+                    <div>
+                        <p class="govuk-body mv0">Without prices</p>
+                    </div>
+                </div>
+            </li>
+            <li class="w-20 bl border-box">
+                <div class="pa3">
+                    <p class="govuk-heading-m mb1" th:inline="text">[[${#numbers.formatDecimal(move.total, 0, 'COMMA',
+                        0, 'POINT')}]]</p>
+                    <div>
+                        <p class="govuk-body mv0">Total moves</p>
+                    </div>
+                </div>
+            </li>
+            <li class="w-20 bl border-box">
+                <div class="pa3">
+                    <p class="govuk-heading-m mb1" th:inline="text">£[[${#numbers.formatDecimal(move.pendingPrice, 0,
+                        'COMMA', 2, 'POINT')}]]</p>
+                    <div class="pt3">
+                        <span class="ttu govuk-body-s govuk-!-font-weight-bold govuk-colour-blue ba bw1 b--blue pa1">Pending price</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
