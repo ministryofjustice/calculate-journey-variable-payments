@@ -7,11 +7,7 @@ import javax.validation.ConstraintValidatorContext
 
 class MonthYearValidator : ConstraintValidator<ValidMonthYear?, String?> {
     override fun initialize(arg0: ValidMonthYear?) {}
-    override fun isValid(date: String?, context: ConstraintValidatorContext): Boolean {
-        val dates = PrettyTimeParser().parse(date)
-        if (dates.size != 1) {
-            return false
-        }
-        return true
+    override fun isValid(dateAsString: String?, context: ConstraintValidatorContext): Boolean {
+        return Result.runCatching { PrettyTimeParser().parse(dateAsString).size == 1 }.getOrElse { false }
     }
 }
