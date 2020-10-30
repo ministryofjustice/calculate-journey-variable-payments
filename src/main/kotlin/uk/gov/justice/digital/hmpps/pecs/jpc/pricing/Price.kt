@@ -25,7 +25,6 @@ data class Price(
         @JoinColumn(name = "to_location_id")
         val toLocation: Location,
 
-        @get: Min(1, message = "Price must be greater than zero.")
         val priceInPence: Int,
 
         @NotNull

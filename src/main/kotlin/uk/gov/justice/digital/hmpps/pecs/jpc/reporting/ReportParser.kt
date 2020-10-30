@@ -44,7 +44,7 @@ object ReportParser {
         logger.info("Parsing moves")
         return read(moveFiles) { Move.fromJson(it) }.
         filter { it.supplier == supplier.reportingName() && MoveStatus.statuses.contains(it.status) }.
-        associateBy(Move::id).values
+        associateBy(Move::id).values // associateBy will only include latest Move by id
     }
 
 
@@ -52,13 +52,14 @@ object ReportParser {
         logger.info("Parsing journeys")
         return read(journeyFiles) { Journey.fromJson(it) }.
         filter { JourneyState.states.contains(it.state) }.
-        associateBy(Journey::id).values.groupBy(Journey::moveId)
+        associateBy(Journey::id).values.groupBy(Journey::moveId) // associateBy will only include latest Journey by id
     }
 
     fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
         logger.info("Parsing events")
         return read(eventFiles) { Event.fromJson(it) }.
         filter { EventType.types.contains(it.type) }.
+        distinctBy { it.id }. // filter duplicates (shouldn't be any, but just in case)
         groupBy(Event::eventableId)
     }
 
@@ -69,10 +70,10 @@ object ReportParser {
         val journeys = parseAsMoveIdToJourneys(journeyFiles)
         val events = parseAsEventableIdToEvents(eventFiles)
 
-        val movesWithJourneysAndEvents = moves.map { move ->
+        return moves.map { move ->
             Report(
                     move = move,
-                    person = if (move.profileId == null) null else people[profileId2PersonId[move.profileId]],
+                    person = move.profileId?.let {people[profileId2PersonId[it]]},
                     journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey ->
                         JourneyWithEvents(journey = journey, events = events.getOrDefault(journey.id, listOf()))
                     },
@@ -80,6 +81,6 @@ object ReportParser {
                     )
             )
         }
-        return movesWithJourneysAndEvents
     }
+
 }

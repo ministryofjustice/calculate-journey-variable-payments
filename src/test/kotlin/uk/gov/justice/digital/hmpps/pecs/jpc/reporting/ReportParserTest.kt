@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.output.assertCellEquals
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 
 
@@ -105,16 +106,16 @@ internal class ReportParserTest {
         val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports())
 
         // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
-        Assertions.assertEquals(setOf("M1", "M2", "M3"), journeys.keys)
+        assertThat(journeys.keys).containsExactlyInAnyOrder("M1", "M2", "M3")
 
         // Move 1 should have 1 journey (the same updated journey)
-        Assertions.assertEquals(1, journeys.getValue("M1").size)
+        assertThat(journeys.getValue("M1").size).isEqualTo(1)
 
         // This journey should have been updated to billable=true
-        Assertions.assertEquals(true, journeys.getValue("M1")[0].billable)
+        assertThat(journeys.getValue("M1")[0].billable).isTrue
 
         // Move 2 should have 2 journeys
-        Assertions.assertEquals(2, journeys.getValue("M2").size)
+        assertThat(journeys.getValue("M2").size).isEqualTo(2)
     }
 
     @Test
@@ -150,10 +151,10 @@ internal class ReportParserTest {
         val move1 = movesWithJourneysAndEvents.find { it.move.id == "M1" }!!
 
         // Move1 should have two events
-        assertThat(move1.events.map{it.id}).isEqualTo(listOf("E1", "E4"))
+        assertThat(move1.events.map{it.id}).containsExactly("E1", "E4")
 
         // Move1's first journey should have event 3
-        assertThat(move1.journeysWithEvents[0].events.map { it.id }).isEqualTo(listOf("E3"))
+        assertThat(move1.journeysWithEvents[0].events.map { it.id }).containsExactly("E3")
 
         // Move 1 should have Person PE1
         assertThat(move1.person?.id).isEqualTo("PE1")
