@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 import org.slf4j.LoggerFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.ClosedRangeLocalDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.equalsStringCaseInsensitive
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,9 +12,9 @@ object ReportFilterer {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private fun Report.hasSupplier(s: Supplier) = move.supplier == s.reportingName()
+    private fun Report.hasSupplier(supplier: Supplier) = supplier.equalsStringCaseInsensitive(move.supplier)
 
-    private fun Report.hasStatus(status: MoveStatus) = move.status == status.value
+    private fun Report.hasStatus(status: MoveStatus) = status.equalsStringCaseInsensitive(move.status)
 
     private fun List<Event>.hasEventType(eventType: EventType) =
             this.find { it.hasType(eventType) } != null
@@ -55,7 +56,7 @@ object ReportFilterer {
                         clientTimestamp = LocalDateTime.now(),
                         fromNomisAgencyId = it.move.fromNomisAgencyId,
                         toNomisAgencyId = it.move.toNomisAgencyId!!,
-                        state = JourneyState.CANCELLED.value,
+                        state = JourneyState.CANCELLED.name,
                         vehicleRegistration = null
                 ),
                 listOf())))
@@ -83,7 +84,10 @@ object ReportFilterer {
      */
     fun longHaulReports(params: FilterParams, moves: Collection<Report>): Sequence<Report> {
         return completedMoves(params, moves).filter { report ->
-            report.hasAnyOf(EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END) &&
+            (
+                report.hasAllOf(EventType.JOURNEY_LODGING) ||
+                report.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
+            ) &&
             report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
             with(report.journeysWithEvents.map { it.journey }) {
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 2

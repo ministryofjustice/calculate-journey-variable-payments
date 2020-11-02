@@ -88,7 +88,7 @@ internal class ReportParserTest {
         assertThat(moves.map { it.id }).containsExactly("M1", "M4")
 
         // M1 should be complete
-        assertThat(MoveStatus.COMPLETED.value).isEqualTo(moves.find{it.id == "M1"}?.status)
+        assertThat(MoveStatus.COMPLETED.name.toLowerCase()).isEqualTo(moves.find{it.id == "M1"}?.status)
     }
 
     @Test

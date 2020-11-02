@@ -31,11 +31,18 @@ data class Price(
         val addedAt: LocalDateTime = LocalDateTime.now(),
 ){
         fun journey() = "${fromLocation.nomisAgencyId}-${toLocation.nomisAgencyId}"
+
 }
 
 enum class Supplier {
         SERCO,
         GEOAMEY;
 
-        fun reportingName() = name.toLowerCase()
+        companion object{
+                fun valueOfCaseInsensitive(value: String): Supplier{
+                        return valueOf(value.toUpperCase())
+                }
+        }
 }
+
+fun <T : Enum<*>> T.equalsStringCaseInsensitive(value: String) = this.name == value.toUpperCase()

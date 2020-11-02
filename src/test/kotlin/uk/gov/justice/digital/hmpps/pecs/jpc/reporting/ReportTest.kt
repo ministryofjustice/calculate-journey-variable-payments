@@ -28,6 +28,13 @@ internal class ReportTest {
     }
 
     @Test
+    fun `has all of`() {
+        assertThat(report.hasAllOf(EventType.MOVE_ACCEPT, EventType.MOVE_REDIRECT, EventType.MOVE_CANCEL)).isTrue
+        assertThat(report.hasAllOf(EventType.MOVE_ACCEPT, EventType.JOURNEY_COMPLETE)).isFalse
+
+    }
+
+    @Test
     fun `has none of`() {
         assertThat(report.hasNoneOf(EventType.MOVE_ACCEPT)).isFalse
     }

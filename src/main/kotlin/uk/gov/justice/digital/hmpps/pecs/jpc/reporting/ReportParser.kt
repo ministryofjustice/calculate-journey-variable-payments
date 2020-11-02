@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.equalsStringCaseInsensitive
 
 @Component
 object ReportParser {
@@ -43,7 +44,10 @@ object ReportParser {
     fun parseAsMoves(supplier: Supplier, moveFiles: List<String>): Collection<Move> {
         logger.info("Parsing moves")
         return read(moveFiles) { Move.fromJson(it) }.
-        filter { it.supplier == supplier.reportingName() && MoveStatus.statuses.contains(it.status) }.
+        filter {
+            supplier.equalsStringCaseInsensitive(it.supplier) &&
+            (MoveStatus.COMPLETED.equalsStringCaseInsensitive(it.status) || MoveStatus.CANCELLED.equalsStringCaseInsensitive(it.status))
+        }.
         associateBy(Move::id).values // associateBy will only include latest Move by id
     }
 
@@ -51,7 +55,7 @@ object ReportParser {
     fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
         logger.info("Parsing journeys")
         return read(journeyFiles) { Journey.fromJson(it) }.
-        filter { JourneyState.states.contains(it.state) }.
+        filter {  (JourneyState.COMPLETED.equalsStringCaseInsensitive(it.state) || JourneyState.CANCELLED.equalsStringCaseInsensitive(it.state)) }.
         associateBy(Journey::id).values.groupBy(Journey::moveId) // associateBy will only include latest Journey by id
     }
 

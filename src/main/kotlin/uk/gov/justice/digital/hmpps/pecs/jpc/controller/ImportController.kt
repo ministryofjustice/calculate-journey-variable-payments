@@ -39,7 +39,7 @@ class ImportController(private val importService: ImportService,
             @PathVariable supplier: String,
             response: HttpServletResponse?): String {
 
-        importService.importPrices(Supplier.valueOf(supplier.toUpperCase()))
+        importService.importPrices(Supplier.valueOfCaseInsensitive(supplier))
 
         return "Done import prices for $supplier"
     }

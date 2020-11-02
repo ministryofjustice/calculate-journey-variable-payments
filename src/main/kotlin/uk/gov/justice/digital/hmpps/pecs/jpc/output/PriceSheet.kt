@@ -48,16 +48,12 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     private fun applyHeader() {
         sheet.getRow(0).getCell(1).setCellValue(header.dateRun)
-        sheet.getRow(4).createCell(1).setCellValue(header.supplier.reportingName().capitalize())
+        sheet.getRow(4).createCell(1).setCellValue(header.supplier.name)
         sheet.getRow(5).getCell(1).setCellValue(header.dateRange.start)
         sheet.getRow(5).getCell(3).setCellValue(header.dateRange.endInclusive)
     }
 
-    /**
-     * Write the Row using the RowValue value object
-     * @param showNotes - Boolean indicating whether the notes column should be displayed
-     * @param styleAppliers - vararg of style functions to apply to each cell
-     */
+
     protected open fun writeMoveRow(moveModel: MoveModel, isShaded: Boolean, showNotes: Boolean = true){
         val fill = if(isShaded) ::fillBlue else ::fillWhite
         val row = createRow()

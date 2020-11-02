@@ -1,12 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import org.joda.time.DateTime
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
-
 
 val moveDate = LocalDate.of(2020, 9, 10)
 

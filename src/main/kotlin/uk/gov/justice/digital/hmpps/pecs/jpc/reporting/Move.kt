@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import java.time.LocalDate
 import javax.validation.constraints.NotBlank
 
@@ -65,11 +63,13 @@ data class Move(
     }
 }
 
-enum class MoveStatus(val value: String) {
-    COMPLETED("completed"),
-    CANCELLED("cancelled");
+enum class MoveStatus {
+    COMPLETED,
+    CANCELLED;
 
     companion object{
-        val statuses = values().map { it.value }
+        fun valueOfCaseInsensitive(value: String): MoveStatus {
+            return valueOf(value.toUpperCase())
+        }
     }
 }

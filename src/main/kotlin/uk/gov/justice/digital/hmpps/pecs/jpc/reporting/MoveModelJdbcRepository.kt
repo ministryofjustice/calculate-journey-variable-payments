@@ -19,9 +19,9 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             with(resultSet) {
                 val moveModel = MoveModel(
                         moveId = getString("move_id"),
-                        supplier = Supplier.valueOf(getString("supplier")),
-                        status = MoveStatus.valueOf(getString("status")),
-                        movePriceType = MovePriceType.valueOf(getString("move_price_type")),
+                        supplier = Supplier.valueOfCaseInsensitive(getString("supplier")),
+                        status = MoveStatus.valueOfCaseInsensitive(getString("status")),
+                        movePriceType = MovePriceType.valueOfCaseInsensitive(getString("move_price_type")),
                         reference = getString("reference"),
                         moveDate = getDate("move_date")?.toLocalDate(),
                         fromNomisAgencyId = getString("from_nomis_agency_id"),
@@ -41,7 +41,7 @@ class MoveModelJdbcRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 JourneyModel(
                         journeyId = journeyId,
                         moveId = getString("move_id"),
-                        state = JourneyState.valueOf(getString("journey_state")),
+                        state = JourneyState.valueOfCaseInsensitive(getString("journey_state")),
                         fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
                         fromSiteName = getString("journey_from_site_name"),
                         fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },

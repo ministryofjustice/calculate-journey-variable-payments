@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 
@@ -38,7 +36,7 @@ data class Journey(
 )
 
 {
-    fun stateIsAnyOf(vararg states: JourneyState) = states.map{it.value}.contains(state)
+    fun stateIsAnyOf(vararg states: JourneyState) = states.map{it.name}.contains(state.toUpperCase())
 
     companion object {
         fun fromJson(json: String): Journey? {
@@ -49,11 +47,13 @@ data class Journey(
     }
 }
 
-enum class JourneyState(val value: String) {
-    CANCELLED("cancelled"),
-    COMPLETED("completed");
+enum class JourneyState() {
+    CANCELLED,
+    COMPLETED;
 
     companion object{
-        val states = values().map { it.value }
+        fun valueOfCaseInsensitive(value: String): JourneyState {
+            return valueOf(value.toUpperCase())
+        }
     }
 }

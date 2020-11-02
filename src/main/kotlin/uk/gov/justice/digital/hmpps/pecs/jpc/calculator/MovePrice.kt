@@ -10,6 +10,12 @@ enum class MovePriceType(val filterer: (p: FilterParams, m: Collection<Report>) 
     REDIRECTION(ReportFilterer::redirectionReports),
     LOCKOUT(ReportFilterer::lockoutReports),
     MULTI(ReportFilterer::multiTypeReports),
-    CANCELLED(ReportFilterer::cancelledBillableMoves)
+    CANCELLED(ReportFilterer::cancelledBillableMoves);
+
+    companion object{
+        fun valueOfCaseInsensitive(value: String): MovePriceType {
+            return MovePriceType.valueOf(value.toUpperCase())
+        }
+    }
 }
 

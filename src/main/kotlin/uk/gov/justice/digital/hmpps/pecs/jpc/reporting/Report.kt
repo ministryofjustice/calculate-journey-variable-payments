@@ -6,8 +6,8 @@ data class Report(
         val events: List<Event> = listOf(),
         val journeysWithEvents: List<JourneyWithEvents> = listOf()) {
 
+    fun hasAllOf(vararg ets: EventType) = getEvents(*ets).size == ets.size
     fun hasAnyOf(vararg ets: EventType) = getEvents(*ets).isNotEmpty()
-
     fun hasNoneOf(vararg ets: EventType) = !hasAnyOf(*ets)
 
     fun getEvents(vararg ets: EventType) =

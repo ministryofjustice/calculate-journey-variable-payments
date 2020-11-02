@@ -2,12 +2,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 val defaultDateTime = LocalDateTime.parse("2020-06-16T10:20:30+01:00", DateTimeFormatter.ISO_DATE_TIME)
 val defaultDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
@@ -19,7 +18,7 @@ const val defaultJourneyEventId="JE1"
 const val defaultProfileId="PR1"
 const val defaultPersonId="PE1"
 
-val defaultSupplier =  Supplier.SERCO.reportingName()
+val defaultSupplier =  Supplier.SERCO.name.toLowerCase()
 
 fun fromPrisonNomisAgencyId() = "WYI"
 fun WYIPrisonLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
@@ -27,34 +26,13 @@ fun WYIPrisonLocation() = Location(id = UUID.randomUUID(), locationType = Locati
 fun toCourtNomisAgencyId() = "GNI"
 fun GNICourtLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
 
-fun testAgencyId2Location(agencyId: String) : Location?{
-    return when(agencyId){
-        "WYI" -> WYIPrisonLocation()
-        "GNI" -> GNICourtLocation()
-        else -> Location(id = UUID.randomUUID(), locationType = LocationType.UNKNOWN, nomisAgencyId = agencyId, siteName = agencyId)
-    }
-}
-
-
 fun notMappedNomisAgencyId() =  "NOT_MAPPED_AGENCY_ID"
-
-fun priceFactory(
-        supplier: Supplier = Supplier.SERCO,
-        priceInPence: Int = 101): Price {
-
-    return Price(
-            supplier = supplier,
-            fromLocation = WYIPrisonLocation(),
-            toLocation = GNICourtLocation(),
-            priceInPence = priceInPence
-    )
-}
 
 fun moveFactory(
         moveId: String = defaultMoveId,
         supplier: String = defaultSupplier,
         profileId: String = defaultProfileId,
-        status: String = MoveStatus.COMPLETED.value,
+        status: String = MoveStatus.COMPLETED.name.toLowerCase(),
         fromLocation: String = fromPrisonNomisAgencyId(),
         fromLocationType: String = "prison",
         toLocation : String = toCourtNomisAgencyId(),
@@ -112,7 +90,7 @@ fun moveEventFactory(
 fun journeyFactory(
         journeyId: String = defaultJourneyId,
         moveId: String = defaultMoveId,
-        state: String = JourneyState.COMPLETED.value,
+        state: String = JourneyState.COMPLETED.name.toLowerCase(),
         supplier: String = defaultSupplier,
         billable: Boolean = false,
         fromLocation: String = fromPrisonNomisAgencyId(),

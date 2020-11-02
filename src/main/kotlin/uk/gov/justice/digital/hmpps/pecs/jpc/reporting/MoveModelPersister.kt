@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.equalsStringCaseInsensitive
 
 @Component
 class MoveModelPersister(private val moveModelRepository: MoveModelRepository, private val journeyModelRepository: JourneyModelRepository) {
@@ -34,8 +35,8 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
                         // create new move model
                         val moveModel = MoveModel(
                                 moveId = moveId,
-                                supplier = Supplier.valueOf(supplier.toUpperCase()),
-                                status = MoveStatus.valueOf(status.toUpperCase()),
+                                supplier = Supplier.valueOfCaseInsensitive(supplier),
+                                status = MoveStatus.valueOfCaseInsensitive(status),
                                 movePriceType = mpt,
                                 reference = reference,
                                 moveDate = moveDate,
@@ -70,12 +71,12 @@ class MoveModelPersister(private val moveModelRepository: MoveModelRepository, p
         with(journeyWithEvents) {
             val pickUp = Event.getLatestByType(journeyWithEvents.events, EventType.JOURNEY_START)?.occurredAt
             val dropOff = Event.getLatestByType(journeyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
-            val isCancelled = journeyWithEvents.journey.state == JourneyState.CANCELLED.value
+            val isCancelled = JourneyState.CANCELLED.equalsStringCaseInsensitive(journeyWithEvents.journey.state)
 
             return JourneyModel(
                     journeyId = journeyId,
                     moveId = moveId,
-                    state = JourneyState.valueOf(journey.state.toUpperCase()),
+                    state = JourneyState.valueOfCaseInsensitive(journey.state),
                     fromNomisAgencyId = journey.fromNomisAgencyId,
                     toNomisAgencyId = journey.toNomisAgencyId,
                     pickUpDateTime = pickUp,
@@ -94,5 +95,5 @@ private val noteworthyEvents = listOf(
         EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END, EventType.JOURNEY_LODGING, EventType.MOVE_CANCEL).map { it.value }
 
 fun List<Event>.notes() = filter { it.type in noteworthyEvents && !it.notes.isNullOrBlank() }.
-joinToString() {"${it.type}: ${it.notes}"}
+joinToString {"${it.type}: ${it.notes}"}
 
