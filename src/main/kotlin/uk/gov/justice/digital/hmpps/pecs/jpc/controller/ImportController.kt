@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.SpreadsheetProtection
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.SpreadsheetProtection
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.io.FileInputStream
 import java.io.IOException

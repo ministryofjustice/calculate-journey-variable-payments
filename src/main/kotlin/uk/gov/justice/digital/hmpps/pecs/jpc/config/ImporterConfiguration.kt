@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ResourceLoader
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.POISpreadsheetProtection
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.SpreadsheetProtection
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.POISpreadsheetProtection
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.SpreadsheetProtection
 import java.time.Clock
 import java.time.LocalDateTime
 

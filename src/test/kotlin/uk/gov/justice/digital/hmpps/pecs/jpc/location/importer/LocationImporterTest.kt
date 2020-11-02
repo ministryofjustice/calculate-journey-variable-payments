@@ -5,6 +5,8 @@ import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.location.LocationsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.location.LocationsSpreadsheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
