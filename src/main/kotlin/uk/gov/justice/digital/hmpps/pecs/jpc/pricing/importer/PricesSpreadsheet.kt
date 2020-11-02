@@ -51,11 +51,8 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
 
         return Price(
                 supplier = supplier,
-                fromLocationName = fromLocationName,
-                fromLocationId = fromLocation.id,
-                toLocationName = toLocationName,
-                toLocationId = toLocation.id,
-                journeyId = journeyId.toInt(),
+                fromLocation = fromLocation,
+                toLocation = toLocation,
                 priceInPence = price)
     }
 

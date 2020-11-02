@@ -14,17 +14,18 @@ import javax.validation.constraints.NotBlank
 @Table(name = "LOCATIONS")
 data class Location(
         @Enumerated(EnumType.STRING)
+        @Column(name = "location_type", nullable = false)
         val locationType: LocationType,
 
-        @Column(unique = true, nullable = false)
+        @Column(name = "nomis_agency_id", unique = true, nullable = false)
         @get: NotBlank(message = "NOMIS agency id cannot be blank")
         val nomisAgencyId: String,
 
-        @Column(unique = true, nullable = false)
+        @Column(name = "site_name", unique = true, nullable = false)
         @get: NotBlank(message = "site name cannot be blank")
         val siteName: String,
 
-        @Column(nullable = false)
+        @Column(name = "added_at", nullable = false)
         val addedAt: LocalDateTime = LocalDateTime.now(),
 
         @Id

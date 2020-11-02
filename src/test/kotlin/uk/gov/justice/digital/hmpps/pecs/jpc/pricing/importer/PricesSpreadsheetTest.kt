@@ -61,10 +61,8 @@ internal class PricesSpreadsheetTest {
         internal fun `can map row to price`() {
             val price = spreadsheet.mapToPrice(row)
 
-            assertThat(price.fromLocationId).isEqualTo(fromLocation.id)
-            assertThat(price.fromLocationName).isEqualTo("FROM SITE")
-            assertThat(price.toLocationId).isEqualTo(toLocation.id)
-            assertThat(price.toLocationName).isEqualTo("TO SITE")
+            assertThat(price.fromLocation).isEqualTo(fromLocation)
+            assertThat(price.toLocation).isEqualTo(toLocation)
             assertThat(price.priceInPence).isEqualTo(10000)
         }
 

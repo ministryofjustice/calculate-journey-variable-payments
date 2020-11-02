@@ -8,13 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.JourneyPrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.*
-import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -25,52 +21,25 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
 
     @Test
     internal fun `test cancelled prices`() {
-        val moveDate = LocalDate.of(2020, 9, 10)
-        val move = moveFactory(
-                moveId = "M9",
-                status = MoveStatus.CANCELLED.value,
-                fromLocation = fromLocationFactory(locationType = LocationType.PR),
-                toLocation = toLocationFactory(locationType = LocationType.PR),
-                cancellationReason = "cancelled_by_pmu",
-                date = moveDate
-        )
-
-        val person = personFactory()
-
-        val journeyWithEvents = JourneyWithEvents(journeyFactory(billable = true), listOf())
-        val cancelledBillable = Report(
-                move = move,
-                person = person,
-                events = listOf(
-                        moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = moveDate.atStartOfDay().minusHours(24)),
-                        moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", notes = "Cancelled due to snow", occurredAt = moveDate.atStartOfDay().minusHours(2))
-                ),
-                journeysWithEvents = listOf()
-        )
-
-        val fromLocation = fromLocationFactory(locationType = LocationType.PR)
-        val toLocation = toLocationFactory(locationType = LocationType.PR)
-        val price = MovePrice(cancelledBillable, listOf(JourneyPrice(journeyWithEvents, 1001)))
+        val move = moveModel(journeys = mutableListOf(journeyModel(state = JourneyState.CANCELLED)))
+        val moves = MovesAndSummary(listOf(move), Summary())
 
         val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
-        sheet.writeMoves(listOf(price))
+        sheet.writeMoves(moves)
 
-        assertCellEquals(sheet, 10, 0, cancelledBillable.move.reference)
-        assertCellEquals(sheet, 10, 1, fromLocation.siteName)
-        assertCellEquals(sheet, 10, 2, fromLocation.locationType.name) // pick up location type
+        assertCellEquals(sheet, 10, 0, "REF1")
 
-        assertCellEquals(sheet, 10, 3, toLocation.siteName)
-        assertCellEquals(sheet, 10, 4, toLocation.locationType.name) // drop off location type
+        assertCellEquals(sheet, 10, 1, "from") // pick up sitename
+        assertCellEquals(sheet, 10, 2, "PR") // pick up location type
+        assertCellEquals(sheet, 10, 3, "to") // drop off sitename
+        assertCellEquals(sheet, 10, 4, "PR") // drop off location type
 
-        assertCellEquals(sheet, 10, 5, "10/09/2020") // move date
+        assertCellEquals(sheet, 10, 5, "10/09/2020") // Move date
+        assertCellEquals(sheet, 10, 6, "10/09/2020") // Cancellation date
+        assertCellEquals(sheet, 10, 7, "10:00") // Cancellation time
 
-        assertCellEquals(sheet, 10, 6, "09/09/2020") // cancellation date
-        assertCellEquals(sheet, 10, 7, "22:00") // cancellation time
-
-        assertCellEquals(sheet, 10, 8, person.prisonNumber)
-        assertCellEquals(sheet, 10, 9, 10.01) // price
-        assertCellEquals(sheet, 10, 10, "MoveCancel: Cancelled due to snow") // notes
-
-
+        assertCellEquals(sheet, 10, 8, "PR101") // prison number
+        assertCellEquals(sheet, 10, 9, 1.0) // price
+        assertCellEquals(sheet, 10, 10, "some notes") // should only show the redirect event notes
     }
 }

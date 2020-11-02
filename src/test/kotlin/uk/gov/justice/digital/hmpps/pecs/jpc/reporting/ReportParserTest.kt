@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.output.assertCellEquals
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 
 
@@ -16,8 +17,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 @Import(TestConfig::class)
 @ActiveProfiles("test")
 internal class ReportParserTest {
-
-    val locations = listOf(fromLocationFactory(), toLocationFactory())
 
     fun profileReports() : List<String> {
         val report1 = """{"id":"PR1","person_id":"PE1"}""".trimIndent()
@@ -85,7 +84,7 @@ internal class ReportParserTest {
     @Test
     fun `Get import moves should return only unique, completed moves`() {
 
-        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, moveReports(), locations)
+        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, moveReports())
         assertThat(moves.map { it.id }).containsExactly("M1", "M4")
 
         // M1 should be complete
@@ -96,7 +95,7 @@ internal class ReportParserTest {
     fun `Assert no Move created from bad json and no exception generated`() {
         val moveJsonWithNullFromLocation = """{"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null, "rejection_reason":null,"from_location_type":"prison","from_location":null,"to_location_type":"prison","to_location":"GNI","supplier":"geoamey"}
 """
-        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, listOf(moveJsonWithNullFromLocation), locations)
+        val moves = ReportParser.parseAsMoves(Supplier.GEOAMEY, listOf(moveJsonWithNullFromLocation))
 
         Assertions.assertEquals(0, moves.size)
     }
@@ -104,19 +103,19 @@ internal class ReportParserTest {
     @Test
     fun `Get import journeys`() {
 
-        val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports(), listOf())
+        val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports())
 
         // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
-        Assertions.assertEquals(setOf("M1", "M2", "M3"), journeys.keys)
+        assertThat(journeys.keys).containsExactlyInAnyOrder("M1", "M2", "M3")
 
         // Move 1 should have 1 journey (the same updated journey)
-        Assertions.assertEquals(1, journeys.getValue("M1").size)
+        assertThat(journeys.getValue("M1").size).isEqualTo(1)
 
         // This journey should have been updated to billable=true
-        Assertions.assertEquals(true, journeys.getValue("M1")[0].billable)
+        assertThat(journeys.getValue("M1")[0].billable).isTrue
 
         // Move 2 should have 2 journeys
-        Assertions.assertEquals(2, journeys.getValue("M2").size)
+        assertThat(journeys.getValue("M2").size).isEqualTo(2)
     }
 
     @Test
@@ -152,10 +151,10 @@ internal class ReportParserTest {
         val move1 = movesWithJourneysAndEvents.find { it.move.id == "M1" }!!
 
         // Move1 should have two events
-        assertThat(move1.events.map{it.id}).isEqualTo(listOf("E1", "E4"))
+        assertThat(move1.events.map{it.id}).containsExactly("E1", "E4")
 
         // Move1's first journey should have event 3
-        assertThat(move1.journeysWithEvents[0].events.map { it.id }).isEqualTo(listOf("E3"))
+        assertThat(move1.journeysWithEvents[0].events.map { it.id }).containsExactly("E3")
 
         // Move 1 should have Person PE1
         assertThat(move1.person?.id).isEqualTo("PE1")

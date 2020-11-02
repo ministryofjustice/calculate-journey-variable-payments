@@ -5,16 +5,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.MovePriceType
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.PriceCalculator
-import uk.gov.justice.digital.hmpps.pecs.jpc.calculator.withType
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.Report
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelJdbcRepository
+
 import java.io.File
 import java.io.FileOutputStream
 
@@ -23,51 +21,52 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
                                  @Autowired private val timeSource: TimeSource,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                  @Autowired private val geoameyPricesProvider: GeoameyPricesProvider,
-                                 @Autowired private val calculator: PriceCalculator) {
+                                 @Autowired private val moveModelJdbcRepository: MoveModelJdbcRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    internal fun generate(filter: FilterParams, moves: List<Report>): File {
+    internal fun generate(filter: FilterParams): File {
         val dateGenerated = timeSource.date()
 
         XSSFWorkbook(template.get()).use { workbook ->
 
             val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
 
-            val allPrices = calculator.allPrices(filter, moves)
-            fun PriceSheet.add(type: MovePriceType) = writeMoves(allPrices.withType(type).prices)
+            val moves = moveModelJdbcRepository.findSummaryForSupplierInDateRange(filter.supplier, filter.movesFrom, filter.movesTo)
 
-            StandardMovesSheet(workbook, header)
-                    .also { logger.info("Adding standard prices.") }
-                    .apply { add(MovePriceType.STANDARD) }
+            with(moves) {
+                StandardMovesSheet(workbook, header)
+                        .also { logger.info("Adding standard prices.") }
+                        .apply { writeMoves(standard) }
 
-            RedirectionMovesSheet(workbook, header)
-                    .also { logger.info("Adding redirect prices.") }
-                    .apply { add(MovePriceType.REDIRECTION) }
+                RedirectionMovesSheet(workbook, header)
+                        .also { logger.info("Adding redirect prices.") }
+                        .apply { writeMoves(redirection) }
 
-            LongHaulMovesSheet(workbook, header)
-                    .also { logger.info("Adding long haul prices.") }
-                    .apply { add(MovePriceType.LONG_HAUL) }
+                LongHaulMovesSheet(workbook, header)
+                        .also { logger.info("Adding long haul prices.") }
+                        .apply { writeMoves(longHaul) }
 
-            LockoutMovesSheet(workbook, header)
-                    .also { logger.info("Adding lockout prices.") }
-                    .apply { add(MovePriceType.LOCKOUT) }
+                LockoutMovesSheet(workbook, header)
+                        .also { logger.info("Adding lockout prices.") }
+                        .apply { writeMoves(lockout) }
 
-            MultiTypeMovesSheet(workbook, header)
-                    .also { logger.info("Adding multi-type prices.") }
-                    .apply { add(MovePriceType.MULTI) }
+                MultiTypeMovesSheet(workbook, header)
+                        .also { logger.info("Adding multi-type prices.") }
+                        .apply { writeMoves(multi) }
 
-            CancelledMovesSheet(workbook, header)
-                    .also { logger.info("Adding cancelled moves.") }
-                    .apply { add(MovePriceType.CANCELLED) }
+                CancelledMovesSheet(workbook, header)
+                        .also { logger.info("Adding cancelled moves.") }
+                        .apply { writeMoves(cancelled) }
 
-            SummarySheet(workbook, header)
-                    .also { logger.info("Adding summaries.") }
-                    .apply { writeSummaries(allPrices.map { it.summary }) }
+                SummarySheet(workbook, header)
+                        .also { logger.info("Adding summaries.") }
+                        .apply { writeSummaries(moves) }
 
-            JPCPriceBookSheet(workbook)
-                    .also { logger.info("Adding supplier JPC price book used.") }
-                    .apply { copyPricesFrom(originalPricesSheetFor(header.supplier)) }
+                JPCPriceBookSheet(workbook)
+                        .also { logger.info("Adding supplier JPC price book used.") }
+                        .apply { copyPricesFrom(originalPricesSheetFor(header.supplier)) }
+            }
 
             return createTempFile(suffix = "xlsx").apply {
                 FileOutputStream(this).use {

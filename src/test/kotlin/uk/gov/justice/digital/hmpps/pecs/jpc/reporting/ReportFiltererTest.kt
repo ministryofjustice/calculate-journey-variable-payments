@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import java.time.LocalDate
 
@@ -101,8 +100,10 @@ internal class ReportFiltererTest{
             move = moveFactory(
                     moveId = "M9",
                     status = MoveStatus.CANCELLED.value,
-                    fromLocation = fromLocationFactory(locationType = LocationType.PR),
-                    toLocation = toLocationFactory(locationType = LocationType.PR),
+                    fromLocation = fromPrisonNomisAgencyId(),
+                    fromLocationType = "prison",
+                    toLocation = toCourtNomisAgencyId(),
+                    toLocationType = "prison",
                     cancellationReason = "cancelled_by_pmu",
                     date = to
             ),

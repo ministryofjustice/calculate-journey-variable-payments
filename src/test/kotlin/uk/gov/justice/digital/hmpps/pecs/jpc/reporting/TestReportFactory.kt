@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.reporting
 
-import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Price
@@ -22,40 +21,31 @@ const val defaultPersonId="PE1"
 
 val defaultSupplier =  Supplier.SERCO.reportingName()
 
-fun json(vararg x: Any) = x.joinToString("\n") { Klaxon().toJsonString(it) }
+fun fromPrisonNomisAgencyId() = "WYI"
+fun WYIPrisonLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
 
-fun fromLocationFactory(
-        locationType: LocationType = LocationType.PR,
-        nomisAgencyId : String = "WYI",
-        siteName: String = "from"
-): Location{
-    return Location(locationType, nomisAgencyId, siteName)
+fun toCourtNomisAgencyId() = "GNI"
+fun GNICourtLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
+
+fun testAgencyId2Location(agencyId: String) : Location?{
+    return when(agencyId){
+        "WYI" -> WYIPrisonLocation()
+        "GNI" -> GNICourtLocation()
+        else -> Location(id = UUID.randomUUID(), locationType = LocationType.UNKNOWN, nomisAgencyId = agencyId, siteName = agencyId)
+    }
 }
 
-fun toLocationFactory(
-        locationType: LocationType = LocationType.CO,
-        nomisAgencyId : String = "GNI",
-        siteName: String = "to"
-): Location{
-    return Location(locationType, nomisAgencyId, siteName)
-}
 
-fun noLocationFactory() =  Location(LocationType.UNKNOWN, "NOT_MAPPED_AGENCY_ID", "NOT_MAPPED_AGENCY_ID")
-
+fun notMappedNomisAgencyId() =  "NOT_MAPPED_AGENCY_ID"
 
 fun priceFactory(
         supplier: Supplier = Supplier.SERCO,
-        fromSiteName: String = "from",
-        toSiteName: String = "to",
         priceInPence: Int = 101): Price {
 
     return Price(
-            journeyId = 1,
             supplier = supplier,
-            fromLocationName = fromSiteName,
-            fromLocationId = UUID.randomUUID(),
-            toLocationName = toSiteName,
-            toLocationId = UUID.randomUUID(),
+            fromLocation = WYIPrisonLocation(),
+            toLocation = GNICourtLocation(),
             priceInPence = priceInPence
     )
 }
@@ -65,8 +55,10 @@ fun moveFactory(
         supplier: String = defaultSupplier,
         profileId: String = defaultProfileId,
         status: String = MoveStatus.COMPLETED.value,
-        fromLocation: Location = fromLocationFactory(),
-        toLocation : Location = toLocationFactory(),
+        fromLocation: String = fromPrisonNomisAgencyId(),
+        fromLocationType: String = "prison",
+        toLocation : String = toCourtNomisAgencyId(),
+        toLocationType: String = "court",
         cancellationReason: String = "",
         date: LocalDate = defaultDate
     ): Move {
@@ -75,10 +67,12 @@ fun moveFactory(
             supplier = supplier,
             profileId = profileId,
             reference = "UKW4591N",
-            date = date,
+            moveDate = date,
             status = status,
-            fromLocation = fromLocation,
-            toLocation = toLocation,
+            fromNomisAgencyId = fromLocation,
+            fromLocationType = fromLocationType,
+            toNomisAgencyId = toLocation,
+            toLocationType = toLocationType,
             cancellationReason = cancellationReason
     )
     return move
@@ -121,8 +115,8 @@ fun journeyFactory(
         state: String = JourneyState.COMPLETED.value,
         supplier: String = defaultSupplier,
         billable: Boolean = false,
-        fromLocation: Location = fromLocationFactory(),
-        toLocation : Location = toLocationFactory(),
+        fromLocation: String = fromPrisonNomisAgencyId(),
+        toLocation : String = toCourtNomisAgencyId(),
         vehicleRegistration: String? ="UHE-92"
 
 ): Journey{
@@ -134,8 +128,8 @@ fun journeyFactory(
             state=state,
             supplier= supplier,
             vehicleRegistration=vehicleRegistration,
-            fromLocation=fromLocation,
-            toLocation=toLocation)
+            fromNomisAgencyId=fromLocation,
+            toNomisAgencyId=toLocation)
     return journey
 }
 

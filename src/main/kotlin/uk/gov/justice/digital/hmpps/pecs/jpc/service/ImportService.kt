@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
 import java.io.File
 import java.lang.IllegalArgumentException
@@ -23,7 +23,7 @@ class ImportService(
         private val priceImporter: PriceImporter,
         private val reportImporter: ReportImporter,
         private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator,
-        private val locationsRepository: LocationRepository) {
+        private val reportModelPersister: MoveModelPersister) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -56,26 +56,25 @@ class ImportService(
 
     fun importPrices(supplier: Supplier) = importUnlessLocked { priceImporter.import(supplier) }
 
-    fun spreadsheet(
-            supplierName: String,
-            movesFrom: LocalDate,
-            movesTo: LocalDate,
-            reportsTo: LocalDate): File? {
+    fun importReports(supplierName: String, reportsFrom: LocalDate, reportsTo: LocalDate) {
 
-        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo' and reports to '$reportsTo'.")
+        logger.info("Importing reports for supplier '$supplierName', moves from '$reportsFrom', moves to '$reportsTo'.")
 
-        if (movesFrom.plusMonths(2).isBefore(movesTo)) throw IllegalArgumentException("A maximum of two months data can be queried at a time.")
+        val supplier = Supplier.valueOf(supplierName.toUpperCase())
+        val (reports, status) = importUnlessLocked { reportImporter.import(supplier, reportsFrom, reportsTo) }
 
-        return if (importLocations().second == ImportStatus.IN_PROGRESS) null
-        else if (importPrices(Supplier.valueOf(supplierName.toUpperCase())).second == ImportStatus.IN_PROGRESS) null
-        else {
-            val supplier = Supplier.valueOf(supplierName.toUpperCase())
-            val (reports, status) = importUnlessLocked { reportImporter.import(supplier, movesFrom, reportsTo, locationsRepository.findAll().toList()) }
-            if (reports != null) {
-                pricesSpreadsheetGenerator.generate(FilterParams(supplier, movesFrom, movesTo), reports.toList())
-            } else {
-                null
-            }
+        reports?.let{
+            reportModelPersister.persist(FilterParams(supplier, reportsFrom, reportsTo), it.toList())
         }
+    }
+
+    fun spreadsheet(supplierName: String, movesFrom: LocalDate, movesTo: LocalDate): File? {
+
+        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo'")
+
+        if (movesTo.plusDays(1).minusMonths(1).isAfter(movesFrom))
+            throw IllegalArgumentException("A maximum of one month's data can be queried at a time.")
+
+        return pricesSpreadsheetGenerator.generate(FilterParams(Supplier.valueOf(supplierName.toUpperCase()), movesFrom, movesTo))
     }
 }
