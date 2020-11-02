@@ -46,11 +46,20 @@ data class MoveTypeWithMovesAndSummary(
     fun summariesByMoveType() = allByMoveType().map { (k, v) -> (k to v.summary) }.toMap()
 
     val uniqueJourneys = UniqueJourneys(
-            allByMoveType().flatMap { it.value.moves }.distinctBy { "${it.fromNomisAgencyId}-${it.toNomisAgencyId}" }.map {
-                UniqueJourney(it.fromNomisAgencyId, it.fromSiteName, it.fromLocationType, it.toNomisAgencyId, it.toSiteName, it.toLocationType,
-                        it.fromSiteName != null && it.toSiteName != null, it.hasPrice())
+            allByMoveType().
+            flatMap { it.value.moves }.
+            distinctBy { "${it.fromNomisAgencyId}-${it.toNomisAgencyId}" }.
+            map {
+                UniqueJourney(
+                    it.fromNomisAgencyId,
+                    it.fromSiteName,
+                    it.fromLocationType,
+                    it.toNomisAgencyId,
+                    it.toSiteName,
+                    it.toLocationType,
+                    it.fromSiteName != null && it.toSiteName != null,
+                    it.hasPrice())
             })
-
 }
 
 data class UniqueJourneys(val journeys: List<UniqueJourney>) {

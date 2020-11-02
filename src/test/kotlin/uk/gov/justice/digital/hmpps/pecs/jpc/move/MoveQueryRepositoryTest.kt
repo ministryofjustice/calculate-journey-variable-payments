@@ -46,10 +46,10 @@ internal class MoveQueryRepositoryTest {
     val wyi = WYIPrisonLocation()
     val gni = GNICourtLocation()
 
-    val standardMoveWithoutJourneys = moveModel(moveId = "NOJOURNEYS", dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(20))
-    val standardMoveWithJourneys = moveModel( dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(5)) // should appear before the one above
-    val journeyModel1 = journeyModel()
-    val journeyModel2 = journeyModel(journeyId = "J2")
+    val standardMoveWithoutJourneys = move(moveId = "NOJOURNEYS", dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(20))
+    val standardMoveWithJourneys = move( dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(5)) // should appear before the one above
+    val journeyModel1 = journey()
+    val journeyModel2 = journey(journeyId = "J2")
 
     @BeforeEach
     fun beforeEach(){
@@ -82,8 +82,8 @@ internal class MoveQueryRepositoryTest {
 
         moveRepository.save(standardMoveWithJourneys)
 
-        val nonBillableJourney = journeyModel(journeyId = "J3", billable = false)
-        val journeyWithoutDropOffDate = journeyModel(journeyId = "J4", pickUpDateTime = null, dropOffDateTime = null)
+        val nonBillableJourney = journey(journeyId = "J3", billable = false)
+        val journeyWithoutDropOffDate = journey(journeyId = "J4", pickUpDateTime = null, dropOffDateTime = null)
 
         journeyRepository.save(journeyModel1)
         journeyRepository.save(journeyModel2)

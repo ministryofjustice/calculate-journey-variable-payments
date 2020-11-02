@@ -19,9 +19,9 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
     @Test
     internal fun `test redirection prices`() {
 
-        val journey1 = journeyModel()
-        val journey2 = journeyModel()
-        val move = moveModel(journeys = mutableListOf(journey1, journey2))
+        val journey1 = journey()
+        val journey2 = journey()
+        val move = move(journeys = mutableListOf(journey1, journey2))
         val moves = MovesAndSummary(listOf(move), Summary())
         
         val sheet = RedirectionMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))

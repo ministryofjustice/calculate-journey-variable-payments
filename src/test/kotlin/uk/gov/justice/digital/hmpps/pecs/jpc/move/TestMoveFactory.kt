@@ -9,8 +9,10 @@ import java.time.LocalDateTime
 
 val moveDate = LocalDate.of(2020, 9, 10)
 
-fun moveModel(
+fun move(
         moveId: String = "M1",
+        fromNomisAgencyId: String = "WYI",
+        toNomisAgencyId: String = "GNI",
         dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
         journeys: MutableList<Journey> = mutableListOf()
 ) = Move(
@@ -20,10 +22,10 @@ fun moveModel(
         status = MoveStatus.COMPLETED,
         reference = "REF1",
         moveDate = moveDate,
-        fromNomisAgencyId = "WYI",
+        fromNomisAgencyId = fromNomisAgencyId,
         fromSiteName = "from",
         fromLocationType = LocationType.PR,
-        toNomisAgencyId = "GNI",
+        toNomisAgencyId = toNomisAgencyId,
         toSiteName = "to",
         toLocationType = LocationType.PR,
         pickUpDateTime = moveDate.atStartOfDay(),
@@ -33,7 +35,7 @@ fun moveModel(
         vehicleRegistration = "reg100",
         journeys = journeys)
 
-fun journeyModel(
+fun journey(
         journeyId: String = "J1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
@@ -44,7 +46,7 @@ fun journeyModel(
 ) = Journey(
         journeyId = journeyId,
         state = state,
-        moveId = moveModel().moveId,
+        moveId = move().moveId,
         fromNomisAgencyId = fromNomisAgencyId,
         fromSiteName = "from",
         fromLocationType = LocationType.PR,

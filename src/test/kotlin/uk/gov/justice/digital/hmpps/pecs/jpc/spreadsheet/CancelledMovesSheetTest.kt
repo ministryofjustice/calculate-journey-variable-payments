@@ -22,7 +22,7 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
 
     @Test
     internal fun `test cancelled prices`() {
-        val move = moveModel(journeys = mutableListOf(journeyModel(state = JourneyState.CANCELLED)))
+        val move = move(journeys = mutableListOf(journey(state = JourneyState.CANCELLED)))
         val moves = MovesAndSummary(listOf(move), Summary())
 
         val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))

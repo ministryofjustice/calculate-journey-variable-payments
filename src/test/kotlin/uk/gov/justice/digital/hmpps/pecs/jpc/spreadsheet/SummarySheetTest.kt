@@ -18,7 +18,7 @@ internal class SummarySheetTest(@Autowired private val template: JPCTemplateProv
     @Test
     internal fun `summary prices`() {
 
-        val move = moveModel(journeys = mutableListOf(journeyModel()))
+        val move = move(journeys = mutableListOf(journey()))
         val moves = MovesAndSummary(listOf(move), Summary(10.0, 2, 1, 200))
         val longHaulMoves = MovesAndSummary(listOf(move), Summary(50.0, 10, 10, 400))
         val allMoves = MoveTypeWithMovesAndSummary(moves, longHaulMoves, moves, moves, moves, moves)

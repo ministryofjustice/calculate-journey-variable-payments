@@ -21,7 +21,7 @@ internal class MoveRepositoryTest {
     @Test
     fun `save report model`() {
 
-        val moveModel = moveModel(moveId = UUID.randomUUID().toString())
+        val moveModel = move(moveId = UUID.randomUUID().toString())
         val persistedReport = moveRepository.save(moveModel)
 
         entityManager.flush()

@@ -46,7 +46,7 @@ internal class StandardMovesSheetTest(@Autowired private val template: JPCTempla
     internal fun `test prices`() {
         val sms = StandardMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
 
-        val move = moveModel(journeys = mutableListOf(journeyModel()))
+        val move = move(journeys = mutableListOf(journey()))
         val moves = MovesAndSummary(listOf(move), Summary())
 
         sms.writeMoves(moves)
