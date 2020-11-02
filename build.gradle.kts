@@ -22,6 +22,7 @@ dependencies {
 	implementation("org.ocpsoft.prettytime:prettytime-nlp:4.0.4.Final")
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.0.5")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("org.springframework.session:spring-session-jdbc")
 
 	testImplementation("org.mockito:mockito-inline:3.5.13")
 

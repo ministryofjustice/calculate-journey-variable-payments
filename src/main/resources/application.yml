@@ -13,6 +13,10 @@ spring:
     username: jpc
     password: letmein
     driverClassName: org.postgresql.Driver
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
 
 server:
   port: 8080
