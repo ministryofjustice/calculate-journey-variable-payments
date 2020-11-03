@@ -29,8 +29,8 @@
     <div class="w-25 pv2 mv2">
         <p class="govuk-body govuk-!-font-weight-bold white ma0">Total price</p>
         <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">
-            £[[${#numbers.formatDecimal(summary.totalPriceInPounds, 0, 'COMMA', 2, 'POINT')}]]</p></div>
-        <div class="pt3">
+            £[[${#numbers.formatDecimal(summary.totalPriceInPounds, 1, 'COMMA', 2, 'POINT')}]]</p></div>
+        <div class="pt3" th:if="${summary.volumeUnpriced != 0}">
             <span class="ttu govuk-body-s govuk-!-font-weight-bold white ba bw1 b--white pa1">Pending price</span>
         </div>
     </div>
