@@ -8,7 +8,7 @@
         <li class="flex-auto bl">
             <div class="pa3">
                 <p class="govuk-heading-m mb1" th:inline="text">
-                    [[${#numbers.formatDecimal(journeySummary.movesWithoutPrices, 0, 'COMMA', 0, 'POINT')}]]</p>
+                    [[${#numbers.formatDecimal(uniqueJourneys.countUnpriced(), 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
                     <p class="govuk-body mv0">Without prices</p>
                 </div>
@@ -18,7 +18,7 @@
         <li class="flex-auto bl">
             <div class="pa3">
                 <p class="govuk-heading-m mb1" th:inline="text">
-                    [[${#numbers.formatDecimal(journeySummary.movesWithoutLocations, 0, 'COMMA', 0, 'POINT')}]]</p>
+                    [[${#numbers.formatDecimal(uniqueJourneys.countUnLocationed(), 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
                     <p class="govuk-body mv0">Without locations</p>
                 </div>
@@ -27,7 +27,7 @@
         <li class="flex-auto bl">
             <div class="pa3">
                 <p class="govuk-heading-m mb1" th:inline="text">
-                    [[${#numbers.formatDecimal(journeySummary.totalUniqueJourneys, 0, 'COMMA', 0, 'POINT')}]]</p>
+                    [[${#numbers.formatDecimal(uniqueJourneys.count(), 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
                     <p class="govuk-body mv0">Total unique journeys</p>
                 </div>

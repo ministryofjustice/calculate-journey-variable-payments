@@ -3,13 +3,13 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.importer.LocationsImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.PricesSpreadsheetGenerator
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.importer.PriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelPersister
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.location.LocationsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PricesSpreadsheetGenerator
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.price.PriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveModelPersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportImporter
 import java.io.File
 import java.lang.IllegalArgumentException
 import java.time.Duration
@@ -60,7 +60,7 @@ class ImportService(
 
         logger.info("Importing reports for supplier '$supplierName', moves from '$reportsFrom', moves to '$reportsTo'.")
 
-        val supplier = Supplier.valueOf(supplierName.toUpperCase())
+        val supplier = Supplier.valueOfCaseInsensitive(supplierName)
         val (reports, status) = importUnlessLocked { reportImporter.import(supplier, reportsFrom, reportsTo) }
 
         reports?.let{
@@ -75,6 +75,6 @@ class ImportService(
         if (movesTo.plusDays(1).minusMonths(1).isAfter(movesFrom))
             throw IllegalArgumentException("A maximum of one month's data can be queried at a time.")
 
-        return pricesSpreadsheetGenerator.generate(FilterParams(Supplier.valueOf(supplierName.toUpperCase()), movesFrom, movesTo))
+        return pricesSpreadsheetGenerator.generate(FilterParams(Supplier.valueOfCaseInsensitive(supplierName), movesFrom, movesTo))
     }
 }

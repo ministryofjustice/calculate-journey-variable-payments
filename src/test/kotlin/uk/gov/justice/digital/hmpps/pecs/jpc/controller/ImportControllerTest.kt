@@ -22,8 +22,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.output.SpreadsheetProtection
-import uk.gov.justice.digital.hmpps.pecs.jpc.pricing.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.SpreadsheetProtection
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 

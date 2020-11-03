@@ -13,8 +13,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelJdbcRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportImporter
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -28,8 +28,8 @@ class TestConfig {
     private lateinit var resourceLoader: ResourceLoader
 
     @Bean
-    fun moveModelSelectRepository(@Qualifier("dataSource") dataSource: DataSource): MoveModelJdbcRepository {
-        return MoveModelJdbcRepository(JdbcTemplate(dataSource))
+    fun moveModelSelectRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository{
+        return MoveQueryRepository(JdbcTemplate(dataSource))
     }
 
     @Bean

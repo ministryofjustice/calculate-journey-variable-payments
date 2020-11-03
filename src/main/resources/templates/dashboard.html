@@ -11,8 +11,8 @@
 
 <div class="govuk-width-container" layout:fragment="content">
 
-    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#dates.monthName(currentDate)}]]
-        [[${#dates.format(currentDate, 'yyyy')}]]</h1>
+    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
+        [[${#dates.format(startOfMonthDate, 'yyyy')}]]</h1>
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -32,8 +32,8 @@
             </ul>
         </div>
         <div class="govuk-grid-column-one-third tr">
-            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplierName)}?moves_from=${#dates.format(months.previousMonth, 'yyyy-MM-dd')}&moves_to=${#dates.format(months.currentMonth, 'yyyy-MM-dd')}&reports_to=${#dates.format(months.currentMonth, 'yyyy-MM-dd')}|}"
-               th:attr="download=${'moves-' + #dates.monthName(currentDate) + '-' + #dates.format(currentDate, 'yyyy') + '.csv'}"
+            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplier.name())}?moves_from=${#dates.format(startOfMonthDate, 'yyyy-MM-dd')}&moves_to=${#dates.format(endOfMonthDate, 'yyyy-MM-dd')}|}"
+               th:attr="download=${'moves-' + #dates.monthName(startOfMonthDate) + '-' + #dates.format(endOfMonthDate, 'yyyy') + '.csv'}"
                class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
         </div>
     </div>
@@ -47,12 +47,13 @@
 
     <section class="mt5">
         <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
-        <div th:each="move: ${moves}">
+        <div th:each="typeAndSummary: ${moveTypeToSummary}">
             <div th:replace="fragments/move-by-type.html :: move"></div>
         </div>
     </section>
 
 </div>
+
 
 </body>
 
