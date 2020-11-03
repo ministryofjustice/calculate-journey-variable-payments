@@ -18,3 +18,32 @@ import-files:
 
 export-files:
   template: classpath:/spreadsheets/JPC_template.xlsx
+
+spring:
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+  security:
+    oauth2:
+      client:
+        provider:
+          hmpps:
+            authorization-uri: http://localhost:9090/auth/oauth/authorize
+#            authorization-uri: ${hmpps.auth.base.uri}/oauth/authorize
+            token-uri: http://localhost:9090/auth/oauth/token
+#            token-uri: ${hmpps.auth.base.uri}/oauth/token
+            user-info-uri: http://localhost:9090/auth/api/user/me
+#            user-info-uri: ${hmpps.auth.base.uri}/api/user/me
+            user-name-attribute: name
+        registration:
+          hmpps:
+            client-id: pecs-jpc-client
+#            client-id: ${hmpps.auth.client.id}
+            client-secret: clientsecret
+#            client-secret: ${hmpps.auth.client.secret}
+            provider: hmpps
+            scope: read
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/hmpps
+#            redirect-uri: ${hmpps.auth.redirect.base.uri}/login/oauth2/code/hmpps

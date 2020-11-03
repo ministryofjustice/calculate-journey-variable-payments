@@ -7,7 +7,12 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.*
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.MoveModelJdbcRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.reporting.ReportImporter
 import java.time.Clock
@@ -23,12 +28,9 @@ class TestConfig {
     private lateinit var resourceLoader: ResourceLoader
 
     @Bean
-    fun moveModelSelectRepository(@Qualifier("dataSource") dataSource: DataSource): MoveModelJdbcRepository{
+    fun moveModelSelectRepository(@Qualifier("dataSource") dataSource: DataSource): MoveModelJdbcRepository {
         return MoveModelJdbcRepository(JdbcTemplate(dataSource))
     }
-
-    @Bean
-    fun clock(): Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
     @Bean
     fun timeSource(): TimeSource {

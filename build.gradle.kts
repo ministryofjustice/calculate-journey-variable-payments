@@ -18,9 +18,11 @@ dependencies {
 	implementation("com.github.kittinunf.result:result-coroutines:3.1.0")
 	implementation("com.beust:klaxon:5.4")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-	implementation("com.amazonaws:aws-java-sdk-s3:1.11.876")
+	implementation("com.amazonaws:aws-java-sdk-s3:1.11.880")
 	implementation("org.ocpsoft.prettytime:prettytime-nlp:4.0.4.Final")
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.0.5")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("org.springframework.session:spring-session-jdbc")
 
 	testImplementation("org.mockito:mockito-inline:3.5.13")
 
