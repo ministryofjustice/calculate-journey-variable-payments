@@ -18,7 +18,7 @@
         </li>
         <li class="w-third pv2 mv2">
             <p class="govuk-body govuk-!-font-weight-bold white ma0">Supplier</p>
-            <div><p class="govuk-heading-m white ma0 pt1" th:text="${supplier}">${supplier}</p></div>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">[[${supplier}]]</p></div>
         </li>
     </ul>
 
