@@ -20,6 +20,10 @@ export-files:
   template: classpath:/spreadsheets/JPC_template.xlsx
 
 spring:
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
   security:
     oauth2:
       client:
