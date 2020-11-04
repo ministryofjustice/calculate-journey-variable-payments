@@ -21,9 +21,7 @@ import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ErrorResponse
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.SpreadsheetProtection
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -31,7 +29,7 @@ import java.time.LocalDateTime
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-// by passing security for now.
+// bypassing security for now.
 @EnableAutoConfiguration(exclude = [ SecurityAutoConfiguration::class, ManagementWebSecurityAutoConfiguration::class ])
 class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
 
@@ -41,36 +39,6 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
     @SpyBean
     @Autowired
     lateinit var spreadsheetProtection: SpreadsheetProtection
-
-    @Autowired
-    lateinit var locationRepository: LocationRepository
-
-    @Autowired
-    lateinit var priceRepository: PriceRepository
-
-    @Test
-    fun `can import locations`() {
-        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
-
-        assertThat(locationRepository.count()).isEqualTo(0)
-
-        val response = restTemplate.getForEntity("/import-locations", InputStreamResource::class.java)
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(locationRepository.count()).isEqualTo(2)
-    }
-
-    @Test
-    fun `can import prices`() {
-        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
-
-        assertThat(priceRepository.count()).isEqualTo(0)
-
-        val response = restTemplate.getForEntity("/import-prices/geoamey", InputStreamResource::class.java)
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-//        assertThat(priceRepository.count()).isEqualTo(2)
-    }
 
     @Test
     fun `can generate spreadsheet for serco`() {

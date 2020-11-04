@@ -39,7 +39,7 @@ internal class PriceImportTest {
 
         verify(locationRepo).findAll()
         verify(sercoPricesProvider).get()
-        verify(priceRepo).deleteAll()
+        verify(priceRepo).deleteBySupplier(Supplier.SERCO)
         verify(priceRepo, times(2)).count()
         verify(priceRepo).save(any())
     }
@@ -55,7 +55,7 @@ internal class PriceImportTest {
 
         verify(locationRepo).findAll()
         verify(geoameyPricesProvider).get()
-        verify(priceRepo).deleteAll()
+        verify(priceRepo).deleteBySupplier(Supplier.GEOAMEY)
         verify(priceRepo, times(2)).count()
         verify(priceRepo).save(any())
     }
