@@ -56,11 +56,12 @@ class ImportService(
 
     fun importPrices(supplier: Supplier) = importUnlessLocked { priceImporter.import(supplier) }
 
-    fun importReports(supplierName: String, reportsFrom: LocalDate, reportsTo: LocalDate) {
+    // TODO remove this...
+    fun importReports(supplierName: String, reportsFrom: LocalDate, reportsTo: LocalDate) = importReports(Supplier.valueOfCaseInsensitive(supplierName), reportsFrom, reportsTo)
 
-        logger.info("Importing reports for supplier '$supplierName', moves from '$reportsFrom', moves to '$reportsTo'.")
+    fun importReports(supplier: Supplier, reportsFrom: LocalDate, reportsTo: LocalDate) {
+        logger.info("Importing reports for supplier '$supplier', moves from '$reportsFrom', moves to '$reportsTo'.")
 
-        val supplier = Supplier.valueOfCaseInsensitive(supplierName)
         val (reports, status) = importUnlessLocked { reportImporter.import(supplier, reportsFrom, reportsTo) }
 
         reports?.let{

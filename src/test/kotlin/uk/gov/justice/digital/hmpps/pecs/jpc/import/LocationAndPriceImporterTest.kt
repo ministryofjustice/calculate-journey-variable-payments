@@ -40,7 +40,7 @@ internal class LocationAndPriceImporterTest(@Autowired val priceRepository: Pric
     internal fun `returns successful exit code when import succeeds`() {
         assertThat(priceRepository.count()).isEqualTo(0)
         assertThat(locationRepository.count()).isEqualTo(0)
-        assertThat(importer.exitCode).isEqualTo(0)
+        assertThat(importer.import().exitCode).isEqualTo(0)
 
         verify(priceRepositorySpy).deleteAll()
         verify(locationRepositorySpy).deleteAll()
@@ -56,6 +56,6 @@ internal class LocationAndPriceImporterTest(@Autowired val priceRepository: Pric
     internal fun `returns failure exit code when import fails`() {
         whenever(importServiceSpy.importLocations()).doThrow(RuntimeException())
 
-        assertThat(importer.exitCode).isEqualTo(1)
+        assertThat(importer.import().exitCode).isEqualTo(1)
     }
 }

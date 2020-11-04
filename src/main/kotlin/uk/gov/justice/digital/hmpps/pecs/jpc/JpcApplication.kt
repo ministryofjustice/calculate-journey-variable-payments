@@ -5,16 +5,26 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import uk.gov.justice.digital.hmpps.pecs.jpc.import.LocationAndPriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.SupplierReportsImporter
+import java.time.LocalDate
 
 @SpringBootApplication
 class JpcApplication
 
 fun main(args: Array<String>) {
     runApplication<JpcApplication>(*args).let { context ->
-
         // This is a temporary solution to run an import of locations and prices then terminate bypassing the need to go to an endpoint.
-        args.firstOrNull { it == "--import-locations-and-prices" }?.let {
-            (context.getBean(LocationAndPriceImporter::class) as LocationAndPriceImporter).let { SpringApplication.exit(context, it) }
+        context.environment.getProperty("import-locations-and-prices")?.let {
+            (context.getBean(LocationAndPriceImporter::class) as LocationAndPriceImporter).let { SpringApplication.exit(context, it.import()) }
+        }
+
+        // This is a temporary solution to run an import of both supplier reports then terminate bypassing the need to go to an endpoint.
+        context.environment.getProperty("import-supplier-reports")?.let {dates ->
+            val from = LocalDate.parse(dates.split(",")[0].trim())
+            val to = LocalDate.parse(dates.split(",")[1].trim())
+
+            (context.getBean(SupplierReportsImporter::class) as SupplierReportsImporter).let { reportImporter ->
+                SpringApplication.exit(context, reportImporter.import(from, to)) }
         }
     }
 }
