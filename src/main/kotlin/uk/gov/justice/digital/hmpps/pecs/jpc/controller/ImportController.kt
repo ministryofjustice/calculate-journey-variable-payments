@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.SpreadsheetProtection
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.io.FileInputStream
 import java.io.IOException
@@ -24,25 +23,6 @@ import javax.servlet.http.HttpServletResponse
 class ImportController(private val importService: ImportService,
                        private val timeSource: TimeSource,
                        private val spreadsheetProtection: SpreadsheetProtection) {
-
-
-    @GetMapping("/import-locations")
-    fun importLocations(
-            response: HttpServletResponse?): String {
-
-        importService.importLocations()
-        return "Done import locations"
-    }
-
-    @GetMapping("/import-prices/{supplier}")
-    fun importPrices(
-            @PathVariable supplier: String,
-            response: HttpServletResponse?): String {
-
-        importService.importPrices(Supplier.valueOfCaseInsensitive(supplier))
-
-        return "Done import prices for $supplier"
-    }
 
     @GetMapping("/import-reports/{supplier}")
     fun importReports(

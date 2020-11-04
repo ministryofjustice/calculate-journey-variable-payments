@@ -23,7 +23,7 @@ class PriceImporter(private val priceRepo: PriceRepository,
 
         logger.info("Importing prices for $supplier")
 
-        priceRepo.deleteAll()
+        priceRepo.deleteBySupplier(supplier)
 
         when(supplier) {
             Supplier.SERCO -> sercoPrices.get().use { import(it, Supplier.SERCO) }
