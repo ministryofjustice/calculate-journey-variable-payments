@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
     runApplication<JpcApplication>(*args).let { context ->
 
         // This is a temporary solution to run an import of locations and prices then terminate bypassing the need to go to an endpoint.
-        args.firstOrNull { it == "--run-import" }?.let {
+        args.firstOrNull { it == "--import-locations-and-prices" }?.let {
             (context.getBean(LocationAndPriceImporter::class) as LocationAndPriceImporter).let { SpringApplication.exit(context, it) }
         }
     }
