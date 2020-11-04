@@ -35,8 +35,6 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
     fun mapToPrice(row: Row) = getPrice(supplier, row)
 
     private fun getPrice(supplier: Supplier, row: Row): Price {
-        val journeyId = Result.runCatching { row.getCell(JOURNEY_ID).numericCellValue }.getOrElse { throw RuntimeException("Error retrieving journey id for supplier '$supplier'", it) }
-
         val fromLocationName = row.getFormattedStringCell(FROM_LOCATION) ?: throw RuntimeException("From location name cannot be blank")
 
         val toLocationName = row.getFormattedStringCell(TO_LOCATION) ?: throw RuntimeException("To location name cannot be blank")

@@ -36,6 +36,7 @@ fun move(
         journeys = journeys)
 
 fun journey(
+        moveId: String = move().moveId,
         journeyId: String = "J1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
@@ -46,7 +47,7 @@ fun journey(
 ) = Journey(
         journeyId = journeyId,
         state = state,
-        moveId = move().moveId,
+        moveId = moveId,
         fromNomisAgencyId = fromNomisAgencyId,
         fromSiteName = "from",
         fromLocationType = LocationType.PR,

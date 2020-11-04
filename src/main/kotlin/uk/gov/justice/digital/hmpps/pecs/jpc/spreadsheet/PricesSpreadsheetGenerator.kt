@@ -12,61 +12,64 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.DashboardService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 
 import java.io.File
 import java.io.FileOutputStream
+import java.time.LocalDate
 
 @Component
 class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplateProvider,
                                  @Autowired private val timeSource: TimeSource,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                  @Autowired private val geoameyPricesProvider: GeoameyPricesProvider,
-                                 @Autowired private val moveQueryRepository: MoveQueryRepository) {
+                                 @Autowired private val dashboardService: DashboardService) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    internal fun generate(filter: FilterParams): File {
+    internal fun generate(supplier: Supplier, startDate: LocalDate): File {
         val dateGenerated = timeSource.date()
 
         XSSFWorkbook(template.get()).use { workbook ->
 
-            val header = PriceSheet.Header(dateGenerated, filter.dateRange(), filter.supplier)
+            val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
 
-            val moves = moveQueryRepository.findSummaryForSupplierInDateRange(filter.supplier, filter.movesFrom, filter.movesTo)
+            val moves = dashboardService.movesForMonth(supplier, startDate)
+            val summaries = dashboardService.summariesForMonth(supplier, startDate)
 
-            with(moves) {
                 StandardMovesSheet(workbook, header)
                         .also { logger.info("Adding standard prices.") }
-                        .apply { writeMoves(standard) }
+                        .apply { writeMoves(moves[0]) }
 
                 RedirectionMovesSheet(workbook, header)
                         .also { logger.info("Adding redirect prices.") }
-                        .apply { writeMoves(redirection) }
+                        .apply { writeMoves(moves[1]) }
 
                 LongHaulMovesSheet(workbook, header)
                         .also { logger.info("Adding long haul prices.") }
-                        .apply { writeMoves(longHaul) }
+                        .apply { writeMoves(moves[2]) }
 
                 LockoutMovesSheet(workbook, header)
                         .also { logger.info("Adding lockout prices.") }
-                        .apply { writeMoves(lockout) }
+                        .apply { writeMoves(moves[3]) }
 
                 MultiTypeMovesSheet(workbook, header)
                         .also { logger.info("Adding multi-type prices.") }
-                        .apply { writeMoves(multi) }
+                        .apply { writeMoves(moves[4]) }
 
                 CancelledMovesSheet(workbook, header)
                         .also { logger.info("Adding cancelled moves.") }
-                        .apply { writeMoves(cancelled) }
+                        .apply { writeMoves(moves[5]) }
 
                 SummarySheet(workbook, header)
                         .also { logger.info("Adding summaries.") }
-                        .apply { writeSummaries(moves) }
+                        .apply { writeSummaries(summaries) }
 
                 JPCPriceBookSheet(workbook)
                         .also { logger.info("Adding supplier JPC price book used.") }
                         .apply { copyPricesFrom(originalPricesSheetFor(header.supplier)) }
-            }
+
 
             return createTempFile(suffix = "xlsx").apply {
                 FileOutputStream(this).use {

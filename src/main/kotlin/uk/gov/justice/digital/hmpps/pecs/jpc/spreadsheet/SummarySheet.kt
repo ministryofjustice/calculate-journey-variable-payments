@@ -2,24 +2,23 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveTypeWithMovesAndSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Summary
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MovesCountAndSummaries
 
 
 class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Summary")!!, header) {
 
     override fun writeMove(move: Move) {}
 
-    fun writeSummaries(moves: MoveTypeWithMovesAndSummary) {
-        with(moves){
-            writeSummary(9, standard.summary)
-            writeSummary(12, longHaul.summary)
-            writeSummary(15, redirection.summary)
-            writeSummary(18, lockout.summary)
-            writeSummary(21, multi.summary)
-            writeSummary(24, cancelled.summary)
-            writeSummary(28, summary())
-        }
+    fun writeSummaries(movesCountAndSummaries: MovesCountAndSummaries) {
+        val summaries = movesCountAndSummaries.allSummaries()
+        writeSummary(9, summaries[0])
+        writeSummary(12, summaries[1])
+        writeSummary(15, summaries[2])
+        writeSummary(18, summaries[3])
+        writeSummary(21, summaries[4])
+        writeSummary(24, summaries[5])
+        writeSummary(28, movesCountAndSummaries.summary())
 
     }
 

@@ -14,6 +14,7 @@ import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.DashboardService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter.ofPattern
@@ -32,19 +33,20 @@ class HtmlController(@Autowired val dashboardService: DashboardService) {
     }
 
     @RequestMapping("/dashboard")
-    fun dashboard(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate?, model: ModelMap): String {
-        val startOfMonthDate = (date ?: LocalDate.now()).withDayOfMonth(1)
-        val endOfMonthDate = startOfMonthDate.plusMonths(1).minusDays(1)
+    fun dashboard(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, model: ModelMap): String {
+        val startOfMonth = (localDate ?: LocalDate.now()).withDayOfMonth(1)
+        val endOfMonth = endOfMonth(startOfMonth)
         val supplier = Supplier.SERCO // FIXME get from session
-        model.addAttribute("startOfMonthDate", convertToDate(startOfMonthDate))
-        model.addAttribute("endOfMonthDate", convertToDate(endOfMonthDate))
+        model.addAttribute("startOfMonthDate", convertToDate(startOfMonth))
+        model.addAttribute("endOfMonthDate", convertToDate(endOfMonth))
         model.addAttribute("supplier", supplier)
-        val moves = dashboardService.movesForMonth(supplier, startOfMonthDate)
+        val countAndSummaries = dashboardService.summariesForMonth(supplier, startOfMonth)
+        val uniqueJourneys = dashboardService.uniqueJourneysForMonth(supplier, startOfMonth)
 
-        model.addAttribute("months", MonthsWidget(convertToDate(startOfMonthDate), nextMonth = convertToDate(startOfMonthDate.plusMonths(1)), previousMonth = convertToDate(startOfMonthDate.minusMonths(1))))
-        model.addAttribute("summary", moves.summary())
-        model.addAttribute("uniqueJourneys", moves.uniqueJourneys)
-        model.addAttribute("moveTypeToSummary", moves.summariesByMoveType())
+        model.addAttribute("months", MonthsWidget(convertToDate(startOfMonth), nextMonth = convertToDate(startOfMonth.plusMonths(1)), previousMonth = convertToDate(startOfMonth.minusMonths(1))))
+        model.addAttribute("summary", countAndSummaries.summary())
+        model.addAttribute("uniqueJourneys", uniqueJourneys)
+        model.addAttribute("summaries", countAndSummaries.allSummaries())
         return "dashboard"
     }
 
