@@ -13,11 +13,38 @@ env:
   - name: SPRING_PROFILES_ACTIVE
     value: "logstash"
 
-  - name: APP_DB_URL
+  - name: DB_HOST
     valueFrom:
       secretKeyRef:
         name: "{{ .Values.db.secret_name }}"
-        key: url
+        key: database_host
+
+  - name: DB_PORT
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_port
+
+  - name: DB_NAME
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_name
+
+  - name: DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_username
+
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_password
+
+  - name: APP_DB_URL
+    value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?user=$(DB_USERNAME)&password=$(DB_PASSWORD)"
 
   - name: AWS_DEFAULT_REGION
     value: "eu-west-2"

@@ -35,7 +35,7 @@ spring:
 
 resources:
   provider: s3
-  endpoint.url: ${S3_ENDPOINT}
+  endpoint.url: ${S3_ENDPOINT:}
 
 import-files:
   locations: ${IMPORT_FILES_LOCATIONS}
