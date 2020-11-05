@@ -27,6 +27,9 @@ data class MonthsWidget(val currentMonth: Date, val nextMonth: Date, val previou
 @Controller
 class HtmlController(@Autowired val dashboardService: DashboardService) {
 
+    @ModelAttribute("supplier")
+    fun supplier() = Supplier.SERCO // FIXME get from session
+
     @RequestMapping("/")
     fun homepage(model: ModelMap): RedirectView {
         return RedirectView("/dashboard")
@@ -36,12 +39,10 @@ class HtmlController(@Autowired val dashboardService: DashboardService) {
     fun dashboard(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, model: ModelMap): String {
         val startOfMonth = (localDate ?: LocalDate.now()).withDayOfMonth(1)
         val endOfMonth = endOfMonth(startOfMonth)
-        val supplier = Supplier.SERCO // FIXME get from session
         model.addAttribute("startOfMonthDate", convertToDate(startOfMonth))
         model.addAttribute("endOfMonthDate", convertToDate(endOfMonth))
-        model.addAttribute("supplier", supplier)
-        val countAndSummaries = dashboardService.summariesForMonth(supplier, startOfMonth)
-        val uniqueJourneys = dashboardService.uniqueJourneysForMonth(supplier, startOfMonth)
+        val countAndSummaries = dashboardService.summariesForMonth(supplier(), startOfMonth)
+        val uniqueJourneys = dashboardService.uniqueJourneysForMonth(supplier(), startOfMonth)
 
         model.addAttribute("months", MonthsWidget(convertToDate(startOfMonth), nextMonth = convertToDate(startOfMonth.plusMonths(1)), previousMonth = convertToDate(startOfMonth.minusMonths(1))))
         model.addAttribute("summary", countAndSummaries.summary())
