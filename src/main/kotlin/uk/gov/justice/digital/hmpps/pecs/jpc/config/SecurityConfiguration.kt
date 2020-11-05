@@ -14,6 +14,8 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http {
             authorizeRequests {
+                authorize("/health/**", permitAll)
+                authorize("/info", permitAll)
                 authorize(anyRequest, authenticated)
             }
             exceptionHandling {
