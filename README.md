@@ -27,16 +27,17 @@ The command will launch:
 - [Localstack](https://github.com/localstack/localstack) (which is used to mock Amazon S3)
 - Postgres
 
-Next, head over to Intellij and configure the Spring Boot's profile to use Localstack in `Run > Edit configurations`:
+Next, head over to Intellij and set the environment variables from .env into the Run Configuration `Run > Edit configurations`:
 
-![Configure the Spring Profile in Intellij](assets/spring-profile.png)
+![Configure the Spring Profile in Intellij](assets/environment_variables.png)
 
 You can run the application from Intelli with `Run > Run`.
 
 If you prefer to run the app from the command line, you can do so from the root of the project with:
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=localstack'
+export $(cat .env | xargs)  # If you want to set or update the current shell environment
+./gradlew bootRun '
 ```
 
 ### Common gradle tasks 

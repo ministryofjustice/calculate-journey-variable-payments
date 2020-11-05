@@ -13,28 +13,52 @@ env:
   - name: SPRING_PROFILES_ACTIVE
     value: "logstash"
 
-  - name: APP_DB_URL
+  - name: DB_HOST
     valueFrom:
       secretKeyRef:
         name: "{{ .Values.db.secret_name }}"
-        key: url
+        key: database_host
+
+  - name: DB_PORT
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_port
+
+  - name: DB_NAME
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_name
+
+  - name: DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_username
+
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.db.secret_name }}"
+        key: database_password
+
+  - name: APP_DB_URL
+    value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?user=$(DB_USERNAME)&password=$(DB_PASSWORD)"
 
   - name: AWS_DEFAULT_REGION
     value: "eu-west-2"
 
-  - name: resources.provider
-    value: "s3"
-
-  - name: import-files.locations
+  - name: IMPORT_FILES_LOCATIONS
     value: "schedule_34_locations.xlsx"
 
-  - name: import-files.serco-prices
+  - name: IMPORT_FILES_PRICES_SERCO
     value: "serco_prices.xlsx"
 
-  - name: import-files.geo-prices
+  - name: IMPORT_FILES_PRICES_GEO
     value: "geoamey_prices.xlsx"
 
-  - name: export-files.template
+  - name: EXPORT_FILES_TEMPLATE
     value: "classpath:/spreadsheets/JPC_template.xlsx"
 
   - name: JPC_AWS_ACCESS_KEY_ID

@@ -9,14 +9,41 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/jpc
-    username: jpc
-    password: letmein
+    url: ${APP_DB_URL}
     driverClassName: org.postgresql.Driver
   session:
     store-type: jdbc
     jdbc:
       initialize-schema: always
+  security:
+    oauth2:
+      client:
+        provider:
+          hmpps:
+            authorization-uri: ${HMPPS_AUTH_BASE_URI}/oauth/authorize
+            token-uri: ${HMPPS_AUTH_BASE_URI}/oauth/token
+            user-info-uri: ${HMPPS_AUTH_BASE_URI}/api/user/me
+            user-name-attribute: name
+        registration:
+          hmpps:
+            client-id: ${HMPPS_AUTH_CLIENT_ID}
+            client-secret: ${HMPPS_AUTH_CLIENT_SECRET}
+            provider: hmpps
+            scope: read
+            authorization-grant-type: authorization_code
+            redirect-uri: ${HMPPS_AUTH_REDIRECT_BASE_URI}
+
+resources:
+  provider: s3
+  endpoint.url: ${S3_ENDPOINT:}
+
+import-files:
+  locations: ${IMPORT_FILES_LOCATIONS}
+  serco-prices: ${IMPORT_FILES_PRICES_SERCO}
+  geo-prices: ${IMPORT_FILES_PRICES_GEO}
+
+export-files:
+  template: ${EXPORT_FILES_TEMPLATE}
 
 server:
   port: 8080
