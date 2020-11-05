@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.web.servlet.invoke
 
 // TODO for now this is tied to run for localstack profile only!!
-@Profile("localstack")
 @EnableWebSecurity
 class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
