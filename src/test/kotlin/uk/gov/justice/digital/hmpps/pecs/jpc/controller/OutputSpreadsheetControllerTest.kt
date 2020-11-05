@@ -31,7 +31,7 @@ import java.time.LocalDateTime
 @ContextConfiguration(classes = [TestConfig::class])
 // bypassing security for now.
 @EnableAutoConfiguration(exclude = [ SecurityAutoConfiguration::class, ManagementWebSecurityAutoConfiguration::class ])
-class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
+class OutputSpreadsheetControllerTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @MockBean
     lateinit var timeSource: TimeSource

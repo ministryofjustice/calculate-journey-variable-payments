@@ -65,7 +65,7 @@ internal class MovePersisterTest {
         val journey1 = reportJourneyFactory().copy(id = UUID.randomUUID().toString(), billable = true, vehicleRegistration = "REG1")
         val journey2 = reportJourneyFactory().copy(id = UUID.randomUUID().toString(), billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
 
-        val completedMoveWithPricedBillableJourney = Report(
+        val completedRedirectMoveWithPricedBillableJourney = Report(
                 reportMove = redirectMove,
                 reportPerson = reportPersonFactory(),
                 reportEvents = listOf(
@@ -101,10 +101,10 @@ internal class MovePersisterTest {
         val persister = MoveModelPersister(moveRepository, journeyRepository)
         val params = FilterParams(Supplier.SERCO, from, to)
 
-        persister.persist(params, listOf(completedMoveWithPricedBillableJourney, multiMoveBecauseNoJourney))
+        persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney, multiMoveBecauseNoJourney))
 
         // persist again to check this works
-        persister.persist(params, listOf(completedMoveWithPricedBillableJourney.copy(reportMove = redirectMove.copy(reference = "NEWREF"))))
+        persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney.copy(reportMove = redirectMove.copy(reference = "NEWREF"))))
 
         entityManager.flush()
 

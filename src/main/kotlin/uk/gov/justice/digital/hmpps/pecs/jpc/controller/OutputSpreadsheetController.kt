@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-class ImportController(private val importService: ImportService,
-                       private val timeSource: TimeSource,
-                       private val spreadsheetProtection: SpreadsheetProtection) {
+class OutputSpreadsheetController(private val importService: ImportService,
+                                  private val timeSource: TimeSource,
+                                  private val spreadsheetProtection: SpreadsheetProtection) {
 
     @GetMapping("/import-reports/{supplier}")
     fun importReports(
