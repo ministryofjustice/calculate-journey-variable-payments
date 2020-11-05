@@ -40,6 +40,7 @@ workflows:
             branches:
               only:
                 - main
+                - dev
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -47,6 +48,7 @@ workflows:
             branches:
               only:
                 - main
+                - dev
           requires:
             - validate
             - build_docker
