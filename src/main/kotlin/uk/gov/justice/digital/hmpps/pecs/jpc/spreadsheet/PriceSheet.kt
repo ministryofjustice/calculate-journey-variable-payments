@@ -4,7 +4,6 @@ import org.apache.poi.ss.usermodel.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovesAndSummary
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -124,7 +123,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         }
     }
 
-    fun writeMoves(movesAndSummary: MovesAndSummary) = movesAndSummary.moves.forEach { writeMove(it) }
+    fun writeMoves(moves: List<Move>) = moves.forEach { writeMove(it) }
 
     /**
      * Implemented in subclasses for specific move price type

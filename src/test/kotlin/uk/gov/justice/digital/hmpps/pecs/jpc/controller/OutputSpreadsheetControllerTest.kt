@@ -31,7 +31,7 @@ import java.time.LocalDateTime
 @ContextConfiguration(classes = [TestConfig::class])
 // bypassing security for now.
 @EnableAutoConfiguration(exclude = [ SecurityAutoConfiguration::class, ManagementWebSecurityAutoConfiguration::class ])
-class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
+class OutputSpreadsheetControllerTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @MockBean
     lateinit var timeSource: TimeSource
@@ -45,21 +45,10 @@ class ImportControllerTest(@Autowired val restTemplate: TestRestTemplate) {
         whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
         whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-10-31", InputStreamResource::class.java)
+        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01", InputStreamResource::class.java)
 
         verify(spreadsheetProtection).protectAndGet(any())
         assertThat(response.headers.contentDisposition.filename).isEqualTo("Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-    }
-
-    @Test
-    fun `generate-prices-spreadsheet fails if more than one months data is requested`() {
-        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
-        whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
-
-        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01&moves_to=2020-11-01", ErrorResponse::class.java)
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertThat(response?.body?.developerMessage).isEqualTo("A maximum of one month's data can be queried at a time.")
     }
 }

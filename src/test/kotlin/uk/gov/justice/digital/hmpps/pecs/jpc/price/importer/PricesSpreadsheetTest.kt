@@ -113,14 +113,6 @@ internal class PricesSpreadsheetTest {
                     .hasMessage("Error retrieving price for supplier 'GEOAMEY'")
         }
 
-        @Test
-        internal fun `throws error if problem reading journey id`() {
-            row.getCell(0).setCellValue("string instead of numeric")
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("Error retrieving journey id for supplier 'GEOAMEY'")
-        }
 
         @Test
         internal fun `cannot map row to price when to site not found`() {

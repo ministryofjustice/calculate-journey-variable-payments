@@ -11,7 +11,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveModelPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportImporter
 import java.io.File
-import java.lang.IllegalArgumentException
 import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicBoolean
@@ -69,13 +68,10 @@ class ImportService(
         }
     }
 
-    fun spreadsheet(supplierName: String, movesFrom: LocalDate, movesTo: LocalDate): File? {
+    fun spreadsheet(supplierName: String, startDate: LocalDate): File? {
 
-        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$movesFrom', moves to '$movesTo'")
+        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$startDate''")
 
-        if (movesTo.plusDays(1).minusMonths(1).isAfter(movesFrom))
-            throw IllegalArgumentException("A maximum of one month's data can be queried at a time.")
-
-        return pricesSpreadsheetGenerator.generate(FilterParams(Supplier.valueOfCaseInsensitive(supplierName), movesFrom, movesTo))
+        return pricesSpreadsheetGenerator.generate(Supplier.valueOfCaseInsensitive(supplierName), startDate)
     }
 }

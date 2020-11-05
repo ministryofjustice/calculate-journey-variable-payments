@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-class ImportController(private val importService: ImportService,
-                       private val timeSource: TimeSource,
-                       private val spreadsheetProtection: SpreadsheetProtection) {
+class OutputSpreadsheetController(private val importService: ImportService,
+                                  private val timeSource: TimeSource,
+                                  private val spreadsheetProtection: SpreadsheetProtection) {
 
     @GetMapping("/import-reports/{supplier}")
     fun importReports(
@@ -41,10 +41,9 @@ class ImportController(private val importService: ImportService,
     fun generateSpreadsheet(
             @PathVariable supplier: String,
             @RequestParam(name = "moves_from", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
-            @RequestParam(name = "moves_to", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesTo: LocalDate,
             response: HttpServletResponse?): ResponseEntity<InputStreamResource?>? {
 
-        return importService.spreadsheet(supplier, movesFrom, movesTo)?.let { file ->
+        return importService.spreadsheet(supplier, movesFrom)?.let { file ->
             val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("YYYY-MM-dd_HH_mm"))
             val filename = "Journey_Variable_Payment_Output_${supplier}_${uploadDateTime}.xlsx"
             val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")

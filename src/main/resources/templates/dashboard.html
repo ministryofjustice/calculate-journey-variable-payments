@@ -32,7 +32,7 @@
             </ul>
         </div>
         <div class="govuk-grid-column-one-third tr">
-            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplier.name())}?moves_from=${#dates.format(startOfMonthDate, 'yyyy-MM-dd')}&moves_to=${#dates.format(endOfMonthDate, 'yyyy-MM-dd')}|}"
+            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplier.name())}?moves_from=${#dates.format(startOfMonthDate, 'yyyy-MM-dd')}|}"
                th:attr="download=${'moves-' + #dates.monthName(startOfMonthDate) + '-' + #dates.format(endOfMonthDate, 'yyyy') + '.csv'}"
                class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
         </div>
@@ -47,7 +47,7 @@
 
     <section class="mt5">
         <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
-        <div th:each="typeAndSummary: ${moveTypeToSummary}">
+        <div th:each="summary: ${summaries}">
             <div th:replace="fragments/move-by-type.html :: move"></div>
         </div>
     </section>

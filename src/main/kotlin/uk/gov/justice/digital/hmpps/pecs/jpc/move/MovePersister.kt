@@ -55,7 +55,7 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
                         val journeyModels = report.journeysWithEventReports.map { journeyModel(moveModel.moveId, it) }
                         moveModel.addJourneys(*journeyModels.toTypedArray())
 
-                        val saved = moveRepository.save(moveModel)
+                        moveRepository.save(moveModel)
 
                     }.onFailure { logger.warn(it.message) }
                 }

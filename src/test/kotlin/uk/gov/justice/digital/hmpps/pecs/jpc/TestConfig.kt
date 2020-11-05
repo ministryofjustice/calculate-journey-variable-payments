@@ -39,7 +39,7 @@ class TestConfig {
 
     @Bean
     fun dataSource(): DataSource {
-        return DataSourceBuilder.create().url("jdbc:h2:mem:testdb").build()
+        return DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
     }
 
     @Bean
