@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-data class Summary(
+data class MovesSummary(
         val moveType: MoveType? = null,
         val percentage: Double = 0.0,
         val volume: Int = 0,

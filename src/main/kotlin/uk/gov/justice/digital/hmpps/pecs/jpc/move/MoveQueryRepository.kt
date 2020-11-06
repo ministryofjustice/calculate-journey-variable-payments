@@ -15,7 +15,7 @@ import java.time.LocalDate
 @Component
 class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
-    fun movesCount(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): Int {
+    fun countForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): Int {
         val rowMapper: RowMapper<Int> = RowMapper<Int> { resultSet: ResultSet, _: Int ->
             resultSet.getInt("moves_count")
         }
@@ -29,11 +29,11 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 rowMapper)[0]
     }
 
-    fun summaries(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, totalMoves: Int): List<Summary> {
-        val rowMapper = RowMapper<Summary> { resultSet: ResultSet, _: Int ->
+    fun summariesForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, totalMoves: Int): List<MovesSummary> {
+        val rowMapper = RowMapper<MovesSummary> { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 val count = getInt("moves_count")
-                Summary(
+                MovesSummary(
                     moveType = MoveType.valueOfCaseInsensitive(getString("move_price_type")),
                     percentage = count.toDouble() / totalMoves,
                     volume = count,
@@ -69,7 +69,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 rowMapper)
     }
 
-    fun findAllForSupplierAndMoveTypeInDateRange(supplier: Supplier, moveType: MoveType, startDate: LocalDate, endDateInclusive: LocalDate): List<Move> {
+    fun allForSupplierAndMoveTypeInDateRange(supplier: Supplier, moveType: MoveType, startDate: LocalDate, endDateInclusive: LocalDate, limit: Int = 50, offset: Long = 0): List<Move> {
         val rowMapper = RowMapper { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 val move = Move(
@@ -135,7 +135,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 "left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
                 "left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id " +
                 "where m.supplier = ? and m.move_price_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
-                "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST",
+                "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST " +
+                "LIMIT $limit OFFSET $offset",
                 arrayOf(
                         supplier.name,
                         moveType.name,
@@ -150,10 +151,10 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         }
     }
 
-    fun uniqueJourneys(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): UniqueJourneys{
-        val rowMapper = RowMapper<UniqueJourneys> { resultSet: ResultSet, _: Int ->
+    fun uniqueJourneysSummaryForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): JourneysSummary{
+        val rowMapper = RowMapper<JourneysSummary> { resultSet: ResultSet, _: Int ->
             with(resultSet) {
-                UniqueJourneys(
+                JourneysSummary(
                         count = getInt("unique_journeys"),
                         totalPriceInPence = getInt("total_price_in_pence"),
                         countWithoutLocations = getInt("count_without_locations"),
@@ -188,8 +189,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 rowMapper)[0]
     }
 
-    fun allMoves(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) =
-            MoveType.values().map { findAllForSupplierAndMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) }
+    fun allForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) =
+            MoveType.values().map { allForSupplierAndMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) }
 
     class MoveAndJourney(val move: Move, val journey: Journey?)
 }

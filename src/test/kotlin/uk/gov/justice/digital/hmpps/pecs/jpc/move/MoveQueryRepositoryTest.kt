@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
@@ -17,6 +19,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.util.UUID
 
 @ActiveProfiles("test")
@@ -69,7 +72,7 @@ internal class MoveQueryRepositoryTest {
         val move = moveQueryRepository.findAllForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
 
         // Move should be priced
-        assertThat(move.hasPrice()).isTrue()
+        assertTrue(move.hasPrice())
     }
 
     @Test
@@ -88,14 +91,14 @@ internal class MoveQueryRepositoryTest {
         assertThat(move.journeys.size).isEqualTo(4)
 
         // Journey 1 should have a price because it's billable
-        assertThat(move.journeys[0].hasPrice()).isTrue
+        assertTrue(move.journeys[0].hasPrice())
 
         // Journey 3 should not have a price because it's not billable
-        assertThat(move.journeys[2].hasPrice()).isFalse()
+        assertFalse(move.journeys[2].hasPrice())
 
 
        // Move should not be priced if one or more journeys is not priced
-        assertThat(move.hasPrice()).isFalse()
+        assertFalse(move.hasPrice())
     }
 
     @Test

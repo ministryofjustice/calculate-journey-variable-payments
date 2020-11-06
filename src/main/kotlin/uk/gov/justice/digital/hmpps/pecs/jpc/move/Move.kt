@@ -116,7 +116,7 @@ data class Move(
         }
 
         override fun toString(): String {
-                return "MoveModel(moveId='$moveId', supplier=$supplier, movePriceType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOffOrCancelled=$dropOffOrCancelledDateTime, notes='$notes', prisonNumber=$prisonNumber, vehicleRegistration=$vehicleRegistration)"
+                return "Move(moveId='$moveId', supplier=$supplier, movePriceType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOffOrCancelled=$dropOffOrCancelledDateTime, notes='$notes', prisonNumber=$prisonNumber, vehicleRegistration=$vehicleRegistration)"
         }
 
         fun hasPrice() = totalInPence() != null

@@ -9,8 +9,9 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.DashboardService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MovesForMonthService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.time.LocalDate
 import java.time.ZoneId
@@ -23,7 +24,7 @@ import javax.validation.Valid
 data class MonthsWidget(val currentMonth: Date, val nextMonth: Date, val previousMonth: Date)
 
 @Controller
-class HtmlController(@Autowired val dashboardService: DashboardService) {
+class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) {
 
     @RequestMapping("/")
     fun homepage(model: ModelMap): RedirectView {
@@ -47,14 +48,19 @@ class HtmlController(@Autowired val dashboardService: DashboardService) {
         return RedirectView("/dashboard")
     }
 
-    @RequestMapping("/dashboard")
-    fun dashboard(@SessionAttribute(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
+    private fun addStartAndEndDatesToModel(localDate: LocalDate?, model: ModelMap): LocalDate{
         val startOfMonth = (localDate ?: LocalDate.now()).withDayOfMonth(1)
         val endOfMonth = endOfMonth(startOfMonth)
         model.addAttribute("startOfMonthDate", convertToDate(startOfMonth))
         model.addAttribute("endOfMonthDate", convertToDate(endOfMonth))
-        val countAndSummaries = dashboardService.summariesForMonth(supplier, startOfMonth)
-        val uniqueJourneys = dashboardService.uniqueJourneysForMonth(supplier, startOfMonth)
+        return startOfMonth
+    }
+
+    @RequestMapping("/dashboard")
+    fun dashboard(@SessionAttribute(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
+        val startOfMonth = addStartAndEndDatesToModel(localDate, model)
+        val countAndSummaries = movesForMonthService.moveTypeSummaries(supplier, startOfMonth)
+        val uniqueJourneys = movesForMonthService.journeysSummary(supplier, startOfMonth)
 
         model.addAttribute("supplier", supplier)
         model.addAttribute("months", MonthsWidget(convertToDate(startOfMonth), nextMonth = convertToDate(startOfMonth.plusMonths(1)), previousMonth = convertToDate(startOfMonth.minusMonths(1))))
