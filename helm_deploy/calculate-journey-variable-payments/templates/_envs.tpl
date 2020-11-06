@@ -103,5 +103,10 @@ env:
         name: {{ template "app.name" . }}
         key: SPREADSHEET_PASSWORD
 
+  - name: HMPPS_AUTH_BASE_URI
+    value: "{{ .Values.env.HMPPS_AUTH_BASE_URI }}"
+
+  - name: HMPPS_AUTH_REDIRECT_BASE_URI
+    value: "{{ .Values.env.HMPPS_AUTH_REDIRECT_BASE_URI }}"
 
 {{- end -}}
