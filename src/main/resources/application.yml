@@ -31,7 +31,7 @@ spring:
             provider: hmpps
             scope: read
             authorization-grant-type: authorization_code
-            redirect-uri: ${HMPPS_AUTH_REDIRECT_BASE_URI}
+            redirect-uri: ${HMPPS_AUTH_REDIRECT_BASE_URI}/login/oauth2/code/hmpps
 
 resources:
   provider: s3
