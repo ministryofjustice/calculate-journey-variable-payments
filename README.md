@@ -39,6 +39,24 @@ If you prefer to run the app from the command line, you can do so from the root 
 export $(cat .env | xargs)  # If you want to set or update the current shell environment
 ./gradlew bootRun '
 ```
+### Running imports from the commandline
+
+Importing locations and prices:
+
+```bash
+export $(cat .env | xargs)  # If you want to set or update the current shell environment
+
+java -jar app.jar --spring.main.web-application-type=none --import-locations-and-prices
+```
+
+Importing supplier reports for given dates:
+
+```bash
+export $(cat .env | xargs)  # If you want to set or update the current shell environment
+
+java -jar app.jar --spring.main.web-application-type=none --import-supplier-reports=2020-10-01,2020-10-02
+```
+
 
 ### Common gradle tasks 
 To list project dependencies, run:

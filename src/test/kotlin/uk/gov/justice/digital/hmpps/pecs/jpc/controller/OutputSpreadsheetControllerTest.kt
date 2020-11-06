@@ -30,8 +30,6 @@ import java.time.LocalDateTime
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-// bypassing security for now.
-@EnableAutoConfiguration(exclude = [ SecurityAutoConfiguration::class, ManagementWebSecurityAutoConfiguration::class ])
 class OutputSpreadsheetControllerTest(@Autowired val restTemplate: TestRestTemplate) {
 
     @MockBean
@@ -49,7 +47,7 @@ class OutputSpreadsheetControllerTest(@Autowired val restTemplate: TestRestTempl
 
         val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01", InputStreamResource::class.java)
 
-//        verify(spreadsheetProtection).protectAndGet(any())
+        verify(spreadsheetProtection).protectAndGet(any())
         assertThat(response.headers.contentDisposition.filename).isEqualTo("Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
