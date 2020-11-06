@@ -21,7 +21,6 @@ ingress:
 
 env:
   JAVA_OPTS: "-Xmx2048m"
-
   HMPPS_AUTH_BASE_URI: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
   HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments.hmpps.service.justice.gov.uk"
 
