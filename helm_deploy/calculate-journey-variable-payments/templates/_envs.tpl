@@ -109,4 +109,16 @@ env:
   - name: HMPPS_AUTH_REDIRECT_BASE_URI
     value: "{{ .Values.env.HMPPS_AUTH_REDIRECT_BASE_URI }}"
 
+  - name: HMPPS_AUTH_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "app.name" . }}
+        key: HMPPS_AUTH_CLIENT_ID
+
+  - name: HMPPS_AUTH_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "app.name" . }}
+        key: HMPPS_AUTH_CLIENT_SECRET
+
 {{- end -}}
