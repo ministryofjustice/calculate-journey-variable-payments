@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.import.location
 
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
-import uk.gov.justice.digital.hmpps.pecs.jpc.InboundSpreadsheet
+import uk.gov.justice.digital.hmpps.pecs.jpc.import.InboundSpreadsheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
