@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/empty}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+
+    <h1 class="govuk-heading-xl mv2 pt2" th:inline="text">Choose a supplier</h1>
+
+    <ul class="list pl3 pb5">
+        <li><a href="/choose-supplier/geoamey" class="govuk-link govuk-heading-m">GeoAmy</a></li>
+        <li><a href="/choose-supplier/serco" class="govuk-link govuk-heading-m">Serco</a></li>
+    </ul>
+
+</div>
+
+</body>
+
+</html>
