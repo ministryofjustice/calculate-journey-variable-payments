@@ -97,12 +97,6 @@ env:
         name: {{ template "app.name" . }}
         key: BASM_AWS_SECRET_ACCESS_KEY
 
-  - name: SPREADSHEET_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: {{ template "app.name" . }}
-        key: SPREADSHEET_PASSWORD
-
   - name: HMPPS_AUTH_BASE_URI
     value: "{{ .Values.env.HMPPS_AUTH_BASE_URI }}"
 
