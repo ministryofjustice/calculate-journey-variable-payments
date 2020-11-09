@@ -49,7 +49,20 @@ export $(cat .env | xargs)  # If you want to set or update the current shell env
 java -jar app.jar --spring.main.web-application-type=none --import-locations-and-prices
 ```
 
-Importing supplier reports for given dates:
+
+Importing supplier reports with no supplied dates:
+
+*Note: using this defaults to one days worth of report data ending on the previous day to today's date.  If the current date is 30th November then from and to would be from 28th to 29th November.*
+
+```bash
+export $(cat .env | xargs)  # If you want to set or update the current shell environment
+
+java -jar app.jar --spring.main.web-application-type=none --import-supplier-reports
+```
+
+Importing supplier reports with supplied dates:
+
+*Note: care should be taken when supplying the date range.  This should not go beyond a month period due to the volume of reporting data*
 
 ```bash
 export $(cat .env | xargs)  # If you want to set or update the current shell environment

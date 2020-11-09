@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.LocationAndPriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.SupplierReportsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import java.time.LocalDate
 
 @SpringBootApplication
@@ -19,12 +20,23 @@ fun main(args: Array<String>) {
         }
 
         // This is a temporary solution to run an import of both supplier reports then terminate bypassing the need to go to an endpoint.
-        context.environment.getProperty("import-supplier-reports")?.let {dates ->
-            val from = LocalDate.parse(dates.split(",")[0].trim())
-            val to = LocalDate.parse(dates.split(",")[1].trim())
+        context.environment.getProperty("import-supplier-reports")?.let { dates ->
+            if (dates.isNotEmpty()) {
+                val from = LocalDate.parse(dates.split(",")[0].trim())
+                val to = LocalDate.parse(dates.split(",")[1].trim())
 
-            (context.getBean(SupplierReportsImporter::class) as SupplierReportsImporter).let { reportImporter ->
-                SpringApplication.exit(context, reportImporter.import(from, to)) }
+                (context.getBean(SupplierReportsImporter::class) as SupplierReportsImporter).let { reportImporter ->
+                    SpringApplication.exit(context, reportImporter.import(from, to)) }
+            } else {
+                (context.getBean(TimeSource::class) as TimeSource).let { ts ->
+                    val to = ts.date().minusDays(1)
+                    val from = to.minusDays(1)
+
+                    (context.getBean(SupplierReportsImporter::class) as SupplierReportsImporter).let { reportImporter ->
+                        SpringApplication.exit(context, reportImporter.import(from, to))
+                    }
+                }
+            }
         }
     }
 }
