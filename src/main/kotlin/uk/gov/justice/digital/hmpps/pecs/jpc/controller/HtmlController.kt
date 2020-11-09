@@ -48,10 +48,7 @@ class HtmlController(@Autowired val dashboardService: DashboardService) {
     }
 
     @RequestMapping("/dashboard")
-    fun dashboard(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier?, model: ModelMap): Any {
-        if (supplier == null) {
-            return RedirectView("/choose-supplier")
-        }
+    fun dashboard(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
         val startOfMonth = (localDate ?: LocalDate.now()).withDayOfMonth(1)
         val endOfMonth = endOfMonth(startOfMonth)
         model.addAttribute("startOfMonthDate", convertToDate(startOfMonth))
@@ -68,10 +65,7 @@ class HtmlController(@Autowired val dashboardService: DashboardService) {
     }
 
     @RequestMapping("/select-month", method = [RequestMethod.GET])
-    fun selectMonth(@SessionAttribute(name = "supplier") supplier: Supplier?, model: ModelMap): Any {
-        if (supplier == null) {
-            return RedirectView("/choose-supplier")
-        }
+    fun selectMonth(@SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
         model.addAttribute("supplier", supplier)
         model.addAttribute("form", JumpToMonthForm(date = ""))
         return "select-month"
