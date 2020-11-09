@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "app.fullname" . }}
+  labels:
+    app: {{ template "app.name" . }}
+    chart: {{ template "app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+
+spec:
+  schedule: "0 3 */1 * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: calculate-journey-variable-payments
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              command: ["java", "-jar", "/app/app.jar", "--import-locations-and-prices" ]
+          {{ include "deployment.envs" . | nindent 14 }}
+          restartPolicy: OnFailure
