@@ -4,8 +4,8 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.LocationAndPriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.SupplierReportsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.LocationAndPriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.SupplierReportsImporter
 import java.time.LocalDate
 
 @SpringBootApplication

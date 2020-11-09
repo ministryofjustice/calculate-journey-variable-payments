@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.*
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.equalsStringCaseInsensitive
 

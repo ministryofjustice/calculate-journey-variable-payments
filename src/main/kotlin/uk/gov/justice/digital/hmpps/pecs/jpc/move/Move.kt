@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate

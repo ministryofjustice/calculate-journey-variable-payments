@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.location.LocationsImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.price.PriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.location.LocationsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveModelPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.Duration

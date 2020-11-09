@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertTrue
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,8 +15,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.report.GNICourtLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.report.WYIPrisonLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
 import java.util.UUID
 
 @ActiveProfiles("test")
@@ -71,7 +69,7 @@ internal class MoveQueryRepositoryTest {
         val move = moveQueryRepository.findAllForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
 
         // Move should be priced
-        assertTrue(move.hasPrice())
+        assertThat(move.hasPrice()).isTrue()
     }
 
     @Test
@@ -90,14 +88,14 @@ internal class MoveQueryRepositoryTest {
         assertThat(move.journeys.size).isEqualTo(4)
 
         // Journey 1 should have a price because it's billable
-        assertTrue(move.journeys[0].hasPrice())
+        assertThat(move.journeys[0].hasPrice()).isTrue
 
         // Journey 3 should not have a price because it's not billable
-        assertFalse(move.journeys[2].hasPrice())
+        assertThat(move.journeys[2].hasPrice()).isFalse()
 
 
        // Move should not be priced if one or more journeys is not priced
-        assertFalse(move.hasPrice())
+        assertThat(move.hasPrice()).isFalse()
     }
 
     @Test

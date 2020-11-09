@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.sql.ResultSet
