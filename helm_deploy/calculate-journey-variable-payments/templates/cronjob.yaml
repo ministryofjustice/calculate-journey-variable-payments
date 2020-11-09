@@ -19,6 +19,6 @@ spec:
           containers:
             - name: calculate-journey-variable-payments
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-              command: ["java", "-jar", "/app/app.jar", "--import-locations-and-prices" ]
+              command: ["java", "-jar", "/app/app.jar", "--import-supplier-reports" ]
           {{ include "deployment.envs" . | nindent 14 }}
           restartPolicy: OnFailure
