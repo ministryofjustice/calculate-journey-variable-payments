@@ -6,10 +6,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportFilterer
 
 enum class MoveType(val text: String, val filterer: (p: FilterParams, m: Collection<Report>) -> Sequence<Report>){
     STANDARD("Standard", ReportFilterer::standardMoveReports),
-    LONG_HAUL("Long Haul", ReportFilterer::longHaulReports),
+    LONG_HAUL("Long haul", ReportFilterer::longHaulReports),
     REDIRECTION("Redirection", ReportFilterer::redirectionReports),
     LOCKOUT("Lockout", ReportFilterer::lockoutReports),
-    MULTI("Multi", ReportFilterer::multiTypeReports),
+    MULTI("Multi-type", ReportFilterer::multiTypeReports),
     CANCELLED("Cancelled", ReportFilterer::cancelledBillableMoves);
 
     companion object{
