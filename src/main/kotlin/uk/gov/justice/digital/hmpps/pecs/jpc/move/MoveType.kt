@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.Report
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportFilterer
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Report
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportFilterer
 
 enum class MoveType(val text: String, val filterer: (p: FilterParams, m: Collection<Report>) -> Sequence<Report>){
     STANDARD("Standard", ReportFilterer::standardMoveReports),

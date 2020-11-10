@@ -9,15 +9,22 @@ import org.springframework.context.annotation.Import
 
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.ReportJourneyWithEvents
-import uk.gov.justice.digital.hmpps.pecs.jpc.import.report.Report
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.FilterParams
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportJourneyWithEvents
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Report
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportJourneyEventFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportJourneyFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportMoveEventFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportMoveFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportPersonFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.report.*
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import java.time.LocalDate
 import java.util.UUID
 
