@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
+import junit.framework.Assert.assertFalse
+import junit.framework.Assert.assertTrue
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -69,7 +71,7 @@ internal class MoveQueryRepositoryTest {
 
     @Test
     fun `move should be priced if all journeys are billable`() {
-        val move = moveQueryRepository.findAllForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        val move = moveQueryRepository.allForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
 
         // Move should be priced
         assertTrue(move.hasPrice())
@@ -86,15 +88,15 @@ internal class MoveQueryRepositoryTest {
 
         entityManager.flush()
 
-        val move = moveQueryRepository.findAllForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        val move = moveQueryRepository.allForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
 
         assertThat(move.journeys.size).isEqualTo(4)
 
         // Journey 1 should have a price because it's billable
-        assertTrue(move.journeys[0].hasPrice())
+        assertTrue(move.journeys.find { it.journeyId == "J1" }!!.hasPrice())
 
         // Journey 3 should not have a price because it's not billable
-        assertFalse(move.journeys[2].hasPrice())
+        assertFalse(move.journeys.find { it.journeyId == "J3" }!!.hasPrice())
 
 
        // Move should not be priced if one or more journeys is not priced
@@ -122,8 +124,8 @@ internal class MoveQueryRepositoryTest {
         entityManager.flush()
 
         // The moves with no journeys, unbillable journey and unpriced journey should come out as unpried
-        val summaries = moveQueryRepository.summaries(Supplier.SERCO, moveDate, moveDate, 4)
-        assertThat(summaries).containsExactly(Summary(MoveType.STANDARD, 1.0, 4, 2, 1998))
+        val summaries = moveQueryRepository.summariesForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate, 4)
+        assertThat(summaries).containsExactly(MovesSummary(MoveType.STANDARD, 1.0, 4, 2, 1998))
     }
 
 
@@ -157,13 +159,24 @@ internal class MoveQueryRepositoryTest {
 
         entityManager.flush()
 
-        val uniqueJourneys = moveQueryRepository.uniqueJourneys(Supplier.SERCO, moveDate, moveDate)
-        assertThat(uniqueJourneys).isEqualTo(UniqueJourneys(4, 1998, 1, 2))
+        val uniqueJourneys = moveQueryRepository.uniqueJourneysSummaryForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(uniqueJourneys).isEqualTo(JourneysSummary(4, 1998, 1, 2))
     }
 
     @Test
     fun `moves count`() {
-        val movesCount = moveQueryRepository.movesCount(Supplier.SERCO, moveDate, moveDate)
+        val movesCount = moveQueryRepository.countForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(movesCount).isEqualTo(1)
+    }
+
+    @Test
+    fun `paging`(){
+        val moves = moveQueryRepository.allForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)
+        val pageNo = 0
+        val pageSize = 50
+
+        val paging: Pageable = PageRequest.of(pageNo, pageSize)
+        val movesPage = MovesPage(moves, paging, 1)
+        println(movesPage)
     }
 }
