@@ -48,7 +48,7 @@ class HtmlController(@Autowired val dashboardService: DashboardService) {
     }
 
     @RequestMapping("/dashboard")
-    fun dashboard(@RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
+    fun dashboard(@SessionAttribute(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
         val startOfMonth = (localDate ?: LocalDate.now()).withDayOfMonth(1)
         val endOfMonth = endOfMonth(startOfMonth)
         model.addAttribute("startOfMonthDate", convertToDate(startOfMonth))
