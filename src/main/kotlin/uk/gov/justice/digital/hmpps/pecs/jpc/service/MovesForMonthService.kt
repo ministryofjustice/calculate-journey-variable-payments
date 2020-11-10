@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
@@ -35,7 +34,9 @@ class MovesForMonthService(private val moveQueryRepository: MoveQueryRepository)
         return MovesTypeSummary(moveCount, summary ?: MovesSummary(moveType))
     }
 
-    fun journeysSummary(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.uniqueJourneysSummaryForSupplierInDateRange(supplier, startDate, endOfMonth(startDate))
+    fun uniqueJourneys(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.uniqueJourneysForSupplierInDateRange(supplier, startDate, endOfMonth(startDate))
+
+    fun journeysSummary(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.journeysSummaryForSupplierInDateRange(supplier, startDate, endOfMonth(startDate))
 
     fun moveTypeSummaries(supplier: Supplier, startDate: LocalDate): MoveTypeSummaries {
         val endDate = endOfMonth(startDate)

@@ -29,16 +29,62 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 rowMapper)[0]
     }
 
+    fun uniqueJourneysForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): List<UniqueJourney> {
+        val rowMapper = RowMapper<UniqueJourney> { resultSet: ResultSet, _: Int ->
+            with(resultSet) {
+                UniqueJourney(
+                    fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
+                    fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
+                    fromSiteName = getString("journey_from_site_name"),
+                    toNomisAgencyId = getString("journey_to_nomis_agency_id"),
+                    toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
+                    toSiteName = getString("journey_to_site_name"),
+                    volume = getInt("volume"),
+                    totalPriceInPence = getInt("total_price_in_pence")
+                )
+            }
+        }
+
+        val sql = """
+            select j.from_nomis_agency_id                                     as journey_from_nomis_agency_id,
+                   jfl.site_name                                              as journey_from_site_name,
+                   jfl.location_type                                          as journey_from_location_type,
+                   j.to_nomis_agency_id                                       as journey_to_nomis_agency_id,
+                   jtl.site_name                                              as journey_to_site_name,
+                   jtl.location_type                                          as journey_to_location_type,
+                   count (CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id)) as volume,
+                   sum(case when j.billable then p.price_in_pence else case when p.price_in_pence is null then null else 0 end end) as total_price_in_pence,
+                   sum(case when jfl.site_name is null then 3 else 0 end + case when jtl.site_name is null then 2 else 0 end + case when p.price_in_pence is null then 1 else 0 end) /
+                   count (CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id)) as null_locations_and_prices_sum
+            from MOVES m
+                     inner join JOURNEYS j on j.move_id = m.move_id
+                     left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
+                     left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
+                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id
+                     where m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ?
+            GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type
+            ORDER BY null_locations_and_prices_sum desc, volume desc
+        """.trimIndent()
+
+        return jdbcTemplate.query(sql,
+                arrayOf(
+                        supplier.name,
+                        Timestamp.valueOf(startDate.atStartOfDay()),
+                        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
+                ),
+                rowMapper)
+    }
+
     fun summariesForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, totalMoves: Int): List<MovesSummary> {
         val rowMapper = RowMapper<MovesSummary> { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 val count = getInt("moves_count")
                 MovesSummary(
-                    moveType = MoveType.valueOfCaseInsensitive(getString("move_price_type")),
-                    percentage = count.toDouble() / totalMoves,
-                    volume = count,
-                    volumeUnpriced = getInt("count_unpriced"),
-                    totalPriceInPence = getInt("total_price_in_pence")
+                        moveType = MoveType.valueOfCaseInsensitive(getString("move_price_type")),
+                        percentage = count.toDouble() / totalMoves,
+                        volume = count,
+                        volumeUnpriced = getInt("count_unpriced"),
+                        totalPriceInPence = getInt("total_price_in_pence")
                 )
             }
         }
@@ -151,7 +197,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         }
     }
 
-    fun uniqueJourneysSummaryForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): JourneysSummary{
+    fun journeysSummaryForSupplierInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): JourneysSummary {
         val rowMapper = RowMapper<JourneysSummary> { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 JourneysSummary(
@@ -159,7 +205,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                         totalPriceInPence = getInt("total_price_in_pence"),
                         countWithoutLocations = getInt("count_without_locations"),
                         countUnpriced = getInt("count_unpriced")
-                        )
+                )
             }
         }
 

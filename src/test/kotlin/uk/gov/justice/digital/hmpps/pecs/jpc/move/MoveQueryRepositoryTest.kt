@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.util.UUID
 
 @ActiveProfiles("test")
@@ -130,7 +129,7 @@ internal class MoveQueryRepositoryTest {
 
 
     @Test
-    fun `unique journeys`() {
+    fun `unique journeys and journey summaries`() {
 
         val locationX  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationX", siteName = "banana")
         val locationY  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationY", siteName = "apple")
@@ -159,8 +158,17 @@ internal class MoveQueryRepositoryTest {
 
         entityManager.flush()
 
-        val uniqueJourneys = moveQueryRepository.uniqueJourneysSummaryForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
-        assertThat(uniqueJourneys).isEqualTo(JourneysSummary(4, 1998, 1, 2))
+        val summaries = moveQueryRepository.journeysSummaryForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2))
+
+        val uniqueJourneys = moveQueryRepository.uniqueJourneysForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(uniqueJourneys.size).isEqualTo(4)
+
+        // Ordered by unmapped from locations first
+        assertThat(uniqueJourneys[0].fromNomisAgencyId).isEqualTo("unmappedNomisAgencyId")
+
+        // this journey should have a volume of 2
+        assertThat(uniqueJourneys.find { it.fromNomisAgencyId == journeyModel1.fromNomisAgencyId }!!.volume).isEqualTo(2)
     }
 
     @Test

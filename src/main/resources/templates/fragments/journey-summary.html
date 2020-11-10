@@ -2,13 +2,13 @@
     <ul class="list pl0 flex mv0">
         <li class="w-40">
             <div class="pa3">
-                <a href="" class="govuk-heading-m govuk-link">Total moves by journey</a>
+                <a th:href="@{/journeys}" class="govuk-heading-m govuk-link">Total moves by journey</a>
             </div>
         </li>
         <li class="flex-auto bl">
             <div class="pa3">
                 <p class="govuk-heading-m mb1" th:inline="text">
-                    [[${#numbers.formatDecimal(uniqueJourneys.countUnpriced, 0, 'COMMA', 0, 'POINT')}]]</p>
+                    [[${#numbers.formatDecimal(journeysSummary.countUnpriced, 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
                     <p class="govuk-body mv0">Without prices</p>
                 </div>
@@ -18,7 +18,7 @@
         <li class="flex-auto bl">
             <div class="pa3">
                 <p class="govuk-heading-m mb1" th:inline="text">
-                    [[${#numbers.formatDecimal(uniqueJourneys.countWithoutLocations, 0, 'COMMA', 0, 'POINT')}]]</p>
+                    [[${#numbers.formatDecimal(journeysSummary.countWithoutLocations, 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
                     <p class="govuk-body mv0">Without locations</p>
                 </div>
@@ -27,7 +27,7 @@
         <li class="flex-auto bl">
             <div class="pa3">
                 <p class="govuk-heading-m mb1" th:inline="text">
-                    [[${#numbers.formatDecimal(uniqueJourneys.count, 0, 'COMMA', 0, 'POINT')}]]</p>
+                    [[${#numbers.formatDecimal(journeysSummary.count, 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
                     <p class="govuk-body mv0">Total unique journeys</p>
                 </div>
