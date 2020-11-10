@@ -56,6 +56,19 @@ class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) 
         return startOfMonth
     }
 
+    @RequestMapping("/moves/{moveTypeString}")
+    fun moves(@PathVariable moveTypeString:String, @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier,model: ModelMap): String {
+        val startOfMonth = addStartAndEndDatesToModel(localDate, model)
+        val moveType = MoveType.valueOfCaseInsensitive(moveTypeString)
+        val moves = movesForMonthService.movesForMoveType(supplier, moveType, startOfMonth)
+        val moveTypeSummary = movesForMonthService.summaryForMoveType(supplier, moveType, startOfMonth)
+
+        model.addAttribute("months", MonthsWidget(convertToDate(startOfMonth), nextMonth = convertToDate(startOfMonth.plusMonths(1)), previousMonth = convertToDate(startOfMonth.minusMonths(1))))
+        model.addAttribute("summary", moveTypeSummary.movesSummary)
+        model.addAttribute("moves", moves)
+        return "moves"
+    }
+
     @RequestMapping("/dashboard")
     fun dashboard(@SessionAttribute(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) localDate: LocalDate?, @SessionAttribute(name = "supplier") supplier: Supplier, model: ModelMap): Any {
         val startOfMonth = addStartAndEndDatesToModel(localDate, model)
