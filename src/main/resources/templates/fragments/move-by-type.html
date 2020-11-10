@@ -3,7 +3,7 @@
         <ul class="list pl0 flex mv0">
             <li class="flex-auto">
                 <div class="pa3">
-                    <a href="" class="govuk-heading-m govuk-link" th:text="${summary.moveType.text}">${summary.moveType.text}</a>
+                    <a th:href="@{'/moves/' + ${summary.moveType}}" class="govuk-heading-m govuk-link" th:text="${summary.moveType.text}">${summary.moveType.text}</a>
                 </div>
             </li>
             <li class="w-20 bl border-box">

@@ -20,6 +20,10 @@
             <p class="govuk-body govuk-!-font-weight-bold white ma0">Supplier</p>
             <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">[[${supplier}]]</p></div>
         </li>
+        <li th:if="${summary.moveType != null}" class="w-third pv2 mv2">
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">Move Type</p>
+            <div><p class="govuk-heading-m white ma0 pt1" th:text="${summary.moveType.text}">${summary.moveType.text}</p></div>
+        </li>
     </ul>
 
     <div class="w-25 pv3 mv3">

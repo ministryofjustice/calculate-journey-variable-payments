@@ -40,7 +40,7 @@ object ReportParser {
         return read(peopleFiles) { ReportPerson.fromJson(it) }.associateBy(ReportPerson::id)
     }
 
-    fun parseAsMoves(supplier: Supplier, moveFiles: List<String>): Collection<ReportMove> {
+    fun     parseAsMoves(supplier: Supplier, moveFiles: List<String>): Collection<ReportMove> {
         logger.info("Parsing moves")
         return read(moveFiles) { ReportMove.fromJson(it) }.
         filter {

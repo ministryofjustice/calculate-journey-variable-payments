@@ -6,11 +6,11 @@
         <title>Calculate Journey Variable Payments - GOV.UK</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <!--[if !IE 8]><!-->
-        <link rel="stylesheet" href="govuk-frontend-3.9.1.min.css">
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" th:href="@{/govuk-frontend-3.9.1.min.css}">
+        <link rel="stylesheet" th:href="@{/style.css}">
         <!--<![endif]-->
         <!--[if IE 8]>
-        <link rel="stylesheet" href="govuk-frontend-ie8-3.9.1.min.css">
+        <link rel="stylesheet" th:href="@{/govuk-frontend-ie8-3.9.1.min.css}">
         <![endif]-->
     </head>
 
@@ -51,7 +51,7 @@
                     <nav class="moj-primary-navigation" aria-label="Primary navigation">
                         <ul class="moj-primary-navigation__list">
                             <li class="moj-primary-navigation__item">
-                                <a class="moj-primary-navigation__link" href="#" aria-current="page">Move summary</a>
+                                <a class="moj-primary-navigation__link" href="#" aria-current="page">Move Summary</a>
                             </li>
 <!--                            <li class="moj-primary-navigation__item">-->
 <!--                                <a class="moj-primary-navigation__link" href="#">Managing pricing</a>-->

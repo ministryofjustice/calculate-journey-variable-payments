@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.DashboardService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MovesForMonthService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 
 import java.io.File
@@ -22,7 +22,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
                                  @Autowired private val timeSource: TimeSource,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                  @Autowired private val geoameyPricesProvider: GeoameyPricesProvider,
-                                 @Autowired private val dashboardService: DashboardService) {
+                                 @Autowired private val movesForMonthService: MovesForMonthService) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -33,8 +33,8 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
 
             val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
 
-            val moves = dashboardService.movesForMonth(supplier, startDate)
-            val summaries = dashboardService.summariesForMonth(supplier, startDate)
+            val moves = movesForMonthService.moves(supplier, startDate)
+            val summaries = movesForMonthService.moveTypeSummaries(supplier, startDate)
 
                 StandardMovesSheet(workbook, header)
                         .also { logger.info("Adding standard prices.") }

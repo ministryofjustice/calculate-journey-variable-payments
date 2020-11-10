@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content" th:inline="text">
+
+    <div th:replace="fragments/summary.html :: summary"></div>
+
+    <section class="mt5">
+        <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
+        <div th:each="move: ${moves}">
+            <div th:replace="fragments/list-moves-by-type.html :: moves"></div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+
+</html>

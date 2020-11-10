@@ -28,7 +28,7 @@ class TestConfig {
     private lateinit var resourceLoader: ResourceLoader
 
     @Bean
-    fun moveModelSelectRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository{
+    fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository{
         return MoveQueryRepository(JdbcTemplate(dataSource))
     }
 
