@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -60,4 +62,15 @@ fun journey(
         priceInPence = 100,
         vehicleRegistration = "REG200",
         notes = "some notes"
+)
+
+fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(
+        id = eventId,
+        type = eventType.value,
+        eventableType = "move",
+        eventableId = eventableId,
+        occurredAt = moveDate.atStartOfDay(),
+        recordedAt = moveDate.atStartOfDay(),
+        notes = null,
+        details = null
 )

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -65,12 +66,20 @@ data class Move(
 
         @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
         @JoinColumn(name="move_id")
-        val journeys: MutableList<Journey> = mutableListOf()
+        val journeys: MutableList<Journey> = mutableListOf(),
 
-        ) {
+        @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+        val events: MutableList<Event> = mutableListOf()
+)
+{
 
         fun addJourneys(vararg journeys: Journey) {
                 this.journeys += journeys
+        }
+
+        fun addEvents(vararg events: Event) {
+                this.events += events
         }
 
         fun totalInPence() = if(journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy { it.priceInPence ?: 0 }
@@ -130,9 +139,6 @@ data class Move(
         fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
         fun toSiteName() = toSiteName ?: toNomisAgencyId
         fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
-
-
-
 
         companion object{
                 private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")

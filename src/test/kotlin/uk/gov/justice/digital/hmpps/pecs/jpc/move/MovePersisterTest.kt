@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import java.time.LocalDate
 import java.util.UUID
 
@@ -69,40 +68,39 @@ internal class MovePersisterTest {
         val redirectMove = reportMoveFactory()
         val noJourneyMove = reportMoveFactory(moveId = "NOJOURNEY")
 
-        val journey1 = reportJourneyFactory().copy(id = UUID.randomUUID().toString(), billable = true, vehicleRegistration = "REG1")
-        val journey2 = reportJourneyFactory().copy(id = UUID.randomUUID().toString(), billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
+        val journey1 = reportJourneyFactory().copy(id = "J1", billable = true, vehicleRegistration = "REG1")
+        val journey2 = reportJourneyFactory().copy(id = "J2", billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
 
+        val moveStartEvent = reportMoveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
+        val moveRedirectEvent = reportMoveEventFactory(eventId = "E2", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7))
+        val moveCompleteEvent = reportMoveEventFactory(eventId = "E3", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
         val completedRedirectMoveWithPricedBillableJourney = Report(
-                reportMove = redirectMove,
-                reportPerson = reportPersonFactory(),
-                reportEvents = listOf(
-                        reportMoveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                        reportMoveEventFactory(type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7)),
-                        reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-                ),
-                journeysWithEventReports = listOf(
+                move = redirectMove,
+                person = reportPersonFactory(),
+                moveEvents = listOf(moveStartEvent, moveRedirectEvent, moveCompleteEvent),
+                journeysWithEvents = listOf(
                         ReportJourneyWithEvents(journey1, listOf(
-                            reportJourneyEventFactory(type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                            reportJourneyEventFactory(type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                            reportJourneyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                            reportJourneyEventFactory(journeyEventId = "E5", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
                             )
                         ),
                         ReportJourneyWithEvents(journey2, listOf(
-                                reportJourneyEventFactory(type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                                reportJourneyEventFactory(type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                                reportJourneyEventFactory(journeyEventId = "E6", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                                reportJourneyEventFactory(journeyEventId = "E7", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
                             )
                         )
                 )
         )
 
         val multiMoveBecauseNoJourney = Report(
-                reportMove = noJourneyMove,
-                reportPerson = reportPersonFactory(),
-                reportEvents = listOf(
-                        reportMoveEventFactory(type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                        reportMoveEventFactory(type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7)),
-                        reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                move = noJourneyMove,
+                person = reportPersonFactory(),
+                moveEvents = listOf(
+                        reportMoveEventFactory(eventId = "E8", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                        reportMoveEventFactory(eventId = "E9", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7)),
+                        reportMoveEventFactory(eventId = "E10", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
                 ),
-                journeysWithEventReports = listOf()
+                journeysWithEvents = listOf()
         )
 
         val persister = MoveModelPersister(moveRepository, journeyRepository)
@@ -110,16 +108,25 @@ internal class MovePersisterTest {
 
         persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney, multiMoveBecauseNoJourney))
 
-        // persist again to check this works
-        persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney.copy(reportMove = redirectMove.copy(reference = "NEWREF"))))
+        // persist again to check that updating it works
+        persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney.copy(move = redirectMove.copy(reference = "NEWREF"))))
 
         entityManager.flush()
 
         val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
 
+        // The ref should be the updated ref
         assertThat(retrievedRedirectMove.reference).isEqualTo("NEWREF")
+
         assertThat(retrievedRedirectMove.notes).isEqualTo("MoveRedirect: This was redirected.")
         assertThat(retrievedRedirectMove.vehicleRegistration).isEqualTo("REG1, REG2")
+
+        // This move should have the 3 move events
+        assertThat(retrievedRedirectMove.events.map { it.id }).containsExactlyInAnyOrder("E1", "E2", "E3")
+
+        // It should have the 2 journeys
+        assertThat(retrievedRedirectMove.journeys.map { it.journeyId }).containsExactlyInAnyOrder("J1", "J2")
+
 
         val retrievedNoJourneyMove = moveRepository.findById(noJourneyMove.id).get()
         assertThat(retrievedNoJourneyMove.reference).isEqualTo("UKW4591N")

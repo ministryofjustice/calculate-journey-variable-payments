@@ -11,51 +11,51 @@ internal class ReportFiltererTest {
     val to = LocalDate.of(2020, 9, 11)
 
     private val standardInDateRange = Report(
-            reportMove = reportMoveFactory(),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
-            journeysWithEventReports = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M1", billable = true)))
+            move = reportMoveFactory(),
+            person = reportPersonFactory(),
+            moveEvents = listOf(reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
+            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M1", billable = true)))
     )
 
     private val cancelled = Report(
-            reportMove = reportMoveFactory(moveId = "M2"),
-            reportPerson = reportPersonFactory(),
-            reportEvents =  listOf(reportMoveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
-            journeysWithEventReports = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true)))
+            move = reportMoveFactory(moveId = "M2"),
+            person = reportPersonFactory(),
+            moveEvents =  listOf(reportMoveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
+            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true)))
     )
 
     private val standardOutsideDateRange = Report(
-            reportMove = reportMoveFactory(moveId = "M3"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M3", occurredAt = LocalDate.of(2020, 9, 9).atStartOfDay())),
-            journeysWithEventReports = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M3", moveId = "M3", billable = true)))
+            move = reportMoveFactory(moveId = "M3"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M3", occurredAt = LocalDate.of(2020, 9, 9).atStartOfDay())),
+            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M3", moveId = "M3", billable = true)))
     )
 
     private val completedUnbillable = Report(
-            reportMove = reportMoveFactory(moveId = "M4"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
-            journeysWithEventReports = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M4", moveId = "M4", billable = false)))
+            move = reportMoveFactory(moveId = "M4"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
+            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M4", moveId = "M4", billable = false)))
     )
 
     private val completedRedirection = Report(
-            reportMove = reportMoveFactory(moveId = "M5"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            move = reportMoveFactory(moveId = "M5"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_START.value, moveId = "M5", occurredAt = from.atStartOfDay()),
                     reportMoveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(2)),
                     reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(4))
             ),
-            journeysWithEventReports = listOf(
+            journeysWithEvents = listOf(
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M5", moveId = "M5", billable = true)),
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J2M5", moveId = "M5", billable = true))
             )
     )
 
     private val completedLongHaulMoveLodgingEvents = Report(
-            reportMove = reportMoveFactory(moveId = "M6"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            move = reportMoveFactory(moveId = "M6"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_START.value, moveId = "M6", occurredAt = from.atStartOfDay()),
                     reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
                     reportMoveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
@@ -63,7 +63,7 @@ internal class ReportFiltererTest {
 
 
             ),
-            journeysWithEventReports = listOf(
+            journeysWithEvents = listOf(
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M6", moveId = "M6", billable = true),
                             listOf()),
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J2M6", moveId = "M6", billable = true))
@@ -71,9 +71,9 @@ internal class ReportFiltererTest {
     )
 
     private val completedLongHaulJourneyLodgingEvents = Report(
-            reportMove = reportMoveFactory(moveId = "M6a"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            move = reportMoveFactory(moveId = "M6a"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_START.value, moveId = "M6a", occurredAt = from.atStartOfDay()),
                     reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
                     reportMoveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
@@ -81,7 +81,7 @@ internal class ReportFiltererTest {
 
 
             ),
-            journeysWithEventReports = listOf(
+            journeysWithEvents = listOf(
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M6a", moveId = "M6a", billable = true),
                             listOf(reportJourneyEventFactory(type = EventType.JOURNEY_LODGING.value))),
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J2M6a", moveId = "M6a", billable = true))
@@ -90,28 +90,28 @@ internal class ReportFiltererTest {
 
 
     private val multiTypeMove = Report(
-            reportMove = reportMoveFactory(moveId = "M7"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            move = reportMoveFactory(moveId = "M7"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
                     reportMoveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
                     reportMoveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
                     reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(4))
             ),
-            journeysWithEventReports = listOf(
+            journeysWithEvents = listOf(
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M6", moveId = "M7", billable = true)),
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J2M6", moveId = "M7", billable = true))
             )
     )
 
     private val completedLockoutJourneyLockoutEvent = Report(
-            reportMove = reportMoveFactory(moveId = "M8"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            move = reportMoveFactory(moveId = "M8"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_START.value, moveId = "M8", occurredAt = from.atStartOfDay()),
                     reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8", occurredAt = from.atStartOfDay().plusHours(4))
             ),
-            journeysWithEventReports = listOf(
+            journeysWithEvents = listOf(
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true),
                             listOf(reportJourneyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))),
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J2M8", moveId = "M8", billable = true))
@@ -119,21 +119,21 @@ internal class ReportFiltererTest {
     )
 
     private val completedLockoutMoveLockoutEvent = Report(
-            reportMove = reportMoveFactory(moveId = "M8b"),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            move = reportMoveFactory(moveId = "M8b"),
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_START.value, moveId = "M8b", occurredAt = from.atStartOfDay()),
                     reportMoveEventFactory(type = "MoveLockout", moveId = "M8b"),
                     reportMoveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8b", occurredAt = from.atStartOfDay().plusHours(4))
             ),
-            journeysWithEventReports = listOf(
+            journeysWithEvents = listOf(
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M8b", moveId = "M8b", billable = true)),
                     ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J2M8b", moveId = "M8b", billable = true))
             )
     )
 
     private val cancelledBillable = Report(
-            reportMove = reportMoveFactory(
+            move = reportMoveFactory(
                     moveId = "M9",
                     status = MoveStatus.CANCELLED.name.toLowerCase(),
                     fromLocation = fromPrisonNomisAgencyId(),
@@ -143,12 +143,12 @@ internal class ReportFiltererTest {
                     cancellationReason = "cancelled_by_pmu",
                     date = to
             ),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(
+            person = reportPersonFactory(),
+            moveEvents = listOf(
                     reportMoveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
                     reportMoveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
             ),
-            journeysWithEventReports = listOf()
+            journeysWithEvents = listOf()
     )
 
 
@@ -207,6 +207,6 @@ internal class ReportFiltererTest {
     fun `Cancelled billable moves`() {
 
         val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(filter, reports).toList()
-        assertThat(cancelledBillableReports.map{it.reportMove}).containsExactlyInAnyOrder(cancelledBillable.reportMove)
+        assertThat(cancelledBillableReports.map{it.move}).containsExactlyInAnyOrder(cancelledBillable.move)
     }
 }

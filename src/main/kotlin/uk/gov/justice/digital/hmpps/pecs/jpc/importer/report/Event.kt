@@ -3,33 +3,49 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
+import javax.persistence.Transient
 import javax.validation.constraints.NotBlank
 
-data class ReportEvent constructor(
+@Entity
+@Table(name = "EVENTS")
+data class Event constructor(
 
         @get: NotBlank(message = "id cannot be blank")
+        @Id
+        @Column(name = "event_id")
         val id: String,
 
         @get: NotBlank(message = "type cannot be blank")
+        @Column(name = "event_type")
         val type: String,
 
+        @Transient
         val supplier: String? = null,
 
         @Json(name = "eventable_type")
         @get: NotBlank(message = "eventable type cannot be blank")
+        @Column(name = "eventable_type")
         val eventableType : String,
 
         @Json(name = "eventable_id")
+        @Column(name = "eventable_id")
         val eventableId: String,
 
+        @Transient
         val details: Map<String, Any>?,
 
         @EventDateTime
         @Json(name = "occurred_at")
+        @Column(name = "occurred_at")
         val occurredAt: LocalDateTime,
 
         @EventDateTime
         @Json(name = "recorded_at")
+        @Column(name = "recorded_at")
         val recordedAt: LocalDateTime,
 
         val notes: String?,
@@ -38,13 +54,13 @@ data class ReportEvent constructor(
     fun hasType(et: EventType) = type == et.value
 
     companion object {
-        fun     getLatestByType(reportEvents: List<ReportEvent>, eventType: EventType): ReportEvent? =
-                reportEvents.sortedByDescending { it.occurredAt }. find { it.hasType(eventType) }
+        fun     getLatestByType(events: List<Event>, eventType: EventType): Event? =
+                events.sortedByDescending { it.occurredAt }. find { it.hasType(eventType) }
 
-        fun fromJson(json: String): ReportEvent? {
+        fun fromJson(json: String): Event? {
             return Klaxon().
             fieldConverter(EventDateTime::class, dateTimeConverter).
-            parse<ReportEvent>(json)
+            parse<Event>(json)
         }
     }
 
@@ -65,9 +81,13 @@ MOVE_START("MoveStart"),
     JOURNEY_LOCKOUT("JourneyLockout"),
     JOURNEY_LODGING("JourneyLodging"),
     JOURNEY_CANCEL("JourneyCancel"),
+    UNKNOWN("Unknown"),
     ;
 
     companion object{
         val types = values().map { it.value }
+
+        fun valueOfOrUnknown(name: String) = if(EventType.values().any{it.name == name}) EventType.valueOf(name) else UNKNOWN
     }
+
 }

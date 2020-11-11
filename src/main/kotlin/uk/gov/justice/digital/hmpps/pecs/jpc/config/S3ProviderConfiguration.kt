@@ -45,13 +45,13 @@ class S3ProviderConfiguration {
         logger.info("Using AWS configuration.")
         val builder = if(endpoint.isNotEmpty()) {
             // Localstack
-            logger.info("Using localstack")
+            logger.info("****Using localstack with endpoint: $endpoint*****")
 
             AmazonS3ClientBuilder.standard().withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpoint, region))
         }
         else {
             // Real AWS S3
-            logger.info("Using S3")
+            logger.info("****Using Real S3 with access key: $accessKey*****")
 
             val awsCreds = BasicAWSCredentials(accessKey, secretKey)
             AmazonS3ClientBuilder.standard()
@@ -103,6 +103,7 @@ class S3ProviderConfiguration {
     fun reportingResourceProvider(@Qualifier("basmAmazonS3") client: AmazonS3, @Value("\${BASM_BUCKET_NAME}") bucketName: String): ReportingProvider {
         logger.info("Using AWS S3 resource provider for move.")
         return ReportingProvider {
+            logger.info("Using bucket $bucketName")
             client.getObjectAsString(bucketName, it)
         }
     }

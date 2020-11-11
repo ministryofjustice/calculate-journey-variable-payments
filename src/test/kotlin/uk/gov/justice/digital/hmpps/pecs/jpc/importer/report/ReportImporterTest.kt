@@ -54,35 +54,35 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
                 LocalDate.of(2020, 9, 3))
 
         // This should only pick up the completed and cancelled moves
-        Assertions.assertEquals(setOf("M1", "M2", "M20",  "M3", "M30"), content.map { it.reportMove.id }.toSet())
+        Assertions.assertEquals(setOf("M1", "M2", "M20",  "M3", "M30"), content.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Standard moves should only include completed moves with one billable, completed journey`() {
 
         val standardReports = ReportFilterer.standardMoveReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
-        Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.reportMove.id }.toSet())
+        Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Redirect moves should only include completed moves with two billable journeys`() {
 
         val redirectionReports = ReportFilterer.redirectionReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
-        Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.reportMove.id }.toSet())
+        Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Long haul moves should only include completed moves with two billable journeys`() {
 
         val longHaulReports = ReportFilterer.longHaulReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
-        Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.reportMove.id }.toSet())
+        Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Cancelled, billable moves should only include moves cancelled before 3pm the day before the move`() {
 
         val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(FilterParams(Supplier.GEOAMEY, from, to), moves)
-        Assertions.assertEquals(setOf("M61"), cancelledBillableReports.map { it.reportMove.id }.toSet())
+        Assertions.assertEquals(setOf("M61"), cancelledBillableReports.map { it.move.id }.toSet())
     }
 }
 

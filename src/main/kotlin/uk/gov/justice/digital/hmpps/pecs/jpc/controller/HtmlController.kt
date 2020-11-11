@@ -15,7 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.SUPPLIER_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MovesForMonthService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.time.LocalDate
 import java.time.ZoneId
@@ -27,7 +27,7 @@ data class MonthsWidget(val currentMonth: Date, val nextMonth: Date, val previou
 
 @Controller
 @SessionAttributes(SUPPLIER_ATTRIBUTE, DATE_ATTRIBUTE, START_OF_MONTH_DATE_ATTRIBUTE, END_OF_MONTH_DATE_ATTRIBUTE )
-class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) {
+class HtmlController(@Autowired val moveService: MoveService) {
 
     @RequestMapping("/")
     fun homepage(model: ModelMap): RedirectView {
@@ -52,16 +52,23 @@ class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) 
     }
 
 
-    @RequestMapping(MOVES_URL)
-    fun moves(@PathVariable moveTypeString:String, @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): String {
+    @RequestMapping("$MOVES_BY_TYPE_URL/{moveTypeString}")
+    fun movesById(@PathVariable moveTypeString:String, @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): String {
         val moveType = MoveType.valueOfCaseInsensitive(moveTypeString)
-        val moves = movesForMonthService.movesForMoveType(supplier, moveType, startOfMonth)
-        val moveTypeSummary = movesForMonthService.summaryForMoveType(supplier, moveType, startOfMonth)
+        val moves = moveService.movesForMoveType(supplier, moveType, startOfMonth)
+        val moveTypeSummary = moveService.summaryForMoveType(supplier, moveType, startOfMonth)
 
         model.addAttribute("months", MonthsWidget(convertToDate(startOfMonth), nextMonth = convertToDate(startOfMonth.plusMonths(1)), previousMonth = convertToDate(startOfMonth.minusMonths(1))))
         model.addAttribute("summary", moveTypeSummary.movesSummary)
         model.addAttribute("moves", moves)
-        return "moves"
+        return "moves-by-type"
+    }
+
+    @RequestMapping("$MOVES_URL/{moveId}")
+    fun moves(@PathVariable moveId: String, model: ModelMap) : String{
+        val move = moveService.move(moveId)
+        model.addAttribute(MOVE_ATTRIBUTE, move)
+        return "move"
     }
 
     @RequestMapping(JOURNEYS_URL)
@@ -70,8 +77,8 @@ class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) 
             @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
             model: ModelMap) : String{
 
-        model.addAttribute("journeysSummary", movesForMonthService.journeysSummary(supplier, startOfMonth))
-        model.addAttribute("journeys", movesForMonthService.uniqueJourneys(supplier, startOfMonth))
+        model.addAttribute("journeysSummary", moveService.journeysSummary(supplier, startOfMonth))
+        model.addAttribute("journeys", moveService.uniqueJourneys(supplier, startOfMonth))
         return "journeys"
     }
 
@@ -85,8 +92,8 @@ class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) 
         model.addAttribute(START_OF_MONTH_DATE_ATTRIBUTE, convertToDate(startOfMonth))
         model.addAttribute(END_OF_MONTH_DATE_ATTRIBUTE, convertToDate(endOfMonth))
 
-        val countAndSummaries = movesForMonthService.moveTypeSummaries(supplier, startOfMonth)
-        val journeysSummary = movesForMonthService.journeysSummary(supplier, startOfMonth)
+        val countAndSummaries = moveService.moveTypeSummaries(supplier, startOfMonth)
+        val journeysSummary = moveService.journeysSummary(supplier, startOfMonth)
 
         model.addAttribute("months", MonthsWidget(convertToDate(startOfMonth), nextMonth = convertToDate(startOfMonth.plusMonths(1)), previousMonth = convertToDate(startOfMonth.minusMonths(1))))
         model.addAttribute("summary", countAndSummaries.summary())
@@ -134,10 +141,12 @@ class HtmlController(@Autowired val movesForMonthService: MovesForMonthService) 
         const val SUPPLIER_ATTRIBUTE = "supplier"
         const val START_OF_MONTH_DATE_ATTRIBUTE = "startOfMonthDate"
         const val END_OF_MONTH_DATE_ATTRIBUTE = "endOfMonthDate"
+        const val MOVE_ATTRIBUTE = "move"
 
         const val DASHBOARD_URL = "/dashboard"
         const val SELECT_MONTH_URL = "/select-month"
-        const val MOVES_URL = "/moves/{moveTypeString}"
+        const val MOVES_BY_TYPE_URL = "/moves-by-type"
+        const val MOVES_URL = "/moves"
         const val JOURNEYS_URL = "/journeys"
     }
 }

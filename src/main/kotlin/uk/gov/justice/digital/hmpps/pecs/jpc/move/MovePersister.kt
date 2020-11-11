@@ -18,16 +18,16 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
         val cancelledBillableMoves = ReportFilterer.cancelledBillableMoves(params, moves).toList()
         val completedAndCancelledMoves = completedMoves + cancelledBillableMoves
 
-        MoveType.values().forEach { mpt ->
-            logger.info("Persisting $mpt moves")
-            mpt.filterer(params, completedAndCancelledMoves).forEach { report ->
-                with(report.reportMove) {
+        MoveType.values().forEach { mt ->
+            logger.info("Persisting $mt moves")
+            mt.filterer(params, completedAndCancelledMoves).forEach { report ->
+                with(report.move) {
                     Result.runCatching {
-                        val moveId = report.reportMove.id
+                        val moveId = report.move.id
 
-                        val pickUp = ReportEvent.getLatestByType(report.reportEvents, EventType.MOVE_START)?.occurredAt
-                        val dropOff = ReportEvent.getLatestByType(report.reportEvents, EventType.MOVE_COMPLETE)?.occurredAt
-                        val cancelled = ReportEvent.getLatestByType(report.reportEvents, EventType.MOVE_CANCEL)?.occurredAt
+                        val pickUp = Event.getLatestByType(report.moveEvents, EventType.MOVE_START)?.occurredAt
+                        val dropOff = Event.getLatestByType(report.moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
+                        val cancelled = Event.getLatestByType(report.moveEvents, EventType.MOVE_CANCEL)?.occurredAt
 
                         // delete any existing move / journeys
                         if (moveRepository.existsById(moveId)) moveRepository.deleteById(moveId)
@@ -37,22 +37,23 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
                                 moveId = moveId,
                                 supplier = Supplier.valueOfCaseInsensitive(supplier),
                                 status = MoveStatus.valueOfCaseInsensitive(status),
-                                moveType = mpt,
+                                moveType = mt,
                                 reference = reference,
                                 moveDate = moveDate,
                                 fromNomisAgencyId = fromNomisAgencyId,
                                 toNomisAgencyId = toNomisAgencyId,
                                 pickUpDateTime = pickUp,
                                 dropOffOrCancelledDateTime = dropOff ?: cancelled,
-                                vehicleRegistration = report.journeysWithEventReports.withIndex().joinToString(separator = ", ") {
+                                vehicleRegistration = report.journeysWithEvents.withIndex().joinToString(separator = ", ") {
                                     it.value.reportJourney.vehicleRegistration ?: ""
                                 },
-                                notes = report.reportEvents.notes(),
-                                prisonNumber = report.reportPerson?.prisonNumber
+                                notes = report.moveEvents.notes(),
+                                prisonNumber = report.person?.prisonNumber,
+                                events = report.moveEvents.toMutableList()
                         )
 
                         // add journeys to move model
-                        val journeyModels = report.journeysWithEventReports.map { journeyModel(moveModel.moveId, it) }
+                        val journeyModels = report.journeysWithEvents.map { journeyModel(moveModel.moveId, it) }
                         moveModel.addJourneys(*journeyModels.toTypedArray())
 
                         moveRepository.save(moveModel)
@@ -69,8 +70,8 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
         val journeyId = reportJourneyWithEvents.reportJourney.id
 
         with(reportJourneyWithEvents) {
-            val pickUp = ReportEvent.getLatestByType(reportJourneyWithEvents.reportEvents, EventType.JOURNEY_START)?.occurredAt
-            val dropOff = ReportEvent.getLatestByType(reportJourneyWithEvents.reportEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
+            val pickUp = Event.getLatestByType(reportJourneyWithEvents.events, EventType.JOURNEY_START)?.occurredAt
+            val dropOff = Event.getLatestByType(reportJourneyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
             val isCancelled = JourneyState.CANCELLED.equalsStringCaseInsensitive(reportJourneyWithEvents.reportJourney.state)
 
             return Journey(
@@ -83,7 +84,8 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
                     dropOffDateTime = dropOff,
                     billable = reportJourney.billable,
                     vehicleRegistration = reportJourney.vehicleRegistration,
-                    notes = reportJourneyWithEvents.reportEvents.notes(),
+                    notes = reportJourneyWithEvents.events.notes(),
+                    events = events.toMutableList()
             )
         }
     }
@@ -94,6 +96,6 @@ private val noteworthyEvents = listOf(
         EventType.MOVE_REDIRECT, EventType.JOURNEY_LOCKOUT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_CANCEL,
         EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END, EventType.JOURNEY_LODGING, EventType.MOVE_CANCEL).map { it.value }
 
-fun List<ReportEvent>.notes() = filter { it.type in noteworthyEvents && !it.notes.isNullOrBlank() }.
+fun List<Event>.notes() = filter { it.type in noteworthyEvents && !it.notes.isNullOrBlank() }.
 joinToString {"${it.type}: ${it.notes}"}
 
