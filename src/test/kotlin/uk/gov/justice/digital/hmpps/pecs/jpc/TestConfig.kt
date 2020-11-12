@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc
 
+import com.nhaarman.mockitokotlin2.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.jdbc.DataSourceBuilder
@@ -7,14 +8,15 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.oauth2.jwt.JwtDecoder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -35,6 +37,12 @@ class TestConfig {
     @Bean
     fun timeSource(): TimeSource {
         return TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
+    }
+
+    @Bean
+    fun jwtDecoder(): JwtDecoder {
+        // This is a temporary measure to prevent auth server startup/lookup errors during the tests.
+        return JwtDecoder { mock() }
     }
 
     @Bean
