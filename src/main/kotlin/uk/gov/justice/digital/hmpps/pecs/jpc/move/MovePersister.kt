@@ -49,6 +49,12 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
                                 },
                                 notes = report.moveEvents.notes(),
                                 prisonNumber = report.person?.prisonNumber,
+                                latestNomisBookingId = report.person?.latestNomisBookingId,
+                                firstNames = report.person?.firstNames,
+                                lastName = report.person?.lastName,
+                                dateOfBirth = report.person?.dateOfBirth,
+                                ethnicity = report.person?.ethnicity,
+                                gender = report.person?.gender,
                                 events = report.moveEvents.toMutableList()
                         )
 

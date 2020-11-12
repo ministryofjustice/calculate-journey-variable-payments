@@ -14,26 +14,18 @@ aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/serc
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-events.jsonl s3://basm/2020/09/01/2020-09-01-events.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-journeys.jsonl s3://basm/2020/09/01/2020-09-01-journeys.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-moves.jsonl s3://basm/2020/09/01/2020-09-01-moves.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-people.jsonl s3://basm/2020/09/01/2020-09-01-people.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-profiles.jsonl s3://basm/2020/09/01/2020-09-01-profiles.jsonl
 
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-events.jsonl s3://basm/2020/09/02/2020-09-02-events.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-journeys.jsonl s3://basm/2020/09/02/2020-09-02-journeys.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-moves.jsonl s3://basm/2020/09/02/2020-09-02-moves.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-people.jsonl s3://basm/2020/09/02/2020-09-02-people.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-profiles.jsonl s3://basm/2020/09/02/2020-09-02-profiles.jsonl
 
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-events.jsonl s3://basm/2020/09/03/2020-09-03-events.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-journeys.jsonl s3://basm/2020/09/03/2020-09-03-journeys.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-moves.jsonl s3://basm/2020/09/03/2020-09-03-moves.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-people.jsonl s3://basm/2020/09/03/2020-09-03-people.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-profiles.jsonl s3://basm/2020/09/03/2020-09-03-profiles.jsonl
 
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-events.jsonl s3://basm/2020/09/04/2020-09-04-events.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-journeys.jsonl s3://basm/2020/09/04/2020-09-04-journeys.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-moves.jsonl s3://basm/2020/09/04/2020-09-04-moves.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-people.jsonl s3://basm/2020/09/04/2020-09-04-people.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-profiles.jsonl s3://basm/2020/09/04/2020-09-04-profiles.jsonl
 
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-events.jsonl s3://basm/2020/09/05/2020-09-05-events.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-journeys.jsonl s3://basm/2020/09/05/2020-09-05-journeys.jsonl

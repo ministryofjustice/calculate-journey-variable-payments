@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
+import java.time.LocalDate
 import java.util.UUID
 
 @ActiveProfiles("test")
@@ -74,6 +75,9 @@ internal class MoveQueryRepositoryTest {
 
         // Move should be priced
         assertTrue(move.hasPrice())
+
+        assertThat(move.firstNames).isEqualTo("Billy the")
+        assertThat(move.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
     }
 
     @Test

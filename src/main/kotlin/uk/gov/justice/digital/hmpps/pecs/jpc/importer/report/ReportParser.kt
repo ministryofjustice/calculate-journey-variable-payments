@@ -35,9 +35,9 @@ object ReportParser {
         return read(profileFiles) { ReportProfile.fromJson(it) }.associateBy(keySelector = { it.id }, valueTransform = { it.personId })
     }
 
-    fun parseAsPersonIdToPerson(peopleFiles: List<String>): Map<String, ReportPerson> {
+    fun parseAsPersonIdToPerson(peopleFiles: List<String>): Map<String, Person> {
         logger.info("Parsing people")
-        return read(peopleFiles) { ReportPerson.fromJson(it) }.associateBy(ReportPerson::id)
+        return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
     }
 
     fun     parseAsMoves(supplier: Supplier, moveFiles: List<String>): Collection<ReportMove> {

@@ -7,7 +7,7 @@ internal class EventTest {
 
     @Test
     fun `get latest by type returns the latest event`(){
-        val moveCancelFirst = reportMoveEventFactory() // MOVE_CANCEL
+        val moveCancelFirst = moveEventFactory() // MOVE_CANCEL
         val moveCancelLast= moveCancelFirst.copy(id = "ME2", occurredAt = moveCancelFirst.occurredAt.plusHours(3))
 
         assertThat(Event.getLatestByType(listOf(moveCancelLast, moveCancelFirst), EventType.MOVE_CANCEL)).isEqualTo(moveCancelLast)
@@ -15,7 +15,7 @@ internal class EventTest {
 
     @Test
     fun `get latest by type returns null if event not present`(){
-        val moveCancel = reportMoveEventFactory() // MOVE_CANCEL event
+        val moveCancel = moveEventFactory() // MOVE_CANCEL event
 
         assertThat(Event.getLatestByType(listOf(moveCancel), EventType.MOVE_COMPLETE)).isNull()
     }

@@ -34,6 +34,11 @@ fun move(
         dropOffOrCancelledDateTime = dropOffOrCancelledDateTime,
         notes = "some notes",
         prisonNumber = "PR101",
+        firstNames = "Billy the",
+        lastName = "Kid",
+        gender = "male",
+        ethnicity = "White",
+        dateOfBirth = LocalDate.of(1980, 12, 25),
         vehicleRegistration = "reg100",
         journeys = journeys)
 

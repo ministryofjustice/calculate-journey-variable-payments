@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,6 +46,14 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
         Assertions.assertEquals(listOf("2020/08/30/2020-08-30-moves.jsonl", "2020/08/31/2020-08-31-moves.jsonl"), fileNames)
     }
 
+    @Test
+    fun `Person populated correctly`(){
+        // This should pick up the latest person file
+        val person = moves.toList()[0].person
+        assertThat(person?.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
+        assertThat(person?.prisonNumber).isEqualTo("PRISON1")
+
+    }
 
     @Test
     fun `Get files for date should ignore missing days`() {

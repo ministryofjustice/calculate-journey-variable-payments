@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 data class Report(
         val move: ReportMove,
-        val person: ReportPerson?,
+        val person: Person?,
         val moveEvents: List<Event> = listOf(),
         val journeysWithEvents: List<ReportJourneyWithEvents> = listOf()) {
 

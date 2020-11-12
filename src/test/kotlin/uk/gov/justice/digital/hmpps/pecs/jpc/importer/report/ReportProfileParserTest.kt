@@ -13,6 +13,6 @@ class ReportProfileParserTest {
 
         val parsedProfile = ReportProfile.fromJson(profileJson)
 
-        assertThat(reportProfileFactory()).isEqualTo(parsedProfile)
+        assertThat(profileFactory()).isEqualTo(parsedProfile)
     }
 }
