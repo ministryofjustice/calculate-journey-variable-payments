@@ -120,6 +120,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         "m.move_id, m.supplier, m.status, m.move_price_type, " +
         "m.reference, m.move_date, m.from_nomis_agency_id, m.to_nomis_agency_id, m.pick_up, m.drop_off_or_cancelled, m.notes, " +
         "m.prison_number, m.vehicle_registration, " +
+        "m.first_names, m.last_name, m.date_of_birth, m.latest_nomis_booking_id, m.gender, m.ethnicity, " +
         "fl.site_name as from_site_name, fl.location_type as from_location_type, " +
         "tl.site_name as to_site_name, tl.location_type as to_location_type, " +
         "j.journey_id, j.billable, j.vehicle_registration, j.state as journey_state, " +
@@ -155,7 +156,13 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 dropOffOrCancelledDateTime = getTimestamp("drop_off_or_cancelled")?.toLocalDateTime(),
                 notes = getString("notes"),
                 prisonNumber = getString("prison_number"),
-                vehicleRegistration = getString("vehicle_registration")
+                vehicleRegistration = getString("vehicle_registration"),
+                latestNomisBookingId = getString("latest_nomis_booking_id"),
+                firstNames = getString("first_names"),
+                lastName = getString("last_name"),
+                ethnicity = getString("ethnicity"),
+                gender = getString("gender"),
+                dateOfBirth = getDate("date_of_birth")?.toLocalDate()
             )
             val journeyId = getString("journey_id")
             val journey = journeyId?.let { // there is a journey for this move

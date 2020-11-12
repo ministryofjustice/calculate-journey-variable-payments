@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
+import com.beust.klaxon.Json
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -61,6 +63,24 @@ data class Move(
         @Column(name="prison_number", nullable = true)
         val prisonNumber: String? = null,
 
+        @Column(name="latest_nomis_booking_id", nullable = true)
+        val latestNomisBookingId: String? = null,
+
+        @Column(name = "first_names", nullable = true)
+        val firstNames: String? = null,
+
+        @Column(name = "last_name", nullable = true)
+        val lastName: String? = null,
+
+        @Column(name = "date_of_birth", nullable = true)
+        val dateOfBirth: LocalDate?,
+
+        @Column(name = "gender", nullable = true)
+        val gender: String? = null,
+
+        @Column(name = "ethnicity")
+        val ethnicity: String? = null,
+
         @Column(name = "vehicle_registration", nullable = true)
         val vehicleRegistration: String?,
 
@@ -84,6 +104,22 @@ data class Move(
 
         fun totalInPence() = if(journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy { it.priceInPence ?: 0 }
 
+        fun hasPrice() = totalInPence() != null
+        fun totalInPounds() = totalInPence()?.let{it.toDouble() / 100}
+        fun moveDate() = moveDate?.format(dateFormatter)
+        fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
+        fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
+        fun dropOffOrCancelledDate() = dropOffOrCancelledDateTime?.format(dateFormatter)
+        fun dropOffOrCancelledTime() = dropOffOrCancelledDateTime?.format(timeFormatter)
+        fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
+        fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
+        fun toSiteName() = toSiteName ?: toNomisAgencyId
+        fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
+
+        override fun toString(): String {
+                return "Move(moveId='$moveId', supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, notes='$notes', prisonNumber=$prisonNumber, latestNomisBookingId=$latestNomisBookingId, firstNames=$firstNames, lastName=$lastName, dateOfBirth=$dateOfBirth, gender=$gender, ethnicity=$ethnicity, vehicleRegistration=$vehicleRegistration)"
+        }
+
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false
@@ -102,6 +138,12 @@ data class Move(
                 if (dropOffOrCancelledDateTime != other.dropOffOrCancelledDateTime) return false
                 if (notes != other.notes) return false
                 if (prisonNumber != other.prisonNumber) return false
+                if (latestNomisBookingId != other.latestNomisBookingId) return false
+                if (firstNames != other.firstNames) return false
+                if (lastName != other.lastName) return false
+                if (dateOfBirth != other.dateOfBirth) return false
+                if (gender != other.gender) return false
+                if (ethnicity != other.ethnicity) return false
                 if (vehicleRegistration != other.vehicleRegistration) return false
 
                 return true
@@ -115,30 +157,20 @@ data class Move(
                 result = 31 * result + reference.hashCode()
                 result = 31 * result + (moveDate?.hashCode() ?: 0)
                 result = 31 * result + fromNomisAgencyId.hashCode()
-                result = 31 * result + toNomisAgencyId.hashCode()
+                result = 31 * result + (toNomisAgencyId?.hashCode() ?: 0)
                 result = 31 * result + (pickUpDateTime?.hashCode() ?: 0)
-                result = 31 * result + dropOffOrCancelledDateTime.hashCode()
+                result = 31 * result + (dropOffOrCancelledDateTime?.hashCode() ?: 0)
                 result = 31 * result + notes.hashCode()
                 result = 31 * result + (prisonNumber?.hashCode() ?: 0)
-                result = 31 * result + vehicleRegistration.hashCode()
+                result = 31 * result + (latestNomisBookingId?.hashCode() ?: 0)
+                result = 31 * result + (firstNames?.hashCode() ?: 0)
+                result = 31 * result + (lastName?.hashCode() ?: 0)
+                result = 31 * result + (dateOfBirth?.hashCode() ?: 0)
+                result = 31 * result + (gender?.hashCode() ?: 0)
+                result = 31 * result + (ethnicity?.hashCode() ?: 0)
+                result = 31 * result + (vehicleRegistration?.hashCode() ?: 0)
                 return result
         }
-
-        override fun toString(): String {
-                return "Move(moveId='$moveId', supplier=$supplier, movePriceType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOffOrCancelled=$dropOffOrCancelledDateTime, notes='$notes', prisonNumber=$prisonNumber, vehicleRegistration=$vehicleRegistration)"
-        }
-
-        fun hasPrice() = totalInPence() != null
-        fun totalInPounds() = totalInPence()?.let{it.toDouble() / 100}
-        fun moveDate() = moveDate?.format(dateFormatter)
-        fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
-        fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
-        fun dropOffOrCancelledDate() = dropOffOrCancelledDateTime?.format(dateFormatter)
-        fun dropOffOrCancelledTime() = dropOffOrCancelledDateTime?.format(timeFormatter)
-        fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
-        fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
-        fun toSiteName() = toSiteName ?: toNomisAgencyId
-        fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
 
         companion object{
                 private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")

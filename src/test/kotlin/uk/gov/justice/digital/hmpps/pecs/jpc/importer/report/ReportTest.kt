@@ -8,16 +8,16 @@ internal class ReportTest {
 
     val date: LocalDate = LocalDate.now()
 
-    val moveAcceptEvent = reportMoveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = date.atStartOfDay().minusHours(24))
-    val moveRedirectEvent = reportMoveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M9")
-    val moveCancelEvent = reportMoveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = date.atStartOfDay().minusHours(2))
+    val moveAcceptEvent = moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = date.atStartOfDay().minusHours(24))
+    val moveRedirectEvent = moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M9")
+    val moveCancelEvent = moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = date.atStartOfDay().minusHours(2))
 
-    val journeyStartEvent = reportJourneyEventFactory(type = EventType.JOURNEY_START.value)
-    val journeyCancelEvent = reportJourneyEventFactory(type = EventType.JOURNEY_CANCEL.value)
+    val journeyStartEvent = journeyEventFactory(type = EventType.JOURNEY_START.value)
+    val journeyCancelEvent = journeyEventFactory(type = EventType.JOURNEY_CANCEL.value)
 
     val report = Report(
             move = reportMoveFactory(),
-            person = reportPersonFactory(),
+            person = personFactory(),
             moveEvents = listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
             journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(), listOf(journeyStartEvent, journeyCancelEvent)))
     )

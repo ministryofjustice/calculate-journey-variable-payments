@@ -56,17 +56,25 @@ fun reportMoveFactory(
     return move
 }
 
-fun reportPersonFactory(personId: String = defaultPersonId): ReportPerson {
-    return ReportPerson(personId, "PRISON1")
+fun personFactory(personId: String = defaultPersonId): Person {
+    return Person(
+            id = personId,
+            prisonNumber = "PRISON1",
+            latestNomisBookingId = null,
+            firstNames = "Billy the",
+            lastName = "Kid",
+            dateOfBirth = LocalDate.of(1980, 12, 25),
+            ethnicity = "White American",
+            gender = "male")
 }
 
-fun reportProfileFactory(
+fun profileFactory(
         profileId: String = defaultProfileId,
         personId: String = defaultPersonId): ReportProfile {
     return ReportProfile(profileId, personId)
 }
 
-fun reportMoveEventFactory(
+fun moveEventFactory(
         eventId : String = defaultMoveEventId,
         moveId: String = defaultMoveId,
         type: String = EventType.MOVE_CANCEL.value,
@@ -111,7 +119,7 @@ fun reportJourneyFactory(
     return journey
 }
 
-fun reportJourneyEventFactory(
+fun journeyEventFactory(
         journeyEventId: String = defaultJourneyEventId,
         journeyId: String = defaultJourneyId,
         type: String = EventType.JOURNEY_START.value,
