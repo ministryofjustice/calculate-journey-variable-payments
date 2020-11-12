@@ -22,6 +22,12 @@ internal class MoveRepositoryTest {
     fun `save report model`() {
 
         val moveModel = move(moveId = UUID.randomUUID().toString())
+        val journeyModel = journey(moveId = moveModel.moveId)
+        journeyModel.addEvents(event(eventId = "E1", eventableId = journeyModel.journeyId))
+
+        moveModel.addJourneys(journeyModel)
+        moveModel.addEvents(event(eventId = "E2", eventableId = moveModel.moveId))
+
         val persistedReport = moveRepository.save(moveModel)
 
         entityManager.flush()

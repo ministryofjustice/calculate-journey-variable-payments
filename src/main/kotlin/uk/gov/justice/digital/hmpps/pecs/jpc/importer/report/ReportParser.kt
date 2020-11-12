@@ -58,12 +58,12 @@ object ReportParser {
         associateBy(ReportJourney::id).values.groupBy(ReportJourney::moveId) // associateBy will only include latest Journey by id
     }
 
-    fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<ReportEvent>> {
+    fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
         logger.info("Parsing events")
-        return read(eventFiles) { ReportEvent.fromJson(it) }.
+        return read(eventFiles) { Event.fromJson(it) }.
         filter { EventType.types.contains(it.type) }.
         distinctBy { it.id }. // filter duplicates (shouldn't be any, but just in case)
-        groupBy(ReportEvent::eventableId)
+        groupBy(Event::eventableId)
     }
 
     fun parseAll(supplier: Supplier, moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Report> {
@@ -75,12 +75,12 @@ object ReportParser {
 
         return moves.map { move ->
             Report(
-                    reportMove = move,
-                    reportPerson = move.profileId?.let {people[profileId2PersonId[it]]},
-                    journeysWithEventReports = journeys.getOrDefault(move.id, listOf()).map { journey ->
-                        ReportJourneyWithEvents(reportJourney = journey, reportEvents = events.getOrDefault(journey.id, listOf()))
+                    move = move,
+                    person = move.profileId?.let {people[profileId2PersonId[it]]},
+                    journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey ->
+                        ReportJourneyWithEvents(reportJourney = journey, events = events.getOrDefault(journey.id, listOf()))
                     },
-                    reportEvents = events.getOrDefault(move.id, listOf()
+                    moveEvents = events.getOrDefault(move.id, listOf()
                     )
             )
         }

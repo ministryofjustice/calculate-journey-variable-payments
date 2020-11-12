@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -74,8 +73,8 @@ fun reportMoveEventFactory(
         supplier: String = defaultSupplier,
         occurredAt: LocalDateTime = defaultDateTime,
         notes: String = ""
-): ReportEvent {
-    val event = ReportEvent(
+): Event {
+    val event = Event(
             id=eventId,
             type=type,
             supplier= supplier,
@@ -119,8 +118,8 @@ fun reportJourneyEventFactory(
         supplier: String = defaultSupplier,
         occurredAt: LocalDateTime = defaultDateTime,
         notes: String = ""
-): ReportEvent {
-    val event = ReportEvent(
+): Event {
+    val event = Event(
             id=journeyEventId,
             type=type,
             supplier= supplier,

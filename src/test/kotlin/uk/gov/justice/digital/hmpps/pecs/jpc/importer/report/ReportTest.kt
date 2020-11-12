@@ -2,9 +2,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportJourneyWithEvents
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Report
 import java.time.LocalDate
 
 internal class ReportTest {
@@ -19,10 +16,10 @@ internal class ReportTest {
     val journeyCancelEvent = reportJourneyEventFactory(type = EventType.JOURNEY_CANCEL.value)
 
     val report = Report(
-            reportMove = reportMoveFactory(),
-            reportPerson = reportPersonFactory(),
-            reportEvents = listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
-            journeysWithEventReports = listOf(ReportJourneyWithEvents(reportJourneyFactory(), listOf(journeyStartEvent, journeyCancelEvent)))
+            move = reportMoveFactory(),
+            person = reportPersonFactory(),
+            moveEvents = listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
+            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(), listOf(journeyStartEvent, journeyCancelEvent)))
     )
 
     @Test

@@ -41,3 +41,5 @@ out/
 /dps-gradle-spring-boot-suppressions.xml
 
 *.xlsx
+/.prodenv
+/.devenv

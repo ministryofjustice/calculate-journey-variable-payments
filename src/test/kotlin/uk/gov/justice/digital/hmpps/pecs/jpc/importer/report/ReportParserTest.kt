@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 @ExtendWith(SpringExtension::class)
@@ -146,18 +144,18 @@ internal class ReportParserTest {
         )
 
         // There should be 1 unique completed move and 1 cancelled move from the 6 in the files
-        assertThat(movesWithJourneysAndEvents.map { it.reportMove.id }).containsExactly("M1", "M4")
+        assertThat(movesWithJourneysAndEvents.map { it.move.id }).containsExactly("M1", "M4")
 
-        val move1 = movesWithJourneysAndEvents.find { it.reportMove.id == "M1" }!!
+        val move1 = movesWithJourneysAndEvents.find { it.move.id == "M1" }!!
 
         // Move1 should have two events
-        assertThat(move1.reportEvents.map{it.id}).containsExactly("E1", "E4")
+        assertThat(move1.moveEvents.map{it.id}).containsExactly("E1", "E4")
 
         // Move1's first journey should have event 3
-        assertThat(move1.journeysWithEventReports[0].reportEvents.map { it.id }).containsExactly("E3")
+        assertThat(move1.journeysWithEvents[0].events.map { it.id }).containsExactly("E3")
 
         // Move 1 should have Person PE1
-        assertThat(move1.reportPerson?.id).isEqualTo("PE1")
+        assertThat(move1.person?.id).isEqualTo("PE1")
     }
 }
 

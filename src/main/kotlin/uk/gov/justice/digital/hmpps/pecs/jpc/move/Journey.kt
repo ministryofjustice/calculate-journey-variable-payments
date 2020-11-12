@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import java.time.LocalDateTime
@@ -50,6 +51,10 @@ data class Journey(
 
         val notes: String? = null,
 
+        @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+        val events: MutableList<Event> = mutableListOf(),
+
         @Transient
         val priceInPence: Int? = null
 
@@ -57,6 +62,10 @@ data class Journey(
 
         override fun toString(): String {
                 return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
+        }
+
+        fun addEvents(vararg events: Event) {
+                this.events += events
         }
 
         fun hasPrice() = priceInPence != null

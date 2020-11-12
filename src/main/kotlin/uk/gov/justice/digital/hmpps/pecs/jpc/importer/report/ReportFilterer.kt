@@ -12,14 +12,14 @@ object ReportFilterer {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private fun Report.hasSupplier(supplier: Supplier) = supplier.equalsStringCaseInsensitive(reportMove.supplier)
+    private fun Report.hasSupplier(supplier: Supplier) = supplier.equalsStringCaseInsensitive(move.supplier)
 
-    private fun Report.hasStatus(status: MoveStatus) = status.equalsStringCaseInsensitive(reportMove.status)
+    private fun Report.hasStatus(status: MoveStatus) = status.equalsStringCaseInsensitive(move.status)
 
-    private fun List<ReportEvent>.hasEventType(eventType: EventType) =
+    private fun List<Event>.hasEventType(eventType: EventType) =
             this.find { it.hasType(eventType) } != null
 
-    private fun List<ReportEvent>.hasEventTypeInDateRange(eventType: EventType, dateRange: ClosedRangeLocalDate) =
+    private fun List<Event>.hasEventTypeInDateRange(eventType: EventType, dateRange: ClosedRangeLocalDate) =
             with(this.find { it.hasType(eventType) }?.occurredAt?.toLocalDate()) {
                 this != null && dateRange.contains(this)
             }
@@ -28,7 +28,7 @@ object ReportFilterer {
         return reports.asSequence().filter {
             it.hasSupplier(params.supplier) &&
             it.hasStatus(MoveStatus.COMPLETED) &&
-            it.reportEvents.hasEventTypeInDateRange(EventType.MOVE_COMPLETE, params.dateRange())
+            it.moveEvents.hasEventTypeInDateRange(EventType.MOVE_COMPLETE, params.dateRange())
         }
     }
 
@@ -40,22 +40,22 @@ object ReportFilterer {
         return reports.asSequence().filter {
             it.hasSupplier(params.supplier) &&
             it.hasStatus(MoveStatus.CANCELLED) &&
-            CANCELLATION_REASON_CANCELLED_BY_PMU == it.reportMove.cancellationReason &&
-            it.reportMove.fromLocationType == "prison" &&
-            it.reportMove.toNomisAgencyId != null &&
-            it.reportMove.toLocationType == "prison" &&
-            it.reportEvents.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
-            it.reportEvents.hasEventTypeInDateRange(EventType.MOVE_CANCEL, params.dateRange()) && // cancel event within date range
-            it.reportMove.moveDate != null && it.reportEvents.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.reportMove.moveDate.atStartOfDay()) ?: false
-        }.map { it.copy(journeysWithEventReports = listOf(ReportJourneyWithEvents( // fake journey with events
+            CANCELLATION_REASON_CANCELLED_BY_PMU == it.move.cancellationReason &&
+            it.move.fromLocationType == "prison" &&
+            it.move.toNomisAgencyId != null &&
+            it.move.toLocationType == "prison" &&
+            it.moveEvents.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
+            it.moveEvents.hasEventTypeInDateRange(EventType.MOVE_CANCEL, params.dateRange()) && // cancel event within date range
+            it.move.moveDate != null && it.moveEvents.find{it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(it.move.moveDate.atStartOfDay()) ?: false
+        }.map { it.copy(journeysWithEvents = listOf(ReportJourneyWithEvents( // fake journey with events
                 ReportJourney(
                         id = "FAKE",
-                        moveId = it.reportMove.id,
+                        moveId = it.move.id,
                         billable = true,
-                        supplier = it.reportMove.supplier,
+                        supplier = it.move.supplier,
                         clientTimestamp = LocalDateTime.now(),
-                        fromNomisAgencyId = it.reportMove.fromNomisAgencyId,
-                        toNomisAgencyId = it.reportMove.toNomisAgencyId!!,
+                        fromNomisAgencyId = it.move.fromNomisAgencyId,
+                        toNomisAgencyId = it.move.toNomisAgencyId!!,
                         state = JourneyState.CANCELLED.name,
                         vehicleRegistration = null
                 ),
@@ -70,7 +70,7 @@ object ReportFilterer {
      */
     fun standardMoveReports(params: FilterParams, reports: Collection<Report>): Sequence<Report> {
         return completedMoves(params, reports).filter { report ->
-            with(report.journeysWithEventReports.map { it.reportJourney }) {
+            with(report.journeysWithEvents.map { it.reportJourney }) {
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) } == 1 &&
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 1 &&
                 count { it.stateIsAnyOf(JourneyState.CANCELLED) } == 0
@@ -89,7 +89,7 @@ object ReportFilterer {
                 report.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
             ) &&
             report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
-            with(report.journeysWithEventReports.map { it.reportJourney }) {
+            with(report.journeysWithEvents.map { it.reportJourney }) {
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 2
             }
         }
@@ -103,7 +103,7 @@ object ReportFilterer {
         return completedMoves(params, moves).filter { report ->
             report.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
                     report.hasNoneOf(EventType.MOVE_REDIRECT) &&
-                    with(report.journeysWithEventReports.map { it.reportJourney }) {
+                    with(report.journeysWithEvents.map { it.reportJourney }) {
                         count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } in 2..3
                     }
         }   
@@ -134,14 +134,14 @@ object ReportFilterer {
                     EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END,
                     EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT
             ) &&
-            when (val moveStartDate = report.reportEvents.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
+            when (val moveStartDate = report.moveEvents.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
                 null -> {
                     logger.warn("No move start date event found for move $report")
                     false
                 }
                 else -> {
-                    report.reportEvents.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
-                    with(report.journeysWithEventReports.map { it.reportJourney }) {
+                    report.moveEvents.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
+                    with(report.journeysWithEvents.map { it.reportJourney }) {
                         count { it.stateIsAnyOf(JourneyState.COMPLETED, JourneyState.CANCELLED) && it.billable } == 2
                     }
                 }

@@ -12,9 +12,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.move
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
@@ -22,14 +20,34 @@ import java.time.LocalDate
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
- class MovesForMonthServiceTest(){
+ class MoveServiceTest(){
 
     @MockBean
     lateinit var moveQueryRepository: MoveQueryRepository
 
+    @MockBean
+    lateinit var eventRepository: EventRepository
+
+    @Test
+    fun `move by move id`(){
+        val service = MoveService(moveQueryRepository, eventRepository)
+        val journey = journey()
+        val move = move(journeys = mutableListOf(journey))
+
+        val moveEvent = event()
+
+        whenever(moveQueryRepository.move(eq("M1"))).thenReturn(move)
+        whenever(eventRepository.findAllByEventableId(eq("M1"))).thenReturn(listOf(moveEvent))
+
+        val retrievedMpve = service.move("M1")
+        assertThat(retrievedMpve).isEqualTo(move)
+        assertThat(retrievedMpve.events).containsExactly(moveEvent)
+
+    }
+
     @Test
     fun `paginate`(){
-        val service = MovesForMonthService(moveQueryRepository)
+        val service = MoveService(moveQueryRepository, eventRepository)
         val pageNo = 0
         val pageSize = 50
         val date = LocalDate.now()
@@ -38,10 +56,10 @@ import java.time.LocalDate
         val first50Moves = (1..50).map { move(moveId = "first50") }
         val second50Moves = (1..50).map { move(moveId = "second50") }
 
-        whenever(moveQueryRepository.allForSupplierAndMoveTypeInDateRange(eq(Supplier.SERCO), any(), any(), any(), eq(50), eq(0))).thenReturn(first50Moves)
-        whenever(moveQueryRepository.allForSupplierAndMoveTypeInDateRange(eq(Supplier.SERCO), any(), any(), any(), eq(50), eq(50))).thenReturn(second50Moves)
-        whenever(moveQueryRepository.allForSupplierAndMoveTypeInDateRange(eq(Supplier.SERCO), any(), any(), any(), eq(50), eq(100))).thenReturn(listOf(move(moveId = "lastOne")))
-        whenever(moveQueryRepository.countForSupplierInDateRange(any(), any(), any())).thenReturn(101)
+        whenever(moveQueryRepository.movesForMoveTypeInDateRange(eq(Supplier.SERCO), any(), any(), any(), eq(50), eq(0))).thenReturn(first50Moves)
+        whenever(moveQueryRepository.movesForMoveTypeInDateRange(eq(Supplier.SERCO), any(), any(), any(), eq(50), eq(50))).thenReturn(second50Moves)
+        whenever(moveQueryRepository.movesForMoveTypeInDateRange(eq(Supplier.SERCO), any(), any(), any(), eq(50), eq(100))).thenReturn(listOf(move(moveId = "lastOne")))
+        whenever(moveQueryRepository.moveCountInDateRange(any(), any(), any())).thenReturn(101)
 
         val firstPage = service.paginatedMovesForMoveType(Supplier.SERCO, MoveType.STANDARD, date, pageable)
 

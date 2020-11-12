@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.util.UUID
 
 @ActiveProfiles("test")
@@ -71,7 +70,7 @@ internal class MoveQueryRepositoryTest {
 
     @Test
     fun `move should be priced if all journeys are billable`() {
-        val move = moveQueryRepository.allForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        val move = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
 
         // Move should be priced
         assertTrue(move.hasPrice())
@@ -88,7 +87,7 @@ internal class MoveQueryRepositoryTest {
 
         entityManager.flush()
 
-        val move = moveQueryRepository.allForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        val move = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
 
         assertThat(move.journeys.size).isEqualTo(4)
 
@@ -124,13 +123,13 @@ internal class MoveQueryRepositoryTest {
         entityManager.flush()
 
         // The moves with no journeys, unbillable journey and unpriced journey should come out as unpried
-        val summaries = moveQueryRepository.summariesForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate, 4)
+        val summaries = moveQueryRepository.summariesInDateRange(Supplier.SERCO, moveDate, moveDate, 4)
         assertThat(summaries).containsExactly(MovesSummary(MoveType.STANDARD, 1.0, 4, 2, 1998))
     }
 
 
     @Test
-    fun `unique journeys`() {
+    fun `unique journeys and journey summaries`() {
 
         val locationX  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationX", siteName = "banana")
         val locationY  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationY", siteName = "apple")
@@ -159,19 +158,25 @@ internal class MoveQueryRepositoryTest {
 
         entityManager.flush()
 
-        val uniqueJourneys = moveQueryRepository.uniqueJourneysSummaryForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
-        assertThat(uniqueJourneys).isEqualTo(JourneysSummary(4, 1998, 1, 2))
+        val summaries = moveQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2))
+
+        val unpricedUniqueJourneys = moveQueryRepository.unpricedUniqueJourneysInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(unpricedUniqueJourneys.size).isEqualTo(2)
+
+        // Ordered by unmapped from locations first
+        assertThat(unpricedUniqueJourneys[0].fromNomisAgencyId).isEqualTo("unmappedNomisAgencyId")
     }
 
     @Test
     fun `moves count`() {
-        val movesCount = moveQueryRepository.countForSupplierInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val movesCount = moveQueryRepository.moveCountInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(movesCount).isEqualTo(1)
     }
 
     @Test
     fun `paging`(){
-        val moves = moveQueryRepository.allForSupplierAndMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)
+        val moves = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)
         val pageNo = 0
         val pageSize = 50
 
