@@ -23,8 +23,10 @@ dependencies {
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.0.5")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.session:spring-session-jdbc")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
 	testImplementation("org.mockito:mockito-inline:3.5.13")
+	testImplementation("org.springframework.security:spring-security-test")
 
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql:42.2.17")
