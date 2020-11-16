@@ -22,6 +22,8 @@ You can run the dependencies for the projects with Docker compose:
 docker-compose up
 ```
 
+*Note: to log into the application (via the redirect to the HMPPS auth service) your user will need the PECS_JPC role assigned. A hmpps-auth in-memory user has been set up with this role to help with this 'jpc_user'.*
+
 The command will launch:
 
 - [Localstack](https://github.com/localstack/localstack) (which is used to mock Amazon S3)
