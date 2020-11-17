@@ -11,13 +11,82 @@
 
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
-    <div th:replace="fragments/summary.html :: summary"></div>
+    <div class="govuk-breadcrumbs ">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/dashboard" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
+                    [[${#dates.format(startOfMonthDate, 'yyyy')}]]</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <span class="govuk-breadcrumbs__link" th:inline="text">[[${moveType}]] moves</span>
+            </li>
+        </ol>
+    </div>
 
-    <section class="mt5">
-        <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
-        <div th:each="move: ${moves}">
-            <div th:replace="fragments/list-moves-by-type.html :: moves"></div>
+    <div class="flex justify-between items-end mv4">
+        <div class="flex-auto">
+            <h1 class="govuk-heading-xl ma0" th:inline="text">[[${moveType}]]</h1>
         </div>
+        <div>
+            <a th:href="@{|/generate-prices-spreadsheet/|}"
+               th:attr="download=${'moves-' + '.csv'}"
+               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
+        </div>
+    </div>
+
+    <div th:replace="fragments/move-summary.html :: summary"></div>
+
+    <section class="mt3">
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" scope="col" aria-sort="none" width="80">Move ID</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pickup location</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pickup type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none" width="60">Location type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none" width="190">Pick up date</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none" width="80">NOMIS ID</th>
+            </tr>
+            </thead>
+            <thbody class="govuk-table__body">
+                <tr class="govuk-table__row" th:each="move: ${moves}">
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.moveId}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromNomisAgencyId}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromLocationType ?: "Not
+                        mapped"}]]
+                    </td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toNomisAgencyId}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toLocationType ?: "Not
+                        mapped"}]]
+                    </td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[move.pickUpDateTime != null ?
+                        ${#dates.format(move.pickUpDateTime, 'dd MMMM yyyy, HH:mm')} : ""]]
+                    </td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.reference}]]</td>
+                </tr>
+                <!--                <tr class="govuk-table__row">-->
+                <!--                    <td class="govuk-table__cell" scope="row">MX1234</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">[NOMIS agency ID]</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">Not mapped</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">Leeds prison</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">PS</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">29 March 2020, 07:30</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">12648573</td>-->
+                <!--                </tr>-->
+                <!--                <tr class="govuk-table__row">-->
+                <!--                    <td class="govuk-table__cell" scope="row">MX1234</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">[NOMIS agency ID]</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">Not mapped</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">Leeds prison</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">PS</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">29 March 2020, 07:30</td>-->
+                <!--                    <td class="govuk-table__cell" scope="row">12648573</td>-->
+                <!--                </tr>-->
+            </thbody>
+        </table>
+
     </section>
 
 </div>
