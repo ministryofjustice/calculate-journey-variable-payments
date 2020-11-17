@@ -1,41 +1,43 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.core.io.InputStreamResource
-import org.springframework.http.HttpStatus
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class OutputSpreadsheetControllerTest(@Autowired val restTemplate: TestRestTemplate) {
+class OutputSpreadsheetControllerTest(@Autowired val mockMvc: MockMvc) {
 
     @MockBean
     lateinit var timeSource: TimeSource
 
     @Test
-    @Disabled
-    fun `can generate spreadsheet for serco`() {
+    @WithMockUser(roles = ["PECS_JPC"])
+    fun `can generate spreadsheet with correct name for Serco`() {
         whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
         whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-        val response = restTemplate.getForEntity("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01", InputStreamResource::class.java)
-
-        assertThat(response.headers.contentDisposition.filename).isEqualTo("Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        mockMvc.get("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01") { }
+                .andExpect {
+                    status { isOk }
+                    content { contentType("application/vnd.ms-excel") }
+                    header {
+                        string("Content-Disposition", "attachment;filename=Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
+                    }
+                }
     }
 }
