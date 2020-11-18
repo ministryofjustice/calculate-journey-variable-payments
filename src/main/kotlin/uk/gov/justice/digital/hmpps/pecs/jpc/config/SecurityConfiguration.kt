@@ -65,7 +65,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     }
 
     private fun accessDeniedHandler(): AccessDeniedHandler {
-        return AccessDeniedHandler { request, response, accessDeniedException ->
+        return AccessDeniedHandler { request, _, accessDeniedException ->
             val auth: Authentication? = SecurityContextHolder.getContext().authentication
 
             if (auth != null) {

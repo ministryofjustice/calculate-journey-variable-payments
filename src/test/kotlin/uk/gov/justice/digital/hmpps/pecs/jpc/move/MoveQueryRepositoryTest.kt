@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import junit.framework.Assert.assertFalse
-import junit.framework.Assert.assertTrue
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
