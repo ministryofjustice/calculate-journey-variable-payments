@@ -19,7 +19,6 @@ dependencies {
 	implementation("com.beust:klaxon:5.4")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("com.amazonaws:aws-java-sdk-s3:1.11.901")
-	implementation("org.ocpsoft.prettytime:prettytime-nlp:4.0.6.Final")
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.1")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.session:spring-session-jdbc")

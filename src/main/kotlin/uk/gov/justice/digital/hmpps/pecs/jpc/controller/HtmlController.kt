@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import org.ocpsoft.prettytime.nlp.PrettyTimeParser
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.stereotype.Controller
@@ -17,6 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
@@ -111,16 +111,13 @@ class HtmlController(@Autowired val moveService: MoveService) {
     data class JumpToMonthForm(@ValidMonthYear val date: String)
 
     @PostMapping(SELECT_MONTH_URL)
-    fun jumpToMonth(
-            @Valid @ModelAttribute("form") form: JumpToMonthForm,
-            result: BindingResult, model: ModelMap,
-    ): Any {
+    fun jumpToMonth(@Valid @ModelAttribute("form") form: JumpToMonthForm, result: BindingResult, model: ModelMap, ): Any {
         if (result.hasErrors()) {
             return "select-month"
         }
-        val date = PrettyTimeParser().parse(form.date)[0]
-        val localDate = convertToLocalDate(date)
-        model.addAttribute(DATE_ATTRIBUTE, localDate)
+
+        model.addAttribute(DATE_ATTRIBUTE, MonthYearParser.atStartOf(form.date))
+
         return RedirectView(DASHBOARD_URL)
     }
 
@@ -128,12 +125,6 @@ class HtmlController(@Autowired val moveService: MoveService) {
         return Date.from(dateToConvert.atStartOfDay()
                 .atZone(ZoneId.systemDefault())
                 .toInstant())
-    }
-
-    fun convertToLocalDate(dateToConvert: Date): LocalDate {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
     }
 
     companion object{
