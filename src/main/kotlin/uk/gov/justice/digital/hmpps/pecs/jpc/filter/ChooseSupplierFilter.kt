@@ -1,14 +1,18 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.filter
 
-import org.springframework.core.annotation.Order
-import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import java.io.IOException
-import java.time.LocalDate
-import javax.servlet.*
+import javax.servlet.Filter
+import javax.servlet.FilterChain
+import javax.servlet.FilterConfig
+import javax.servlet.ServletException
+import javax.servlet.ServletRequest
+import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class ChooseSupplierFilter : Filter {
+class ChooseSupplierFilter(private val timeSource: TimeSource) : Filter {
+
     @Throws(ServletException::class)
     override fun init(filterConfig: FilterConfig?) {
     }
@@ -21,8 +25,8 @@ class ChooseSupplierFilter : Filter {
         val supplier = session.getAttribute("supplier")
 
         if (supplier == null) {
-            session.setAttribute("date", LocalDate.now().withDayOfMonth(1))
-            res.sendRedirect("/choose-supplier");
+            session.setAttribute("date", timeSource.date().withDayOfMonth(1))
+            res.sendRedirect("/choose-supplier")
         } else {
             chain.doFilter(request, response)
         }

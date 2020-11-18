@@ -102,7 +102,7 @@ class HtmlController(@Autowired val moveService: MoveService) {
         return "dashboard"
     }
 
-    @RequestMapping(SELECT_MONTH_URL, method = [RequestMethod.GET])
+    @GetMapping(SELECT_MONTH_URL)
     fun selectMonth(@ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): Any {
         model.addAttribute("form", JumpToMonthForm(date = ""))
         return "select-month"
@@ -110,7 +110,7 @@ class HtmlController(@Autowired val moveService: MoveService) {
 
     data class JumpToMonthForm(@ValidMonthYear val date: String)
 
-    @RequestMapping(value = ["/select-month"], method = [RequestMethod.POST])
+    @PostMapping(SELECT_MONTH_URL)
     fun jumpToMonth(
             @Valid @ModelAttribute("form") form: JumpToMonthForm,
             result: BindingResult, model: ModelMap,

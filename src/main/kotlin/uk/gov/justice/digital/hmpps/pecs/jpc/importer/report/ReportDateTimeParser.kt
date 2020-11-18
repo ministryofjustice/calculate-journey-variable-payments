@@ -20,5 +20,5 @@ val dateTimeConverter = object: Converter {
                 throw KlaxonException("Couldn't parse date: ${jv.string}")
             }
 
-    override fun toJson(o: Any) = """"$o""""
+    override fun toJson(value: Any) = """"$value""""
 }
