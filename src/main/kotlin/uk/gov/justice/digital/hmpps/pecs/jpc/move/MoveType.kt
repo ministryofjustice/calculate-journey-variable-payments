@@ -9,7 +9,7 @@ enum class MoveType(val text: String, val filterer: (p: FilterParams, m: Collect
     LONG_HAUL("Long haul", ReportFilterer::longHaulReports),
     REDIRECTION("Redirection", ReportFilterer::redirectionReports),
     LOCKOUT("Lockout", ReportFilterer::lockoutReports),
-    MULTI("Multi-type", ReportFilterer::multiTypeReports),
+    MULTI("Multi type", ReportFilterer::multiTypeReports),
     CANCELLED("Cancelled", ReportFilterer::cancelledBillableMoves);
 
     companion object{

@@ -4,6 +4,12 @@
 .govuk-colour-blue {
     color: #1d70b8;
 }
+.govuk-colour-red {
+    color: #d4351c
+}
+.govuk-colour-green {
+    color: #00703c;
+}
 .white {
     color: white;
 }

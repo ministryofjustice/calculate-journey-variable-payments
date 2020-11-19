@@ -7,21 +7,21 @@
         </li>
         <li class="w-25 pv2 mv2">
             <p class="govuk-heading-m white ma0 pt1" th:inline="text">
-                [[${#numbers.formatDecimal(summary.percentage, 0, 'COMMA', 2, 'POINT')}]]%</p>
-            <div><p class="govuk-body govuk-!-font-weight-bold white ma0">Percentage</p></div>
+                [[${#numbers.formatDecimal(summary.percentage * 100, 1, 'COMMA', 0, 'POINT')}]]%</p>
+            <div><p class="govuk-body govuk-!-font-weight-bold white ma0">of total moves</p></div>
         </li>
         <li class="w-25 pv2 mv2">
             <p class="govuk-heading-m white ma0 pt1" th:inline="text">
                 [[${#numbers.formatDecimal(summary.volumeUnpriced, 0, 'COMMA', 0, 'POINT')}]]</p>
-            <div><p class="govuk-body govuk-!-font-weight-bold white ma0">Moves without prices</p></div>
+            <div><p class="govuk-body govuk-!-font-weight-bold white ma0">without prices</p></div>
         </li>
         <li class="w-25 pv2 mv2">
             <p class="govuk-heading-m white ma0 pt1" th:inline="text">
                 £[[${#numbers.formatDecimal(summary.totalPriceInPounds, 1, 'COMMA', 2, 'POINT')}]]</p>
             <div class="pt3" th:if="${summary.volumeUnpriced != 0}">
-                <span class="ttu govuk-body-s govuk-!-font-weight-bold white ba bw1 b--white pa1">Pending price</span>
+                <span class="ttu govuk-body-s govuk-!-font-weight-bold white ba bw1 b--white pa1 dib mb2">Pending price</span>
             </div>
-            <p class="govuk-body govuk-!-font-weight-bold white ma0">Total price</p>
+            <p class="govuk-body govuk-!-font-weight-bold white ma0">total price</p>
         </li>
     </ul>
 

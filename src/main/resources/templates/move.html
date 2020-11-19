@@ -11,13 +11,207 @@
 
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
-    <section class="mt5">
-        <h2 class="govuk-heading-m pt1 bt bw2">Move</h2>
-        <p th:text="${move}"></p>
-        <p th:text="${move.events}"></p>
-        <p th:text="${move.getJourneys()}"></p>
+    <div class="govuk-breadcrumbs ">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/dashboard" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
+                    [[${#dates.format(startOfMonthDate, 'yyyy')}]]</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" th:href="@{/moves-by-type/{moveType}(moveType=${move.moveType})}"
+                   th:inline="text">[[${move.moveType}]] moves</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <span class="govuk-breadcrumbs__link" th:inline="text">Move: [[${move.reference}]]</span>
+            </li>
+        </ol>
+    </div>
 
-    </section>
+    <div class="mv4">
+        <h1 class="govuk-heading-xl ma0" th:inline="text">Move: [[${move.reference}]]</h1>
+    </div>
+
+    <main class="govuk-main-wrapper">
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h2 class="govuk-heading-m ma0 pb2">Person being moved</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            NOMIS Person ID
+                        </dt>
+                        <dd class="govuk-summary-list__value">???</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            First
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:text="${move.firstNames}?: 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Last
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:text="${move.lastName}?: 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Date of birth
+                        </dt>
+                        <dd class="govuk-summary-list__value"
+                            th:text="${move.dateOfBirth != null} ? ${#temporals.format(move.dateOfBirth, 'dd MM yyyy')} : 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Gender
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:text="${move.gender}?: 'Not available'"></dd>
+                    </div>
+                </dl>
+
+                <h2 class="govuk-heading-m ma0 pb2">Move details</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Move start
+                        </dt>
+                        <dd class="govuk-summary-list__value"
+                            th:text="${move.pickUpDateTime != null} ? ${#temporals.format(move.pickUpDateTime, 'dd MMM yyyy, HH:mm')} : 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Move end
+                        </dt>
+                        <dd class="govuk-summary-list__value"
+                            th:text="${move.dropOffOrCancelledDateTime != null} ? ${#temporals.format(move.dropOffOrCancelledDateTime, 'dd MMM yyyy, HH:mm')} : 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Move from
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:text="${move.fromSiteName}?: 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Move to
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:text="${move.toSiteName}?: 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Move type
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:text="${move.moveType}?: 'Not available'"></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Move events
+                        </dt>
+                        <dd class="govuk-summary-list__value" th:switch="${#lists.size(move.events)}">
+                            <p th:case="'0'"></p>
+                            <p th:case="'1'" th:text="${move.events[0]}"></p>
+                            <div th:case="*">
+                                <ul class="pl2">
+                                    <li th:each="event: ${move.events}">
+                                        <span th:text="${event.type}"></span>,
+                                        <span th:text="${event.notes}?: '(no notes)'"></span>,
+                                        <span th:text="${#temporals.format(event.occurredAt, 'dd MMM yyyy, HH:mm')}"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </dd>
+                    </div>
+                </dl>
+
+                <div>
+
+                    <div th:switch="${#lists.size(move.journeys)}">
+                        <h2 th:case="'1'" class="govuk-heading-m ma0 pb2" th:inline="text">Journey details</h2>
+                        <h2 th:case="*" class="govuk-heading-m ma0 pb2" th:inline="text">Journey [[${iter.index + 1}]] of
+                            [[${#lists.size(move.journeys)}]] details</h2>
+                    </div>
+
+                    <dl class="govuk-summary-list" th:each="journey, iter: ${move.journeys}">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Pick up location
+                            </dt>
+                            <dd class="govuk-summary-list__value" th:text="${move.fromSiteName}?: 'Not available'"></dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Pick up location type
+                            </dt>
+                            <dd class="govuk-summary-list__value"
+                                th:text="${move.fromLocationType}?: 'Not available'"></dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Drop off location
+                            </dt>
+                            <dd class="govuk-summary-list__value" th:text="${move.toSiteName}?: 'Not available'"></dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Drop off location type
+                            </dt>
+                            <dd class="govuk-summary-list__value"
+                                th:text="${move.toLocationType}?: 'Not available'"></dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Journey events
+                            </dt>
+                            <dd class="govuk-summary-list__value" th:switch="${#lists.size(journey.events)}">
+                                <p th:case="'0'"></p>
+                                <p th:case="'1'" th:text="${move.events[0]}"></p>
+                                <div th:case="*">
+                                    <ul class="pl2">
+                                        <li th:each="event: ${journey.events}">
+                                            <span th:text="${event.type}"></span>,
+                                            <span th:text="${event.notes}?: '(no notes)'"></span>,
+                                            <span th:text="${#temporals.format(event.occurredAt, 'dd MMM yyyy, HH:mm')}"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Journey billable?
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                <span th:if="${journey.billable}" class="govuk-!-font-weight-bold govuk-colour-green">Yes</span>
+                                <span th:unless="${journey.billable}" class="govuk-!-font-weight-bold govuk-colour-red">No</span>
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Journey vehicle
+                            </dt>
+                            <dd class="govuk-summary-list__value" th:text="${journey.vehicleRegistration}"></dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">
+                                Journey payment
+                            </dt>
+                            <dd class="govuk-summary-list__value" th:inline="text">
+                                £[[${#numbers.formatDecimal(journey.priceInPence ?: 0, 1, 'COMMA', 2, 'POINT')}]]
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="govuk-grid-column-one-third">
+                <h2 class="govuk-heading-m mb1 bt bw1 b--blue pt2">Move price</h2>
+                <p class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPence() ?: 0, 1, 'COMMA', 2,
+                    'POINT')}]]</p>
+            </div>
+        </div>
+
+    </main>
 
 </div>
 
