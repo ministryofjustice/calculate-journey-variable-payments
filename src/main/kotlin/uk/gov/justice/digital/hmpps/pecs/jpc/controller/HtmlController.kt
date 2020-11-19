@@ -66,9 +66,10 @@ class HtmlController(@Autowired val moveService: MoveService) {
     }
 
     @RequestMapping("$MOVES_URL/{moveId}")
-    fun moves(@PathVariable moveId: String, model: ModelMap) : String{
+    fun moves(@PathVariable moveId: String, @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate, model: ModelMap) : String{
         val move = moveService.move(moveId)
         model.addAttribute(MOVE_ATTRIBUTE, move)
+        model.addAttribute("startOfMonthDate", startOfMonth)
         return "move"
     }
 

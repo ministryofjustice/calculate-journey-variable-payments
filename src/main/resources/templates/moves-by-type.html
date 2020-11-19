@@ -15,7 +15,7 @@
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link" href="/dashboard" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
-                    [[${#dates.format(startOfMonthDate, 'yyyy')}]]</a>
+                    [[${#dates.format(startOfMonthDate, 'yyyy')}]] move summary</a>
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <span class="govuk-breadcrumbs__link" th:inline="text">[[${moveType}]] moves</span>
@@ -42,8 +42,8 @@
             <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th class="govuk-table__header" scope="col" aria-sort="none" width="80">Move ID</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Pickup location</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Pickup type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up location</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Location type</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none" width="60">Location type</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none" width="190">Pick up date</th>
@@ -52,38 +52,22 @@
             </thead>
             <thbody class="govuk-table__body">
                 <tr class="govuk-table__row" th:each="move: ${moves}">
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.moveId}]]</td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromNomisAgencyId}]]</td>
+                    <td class="govuk-table__cell" scope="row"><a class="govuk-link" th:href="@{/moves/{id}(id=${move.moveId})}" th:inline="text">[[${move.reference}]]</a></td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromSiteName ?: "Not
+                        mapped"}]]</td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromLocationType ?: "Not
                         mapped"}]]
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toNomisAgencyId}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toSiteName ?: "Not
+                        mapped"}]]</td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toLocationType ?: "Not
                         mapped"}]]
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[move.pickUpDateTime != null ?
-                        ${#dates.format(move.pickUpDateTime, 'dd MMMM yyyy, HH:mm')} : ""]]
+                    <td class="govuk-table__cell" scope="row"
+                        th:text="${move.pickUpDateTime != null} ? ${#temporals.format(move.pickUpDateTime, 'dd MMM yyyy, HH:mm')} : ''">
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.reference}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.latestNomisBookingId}?: 'Not set']]</td>
                 </tr>
-                <!--                <tr class="govuk-table__row">-->
-                <!--                    <td class="govuk-table__cell" scope="row">MX1234</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">[NOMIS agency ID]</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">Not mapped</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">Leeds prison</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">PS</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">29 March 2020, 07:30</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">12648573</td>-->
-                <!--                </tr>-->
-                <!--                <tr class="govuk-table__row">-->
-                <!--                    <td class="govuk-table__cell" scope="row">MX1234</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">[NOMIS agency ID]</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">Not mapped</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">Leeds prison</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">PS</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">29 March 2020, 07:30</td>-->
-                <!--                    <td class="govuk-table__cell" scope="row">12648573</td>-->
-                <!--                </tr>-->
             </thbody>
         </table>
 
