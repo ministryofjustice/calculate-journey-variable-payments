@@ -10,6 +10,11 @@ data class UniqueJourney(
         val toLocationType: LocationType?,
         val toSiteName: String?,
         val volume: Int,
+        val unitPriceInPence: Int?,
         val totalPriceInPence: Int?
 ) {
+    fun unitPriceInPounds() = unitPriceInPence?.let{it.toDouble() / 100}
+    fun totalPriceInPounds() = totalPriceInPence?.let{it.toDouble() / 100}
+    fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
+    fun toSiteName() = toSiteName ?: toNomisAgencyId
 }

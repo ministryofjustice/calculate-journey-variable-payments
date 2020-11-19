@@ -80,7 +80,7 @@ class HtmlController(@Autowired val moveService: MoveService) {
             model: ModelMap) : String{
 
         model.addAttribute("journeysSummary", moveService.journeysSummary(supplier, startOfMonth))
-        model.addAttribute("journeys", moveService.uniqueJourneys(supplier, startOfMonth))
+        model.addAttribute("journeys", moveService.uniqueJourneysExcludingPriced(supplier, startOfMonth))
         return "journeys"
     }
 

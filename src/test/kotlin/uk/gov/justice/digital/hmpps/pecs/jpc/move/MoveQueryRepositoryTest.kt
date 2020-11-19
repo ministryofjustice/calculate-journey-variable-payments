@@ -165,7 +165,7 @@ internal class MoveQueryRepositoryTest {
         val summaries = moveQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2))
 
-        val unpricedUniqueJourneys = moveQueryRepository.unpricedUniqueJourneysInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val unpricedUniqueJourneys = moveQueryRepository.uniqueJourneysInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(unpricedUniqueJourneys.size).isEqualTo(2)
 
         // Ordered by unmapped from locations first

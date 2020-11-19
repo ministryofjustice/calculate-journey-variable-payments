@@ -29,7 +29,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             rowMapper)[0]
     }
 
-    fun unpricedUniqueJourneysInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): List<UniqueJourney> {
+    fun uniqueJourneysInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, excludePriced: Boolean = true): List<UniqueJourney> {
         val uniqueJourneysRowMapper = RowMapper<UniqueJourney> { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 UniqueJourney(
@@ -40,11 +40,13 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                     toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
                     toSiteName = getString("journey_to_site_name"),
                     volume = getInt("volume"),
+                    unitPriceInPence = getInt("unit_price_in_pence"),
                     totalPriceInPence = getInt("total_price_in_pence")
                 )
             }
         }
 
+        val havingOnlyUnpriced = if(excludePriced) "HAVING max(case when p.price_in_pence is null then 1 else 0 end) > 0 " else ""
         val uniqueJourneysSQL = """
             select j.from_nomis_agency_id                                     as journey_from_nomis_agency_id,
                    jfl.site_name                                              as journey_from_site_name,
@@ -52,6 +54,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                    j.to_nomis_agency_id                                       as journey_to_nomis_agency_id,
                    jtl.site_name                                              as journey_to_site_name,
                    jtl.location_type                                          as journey_to_location_type,
+                   p.price_in_pence                                           as unit_price_in_pence,
                    count (CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id)) as volume,
                    sum(case when j.billable then p.price_in_pence else case when p.price_in_pence is null then null else 0 end end) as total_price_in_pence,
                    sum(case when jfl.site_name is null then 3 else 0 end + case when jtl.site_name is null then 2 else 0 end + case when p.price_in_pence is null then 1 else 0 end) /
@@ -62,8 +65,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
                      left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id
                      where m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ?
-            GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type
-            HAVING max(case when p.price_in_pence is null then 1 else 0 end) > 0
+            GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, p.price_in_pence
+            $havingOnlyUnpriced
             ORDER BY null_locations_and_prices_sum desc, volume desc
         """.trimIndent()
 
@@ -157,7 +160,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 notes = getString("notes"),
                 prisonNumber = getString("prison_number"),
                 vehicleRegistration = getString("vehicle_registration"),
-                latestNomisBookingId = getString("latest_nomis_booking_id"),
+                latestNomisBookingId = getInt("latest_nomis_booking_id"),
                 firstNames = getString("first_names"),
                 lastName = getString("last_name"),
                 ethnicity = getString("ethnicity"),

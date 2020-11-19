@@ -64,7 +64,7 @@ data class Move(
         val prisonNumber: String? = null,
 
         @Column(name="latest_nomis_booking_id", nullable = true)
-        val latestNomisBookingId: String? = null,
+        val latestNomisBookingId: Int? = null,
 
         @Column(name = "first_names", nullable = true)
         val firstNames: String? = null,
