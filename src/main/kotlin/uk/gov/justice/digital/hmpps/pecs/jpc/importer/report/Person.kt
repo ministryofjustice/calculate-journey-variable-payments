@@ -14,7 +14,7 @@ data class Person(
         val prisonNumber: String?,
 
         @Json(name="latest_nomis_booking_id")
-        val latestNomisBookingId: String? = null,
+        val latestNomisBookingId: Int? = null,
 
         @Json(name = "first_names")
         val firstNames: String? = null,

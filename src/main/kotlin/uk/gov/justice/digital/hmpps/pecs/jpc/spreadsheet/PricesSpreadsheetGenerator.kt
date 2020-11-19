@@ -34,6 +34,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
             val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
 
             val moves = moveService.moves(supplier, startDate)
+            val journeys = moveService.uniqueJourneysIncludingPriced(supplier, startDate)
             val summaries = moveService.moveTypeSummaries(supplier, startDate)
 
                 StandardMovesSheet(workbook, header)
@@ -59,6 +60,10 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
                 CancelledMovesSheet(workbook, header)
                         .also { logger.info("Adding cancelled moves.") }
                         .apply { writeMoves(moves[5]) }
+
+            JourneysSheet(workbook, header)
+                    .also { logger.info("Adding journeys.") }
+                    .apply { writeJourneys(journeys) }
 
                 SummarySheet(workbook, header)
                         .also { logger.info("Adding summaries.") }
