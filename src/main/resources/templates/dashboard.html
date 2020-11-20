@@ -11,14 +11,14 @@
 
 <div class="govuk-width-container" layout:fragment="content">
 
-    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
-        [[${#dates.format(startOfMonthDate, 'yyyy')}]]</h1>
+    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#temporals.monthName(startOfMonthDate)}]]
+        [[${#temporals.format(startOfMonthDate, 'yyyy')}]]</h1>
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <ul class="list pl0 ma0">
                 <li class="govuk-!-display-inline-block"><a
-                        th:href="@{/dashboard(date=${#dates.format(months.previousMonth, 'yyyy-MM-dd')})}"
+                        th:href="@{/dashboard(date=${#temporals.format(months.previousMonth, 'yyyy-MM-dd')})}"
                         class="ma0 govuk-link govuk-heading-s right-arrow-left">Previous
                     month</a></li>
                 <li class="govuk-!-display-inline-block"><a
@@ -26,14 +26,14 @@
                         class="ma0 govuk-link govuk-heading-s mh3">Jump to
                     month</a></li>
                 <li class="govuk-!-display-inline-block"><a
-                        th:href="@{/dashboard(date=${#dates.format(months.nextMonth, 'yyyy-MM-dd')})}"
+                        th:href="@{/dashboard(date=${#temporals.format(months.nextMonth, 'yyyy-MM-dd')})}"
                         class="ma0 govuk-link govuk-heading-s right-arrow-right">Next
                     month</a></li>
             </ul>
         </div>
         <div class="govuk-grid-column-one-third tr">
-            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplier.name())}?moves_from=${#dates.format(startOfMonthDate, 'yyyy-MM-dd')}|}"
-               th:attr="download=${'moves-' + #dates.monthName(startOfMonthDate) + '-' + #dates.format(endOfMonthDate, 'yyyy') + '.csv'}"
+            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplier.name())}?moves_from=${#temporals.format(startOfMonthDate, 'yyyy-MM-dd')}|}"
+               th:attr="download=${'moves-' + #temporals.format(endOfMonthDate, 'MMMM-yyyy') + '.csv'}"
                class="ma0 govuk-link govuk-heading-s download-icon dib">Download all moves</a>
         </div>
     </div>

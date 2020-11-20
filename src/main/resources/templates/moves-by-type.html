@@ -14,8 +14,8 @@
     <div class="govuk-breadcrumbs ">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="/dashboard" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
-                    [[${#dates.format(startOfMonthDate, 'yyyy')}]] move summary</a>
+                <a class="govuk-breadcrumbs__link" href="/dashboard" th:inline="text">[[${#temporals.monthName(startOfMonthDate)}]]
+                    [[${#temporals.format(startOfMonthDate, 'yyyy')}]] move summary</a>
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <span class="govuk-breadcrumbs__link" th:inline="text">[[${moveType}]] moves</span>
