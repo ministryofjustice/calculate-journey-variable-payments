@@ -1,0 +1,17 @@
+<span th:fragment="eventType" th:switch="${type}">
+    <span th:case="'MoveStart'">MoveStart</span>
+    <span th:case="'MoveAccept'">MoveAccept</span>
+    <span th:case="'MoveCancel'">MoveCancel</span>
+    <span th:case="'MoveComplete'">MoveComplete</span>
+    <span th:case="'MoveLockout'">MoveLockout</span>
+    <span th:case="'MoveLodgingStart'">MoveLodgingStart</span>
+    <span th:case="'MoveLodgingEnd'">MoveLodgingEnd</span>
+    <span th:case="'MoveRedirect'">MoveRedirect</span>
+    <span th:case="'JourneyStart'">JourneyStart</span>
+    <span th:case="'JourneyComplete'">JourneyComplete</span>
+    <span th:case="'JourneyLockout'">JourneyLockout</span>
+    <span th:case="'JourneyLodging'">JourneyLodging</span>
+    <span th:case="'JourneyCancel'">JourneyCancel</span>
+    <span th:case="'Unknown'">Unknown</span>
+    <span th:case="*" th:inline="text">Unknown ([[${type}]])</span>
+</span>
