@@ -1,17 +1,17 @@
 <span th:fragment="eventType" th:switch="${type}">
-    <span th:case="'MoveStart'">MoveStart</span>
-    <span th:case="'MoveAccept'">MoveAccept</span>
-    <span th:case="'MoveCancel'">MoveCancel</span>
-    <span th:case="'MoveComplete'">MoveComplete</span>
-    <span th:case="'MoveLockout'">MoveLockout</span>
-    <span th:case="'MoveLodgingStart'">MoveLodgingStart</span>
-    <span th:case="'MoveLodgingEnd'">MoveLodgingEnd</span>
-    <span th:case="'MoveRedirect'">MoveRedirect</span>
-    <span th:case="'JourneyStart'">JourneyStart</span>
-    <span th:case="'JourneyComplete'">JourneyComplete</span>
-    <span th:case="'JourneyLockout'">JourneyLockout</span>
-    <span th:case="'JourneyLodging'">JourneyLodging</span>
-    <span th:case="'JourneyCancel'">JourneyCancel</span>
-    <span th:case="'Unknown'">Unknown</span>
+    <span th:case="'MoveStart'">Move started</span>
+    <span th:case="'MoveAccept'">Move accepted</span>
+    <span th:case="'MoveCancel'">Move cancelled</span>
+    <span th:case="'MoveComplete'">Move completed</span>
+    <span th:case="'MoveLockout'">Lockout</span>
+    <span th:case="'MoveLodgingStart'">Lodging started</span>
+    <span th:case="'MoveLodgingEnd'">Lodging ended</span>
+    <span th:case="'MoveRedirect'">Redirected</span>
+    <span th:case="'JourneyStart'">Journey started</span>
+    <span th:case="'JourneyComplete'">Journey completed</span>
+    <span th:case="'JourneyLockout'">Journey lockout</span>
+    <span th:case="'JourneyLodging'">Journey lodging</span>
+    <span th:case="'JourneyCancel'">Journey cancelled</span>
+    <span th:case="'Unknown'">No events listed</span>
     <span th:case="*" th:inline="text">Unknown ([[${type}]])</span>
 </span>
