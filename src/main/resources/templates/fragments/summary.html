@@ -3,8 +3,8 @@
     <ul class="list ph0 bg-govuk-colour-blue flex mv3 flex-wrap w-75">
         <li class="w-third pv2 mv2">
             <p class="govuk-body govuk-!-font-weight-bold white ma0">Total moves for</p>
-            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">[[${#dates.monthName(startOfMonthDate)}]]
-                [[${#dates.format(startOfMonthDate, 'yyyy')}]]</p></div>
+            <div><p class="govuk-heading-m white ma0 pt1" th:inline="text">[[${#temporals.monthName(startOfMonthDate)}]]
+                [[${#temporals.format(startOfMonthDate, 'yyyy')}]]</p></div>
         </li>
         <li class="w-third pv2 mv2">
             <p class="govuk-body govuk-!-font-weight-bold white ma0">Moves without prices</p>
