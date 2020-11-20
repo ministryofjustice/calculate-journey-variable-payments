@@ -10,6 +10,10 @@ data class ReportJourney(
         @get: NotBlank(message = "id cannot be blank")
         val id: String,
 
+        @EventDateTime
+        @Json(name = "updated_at")
+        val updatedAt: LocalDateTime,
+
         @Json(name = "move_id")
         val moveId: String,
 

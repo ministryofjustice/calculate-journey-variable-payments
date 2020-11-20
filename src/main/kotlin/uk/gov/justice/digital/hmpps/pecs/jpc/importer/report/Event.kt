@@ -19,6 +19,11 @@ data class Event constructor(
         @Column(name = "event_id")
         val id: String,
 
+        @EventDateTime
+        @Json(name = "updated_at")
+        @Column(name = "updated_at")
+        val updatedAt: LocalDateTime,
+
         @get: NotBlank(message = "type cannot be blank")
         @Column(name = "event_type")
         val type: String,

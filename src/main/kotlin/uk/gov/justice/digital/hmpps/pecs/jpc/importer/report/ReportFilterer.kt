@@ -50,6 +50,7 @@ object ReportFilterer {
         }.map { it.copy(journeysWithEvents = listOf(ReportJourneyWithEvents( // fake journey with events
                 ReportJourney(
                         id = "FAKE",
+                        updatedAt = LocalDateTime.now(),
                         moveId = it.move.id,
                         billable = true,
                         supplier = it.move.supplier,

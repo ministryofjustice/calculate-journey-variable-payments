@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 internal class ReportParserTest {
 
     fun profileReports() : List<String> {
-        val report1 = """{"id":"PR1","person_id":"PE1"}""".trimIndent()
+        val report1 = """{"id":"PR1", "updated_at" : "2020-09-07T15:30:59+01:00", "person_id":"PE1"}""".trimIndent()
         return listOf(report1)
     }
 
@@ -49,14 +49,14 @@ internal class ReportParserTest {
 
     fun eventReports() : List<String> {
         val report1 = """
-            {"id": "E1", "type": "MoveCancel", "actioned_by": "serco", "notes": "", "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-08-03 15:43:12 +0100", "eventable_id": "M1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"cancellation_reason": "made_in_error", "cancellation_reason_comment": "cancelled because the prisoner refused to move"}}
-            {"id": "E2", "type": "MoveRedirect", "actioned_by": "geoamey", "notes": null, "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-08-03 15:43:12 +0100", "eventable_id": "M2", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"to_location": "BRSTCC"}}
+            {"id": "E1", "type": "MoveCancel", "actioned_by": "serco", "notes": "", "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-09-07T15:30:59+01:00", "eventable_id": "M1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"cancellation_reason": "made_in_error", "cancellation_reason_comment": "cancelled because the prisoner refused to move"}}
+            {"id": "E2", "type": "MoveRedirect", "actioned_by": "geoamey", "notes": null, "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-09-07T15:30:59+01:00", "eventable_id": "M2", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"to_location": "BRSTCC"}}
         """.trimIndent()
 
         val report2 = """
-            {"id": "E3", "type": "JourneyCancel", "actioned_by": "serco", "notes": "", "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-08-03 15:43:12 +0100", "eventable_id": "J1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"cancellation_reason": "made_in_error", "cancellation_reason_comment": "cancelled because the prisoner refused to move"}}
-            {"id": "E4", "type": "MoveRedirect", "actioned_by": "geoamey", "notes": null, "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-08-03 15:43:12 +0100", "eventable_id": "M1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"to_location": "BRSTCC"}}
-            {"id": "E5", "type": "MoveUnknownEvent", "actioned_by": "geoamey", "notes": null, "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-08-03 15:43:12 +0100", "eventable_id": "M1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"to_location": "BRSTCC"}}
+            {"id": "E3", "type": "JourneyCancel", "actioned_by": "serco", "notes": "", "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-09-07T15:30:59+01:00", "eventable_id": "J1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"cancellation_reason": "made_in_error", "cancellation_reason_comment": "cancelled because the prisoner refused to move"}}
+            {"id": "E4", "type": "MoveRedirect", "actioned_by": "geoamey", "notes": null, "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-09-07T15:30:59+01:00", "eventable_id": "M1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"to_location": "BRSTCC"}}
+            {"id": "E5", "type": "MoveUnknownEvent", "actioned_by": "geoamey", "notes": null, "created_at": "2020-08-03 15:43:12 +0100", "updated_at": "2020-09-07T15:30:59+01:00", "eventable_id": "M1", "eventable_type": "move", "occurred_at": "2020-06-16T10:20:30+01:00", "recorded_at": "2020-06-16T10:20:30+01:00", "details": {"to_location": "BRSTCC"}}
         """.trimIndent()
 
         return listOf(report1, report2)

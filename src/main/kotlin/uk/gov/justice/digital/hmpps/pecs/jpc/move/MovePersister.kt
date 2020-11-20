@@ -29,8 +29,11 @@ class MoveModelPersister(private val moveRepository: MoveRepository, private val
                         val dropOff = Event.getLatestByType(report.moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
                         val cancelled = Event.getLatestByType(report.moveEvents, EventType.MOVE_CANCEL)?.occurredAt
 
+                        val move = moveRepository.findById(moveId)
                         // delete any existing move / journeys
-                        if (moveRepository.existsById(moveId)) moveRepository.deleteById(moveId)
+                      //  if (moveRepository.existsById(moveId)) moveRepository.deleteById(moveId)
+
+
 
                         // create new move model
                         val moveModel = Move(

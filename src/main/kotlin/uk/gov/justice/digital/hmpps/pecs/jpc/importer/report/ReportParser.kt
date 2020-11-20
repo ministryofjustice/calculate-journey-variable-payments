@@ -32,7 +32,7 @@ object ReportParser {
 
     fun parseAsProfileIdToPersonId(profileFiles: List<String>): Map<String, String> {
         logger.info("Parsing profiles")
-        return read(profileFiles) { ReportProfile.fromJson(it) }.associateBy(keySelector = { it.id }, valueTransform = { it.personId })
+        return read(profileFiles) { Profile.fromJson(it) }.associateBy(keySelector = { it.id }, valueTransform = { it.personId })
     }
 
     fun parseAsPersonIdToPerson(peopleFiles: List<String>): Map<String, Person> {
