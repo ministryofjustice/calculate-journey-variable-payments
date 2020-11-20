@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+    <a href="/dashboard" class="govuk-back-link">Back</a>
+
+    <form th:action="@{/map-friendly-location-name}" th:object="${form}" method="post">
+        <div class="govuk-form-group" >
+            <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="event-name">
+                Map location
+            </label>
+            </h1>
+            <div id="map-location-name-hint" class="govuk-hint">
+                Please add a Schedule 34 location name for this NOMIS agency ID.
+            </div>
+            <div id="agency-id-hint" class="govuk-hint">
+                <span class="db govuk-!-font-weight-bold">Pick up location</span>
+                <p th:text="*{agencyId}"></p>
+            </div>
+            <div id="location-name-hint" class="govuk-hint">
+                <span class="db govuk-!-font-weight-bold">Maps to Schedule 34 location</span>
+            </div>
+            <input class="govuk-input govuk-input--width-20" id="location-name" name="location-name" type="text"
+                   aria-describedby="location-name-hint" th:field="*{locationName}"
+                   th:classappend="${#fields.hasErrors('locationName')} ? 'govuk-input--error'">
+
+            <div id="location-type-hint" class="govuk-hint">
+                <span class="db govuk-!-font-weight-bold">Add location type</span>
+            </div>
+            <select name="location-type" id="location-type-id">
+                <option value="AP">Airport</option>
+                <option value="CC">Crown Court</option>
+                <option value="CM">Combined Court</option>
+                <option value="CO">County Court</option>
+                <option value="HP">Hospital</option>
+                <option value="IM">Immigration</option>
+                <option value="MC">Mag Court</option>
+                <option value="O">Other</option>
+                <option value="PR">Prison</option>
+                <option value="PS">Police</option>
+                <option value="SCH">SCH</option>
+                <option value="STC">STC</option>
+            </select>
+        </div>
+        <div class="flex items-center">
+            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+                Confirm and save
+            </button>
+            <a href="/dashboard" class="govuk-link">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+
+</html>
