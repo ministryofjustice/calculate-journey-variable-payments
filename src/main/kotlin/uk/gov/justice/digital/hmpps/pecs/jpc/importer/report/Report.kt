@@ -1,10 +1,19 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
+
 data class Report(
         val move: ReportMove,
         val person: Person?,
         val moveEvents: List<Event> = listOf(),
         val journeysWithEvents: List<ReportJourneyWithEvents> = listOf()) {
+
+    /**
+     * Returns the nullable MoveType for the Report
+     * This goes through each filterer in turn to see if it is that MoveType
+     * If it doesn't find any matching MoveType, return null
+     */
+    fun moveType(params: FilterParams) = MoveType.values().firstOrNull { it.filterer(params, listOf(this)).toList().isNotEmpty() }
 
     fun hasAllOf(vararg ets: EventType) = getEvents(*ets).size == ets.size
     fun hasAnyOf(vararg ets: EventType) = getEvents(*ets).isNotEmpty()

@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.location.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveModelPersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.Duration
 import java.time.LocalDate
@@ -18,7 +18,7 @@ class ImportService(
         private val locationsImporter: LocationsImporter,
         private val priceImporter: PriceImporter,
         private val reportImporter: ReportImporter,
-        private val reportModelPersister: MoveModelPersister) {
+        private val reportPersister: MovePersister) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -32,7 +32,7 @@ class ImportService(
         val reports = import { reportImporter.import(supplier, reportsFrom, reportsTo) }
 
         reports?.let {
-            reportModelPersister.persist(FilterParams(supplier, reportsFrom, reportsTo), it.toList())
+            reportPersister.persist(FilterParams(supplier, reportsFrom, reportsTo), it.toList())
         }
     }
 

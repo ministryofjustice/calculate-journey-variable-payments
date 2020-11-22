@@ -16,6 +16,7 @@ fun move(
         journeys: MutableList<Journey> = mutableListOf()
 ) = Move(
         moveId = moveId,
+        updatedAt = defaultDateTime,
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
         status = MoveStatus.COMPLETED,
@@ -50,6 +51,7 @@ fun journey(
         dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
 ) = Journey(
         journeyId = journeyId,
+        updatedAt = defaultDateTime,
         state = state,
         moveId = moveId,
         fromNomisAgencyId = fromNomisAgencyId,

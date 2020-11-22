@@ -70,12 +70,15 @@ data class ReportMove(
 }
 
 enum class MoveStatus {
+    PROPOSED,
+    REQUESTED,
+    BOOKED,
+    IN_TRANSIT,
     COMPLETED,
-    CANCELLED;
+    CANCELLED,
+    UNKNOWN;
 
     companion object{
-        fun valueOfCaseInsensitive(value: String): MoveStatus {
-            return valueOf(value.toUpperCase())
-        }
+        fun valueOfCaseInsensitive(value: String) = kotlin.runCatching { valueOf(value.toUpperCase())}.getOrDefault(UNKNOWN)
     }
 }

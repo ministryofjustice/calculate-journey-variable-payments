@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
@@ -208,5 +209,20 @@ internal class ReportFiltererTest {
 
         val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(filter, reports).toList()
         assertThat(cancelledBillableReports.map{it.move}).containsExactlyInAnyOrder(cancelledBillable.move)
+    }
+
+    @Test
+    fun `billable cancelled report move type is CANCELLED`(){
+        assertThat(cancelledBillable.moveType(filter)).isEqualTo(MoveType.CANCELLED)
+    }
+
+    @Test
+    fun `non billable cancelled report move type is null`(){
+        assertThat(cancelled.moveType(filter)).isNull()
+    }
+
+    @Test
+    fun `standard report move type is STANDARD`(){
+        assertThat(standardInDateRange.moveType(filter)).isEqualTo(MoveType.STANDARD)
     }
 }

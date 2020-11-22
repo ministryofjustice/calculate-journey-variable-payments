@@ -14,6 +14,9 @@ data class Journey(
         @Column(name = "journey_id")
         val journeyId: String,
 
+        @Column(name = "updated_at")
+        val updatedAt: LocalDateTime,
+
         @Column(name = "move_id")
         val moveId: String,
 

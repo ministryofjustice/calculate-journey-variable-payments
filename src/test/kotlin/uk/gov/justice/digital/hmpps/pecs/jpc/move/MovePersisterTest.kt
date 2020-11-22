@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
@@ -9,17 +10,7 @@ import org.springframework.context.annotation.Import
 
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.FilterParams
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportJourneyWithEvents
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Report
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.journeyEventFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportJourneyFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.moveEventFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportMoveFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.personFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
@@ -42,31 +33,27 @@ internal class MovePersisterTest {
     lateinit var moveRepository: MoveRepository
 
     @Autowired
-    lateinit var moveQueryRepository: MoveQueryRepository
-
-    @Autowired
-    lateinit var journeyRepository: JourneyRepository
-
-    @Autowired
     lateinit var entityManager: TestEntityManager
 
-    val from = LocalDate.of(2020, 9, 1)
-    val to = LocalDate.of(2020, 9, 6)
+    final val from: LocalDate = LocalDate.of(2020, 9, 1)
+    final val to: LocalDate = LocalDate.of(2020, 9, 6)
+    val params = FilterParams(Supplier.SERCO, from, to)
 
+    lateinit var redirectMove: ReportMove
+    lateinit var redirectReport: Report
 
-    @Test
-    fun `Persist one move with one extant location and one journey`() {
+    lateinit var persister: MovePersister
 
+    @BeforeEach
+    fun beforeEach() {
         val fromLocation = WYIPrisonLocation()
         val toLocation = GNICourtLocation()
-
         locationRepository.save(fromLocation)
         locationRepository.save(toLocation)
 
-        priceRepository.save(Price(id= UUID.randomUUID(), fromLocation = fromLocation, toLocation = toLocation, priceInPence = 999, supplier = Supplier.SERCO))
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = fromLocation, toLocation = toLocation, priceInPence = 999, supplier = Supplier.SERCO))
 
-        val redirectMove = reportMoveFactory()
-        val noJourneyMove = reportMoveFactory(moveId = "NOJOURNEY")
+        redirectMove = reportMoveFactory()
 
         val journey1 = reportJourneyFactory().copy(id = "J1", billable = true, vehicleRegistration = "REG1")
         val journey2 = reportJourneyFactory().copy(id = "J2", billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
@@ -74,49 +61,34 @@ internal class MovePersisterTest {
         val moveStartEvent = moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
         val moveRedirectEvent = moveEventFactory(eventId = "E2", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7))
         val moveCompleteEvent = moveEventFactory(eventId = "E3", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-        val completedRedirectMoveWithPricedBillableJourney = Report(
+        redirectReport = Report(
                 move = redirectMove,
                 person = personFactory(),
                 moveEvents = listOf(moveStartEvent, moveRedirectEvent, moveCompleteEvent),
                 journeysWithEvents = listOf(
                         ReportJourneyWithEvents(journey1, listOf(
-                            journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                            journeyEventFactory(journeyEventId = "E5", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-                            )
+                                journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                                journeyEventFactory(journeyEventId = "E5", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                        )
                         ),
                         ReportJourneyWithEvents(journey2, listOf(
                                 journeyEventFactory(journeyEventId = "E6", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
                                 journeyEventFactory(journeyEventId = "E7", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-                            )
+                        )
                         )
                 )
         )
 
-        val multiMoveBecauseNoJourney = Report(
-                move = noJourneyMove,
-                person = personFactory(),
-                moveEvents = listOf(
-                        moveEventFactory(eventId = "E8", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                        moveEventFactory(eventId = "E9", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7)),
-                        moveEventFactory(eventId = "E10", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-                ),
-                journeysWithEvents = listOf()
-        )
+        persister = MovePersister(moveRepository)
+    }
 
-        val persister = MoveModelPersister(moveRepository, journeyRepository)
-        val params = FilterParams(Supplier.SERCO, from, to)
 
-        persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney, multiMoveBecauseNoJourney))
-
-        // persist again to check that updating it works
-        persister.persist(params, listOf(completedRedirectMoveWithPricedBillableJourney.copy(move = redirectMove.copy(reference = "NEWREF"))))
+    @Test
+    fun `Persist redirect move`() {
+        persister.persist(params, listOf(redirectReport))
 
         entityManager.flush()
-
         val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
-
-        // The ref should be the updated ref
-        assertThat(retrievedRedirectMove.reference).isEqualTo("NEWREF")
 
         assertThat(retrievedRedirectMove.notes).isEqualTo("MoveRedirect: This was redirected.")
         assertThat(retrievedRedirectMove.vehicleRegistration).isEqualTo("REG1, REG2")
@@ -135,8 +107,82 @@ internal class MovePersisterTest {
         assertThat(retrievedRedirectMove.lastName).isEqualTo("Kid")
 
 
-        val retrievedNoJourneyMove = moveRepository.findById(noJourneyMove.id).get()
-        assertThat(retrievedNoJourneyMove.reference).isEqualTo("UKW4591N")
+    }
+
+    @Test
+    fun `Persist updated move`() {
+        persister.persist(params, listOf(redirectReport))
+
+        // persist again to check that updating it works
+        persister.persist(params, listOf(redirectReport.copy(move = redirectMove.copy(reference = "NEWREF"))))
+
+        entityManager.flush()
+        val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
+
+        // The ref should be the updated ref
+        assertThat(retrievedRedirectMove.reference).isEqualTo("NEWREF")
+    }
+
+    @Test
+    fun `Persist two moves`() {
+        val noJourneyMove = reportMoveFactory(moveId = "NOJOURNEY")
+
+        val multiReport = Report(
+                move = noJourneyMove,
+                person = personFactory(),
+                moveEvents = listOf(
+                        moveEventFactory(eventId = "E8", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                        moveEventFactory(eventId = "E9", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7)),
+                        moveEventFactory(eventId = "E10", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                ),
+                journeysWithEvents = listOf()
+        )
+
+        persister.persist(params, listOf(redirectReport, multiReport))
+        entityManager.flush()
+
+        assertThat(moveRepository.findAll().map { it.moveId }).containsExactlyInAnyOrder("M1", "NOJOURNEY")
+    }
+
+    @Test
+    fun `Persist new event`() {
+        persister.persist(params, listOf(redirectReport))
+
+        val reportWithNewEvent = Report(
+                move = redirectMove,
+                moveEvents = listOf(moveEventFactory(eventId = "E400", type = EventType.MOVE_LOCKOUT.value, occurredAt = from.atStartOfDay().plusHours(10))),
+                person = null
+        )
+
+        persister.persist(params, listOf(reportWithNewEvent))
+        entityManager.flush()
+
+        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+
+        // Previous and new events should be present
+        assertThat(retrievedMove.events.map { it.id }).containsExactlyInAnyOrder("E1", "E2", "E3", "E400")
+    }
+
+    @Test
+    fun `Persist new journey`() {
+        persister.persist(params, listOf(redirectReport))
+
+        val newJourney = reportJourneyFactory(journeyId = "J400")
+        val journeyEvents = listOf(journeyEventFactory(journeyEventId = "JE400", type = EventType.JOURNEY_LODGING.value, occurredAt = from.atStartOfDay().plusHours(10)))
+
+        val reportWithNewJourney = Report(
+                move = redirectMove,
+                journeysWithEvents = listOf(ReportJourneyWithEvents(newJourney, journeyEvents)),
+                person = null
+        )
+
+        persister.persist(params, listOf(reportWithNewJourney))
+        entityManager.flush()
+
+        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+
+        // Previous and new journeys should be present
+        assertThat(retrievedMove.journeys.map { it.journeyId }).containsExactlyInAnyOrder("J1", "J2", "J400")
     }
 }
 
