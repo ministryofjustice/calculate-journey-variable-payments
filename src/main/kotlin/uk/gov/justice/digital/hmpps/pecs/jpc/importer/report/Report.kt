@@ -13,7 +13,7 @@ data class Report(
      * This goes through each filterer in turn to see if it is that MoveType
      * If it doesn't find any matching MoveType, return null
      */
-    fun moveType(params: FilterParams) = MoveType.values().firstOrNull { it.filterer(params, listOf(this)).toList().isNotEmpty() }
+    fun moveType() = MoveType.values().firstOrNull { it.filterer(listOf(this)).toList().isNotEmpty() }
 
     fun hasAllOf(vararg ets: EventType) = getEvents(*ets).size == ets.size
     fun hasAnyOf(vararg ets: EventType) = getEvents(*ets).isNotEmpty()

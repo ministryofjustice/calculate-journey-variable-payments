@@ -98,7 +98,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
 
-    fun writeJourneyRows(journeys: List<Journey>) {
+    fun writeJourneyRows(journeys: Collection<Journey>) {
         journeys.forEachIndexed { i, j ->
             writeJourneyRow(i, j)
         }

@@ -37,7 +37,6 @@ internal class MovePersisterTest {
 
     final val from: LocalDate = LocalDate.of(2020, 9, 1)
     final val to: LocalDate = LocalDate.of(2020, 9, 6)
-    val params = FilterParams(Supplier.SERCO, from, to)
 
     lateinit var redirectMove: ReportMove
     lateinit var redirectReport: Report
@@ -85,7 +84,7 @@ internal class MovePersisterTest {
 
     @Test
     fun `Persist redirect move`() {
-        persister.persist(params, listOf(redirectReport))
+        persister.persist(listOf(redirectReport))
 
         entityManager.flush()
         val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
@@ -111,10 +110,10 @@ internal class MovePersisterTest {
 
     @Test
     fun `Persist updated move`() {
-        persister.persist(params, listOf(redirectReport))
+        persister.persist(listOf(redirectReport))
 
         // persist again to check that updating it works
-        persister.persist(params, listOf(redirectReport.copy(move = redirectMove.copy(reference = "NEWREF"))))
+        persister.persist(listOf(redirectReport.copy(move = redirectMove.copy(reference = "NEWREF"))))
 
         entityManager.flush()
         val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
@@ -138,7 +137,7 @@ internal class MovePersisterTest {
                 journeysWithEvents = listOf()
         )
 
-        persister.persist(params, listOf(redirectReport, multiReport))
+        persister.persist(listOf(redirectReport, multiReport))
         entityManager.flush()
 
         assertThat(moveRepository.findAll().map { it.moveId }).containsExactlyInAnyOrder("M1", "NOJOURNEY")
@@ -146,7 +145,7 @@ internal class MovePersisterTest {
 
     @Test
     fun `Persist new event`() {
-        persister.persist(params, listOf(redirectReport))
+        persister.persist(listOf(redirectReport))
 
         val reportWithNewEvent = Report(
                 move = redirectMove,
@@ -154,7 +153,7 @@ internal class MovePersisterTest {
                 person = null
         )
 
-        persister.persist(params, listOf(reportWithNewEvent))
+        persister.persist(listOf(reportWithNewEvent))
         entityManager.flush()
 
         val retrievedMove = moveRepository.findById(redirectMove.id).get()
@@ -165,7 +164,7 @@ internal class MovePersisterTest {
 
     @Test
     fun `Persist new journey`() {
-        persister.persist(params, listOf(redirectReport))
+        persister.persist(listOf(redirectReport))
 
         val newJourney = reportJourneyFactory(journeyId = "J400")
         val journeyEvents = listOf(journeyEventFactory(journeyEventId = "JE400", type = EventType.JOURNEY_LODGING.value, occurredAt = from.atStartOfDay().plusHours(10)))
@@ -176,7 +175,7 @@ internal class MovePersisterTest {
                 person = null
         )
 
-        persister.persist(params, listOf(reportWithNewJourney))
+        persister.persist(listOf(reportWithNewJourney))
         entityManager.flush()
 
         val retrievedMove = moveRepository.findById(redirectMove.id).get()

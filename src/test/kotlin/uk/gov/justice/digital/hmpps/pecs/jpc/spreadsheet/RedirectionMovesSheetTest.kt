@@ -20,8 +20,8 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
     internal fun `test redirection prices`() {
 
         val journey1 = journey()
-        val journey2 = journey()
-        val move = move(journeys = mutableListOf(journey1, journey2))
+        val journey2 = journey(journeyId = "J2")
+        val move = move(journeys = mutableSetOf(journey1, journey2))
         val moves = listOf(move)
         
         val sheet = RedirectionMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
@@ -29,9 +29,9 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
 
         assertCellEquals(sheet, 10, 0, "REF1")
 
-        assertCellEquals(sheet, 10, 1, "from") // pick up sitename
+        assertCellEquals(sheet, 10, 1, "from") // pick up site name
         assertCellEquals(sheet, 10, 2, "PR") // pick up location type
-        assertCellEquals(sheet, 10, 3, "to") // drop off sitename
+        assertCellEquals(sheet, 10, 3, "to") // drop off site name
         assertCellEquals(sheet, 10, 4, "PR") // drop off location type
 
         assertCellEquals(sheet, 10, 5, "10/09/2020") // Pick up date

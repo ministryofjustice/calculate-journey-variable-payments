@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.location.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.FilterParams
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -26,14 +25,12 @@ class ImportService(
 
     fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier) }
 
-    fun importReports(supplier: Supplier, reportsFrom: LocalDate, reportsTo: LocalDate) {
-        logger.info("Importing reports for supplier '$supplier', moves from '$reportsFrom', moves to '$reportsTo'.")
+    fun importReports(reportsFrom: LocalDate, reportsTo: LocalDate) {
+        logger.info("Importing reports from '$reportsFrom', moves to '$reportsTo'.")
 
-        val reports = import { reportImporter.import(supplier, reportsFrom, reportsTo) }
+        val reports = import { reportImporter.import(reportsFrom, reportsTo) }
 
-        reports?.let {
-            reportPersister.persist(FilterParams(supplier, reportsFrom, reportsTo), it.toList())
-        }
+        reports?.let { reportPersister.persist(it.toList()) }
     }
 
     /**

@@ -27,7 +27,7 @@ data class ReportJourney(
 
         @EventDateTime
         @Json(name = "client_timestamp")
-        val clientTimestamp: LocalDateTime,
+        val clientTimestamp: LocalDateTime? = null,
 
         @Json(name = "vehicle_registration")
         val vehicleRegistration: String?,
@@ -36,7 +36,7 @@ data class ReportJourney(
         val fromNomisAgencyId: String,
 
         @Json(name = "to_location")
-        val toNomisAgencyId: String
+        val toNomisAgencyId: String? = null
 )
 
 {

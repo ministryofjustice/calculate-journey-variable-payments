@@ -13,7 +13,7 @@ fun move(
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
         dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
-        journeys: MutableList<Journey> = mutableListOf()
+        journeys: MutableSet<Journey> = mutableSetOf()
 ) = Move(
         moveId = moveId,
         updatedAt = defaultDateTime,
@@ -51,6 +51,8 @@ fun journey(
         dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
 ) = Journey(
         journeyId = journeyId,
+        supplier = move().supplier,
+        clientTimeStamp = defaultDateTime,
         updatedAt = defaultDateTime,
         state = state,
         moveId = moveId,
