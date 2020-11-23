@@ -12,7 +12,7 @@ class ReportJourneyParserTest {
         val to = notMappedNomisAgencyId()
 
         val journeyJson = """
-            {"id":"J1", "move_id":"M1", "billable": false, "state":"completed", "supplier":"serco", "client_timestamp":"2020-06-16T10:20:30",
+            {"id":"J1", "updated_at": "2020-06-16T10:20:30+01:00", "move_id":"M1", "billable": false, "state":"completed", "supplier":"serco", "client_timestamp":"2020-06-16T10:20:30",
             "vehicle_registration":"UHE-92", "from_location":"WYI", "to_location":"NOT_MAPPED_AGENCY_ID"}
             """.trimIndent()
 

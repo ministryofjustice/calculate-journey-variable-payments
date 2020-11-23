@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
@@ -34,9 +33,8 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
 
     @BeforeEach
     fun beforeEach() {
-     moves = importer.import(Supplier.GEOAMEY, from, to)
+     moves = importer.import(from, to)
     }
-
 
     @Test
     fun `For the 3rd of the month, starting on the 2nd should return 2 file names`() {
@@ -58,7 +56,6 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
     @Test
     fun `Get files for date should ignore missing days`() {
         val content = importer.import(
-                Supplier.GEOAMEY,
                 LocalDate.of(2020, 9, 1),
                 LocalDate.of(2020, 9, 3))
 
@@ -68,31 +65,25 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
 
     @Test
     fun `Standard moves should only include completed moves with one billable, completed journey`() {
-
-        val standardReports = ReportFilterer.standardMoveReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
+        val standardReports = ReportFilterer.standardMoveReports(moves)
         Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Redirect moves should only include completed moves with two billable journeys`() {
-
-        val redirectionReports = ReportFilterer.redirectionReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
+        val redirectionReports = ReportFilterer.redirectionReports(moves)
         Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Long haul moves should only include completed moves with two billable journeys`() {
-
-        val longHaulReports = ReportFilterer.longHaulReports(FilterParams(Supplier.GEOAMEY, from, to), moves)
+        val longHaulReports = ReportFilterer.longHaulReports(moves)
         Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.move.id }.toSet())
     }
 
     @Test
     fun `Cancelled, billable moves should only include moves cancelled before 3pm the day before the move`() {
-
-        val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(FilterParams(Supplier.GEOAMEY, from, to), moves)
+        val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(moves)
         Assertions.assertEquals(setOf("M61"), cancelledBillableReports.map { it.move.id }.toSet())
     }
 }
-
-

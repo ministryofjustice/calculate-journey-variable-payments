@@ -1,9 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
@@ -16,9 +13,10 @@ fun move(
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
         dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
-        journeys: MutableList<Journey> = mutableListOf()
+        journeys: MutableSet<Journey> = mutableSetOf()
 ) = Move(
         moveId = moveId,
+        updatedAt = defaultDateTime,
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
         status = MoveStatus.COMPLETED,
@@ -53,6 +51,9 @@ fun journey(
         dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
 ) = Journey(
         journeyId = journeyId,
+        supplier = move().supplier,
+        clientTimeStamp = defaultDateTime,
+        updatedAt = defaultDateTime,
         state = state,
         moveId = moveId,
         fromNomisAgencyId = fromNomisAgencyId,
@@ -71,6 +72,7 @@ fun journey(
 
 fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(
         id = eventId,
+        updatedAt = defaultDateTime,
         type = eventType.value,
         eventableType = "move",
         eventableId = eventableId,

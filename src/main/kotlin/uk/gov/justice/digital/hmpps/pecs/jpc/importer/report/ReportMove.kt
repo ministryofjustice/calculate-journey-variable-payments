@@ -3,12 +3,17 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 
 data class ReportMove(
 
         @get: NotBlank(message = "id cannot be blank")
         val id: String,
+
+        @EventDateTime
+        @Json(name = "updated_at")
+        val updatedAt: LocalDateTime,
 
         @get: NotBlank(message = "supplier cannot be blank")
         val supplier: String,
@@ -48,6 +53,7 @@ data class ReportMove(
     fun toJson() : String{
         return Klaxon().
         fieldConverter(EventDate::class, dateConverter).
+        fieldConverter(EventDateTime::class, dateTimeConverter).
         toJsonString(this)
     }
     companion object {
@@ -64,12 +70,15 @@ data class ReportMove(
 }
 
 enum class MoveStatus {
+    PROPOSED,
+    REQUESTED,
+    BOOKED,
+    IN_TRANSIT,
     COMPLETED,
-    CANCELLED;
+    CANCELLED,
+    UNKNOWN;
 
     companion object{
-        fun valueOfCaseInsensitive(value: String): MoveStatus {
-            return valueOf(value.toUpperCase())
-        }
+        fun valueOfCaseInsensitive(value: String) = kotlin.runCatching { valueOf(value.toUpperCase())}.getOrDefault(UNKNOWN)
     }
 }

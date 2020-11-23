@@ -18,12 +18,15 @@ data class Move(
         @Column(name = "move_id")
         val moveId: String,
 
+        @Column(name = "updated_at")
+        val updatedAt: LocalDateTime,
+
         @Enumerated(EnumType.STRING)
         val supplier: Supplier,
 
         @Enumerated(EnumType.STRING)
-        @Column(name = "move_price_type", nullable = false)
-        val moveType: MoveType,
+        @Column(name = "move_type", nullable = true)
+        val moveType: MoveType?,
 
         @Enumerated(EnumType.STRING)
         val status: MoveStatus,
@@ -84,13 +87,13 @@ data class Move(
         @Column(name = "vehicle_registration", nullable = true)
         val vehicleRegistration: String?,
 
-        @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
         @JoinColumn(name="move_id")
-        val journeys: MutableList<Journey> = mutableListOf(),
+        val journeys: MutableSet<Journey> = mutableSetOf(),
 
-        @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
         @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-        val events: MutableList<Event> = mutableListOf()
+        val events: MutableSet<Event> = mutableSetOf()
 )
 {
 

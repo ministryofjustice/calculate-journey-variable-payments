@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import java.time.LocalDate
 
 internal class ReportFiltererTest {
@@ -10,7 +10,7 @@ internal class ReportFiltererTest {
     val from = LocalDate.of(2020, 9, 10)
     val to = LocalDate.of(2020, 9, 11)
 
-    private val standardInDateRange = Report(
+    private val standard = Report(
             move = reportMoveFactory(),
             person = personFactory(),
             moveEvents = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
@@ -18,18 +18,12 @@ internal class ReportFiltererTest {
     )
 
     private val cancelled = Report(
-            move = reportMoveFactory(moveId = "M2"),
+            move = reportMoveFactory(moveId = "M2", status = "cancelled"),
             person = personFactory(),
             moveEvents =  listOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
             journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true)))
     )
 
-    private val standardOutsideDateRange = Report(
-            move = reportMoveFactory(moveId = "M3"),
-            person = personFactory(),
-            moveEvents = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M3", occurredAt = LocalDate.of(2020, 9, 9).atStartOfDay())),
-            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(journeyId = "J1M3", moveId = "M3", billable = true)))
-    )
 
     private val completedUnbillable = Report(
             move = reportMoveFactory(moveId = "M4"),
@@ -153,9 +147,8 @@ internal class ReportFiltererTest {
 
 
     private val reports = listOf(
-            standardInDateRange,
+            standard,
             cancelled,
-            standardOutsideDateRange,
             completedUnbillable,
             completedRedirection,
             completedLongHaulMoveLodgingEvents,
@@ -166,47 +159,55 @@ internal class ReportFiltererTest {
             cancelledBillable
     )
 
-    private val filter = FilterParams(Supplier.SERCO, from, to)
 
     @Test
-    fun `Only standard moves within date range are filtered`() {
-
-        val standardReports = ReportFilterer.standardMoveReports(filter, reports).toList()
-        assertThat(standardReports).containsOnly(standardInDateRange)
+    fun `Only standard moves are filtered`() {
+        val standardReports = ReportFilterer.standardMoveReports(reports).toList()
+        assertThat(standardReports).containsOnly(standard)
     }
 
     @Test
-    fun `Only redirection moves within date range are filtered`() {
-
-        val redirectReports = ReportFilterer.redirectionReports(filter, reports).toList()
+    fun `Only redirection moves are filtered`() {
+        val redirectReports = ReportFilterer.redirectionReports(reports).toList()
         assertThat(redirectReports).containsOnly(completedRedirection)
     }
 
     @Test
-    fun `Only long haul moves within date range are filtered`() {
-
-        val longHaulReports = ReportFilterer.longHaulReports(filter, reports).toList()
+    fun `Only long haul moves are filtered`() {
+        val longHaulReports = ReportFilterer.longHaulReports(reports).toList()
         assertThat(longHaulReports).containsExactlyInAnyOrder(completedLongHaulMoveLodgingEvents, completedLongHaulJourneyLodgingEvents)
     }
 
     @Test
-    fun `Only lockout moves within date range are filtered`() {
-
-        val lockoutReports = ReportFilterer.lockoutReports(filter, reports).toList()
+    fun `Only lockout moves are filtered`() {
+        val lockoutReports = ReportFilterer.lockoutReports(reports).toList()
         assertThat(lockoutReports).containsExactlyInAnyOrder(completedLockoutJourneyLockoutEvent, completedLockoutMoveLockoutEvent)
     }
 
     @Test
     fun `Unbillable and multi-type moves`() {
-
-        val multiTypeReports = ReportFilterer.multiTypeReports(filter, reports).toList()
+        val multiTypeReports = ReportFilterer.multiTypeReports(reports).toList()
         assertThat(multiTypeReports).containsExactlyInAnyOrder(multiTypeMove, completedUnbillable)
     }
 
     @Test
     fun `Cancelled billable moves`() {
-
-        val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(filter, reports).toList()
+        val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(reports).toList()
         assertThat(cancelledBillableReports.map{it.move}).containsExactlyInAnyOrder(cancelledBillable.move)
+    }
+
+    @Test
+    fun `billable cancelled report move type is CANCELLED`(){
+        assertThat(cancelledBillable.moveType()).isEqualTo(MoveType.CANCELLED)
+    }
+
+    @Test
+    fun `non billable cancelled report move type is null`(){
+        assertThat(cancelled.moveType()).isNull()
+    }
+
+    @Test
+    fun `standard report move type is STANDARD`(){
+        assertThat(standard.moveType()).isEqualTo(MoveType.STANDARD)
     }
 }

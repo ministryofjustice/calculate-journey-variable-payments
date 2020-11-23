@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.persistence.*
@@ -14,8 +15,17 @@ data class Journey(
         @Column(name = "journey_id")
         val journeyId: String,
 
+        @Column(name = "updated_at")
+        val updatedAt: LocalDateTime,
+
         @Column(name = "move_id")
         val moveId: String,
+
+        @Enumerated(EnumType.STRING)
+        val supplier: Supplier,
+
+        @Column(name = "client_timestamp")
+        val clientTimeStamp: LocalDateTime?,
 
         @Enumerated(EnumType.STRING)
         val state: JourneyState,
@@ -51,9 +61,9 @@ data class Journey(
 
         val notes: String? = null,
 
-        @OneToMany(cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
         @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-        val events: MutableList<Event> = mutableListOf(),
+        val events: MutableSet<Event> = mutableSetOf(),
 
         @Transient
         val priceInPence: Int? = null

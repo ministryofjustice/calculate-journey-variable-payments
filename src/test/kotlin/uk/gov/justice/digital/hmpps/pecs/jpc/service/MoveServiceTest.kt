@@ -32,7 +32,7 @@ import java.time.LocalDate
     fun `move by move id`(){
         val service = MoveService(moveQueryRepository, eventRepository)
         val journey = journey()
-        val move = move(journeys = mutableListOf(journey))
+        val move = move(journeys = mutableSetOf(journey))
 
         val moveEvent = event()
 

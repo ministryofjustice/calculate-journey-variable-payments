@@ -1,2 +1,2 @@
-{"id":"J1","move_id":"M2","billable":true,"state":"completed","client_timestamp":"2020-09-08T12:49:00+01:00","from_location":"UNMAPPEDFROM","to_location":"UNMAPPEDTO","supplier":"geoamey","vehicle_registration":"123"}
-{"id":"J2","move_id":"M3","billable":true,"state":"started","client_timestamp":"2020-09-08T12:49:00+01:00","from_location":"WYI","to_location":"GNI","supplier":"geoamey","vehicle_registration":"456"}
+{"id":"J1","updated_at": "2020-06-16T10:20:30+01:00", "move_id":"M2","billable":true,"state":"completed","client_timestamp":"2020-09-08T12:49:00+01:00","from_location":"UNMAPPEDFROM","to_location":"UNMAPPEDTO","supplier":"geoamey","vehicle_registration":"123"}
+{"id":"J2","updated_at": "2020-06-16T10:20:30+01:00", "move_id":"M3","billable":true,"state":"started","client_timestamp":"2020-09-08T12:49:00+01:00","from_location":"WYI","to_location":"GNI","supplier":"geoamey","vehicle_registration":"456"}

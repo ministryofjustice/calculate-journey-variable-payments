@@ -42,6 +42,7 @@ fun reportMoveFactory(
     ): ReportMove {
     val move = ReportMove(
             id = moveId,
+            updatedAt = defaultDateTime,
             supplier = supplier,
             profileId = profileId,
             reference = "UKW4591N",
@@ -59,6 +60,7 @@ fun reportMoveFactory(
 fun personFactory(personId: String = defaultPersonId): Person {
     return Person(
             id = personId,
+            updatedAt = defaultDateTime,
             prisonNumber = "PRISON1",
             latestNomisBookingId = null,
             firstNames = "Billy the",
@@ -70,8 +72,8 @@ fun personFactory(personId: String = defaultPersonId): Person {
 
 fun profileFactory(
         profileId: String = defaultProfileId,
-        personId: String = defaultPersonId): ReportProfile {
-    return ReportProfile(profileId, personId)
+        personId: String = defaultPersonId): Profile {
+    return Profile(profileId, defaultDateTime, personId)
 }
 
 fun moveEventFactory(
@@ -84,6 +86,7 @@ fun moveEventFactory(
 ): Event {
     val event = Event(
             id=eventId,
+            updatedAt = defaultDateTime,
             type=type,
             supplier= supplier,
             eventableType="move",
@@ -108,6 +111,7 @@ fun reportJourneyFactory(
 ): ReportJourney {
     val journey = ReportJourney(
             id= journeyId,
+            updatedAt = defaultDateTime,
             moveId= moveId,
             clientTimestamp = defaultDateTime,
             billable=billable,
@@ -129,6 +133,7 @@ fun journeyEventFactory(
 ): Event {
     val event = Event(
             id=journeyEventId,
+            updatedAt = defaultDateTime,
             type=type,
             supplier= supplier,
             eventableType="journey",
