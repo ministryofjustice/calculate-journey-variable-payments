@@ -183,5 +183,45 @@ internal class MovePersisterTest {
         // Previous and new journeys should be present
         assertThat(retrievedMove.journeys.map { it.journeyId }).containsExactlyInAnyOrder("J1", "J2", "J400")
     }
+
+    @Test
+    fun `Persist non complete move then complete it`() {
+
+        val journey1 = reportJourneyFactory().copy(id = "J1", billable = true, vehicleRegistration = "REG1")
+        val moveStartEvent = moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
+
+        val inTransitReport = Report(
+                move = reportMoveFactory(status = MoveStatus.IN_TRANSIT.name),
+                person = personFactory(),
+                moveEvents = listOf(moveStartEvent),
+                journeysWithEvents = listOf(
+                        ReportJourneyWithEvents(journey1, listOf(
+                                journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5))
+                        )
+                        )
+                )
+        )
+
+        persister.persist(listOf(inTransitReport))
+        entityManager.flush()
+        val retrievedInTransitMove = moveRepository.findById(redirectMove.id).get()
+        assertThat(retrievedInTransitMove.moveType).isNull() // should not have a move type yet - it's in_transit
+
+        val journeyCompleteEvent = journeyEventFactory(journeyEventId = "J1", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+        val moveCompleteEvent = moveEventFactory(eventId = "E3", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+
+        val completedReportWithNewJourney = Report(
+                move = inTransitReport.move.copy(status = MoveStatus.COMPLETED.name),
+                journeysWithEvents = listOf(ReportJourneyWithEvents(journey1, listOf(journeyCompleteEvent))),
+                person = null,
+                moveEvents = listOf(moveCompleteEvent)
+        )
+
+        persister.persist(listOf(completedReportWithNewJourney))
+        entityManager.flush()
+
+        val retrievedCompletedMove = moveRepository.findById(redirectMove.id).get()
+        assertThat(retrievedCompletedMove.moveType).isEqualTo(MoveType.STANDARD)
+    }
 }
 
