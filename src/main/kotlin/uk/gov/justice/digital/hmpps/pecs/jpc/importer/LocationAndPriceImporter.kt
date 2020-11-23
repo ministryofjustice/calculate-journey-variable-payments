@@ -28,11 +28,19 @@ internal class LocationAndPriceImporter(private val priceRepository: PriceReposi
     fun import() : ExitCodeGenerator {
         return Result.runCatching {
             priceRepository.deleteAll()
+            priceRepository.flush()
+
             locationRepository.deleteAll()
+            locationRepository.flush()
 
             importService.importLocations()
+            locationRepository.flush()
+
             importService.importPrices(Supplier.GEOAMEY)
+            priceRepository.flush()
+
             importService.importPrices(Supplier.SERCO)
+            priceRepository.flush()
 
             return success
         }.onFailure { logger.error(it.stackTraceToString()) }.getOrDefault(failure)
