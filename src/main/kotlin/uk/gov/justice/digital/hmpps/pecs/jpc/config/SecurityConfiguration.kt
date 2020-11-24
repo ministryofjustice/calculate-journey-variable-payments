@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
 import kotlin.streams.toList
 
 @EnableWebSecurity
@@ -60,7 +61,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             val jwt = JwtDecoders.fromIssuerLocation(issuer).decode(userRequest.accessToken.tokenValue)
             val authorities = JSONArrayUtils.toStringList(jwt.claims["authorities"] as JSONArray?)
 
-            DefaultOAuth2User(authorities.stream().map { SimpleGrantedAuthority(it) }.toList(), user.attributes, "username")
+            DefaultOAuth2User(authorities.stream().map { SimpleGrantedAuthority(it) }.toList(), user.attributes, "name")
         }
     }
 
@@ -74,5 +75,11 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
             logger.error(accessDeniedException.message)
         }
+    }
+
+    // Needed for Thymeleaf security extras.
+    @Bean
+    fun securityDialect(): SpringSecurityDialect? {
+        return SpringSecurityDialect()
     }
 }

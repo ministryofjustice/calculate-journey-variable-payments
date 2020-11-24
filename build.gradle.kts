@@ -20,6 +20,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("com.amazonaws:aws-java-sdk-s3:1.11.901")
 	implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.1")
+	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.session:spring-session-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
