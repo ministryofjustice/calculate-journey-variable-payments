@@ -20,8 +20,10 @@
                 </a>
             </div>
             <div sec:authorize="isAuthenticated()" class="govuk-header__content tr mt1">
+                <form id="logoutForm" method="POST" th:action="@{/logout}"></form>
+
                 <span class="govuk-!-font-weight-bold pr4" sec:authentication="name"></span>
-                <a href="/logout" class="govuk-header__link govuk-!-font-weight-bold dib pr3">Sign out</a>
+                <a class="govuk-header__link govuk-!-font-weight-bold dib pr3" onclick="document.forms['logoutForm'].submit()">Sign out</a>
             </div>
         </div>
     </div>
