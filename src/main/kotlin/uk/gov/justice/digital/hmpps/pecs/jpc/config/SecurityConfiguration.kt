@@ -32,6 +32,9 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private lateinit var issuer: String
 
+    @Value("\${HMPPS_AUTH_BASE_URI}")
+    private lateinit var authLogoutSuccesUri: String
+
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http {
@@ -47,6 +50,9 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             oauth2Login {
                 userInfoEndpoint { userService = oAuth2UserService() }
                 defaultSuccessUrl("/", true)
+            }
+            logout {
+                logoutSuccessUrl = authLogoutSuccesUri
             }
         }
     }

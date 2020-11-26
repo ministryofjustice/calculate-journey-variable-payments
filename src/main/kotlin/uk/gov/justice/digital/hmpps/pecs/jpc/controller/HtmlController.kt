@@ -37,11 +37,6 @@ class HtmlController(@Autowired val moveService: MoveService) {
         return "choose-supplier"
     }
 
-    @RequestMapping("/signed-out")
-    fun signedOut(model: ModelMap): String {
-        return "signed-out"
-    }
-
     @RequestMapping("/choose-supplier/serco")
     fun chooseSupplierSerco(model: ModelMap): RedirectView {
         model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.SERCO)
@@ -53,7 +48,6 @@ class HtmlController(@Autowired val moveService: MoveService) {
         model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.GEOAMEY)
         return RedirectView(DASHBOARD_URL)
     }
-
 
     @RequestMapping("$MOVES_BY_TYPE_URL/{moveTypeString}")
     fun movesById(@PathVariable moveTypeString: String, @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): String {
