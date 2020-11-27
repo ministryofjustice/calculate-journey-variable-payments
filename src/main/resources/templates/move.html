@@ -202,7 +202,7 @@
                                 Journey payment
                             </dt>
                             <dd class="govuk-summary-list__value" th:inline="text">
-                                £[[${#numbers.formatDecimal(journey.priceInPence ?: 0, 1, 'COMMA', 2, 'POINT')}]]
+                                £[[${#numbers.formatDecimal(journey.priceInPounds() ?: 0, 1, 'COMMA', 2, 'POINT')}]]
                             </dd>
                         </div>
                     </dl>
@@ -211,7 +211,7 @@
 
             <div class="govuk-grid-column-one-third">
                 <h2 class="govuk-heading-m mb1 bt bw1 b--blue pt2">Move price</h2>
-                <p class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPence() ?: 0, 1, 'COMMA', 2,
+                <p class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPounds() ?: 0, 1, 'COMMA', 2,
                     'POINT')}]]</p>
             </div>
         </div>

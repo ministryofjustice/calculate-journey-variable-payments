@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 
-data class UniqueJourney(
+data class JourneyWithPrices(
         val fromNomisAgencyId: String,
         val fromLocationType: LocationType?,
         val fromSiteName: String?,
@@ -17,4 +17,4 @@ data class UniqueJourney(
     fun totalPriceInPounds() = totalPriceInPence?.let{it.toDouble() / 100}
     fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
     fun toSiteName() = toSiteName ?: toNomisAgencyId
-}
+    }

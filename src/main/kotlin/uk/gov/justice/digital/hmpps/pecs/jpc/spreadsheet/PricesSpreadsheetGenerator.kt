@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 
@@ -22,7 +23,8 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
                                  @Autowired private val timeSource: TimeSource,
                                  @Autowired private val sercoPricesProvider: SercoPricesProvider,
                                  @Autowired private val geoameyPricesProvider: GeoameyPricesProvider,
-                                 @Autowired private val moveService: MoveService) {
+                                 @Autowired private val moveService: MoveService,
+                                 @Autowired private val journeyService: JourneyService) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -34,7 +36,7 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
             val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
 
             val moves = moveService.moves(supplier, startDate)
-            val journeys = moveService.uniqueJourneysIncludingPriced(supplier, startDate)
+            val journeys = journeyService.distinctJourneysIncludingPriced(supplier, startDate)
             val summaries = moveService.moveTypeSummaries(supplier, startDate)
 
                 StandardMovesSheet(workbook, header)

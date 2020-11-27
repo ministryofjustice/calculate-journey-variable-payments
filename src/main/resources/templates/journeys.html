@@ -92,13 +92,12 @@
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType ?: "Not
                         mapped"}]]
                     </td>
-                    <td class="govuk-table__cell" scope="row"
-                        th:text="${false} : '???'">
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.volume}]]
                     </td>
                     <td class="govuk-table__cell" scope="row"
                         th:inline="text">
-                        <span th:if="${journey.hasPrice()}" th:inline="text">£[[${#numbers.formatDecimal(summary.totalPriceInPounds, 1, 'COMMA', 2, 'POINT')}]]</span>
-                        <span th:unless="${journey.hasPrice()}">Add price</span>
+                        <span th:unless="${journey.unitPriceInPence == 0}" th:inline="text">£[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]</span>
+                        <span th:if="${journey.unitPriceInPence == 0}">Add price</span>
                     </td>
                 </tr>
             </thbody>

@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
 import java.time.Clock
 import java.time.Instant
@@ -32,6 +33,11 @@ class TestConfig {
     @Bean
     fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository{
         return MoveQueryRepository(JdbcTemplate(dataSource))
+    }
+
+    @Bean
+    fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource): JourneyQueryRepository{
+        return JourneyQueryRepository(JdbcTemplate(dataSource))
     }
 
     @Bean
