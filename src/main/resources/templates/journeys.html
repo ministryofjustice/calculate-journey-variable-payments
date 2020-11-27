@@ -11,13 +11,99 @@
 
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
-    <div th:replace="fragments/journey-summary.html :: journeySummary"></div>
+    <div class="govuk-breadcrumbs ">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/dashboard" th:inline="text">[[${#temporals.monthName(startOfMonthDate)}]]
+                    [[${#temporals.format(startOfMonthDate, 'yyyy')}]] move summary</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <span class="govuk-breadcrumbs__link">Journeys for review</span>
+            </li>
+        </ol>
+    </div>
 
-    <section class="mt5">
-        <h2 class="govuk-heading-m pt1 bt bw2">Unique Journeys</h2>
-        <div th:each="uniqueJourney: ${journeys}">
-            <div th:replace="fragments/list-unique-journey.html :: uniqueJourney"></div>
+    <div class="flex justify-between items-end mv4">
+        <div class="flex-auto">
+            <h1 class="govuk-heading-xl ma0">Journeys for review</h1>
         </div>
+        <div>
+            <a th:href="@{|/generate-prices-spreadsheet/|}"
+               th:attr="download=${'moves-' + '.csv'}"
+               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
+        </div>
+    </div>
+
+    <div class="bg-govuk-colour-blue ph3 mt3 flex">
+        <ul class="list ph0 bg-govuk-colour-blue flex mv1 flex-wrap w-100">
+            <li class="w-25 pv2 mv2">
+                <p class="govuk-heading-l white ma0 pt1" th:inline="text">
+                    [[${journeysSummary.supplier}]]</p>
+                <div>
+                    <p class="govuk-heading-s govuk-!-font-weight-bold white ma0">supplier</p>
+                </div>
+            </li>
+            <li class="w-25 pv2 mv2">
+                <p class="govuk-heading-l white ma0 pt1" th:inline="text">
+                    [[${#numbers.formatDecimal(journeysSummary.count, 0, 'COMMA', 0, 'POINT')}]]</p>
+                <div>
+                    <p class="govuk-heading-s govuk-!-font-weight-bold white ma0">total unique journeys</p>
+                </div>
+            </li>
+            <li class="w-25 pv2 mv2">
+                <p class="govuk-heading-l white ma0 pt1" th:inline="text">
+                    [[${#numbers.formatDecimal(journeysSummary.countWithoutLocations, 0, 'COMMA', 0, 'POINT')}]]</p>
+                <div>
+                    <p class="govuk-heading-s govuk-!-font-weight-bold white ma0">without locations</p>
+                </div>
+            </li>
+            <li class="w-25 pv2 mv2">
+                <p class="govuk-heading-l white ma0 pt1" th:inline="text">
+                    [[${#numbers.formatDecimal(journeysSummary.countUnpriced, 0, 'COMMA', 0, 'POINT')}]]</p>
+                <div>
+                    <p class="govuk-heading-s govuk-!-font-weight-bold white ma0">without prices</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <section class="mt3">
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up location type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Total volume</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Unit price</th>
+            </tr>
+            </thead>
+            <thbody class="govuk-table__body">
+                <tr class="govuk-table__row" th:each="journey: ${journeys}">
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromSiteName ?: "Not
+                        mapped"}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType ?: "Not
+                        mapped"}]]
+                    </td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toSiteName ?: "Not
+                        mapped"}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType ?: "Not
+                        mapped"}]]
+                    </td>
+                    <td class="govuk-table__cell" scope="row"
+                        th:text="${false} : '???'">
+                    </td>
+                    <td class="govuk-table__cell" scope="row"
+                        th:inline="text">
+                        <span th:if="${journey.hasPrice()}" th:inline="text">£[[${#numbers.formatDecimal(summary.totalPriceInPounds, 1, 'COMMA', 2, 'POINT')}]]</span>
+                        <span th:unless="${journey.hasPrice()}">Add price</span>
+                    </td>
+                </tr>
+            </thbody>
+        </table>
+
     </section>
 
 </div>
