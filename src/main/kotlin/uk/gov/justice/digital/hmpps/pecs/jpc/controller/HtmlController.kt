@@ -19,6 +19,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import javax.validation.Valid
+import javax.validation.constraints.DecimalMin
+import javax.validation.constraints.Min
 
 
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
@@ -120,6 +122,23 @@ class HtmlController(@Autowired val moveService: MoveService) {
         return RedirectView(DASHBOARD_URL)
     }
 
+    data class PriceForm(@DecimalMin("0.0") val price: Double)
+
+    @GetMapping("$ADD_PRICE_URL/{moveId}")
+    fun addPrice(@PathVariable moveId: String, model: ModelMap): Any {
+        model.addAttribute("form", PriceForm(price = 0.0))
+        return "add-price"
+    }
+
+    @PostMapping("$ADD_PRICE_URL/{moveId}")
+    fun savePrice(@PathVariable moveId: String, @Valid @ModelAttribute("form") form: PriceForm?, result: BindingResult, model: ModelMap): Any {
+        if (result.hasErrors()) {
+            return "add-price"
+        }
+
+        return RedirectView(DASHBOARD_URL)
+    }
+
     companion object {
         const val DATE_ATTRIBUTE = "date"
         const val SUPPLIER_ATTRIBUTE = "supplier"
@@ -132,5 +151,6 @@ class HtmlController(@Autowired val moveService: MoveService) {
         const val MOVES_BY_TYPE_URL = "/moves-by-type"
         const val MOVES_URL = "/moves"
         const val JOURNEYS_URL = "/journeys"
+        const val ADD_PRICE_URL = "/add-price"
     }
 }

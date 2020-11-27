@@ -22,8 +22,8 @@
                 <span class="db govuk-!-font-weight-bold">Enter month and year you want to view.</span>
                 For example 10/2019 or October 2019
             </div>
-            <p th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="govuk-error-message">
-                <span class="govuk-visually-hidden">Error:</span> Enter a National Insurance number in the correct
+            <p th:if="${#fields.hasErrors('date')}" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Enter a valid month in the correct
                 format
             </p>
             <input class="govuk-input govuk-input--width-20" id="event-name" name="date" type="text"
