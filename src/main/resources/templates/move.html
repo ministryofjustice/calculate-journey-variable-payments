@@ -128,14 +128,14 @@
 
                 <div>
 
-                    <div th:switch="${#lists.size(move.journeyWithPrices)}">
+                    <div th:switch="${#lists.size(move.journeys)}">
                         <h2 th:case="'1'" class="govuk-heading-m ma0 pb2" th:inline="text">Journey details</h2>
                         <h2 th:case="*" class="govuk-heading-m ma0 pb2" th:inline="text">Journey [[${iter.index + 1}]]
                             of
-                            [[${#lists.size(move.journeyWithPrices)}]] details</h2>
+                            [[${#lists.size(move.journeys)}]] details</h2>
                     </div>
 
-                    <dl class="govuk-summary-list" th:each="journey, iter: ${move.journeyWithPrices}">
+                    <dl class="govuk-summary-list" th:each="journey, iter: ${move.journeys}">
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 Pick up location
@@ -202,7 +202,7 @@
                                 Journey payment
                             </dt>
                             <dd class="govuk-summary-list__value" th:inline="text">
-                                £[[${#numbers.formatDecimal(journey.priceInPence ?: 0, 1, 'COMMA', 2, 'POINT')}]]
+                                £[[${#numbers.formatDecimal(journey.priceInPounds() ?: 0, 1, 'COMMA', 2, 'POINT')}]]
                             </dd>
                         </div>
                     </dl>
@@ -211,7 +211,7 @@
 
             <div class="govuk-grid-column-one-third">
                 <h2 class="govuk-heading-m mb1 bt bw1 b--blue pt2">Move price</h2>
-                <p class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPence() ?: 0, 1, 'COMMA', 2,
+                <p class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPounds() ?: 0, 1, 'COMMA', 2,
                     'POINT')}]]</p>
             </div>
         </div>

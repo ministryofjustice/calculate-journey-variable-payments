@@ -17,4 +17,4 @@ data class JourneyWithPrices(
     fun totalPriceInPounds() = totalPriceInPence?.let{it.toDouble() / 100}
     fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
     fun toSiteName() = toSiteName ?: toNomisAgencyId
-}
+    }

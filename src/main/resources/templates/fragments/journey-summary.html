@@ -2,7 +2,7 @@
     <ul class="list pl0 flex mv0">
         <li class="w-40">
             <div class="pa3">
-                <a th:href="@{/journeyWithPrices}" class="govuk-heading-m govuk-link">Total moves by journey</a>
+                <a th:href="@{/journeys}" class="govuk-heading-m govuk-link">Total moves by journey</a>
             </div>
         </li>
         <li class="flex-auto bl">
@@ -29,7 +29,7 @@
                 <p class="govuk-heading-m mb1" th:inline="text">
                     [[${#numbers.formatDecimal(journeysSummary.count, 0, 'COMMA', 0, 'POINT')}]]</p>
                 <div>
-                    <p class="govuk-body mv0">Total unique journeyWithPrices</p>
+                    <p class="govuk-body mv0">Total unique journeys</p>
                 </div>
             </div>
         </li>
