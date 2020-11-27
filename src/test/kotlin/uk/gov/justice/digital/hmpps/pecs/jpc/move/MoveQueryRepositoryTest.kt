@@ -163,7 +163,7 @@ internal class MoveQueryRepositoryTest {
         entityManager.flush()
 
         val summaries = moveQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
-        assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2))
+        assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2, Supplier.SERCO))
 
         val unpricedUniqueJourneys = moveQueryRepository.uniqueJourneysInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(unpricedUniqueJourneys.size).isEqualTo(2)

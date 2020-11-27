@@ -232,6 +232,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         val journeysSummaryRowMapper = RowMapper<JourneysSummary> { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 JourneysSummary(
+                        supplier = supplier,
                         count = getInt("journey_count"),
                         totalPriceInPence = getInt("total_price_in_pence"),
                         countWithoutLocations = getInt("count_without_locations"),
