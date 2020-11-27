@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+
+    <h1 class="govuk-heading-xl mv2 pt2" th:inline="text">Manage Journey Price Catalogue</h1>
+
+    <h2 class="govuk-heading-xl mv2 pt3" th:inline="text">Find Journeys</h2>
+
+
+    <form th:action="@{/search-journeys}" th:object="${form}" method="post">
+        <h1 class="govuk-label-wrapper">Enter pick up or drop off location</h1>
+
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
+            <p th:if="${#fields.hasErrors('*')}" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Please enter either a pick up or drop off location
+            </p>
+
+            <label class="govuk-label govuk-label--m" for="from">Pick up location</label>
+            <input class="govuk-input govuk-input--width-20" id="from" name="from" type="text"
+                   aria-describedby="from-hint" th:field="*{from}"
+                   th:classappend="${#fields.hasErrors('from')} ? 'govuk-input--error'">
+        </div>
+
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--m" for="from">Drop off location</label>
+            <input class="govuk-input govuk-input--width-20" id="to" name="to" type="text"
+                   aria-describedby="to-hint" th:field="*{to}"
+                   th:classappend="${#fields.hasErrors('to')} ? 'govuk-input--error'">
+        </div>
+        <div class="flex items-center">
+            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+                Find Journeys
+            </button>
+            <a href="/dashboard" class="govuk-link">Cancel</a>
+        </div>
+    </form>
+
+</div>
+
+</body>
+
+</html>

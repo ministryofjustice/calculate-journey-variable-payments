@@ -128,14 +128,14 @@
 
                 <div>
 
-                    <div th:switch="${#lists.size(move.journeys)}">
+                    <div th:switch="${#lists.size(move.journeyWithPrices)}">
                         <h2 th:case="'1'" class="govuk-heading-m ma0 pb2" th:inline="text">Journey details</h2>
                         <h2 th:case="*" class="govuk-heading-m ma0 pb2" th:inline="text">Journey [[${iter.index + 1}]]
                             of
-                            [[${#lists.size(move.journeys)}]] details</h2>
+                            [[${#lists.size(move.journeyWithPrices)}]] details</h2>
                     </div>
 
-                    <dl class="govuk-summary-list" th:each="journey, iter: ${move.journeys}">
+                    <dl class="govuk-summary-list" th:each="journey, iter: ${move.journeyWithPrices}">
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 Pick up location

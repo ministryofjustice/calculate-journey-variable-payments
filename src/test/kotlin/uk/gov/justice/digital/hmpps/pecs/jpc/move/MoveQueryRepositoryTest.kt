@@ -133,46 +133,6 @@ internal class MoveQueryRepositoryTest {
 
 
     @Test
-    fun `unique journeys and journey summaries`() {
-
-        val locationX  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationX", siteName = "banana")
-        val locationY  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationY", siteName = "apple")
-
-        locationRepository.save(locationX)
-        locationRepository.save(locationY)
-
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = locationX, priceInPence = 201, supplier = Supplier.SERCO))
-
-        val moveWithUnbillableJourney = standardMove.copy(moveId = "M2")
-        val journey3 = journey(moveId = "M2", journeyId = "J3", billable = false, toNomisAgencyId = locationX.nomisAgencyId)
-
-        val moveWithUnmappedLocation = standardMove.copy(moveId = "M3")
-        val journey4 = journey(moveId = "M3", journeyId = "J4", billable = true, fromNomisAgencyId = "unmappedNomisAgencyId")
-
-        val moveWithUpricedLocation = standardMove.copy(moveId = "M4")
-        val journey5 = journey(moveId = "M4", journeyId = "J5", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
-
-        moveRepository.save(moveWithUnbillableJourney) // not unpriced just because journey is not billable
-        moveRepository.save(moveWithUpricedLocation) // unpriced but has location
-        moveRepository.save(moveWithUnmappedLocation) // unpriced since it has no mapped location
-
-        journeyRepository.save(journey3)
-        journeyRepository.save(journey4)
-        journeyRepository.save(journey5)
-
-        entityManager.flush()
-
-        val summaries = moveQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
-        assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2, Supplier.SERCO))
-
-        val unpricedUniqueJourneys = moveQueryRepository.uniqueJourneysInDateRange(Supplier.SERCO, moveDate, moveDate)
-        assertThat(unpricedUniqueJourneys.size).isEqualTo(2)
-
-        // Ordered by unmapped from locations first
-        assertThat(unpricedUniqueJourneys[0].fromNomisAgencyId).isEqualTo("unmappedNomisAgencyId")
-    }
-
-    @Test
     fun `moves count`() {
         val movesCount = moveQueryRepository.moveCountInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(movesCount).isEqualTo(1)

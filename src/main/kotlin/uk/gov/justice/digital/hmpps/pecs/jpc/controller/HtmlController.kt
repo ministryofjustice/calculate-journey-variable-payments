@@ -7,6 +7,7 @@ import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.view.RedirectView
+import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DATE_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.END_OF_MONTH_DATE_ATTRIBUTE
@@ -14,6 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.SUPPLIER_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
@@ -27,7 +29,7 @@ data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, v
 
 @Controller
 @SessionAttributes(SUPPLIER_ATTRIBUTE, DATE_ATTRIBUTE, START_OF_MONTH_DATE_ATTRIBUTE, END_OF_MONTH_DATE_ATTRIBUTE)
-class HtmlController(@Autowired val moveService: MoveService) {
+class HtmlController(@Autowired val moveService: MoveService, @Autowired val journeyService: JourneyService) {
 
     @RequestMapping("/")
     fun homepage(model: ModelMap): RedirectView {
@@ -78,8 +80,8 @@ class HtmlController(@Autowired val moveService: MoveService) {
             model: ModelMap,
     ): String {
 
-        model.addAttribute("journeysSummary", moveService.journeysSummary(supplier, startOfMonth))
-        model.addAttribute("journeys", moveService.uniqueJourneysExcludingPriced(supplier, startOfMonth))
+        model.addAttribute("journeysSummary", journeyService.journeysSummary(supplier, startOfMonth))
+        model.addAttribute("journeys", journeyService.distinctJourneysExcludingPriced(supplier, startOfMonth))
         return "journeys"
     }
 
@@ -94,7 +96,7 @@ class HtmlController(@Autowired val moveService: MoveService) {
         model.addAttribute(END_OF_MONTH_DATE_ATTRIBUTE, endOfMonth)
 
         val countAndSummaries = moveService.moveTypeSummaries(supplier, startOfMonth)
-        val journeysSummary = moveService.journeysSummary(supplier, startOfMonth)
+        val journeysSummary = journeyService.journeysSummary(supplier, startOfMonth)
 
         model.addAttribute("months", MonthsWidget((startOfMonth), nextMonth = (startOfMonth.plusMonths(1)), previousMonth = (startOfMonth.minusMonths(1))))
         model.addAttribute("summary", countAndSummaries.summary())
@@ -139,6 +141,35 @@ class HtmlController(@Autowired val moveService: MoveService) {
         return RedirectView(DASHBOARD_URL)
     }
 
+    @GetMapping(SEARCH_JOURNEYS_URL)
+    fun searchJourneys(model: ModelMap): Any {
+        model.addAttribute("form", SearchJourneyForm())
+        return "search-journeys"
+    }
+
+    @ValidJourneySearch
+    data class SearchJourneyForm (val from: String? = null, val to: String? = null)
+
+    @PostMapping(SEARCH_JOURNEYS_URL)
+    fun performJourneySearch(
+            @Valid @ModelAttribute("form") form: SearchJourneyForm,
+            result: BindingResult,
+            @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
+            model: ModelMap): Any {
+
+        if (result.hasErrors()) {
+            return "search-journeys"
+        }
+
+        val journeys = journeyService.distinctJourneysBySiteNames(supplier, form.from, form.to)
+
+        return if(journeys.isEmpty()) "no-search-journeys-results" else {
+            model.addAttribute("journeys", journeys)
+            "search-journeys-results"
+        }
+
+    }
+
     companion object {
         const val DATE_ATTRIBUTE = "date"
         const val SUPPLIER_ATTRIBUTE = "supplier"
@@ -151,6 +182,7 @@ class HtmlController(@Autowired val moveService: MoveService) {
         const val MOVES_BY_TYPE_URL = "/moves-by-type"
         const val MOVES_URL = "/moves"
         const val JOURNEYS_URL = "/journeys"
+        const val SEARCH_JOURNEYS_URL = "/search-journeys"
         const val ADD_PRICE_URL = "/add-price"
     }
 }

@@ -43,12 +43,6 @@ class MoveService(private val moveQueryRepository: MoveQueryRepository, private 
         return MovesTypeSummary(moveCount, summary ?: MovesSummary(moveType))
     }
 
-    fun uniqueJourneysExcludingPriced(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.uniqueJourneysInDateRange(supplier, startDate, endOfMonth(startDate))
-
-    fun uniqueJourneysIncludingPriced(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.uniqueJourneysInDateRange(supplier, startDate, endOfMonth(startDate), false)
-
-    fun journeysSummary(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.journeysSummaryInDateRange(supplier, startDate, endOfMonth(startDate))
-
     fun moveTypeSummaries(supplier: Supplier, startDate: LocalDate): MoveTypeSummaries {
         val endDate = endOfMonth(startDate)
         val moveCount = moveQueryRepository.moveCountInDateRange(supplier, startDate, endDate)
