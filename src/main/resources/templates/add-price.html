@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+    <a href="/dashboard" class="govuk-back-link">Back</a>
+
+    <div class="mv4">
+        <h1 class="govuk-heading-xl mv2" th:inline="text">Add price</h1>
+        <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add the price agreed with the supplier for this journey.</p>
+    </div>
+
+<!--    <form th:action="@{/add-price}" th:object="${form}" method="post">-->
+    <form th:action="@{/add-price/1}" th:object="${form}" method="post">
+
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('price')} ? 'govuk-form-group--error'">
+            <ol class="list pl0">
+                <li class="mv1">
+                    <p class="govuk-label govuk-body govuk-!-font-weight-bold">Journey</p>
+                    <p th:inline="text" class="govuk-body">Location A to Loaction B</p>
+                </li>
+                <li class="mv1">
+                    <label class="govuk-label govuk-body govuk-!-font-weight-bold"
+                           for="event-name">
+                        Add price
+                    </label>
+                    <div id="event-name-hint" class="govuk-hint">
+                        Example £100.00
+                    </div>
+                    <p th:if="${#fields.hasErrors('price')}" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> Enter a valid price in the correct
+                        format
+                    </p>
+                    <div class="govuk-input__wrapper">
+                        <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                        <input class="govuk-input govuk-input--width-5" id="event-name" name="price" type="text"
+                               aria-describedby="event-name-hint" th:field="*{price}"
+                               th:classappend="${#fields.hasErrors('price')} ? 'govuk-input--error'">
+                    </div>
+                </li>
+            </ol>
+        </div>
+        <div class="govuk-warning-text mv3">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                <span th:inline="text">Please note the added price will be effective for all instances of this journey undertaken by in [[${supplier}]] the current contractual year.</span>
+            </strong>
+        </div>
+        <div class="flex items-center">
+            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+                Confirm and save
+            </button>
+            <a href="/dashboard" class="govuk-link">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+
+</html>
