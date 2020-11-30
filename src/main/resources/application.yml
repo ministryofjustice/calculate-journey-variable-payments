@@ -41,12 +41,6 @@ spring:
 
   flyway:
     locations: classpath:/db/migration/postgres,classpath:/db/migration
-    url: ${APP_DB_URL}
-    user: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    placeholders:
-      database_password: ${DB_PASSWORD}
-    schemas: ${DB_NAME}
     baseline-on-migrate: true
 
 resources:
