@@ -1,6 +1,9 @@
 .bg-govuk-colour-blue {
     background-color: #1d70b8;
 }
+.bg-transparent {
+    background: transparent;
+}
 .govuk-colour-blue {
     color: #1d70b8;
 }
@@ -523,3 +526,9 @@
   .moj-primary-navigation__search {
     display: inline-block;
     vertical-align: middle; } }
+
+.button-fix {
+    font-family: inherit;
+    font-size: 1em;
+    cursor: pointer;
+}
