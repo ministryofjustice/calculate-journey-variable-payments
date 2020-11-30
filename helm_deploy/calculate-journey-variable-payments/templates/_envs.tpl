@@ -115,4 +115,7 @@ env:
         name: {{ template "app.name" . }}
         key: HMPPS_AUTH_CLIENT_SECRET
 
+  - name: CRON_IMPORT_REPORTS
+    value: "{{ .Values.env.CRON_IMPORT_REPORTS }}"
+
 {{- end -}}
