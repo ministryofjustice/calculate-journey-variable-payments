@@ -23,4 +23,4 @@ env:
   JAVA_OPTS: "-Xmx2048m"
   HMPPS_AUTH_BASE_URI: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
   HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.live-1.cloud-platform.service.justice.gov.uk"
-  CRON_IMPORT_REPORTS: "0 0 13 * * ?"
+  CRON_IMPORT_REPORTS: "0 0 14 * * ?"
