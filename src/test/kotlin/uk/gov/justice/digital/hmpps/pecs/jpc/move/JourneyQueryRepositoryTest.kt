@@ -112,10 +112,9 @@ internal class JourneyQueryRepositoryTest {
         journeyRepository.save(journey2)
         entityManager.flush()
 
-        val journeys = journeyQueryRepository.distinctJourneysBySiteNames(Supplier.SERCO, "from", "")
+        val journeys = journeyQueryRepository.distinctPricedJourneys(Supplier.SERCO, "from", "")
         assertThat(journeys).containsExactlyInAnyOrder(
-                DistinctJourney(fromNomisAgencyId="WYI", LocationType.PR, fromSiteName="from", toNomisAgencyId="GNI", LocationType.CO, toSiteName="to"),
-                DistinctJourney(fromNomisAgencyId="WYI", LocationType.PR, fromSiteName="from", toNomisAgencyId="NEW", null, toSiteName=null)
+                JourneyWithPrice(fromNomisAgencyId="WYI", LocationType.PR, fromSiteName="from", toNomisAgencyId="GNI", LocationType.CO, toSiteName="to", volume = null, unitPriceInPence = 999, totalPriceInPence = null),
         )
     }
 
@@ -125,10 +124,9 @@ internal class JourneyQueryRepositoryTest {
         journeyRepository.save(journey2)
         entityManager.flush()
 
-        val journeys = journeyQueryRepository.distinctJourneysBySiteNames(Supplier.SERCO, " ", "to")
+        val journeys = journeyQueryRepository.distinctPricedJourneys(Supplier.SERCO, " ", "to")
         assertThat(journeys).containsExactlyInAnyOrder(
-                DistinctJourney(fromNomisAgencyId="WYI", LocationType.PR, fromSiteName="from", toNomisAgencyId="GNI", LocationType.CO, toSiteName="to"),
-                DistinctJourney(fromNomisAgencyId="NEW", null, fromSiteName=null, toNomisAgencyId="GNI", LocationType.CO, toSiteName="to")
+                JourneyWithPrice(fromNomisAgencyId="WYI", LocationType.PR, fromSiteName="from", toNomisAgencyId="GNI", LocationType.CO, toSiteName="to", volume = null, unitPriceInPence = 999, totalPriceInPence = null),
         )
     }
 

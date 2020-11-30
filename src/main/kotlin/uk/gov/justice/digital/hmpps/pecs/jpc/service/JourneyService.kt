@@ -21,6 +21,6 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
     fun journeysSummary(supplier: Supplier, startDate: LocalDate) =
             journeyQueryRepository.journeysSummaryInDateRange(supplier, startDate, endOfMonth(startDate))
 
-    fun distinctJourneysBySiteNames(supplier: Supplier, fromSiteName: String?, toSiteName: String?) =
-            journeyQueryRepository.distinctJourneysBySiteNames(supplier, fromSiteName, toSiteName)
+    fun distinctPricedJourneys(supplier: Supplier, fromSiteName: String?, toSiteName: String?) =
+            journeyQueryRepository.distinctPricedJourneys(supplier, fromSiteName?.trim()?.toUpperCase(), toSiteName?.trim()?.toUpperCase())
 }

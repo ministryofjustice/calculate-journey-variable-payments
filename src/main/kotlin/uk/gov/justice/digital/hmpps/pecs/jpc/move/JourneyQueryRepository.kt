@@ -13,7 +13,7 @@ import java.time.LocalDate
 @Component
 class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
-    fun distinctJourneysBySiteNames(supplier: Supplier, fromSiteName: String?, toSiteName: String?): List<DistinctJourney>{
+    fun distinctPricedJourneys(supplier: Supplier, fromSiteName: String?, toSiteName: String?): List<JourneyWithPrice>{
         val selectDistinctJourneysSQL = """
              select distinct
                    j.from_nomis_agency_id                                     as journey_from_nomis_agency_id,
@@ -21,12 +21,13 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                    jfl.location_type                                          as journey_from_location_type,
                    j.to_nomis_agency_id                                       as journey_to_nomis_agency_id,
                    jtl.site_name                                              as journey_to_site_name,
-                   jtl.location_type                                          as journey_to_location_type
+                   jtl.location_type                                          as journey_to_location_type,
+                   p.price_in_pence                                           as unit_price_in_pence
             from  JOURNEYS j
                      left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
                      left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id
-            where j.supplier = ?
+            where j.supplier = ? and p.price_in_pence is not null
         """.trimIndent() +
                 (if(fromSiteName.isNullOrBlank()) "" else  " and jfl.site_name = ? ") +
                 (if(toSiteName.isNullOrBlank()) "" else  " and jtl.site_name = ? ")
@@ -34,13 +35,16 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
         val distinctJourneysRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
             with(resultSet) {
-                DistinctJourney(
+                JourneyWithPrice(
                     fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
                     fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
                     fromSiteName = getString("journey_from_site_name"),
                     toNomisAgencyId = getString("journey_to_nomis_agency_id"),
                     toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
                     toSiteName = getString("journey_to_site_name"),
+                    unitPriceInPence =  if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
+                    volume = null,
+                    totalPriceInPence = null
                 )
             }
         }
@@ -48,10 +52,10 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         return jdbcTemplate.query(selectDistinctJourneysSQL, placeholders, distinctJourneysRowMapper)
     }
 
-    fun distinctJourneysAndPriceInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, excludePriced: Boolean = true): List<JourneyWithPrices> {
+    fun distinctJourneysAndPriceInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, excludePriced: Boolean = true): List<JourneyWithPrice> {
         val journeyWithPricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
             with(resultSet) {
-                JourneyWithPrices(
+                JourneyWithPrice(
                     fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
                     fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
                     fromSiteName = getString("journey_from_site_name"),
@@ -59,7 +63,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                     toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
                     toSiteName = getString("journey_to_site_name"),
                     volume = getInt("volume"),
-                    unitPriceInPence = getInt("unit_price_in_pence"),
+                    unitPriceInPence = if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
                     totalPriceInPence = getInt("total_price_in_pence")
                 )
             }

@@ -20,7 +20,7 @@ internal class JourneysSheetTest(@Autowired private val template: JPCTemplatePro
     @Test
     internal fun `test unique journeys`() {
 
-        val journey = JourneyWithPrices(
+        val journey = JourneyWithPrice(
               fromNomisAgencyId = "FRO",
                 fromLocationType = LocationType.PR,
                 fromSiteName = "from",
