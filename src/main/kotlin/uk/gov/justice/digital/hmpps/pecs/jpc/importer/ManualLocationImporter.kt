@@ -12,9 +12,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
  * This should be considered a temporary component in that as soon as we no longer need to import spreadsheets this can be removed.
  */
 @Component
-internal class ManualLocationImporter(private val priceRepository: PriceRepository,
-                                      private val locationRepository: LocationRepository,
-                                      private val importService: ImportService) {
+class ManualLocationImporter(private val priceRepository: PriceRepository,
+                             private val locationRepository: LocationRepository,
+                             private val importService: ImportService) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

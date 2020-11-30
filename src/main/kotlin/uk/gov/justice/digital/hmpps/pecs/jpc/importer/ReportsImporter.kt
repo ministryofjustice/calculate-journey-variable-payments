@@ -11,7 +11,7 @@ import java.time.LocalDate
  * This should be considered a temporary component in that as soon as we no longer need to import spreadsheets this can be removed.
  */
 @Component
-internal class ReportsImporter(private val importService: ImportService) {
+class ReportsImporter(private val importService: ImportService) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

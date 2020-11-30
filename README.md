@@ -41,24 +41,28 @@ If you prefer to run the app from the command line, you can do so from the root 
 export $(cat .env | xargs)  # If you want to set or update the current shell environment
 ./gradlew bootRun '
 ```
-### Running imports from the commandline
+### Running imports of locations, prices and reporting data
 
-Importing locations and prices:
-
-```bash
-export $(cat .env | xargs)  # If you want to set or update the current shell environment
-
-java -jar app.jar --spring.main.web-application-type=none --import-locations-and-prices
-```
-
-Importing supplier reports for given dates:
+Start by running the following from the command line to take you into the Spring shell.
 
 ```bash
-export $(cat .env | xargs)  # If you want to set or update the current shell environment
+export $(cat .env | xargs) # Only run this if you want to set or update the current local environment
 
-java -jar app.jar --spring.main.web-application-type=none --import-supplier-reports=2020-10-01,2020-10-02
+java -jar app.jar --spring.shell.interactive.enabled=true --spring.main.web-application-type=none
 ```
+Once in the Spring shell the following commands for importing data are available:
+```
+import-locations
+```
+```
+import-prices --supplier SERCO/GEOAMEY
+```
+```
+import-reports --from YYYY-MM-DD --to YYYY-MM-DD
+```
+Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 
+To exit from the shell simply type: exit
 
 ### Common gradle tasks 
 To list project dependencies, run:
