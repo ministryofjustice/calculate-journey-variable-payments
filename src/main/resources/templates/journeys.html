@@ -23,6 +23,20 @@
         </ol>
     </div>
 
+    <div
+            class="ba bw2 b--green flex justify-between items-center ph4 pv3 mt2"
+            data-module="app-message"
+            data-allow-dismiss tabindex="-1"
+            role="alert"
+            aria-labelledby="app-message__heading"
+            th:if="${success}"
+    >
+        <p class="govuk-heading-m govuk-!-font-weight-bold ma0" id="app-message__heading" th:inline="text">
+            [[$success.agencyId]] successfully mapped to [[${success.locationName}]]
+        </p>
+        <a href="/journeys" class="govuk-link">Dismiss</a>
+    </div>
+
     <div class="flex justify-between items-end mv4">
         <div class="flex-auto">
             <h1 class="govuk-heading-xl ma0">Journeys for review</h1>
@@ -83,12 +97,14 @@
             <thbody class="govuk-table__body">
                 <tr class="govuk-table__row" th:each="journey: ${journeys}">
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromSiteName ?: "Not
-                        mapped"}]]</td>
+                        mapped"}]]
+                    </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType ?: "Not
                         mapped"}]]
                     </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toSiteName ?: "Not
-                        mapped"}]]</td>
+                        mapped"}]]
+                    </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType ?: "Not
                         mapped"}]]
                     </td>

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
@@ -27,16 +28,18 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
   }
 
   @PostMapping("/map-location")
-  fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap): Any {
+  fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
     if (result.hasErrors()) {
       return "/map-location"
     }
 
     service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
-    // TODO this needs to go back to the journeys for review page when it is ready/available!
-    return RedirectView(HtmlController.DASHBOARD_URL)
+    redirectAttributes.addFlashAttribute("success", MappedLocation(form.locationName, form.agencyId))
+    return "redirect:/journeys/"
   }
+
+  data class MappedLocation(val locationName: String, val agencyId: String)
 
   data class MapLocationForm(
           @get: NotEmpty(message = "Enter NOMIS agency id")
