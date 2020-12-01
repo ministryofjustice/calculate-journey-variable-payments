@@ -361,6 +361,9 @@
 .b--blue {
     border-color: #1d70b8;
 }
+.b--green {
+    border-color: #00823b;
+}
 .tr {
     text-align: right;
 }

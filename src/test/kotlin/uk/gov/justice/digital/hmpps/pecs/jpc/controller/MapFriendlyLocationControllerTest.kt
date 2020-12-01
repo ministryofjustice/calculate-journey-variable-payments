@@ -46,7 +46,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
     }
             .andExpect { model { hasNoErrors() } }
             .andExpect { status { is3xxRedirection } }
-            .andExpect { redirectedUrl("/dashboard") }
+            .andExpect { redirectedUrl("/journeys/") }
 
     verify(service).mapFriendlyLocation(agencyId, "Friendly Location Name", LocationType.CC)
   }
