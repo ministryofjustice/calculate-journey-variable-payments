@@ -13,6 +13,8 @@ class MovePersister(private val moveRepository: MoveRepository) {
     fun persist(reports: List<Report>) {
         logger.info("Persisting ${reports.size} moves")
 
+        var counter = 0
+
         reports.forEach { report ->
             Result.runCatching {
             with(report.move) {
@@ -75,11 +77,17 @@ class MovePersister(private val moveRepository: MoveRepository) {
 
                     moveRepository.save(newMove)
 
+                    if (counter % 500 == 0) {
+                        logger.info("Persisted $counter moves out of ${reports.size} (flushing moves to the database).")
+
+                        moveRepository.flush()
+                    }
                 }
             }
             }.onFailure { logger.warn(it.message) }
-        }
 
+            moveRepository.flush()
+        }
     }
 
     fun journeyToReportJourneyWithEvents(journey: Journey): ReportJourneyWithEvents{
