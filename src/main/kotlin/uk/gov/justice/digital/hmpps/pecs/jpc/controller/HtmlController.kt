@@ -22,7 +22,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.DecimalMin
-import javax.validation.constraints.Min
 
 
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
@@ -161,7 +160,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
             return "search-journeys"
         }
 
-        val journeys = journeyService.distinctJourneysBySiteNames(supplier, form.from, form.to)
+        val journeys = journeyService.distinctPricedJourneys(supplier, form.from, form.to)
 
         return if(journeys.isEmpty()) "no-search-journeys-results" else {
             model.addAttribute("journeys", journeys)

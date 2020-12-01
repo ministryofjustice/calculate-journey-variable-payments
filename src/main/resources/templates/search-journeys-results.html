@@ -11,11 +11,64 @@
 
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
-    <section class="mt5">
-        <h2 class="govuk-heading-m pt1 bt bw2">Distinct Journeys</h2>
-        <div th:each="journey: ${journeys}">
-            <div th:replace="fragments/journey.html :: journey"></div>
+    <div class="govuk-breadcrumbs ">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="/search-journeys" th:inline="text">Search journeys</a>
+            </li>
+        </ol>
+    </div>
+
+    <div class="flex justify-between items-end mv4">
+        <div class="flex-auto">
+            <h1 class="govuk-heading-xl ma0">Manage Journey Price Catalogue</h1>
         </div>
+        <div>
+            <a th:href="@{|/generate-prices-spreadsheet/|}"
+               th:attr="download=${'moves-' + '.csv'}"
+               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
+        </div>
+    </div>
+
+    <section class="mt3">
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up location type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location type</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none">Unit price</th>
+            </tr>
+            </thead>
+            <thbody class="govuk-table__body">
+                <tr class="govuk-table__row" th:each="journey: ${journeys}">
+                    <td class="govuk-table__cell" scope="row" th:inline="text">
+                        <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId}}" class="ma0 govuk-link">
+                            <span th:inline="text"> [[${journey.fromSiteName}]]</span>
+                        </a>
+                    </td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType}]]
+                    </td>
+
+                    <td class="govuk-table__cell" scope="row" th:inline="text">
+                        <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">
+                            <span th:inline="text"> [[${journey.toSiteName}]]</span>
+                        </a>
+                    </td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType}]]
+                    </td>
+                    <td class="govuk-table__cell" scope="row"
+                        th:inline="text">
+                        <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">
+                            <span th:inline="text">£[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]</span>
+                        </a>
+                    </td>
+                </tr>
+            </thbody>
+        </table>
+
     </section>
 
 </div>
