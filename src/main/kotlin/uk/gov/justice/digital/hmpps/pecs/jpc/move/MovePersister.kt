@@ -14,8 +14,11 @@ class MovePersister(private val moveRepository: MoveRepository) {
         logger.info("Persisting ${reports.size} moves")
 
         var counter = 0
+        var output = StringBuilder()
 
         reports.forEach { report ->
+            output.append("${report.move.reference} ")
+
             Result.runCatching {
             with(report.move) {
                 val moveId = report.move.id
@@ -75,10 +78,13 @@ class MovePersister(private val moveRepository: MoveRepository) {
                             events = mergedReport.moveEvents.toMutableSet()
                     )
 
+//                    logger.info("Saving new move ${newMove.reference}")
                     moveRepository.save(newMove)
 
-                    if (counter % 500 == 0) {
+                    if (counter++ % 500 == 0) {
                         logger.info("Persisted $counter moves out of ${reports.size} (flushing moves to the database).")
+                        logger.info("Persisted $output")
+                        output.clear()
 
                         moveRepository.flush()
                     }
