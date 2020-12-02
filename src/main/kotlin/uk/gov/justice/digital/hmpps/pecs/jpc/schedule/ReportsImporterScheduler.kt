@@ -17,11 +17,10 @@ class ReportsImporterScheduler(private val reportsImporter: ReportsImporter, pri
   @Scheduled(cron = "\${CRON_IMPORT_REPORTS}")
   @SchedulerLock(name = "importReports")
   fun importPreviousDaysReports() {
-    val to = timeSource.date().minusDays(1)
-    val from = to.minusDays(1)
+    val yesterday = timeSource.date().minusDays(1)
 
-    logger.info("Importing previous days reporting data: from $from to $to.")
+    logger.info("Importing previous days reporting data: $yesterday.")
 
-    reportsImporter.import(from, to)
+    reportsImporter.import(yesterday, yesterday)
   }
 }

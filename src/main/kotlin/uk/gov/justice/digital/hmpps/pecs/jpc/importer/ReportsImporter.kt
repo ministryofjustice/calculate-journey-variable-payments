@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ExitCodeGenerator
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.time.LocalDate
 
@@ -21,6 +20,8 @@ class ReportsImporter(private val importService: ImportService) {
 
     /**
      * Calling this kicks off an import and returns '0' if successful or '1' if any exception is thrown (and caught).
+     *
+     * To import reports for a single day then the [from] and [to] dates should be the same.
      */
     fun import(from: LocalDate, to: LocalDate): ExitCodeGenerator {
         return Result.runCatching {
