@@ -1,5 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface MoveRepository : CrudRepository<Move, String>
+interface MoveRepository : JpaRepository<Move, String>
