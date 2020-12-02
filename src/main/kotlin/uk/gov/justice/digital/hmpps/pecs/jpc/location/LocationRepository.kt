@@ -6,4 +6,6 @@ import java.util.UUID
 interface LocationRepository : JpaRepository<Location, UUID> {
 
     fun findByNomisAgencyId(id: String) : Location?
+
+    fun findBySiteName(name: String): Location?
 }

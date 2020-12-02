@@ -76,6 +76,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     fun journeys(
             @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
             @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
+            @ModelAttribute(name = "locationName") locationName: String,
+            @ModelAttribute(name = "agencyId") agencyId: String,
             model: ModelMap,
     ): String {
 

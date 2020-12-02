@@ -16,30 +16,44 @@ import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE)
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, "operation")
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
 
   @GetMapping("/map-location/{agency-id}")
   fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
 
+    service.findAgencyLocationAndType(agencyId)?.let {
+      model.addAttribute("operation", "update")
+      model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name))
+
+      return "map-location"
+    }
+
+    model.addAttribute("operation", "create")
     model.addAttribute("form", MapLocationForm(agencyId = agencyId))
 
     return "map-location"
   }
 
   @PostMapping("/map-location")
-  fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
+  fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): Any {
     if (result.hasErrors()) {
+      return "/map-location"
+    }
+
+    if (service.locationAlreadyExists(form.agencyId, form.locationName)) {
+      // TODO need to display error
+
       return "/map-location"
     }
 
     service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
-    redirectAttributes.addFlashAttribute("success", MappedLocation(form.locationName, form.agencyId))
-    return "redirect:/journeys/"
-  }
+    redirectAttributes.addFlashAttribute("mappedLocationName", form.locationName)
+    redirectAttributes.addFlashAttribute("mappedAgencyId", form.agencyId)
 
-  data class MappedLocation(val locationName: String, val agencyId: String)
+    return RedirectView("/journeys", true)
+  }
 
   data class MapLocationForm(
           @get: NotEmpty(message = "Enter NOMIS agency id")
@@ -52,3 +66,4 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
           val locationType: String = ""
   )
 }
+
