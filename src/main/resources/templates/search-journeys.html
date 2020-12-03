@@ -10,32 +10,43 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
+    <a href="/dashboard" class="govuk-back-link">Back</a>
 
-    <h1 class="govuk-heading-xl mv2 pt2" th:inline="text">Manage Journey Price Catalogue</h1>
+    <div class="mv4">
+        <h1 class="govuk-heading-xl mv2">Manage Journey Price Catalogue</h1>
+    </div>
 
-    <h2 class="govuk-heading-xl mv2 pt3" th:inline="text">Find Journeys</h2>
+    <h2 class="govuk-heading-l mv2 pt3">Find Journeys</h2>
+    <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Enter 1 location to find all journeys or 2
+        locations for a specific journey in the journey price catalogue.</p>
 
 
     <form th:action="@{/search-journeys}" th:object="${form}" method="post">
-        <h1 class="govuk-label-wrapper">Enter pick up or drop off location</h1>
 
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
             <p th:if="${#fields.hasErrors('*')}" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span> Please enter either a pick up or drop off location
             </p>
-
-            <label class="govuk-label govuk-label--m" for="from">Pick up location</label>
-            <input class="govuk-input govuk-input--width-20" id="from" name="from" type="text"
-                   aria-describedby="from-hint" th:field="*{from}"
-                   th:classappend="${#fields.hasErrors('from')} ? 'govuk-input--error'">
+            <ol class="pl0 list">
+                <li class="mv3">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="from">Pick up location</label>
+                        <input class="govuk-input govuk-input--width-20" id="from" name="from" type="text"
+                               aria-describedby="from-hint" th:field="*{from}"
+                               th:classappend="${#fields.hasErrors('from')} ? 'govuk-input--error'">
+                    </div>
+                </li>
+                <li class="mv3">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="from">Drop off location</label>
+                        <input class="govuk-input govuk-input--width-20" id="to" name="to" type="text"
+                               aria-describedby="to-hint" th:field="*{to}"
+                               th:classappend="${#fields.hasErrors('to')} ? 'govuk-input--error'">
+                    </div>
+                </li>
+            </ol>
         </div>
 
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="from">Drop off location</label>
-            <input class="govuk-input govuk-input--width-20" id="to" name="to" type="text"
-                   aria-describedby="to-hint" th:field="*{to}"
-                   th:classappend="${#fields.hasErrors('to')} ? 'govuk-input--error'">
-        </div>
         <div class="flex items-center">
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
                 Find Journeys
