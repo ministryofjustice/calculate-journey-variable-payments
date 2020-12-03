@@ -13,9 +13,14 @@
     <a href="/dashboard" class="govuk-back-link">Back</a>
 
     <div class="mv4">
-        <h1 class="govuk-heading-xl mv2" th:inline="text">Map location</h1>
-        <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add a Schedule 34 location name for
-            this NOMIS agency ID.</p>
+        <div th:if="${operation == 'create'}">
+            <h1 class="govuk-heading-xl mv2" th:inline="text">Map location</h1>
+            <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add a Schedule 34 location name for this NOMIS agency ID.</p>
+        </div>
+        <div th:if="${operation == 'update'}">
+            <h1 class="govuk-heading-xl mv2" th:inline="text">Update location</h1>
+            <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update Schedule 34 location.</p>
+        </div>
     </div>
 
     <form th:action="@{/map-location}" th:object="${form}" method="post">

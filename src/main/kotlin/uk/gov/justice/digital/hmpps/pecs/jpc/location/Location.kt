@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank
 data class Location(
         @Enumerated(EnumType.STRING)
         @Column(name = "location_type", nullable = false)
-        val locationType: LocationType,
+        var locationType: LocationType,
 
         @Column(name = "nomis_agency_id", unique = true, nullable = false)
         @get: NotBlank(message = "NOMIS agency id cannot be blank")
@@ -23,7 +23,7 @@ data class Location(
 
         @Column(name = "site_name", unique = true, nullable = false)
         @get: NotBlank(message = "site name cannot be blank")
-        val siteName: String,
+        var siteName: String,
 
         @Column(name = "added_at", nullable = false)
         val addedAt: LocalDateTime = LocalDateTime.now(),

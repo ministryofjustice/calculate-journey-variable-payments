@@ -29,10 +29,10 @@
             data-allow-dismiss tabindex="-1"
             role="alert"
             aria-labelledby="app-message__heading"
-            th:if="${success}"
+            th:if="${mappedLocationName}"
     >
         <p class="govuk-heading-m govuk-!-font-weight-bold ma0" id="app-message__heading" th:inline="text">
-            [[$success.agencyId]] successfully mapped to [[${success.locationName}]]
+            [[${mappedAgencyId}]] successfully mapped to [[${mappedLocationName}]]
         </p>
         <a href="/journeys" class="govuk-link">Dismiss</a>
     </div>

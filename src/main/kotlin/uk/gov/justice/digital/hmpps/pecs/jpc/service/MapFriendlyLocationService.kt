@@ -10,7 +10,24 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 @Service
 @Transactional
 class MapFriendlyLocationService(private val locationRepository: LocationRepository, private val timeSource: TimeSource) {
+
+  fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? =
+          locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }
+
+  fun locationAlreadyExists(agencyId: String, siteName: String): Boolean {
+    return locationRepository.findBySiteName(siteName.trim().toUpperCase())?.takeUnless { it.nomisAgencyId == agencyId.trim().toUpperCase() } != null
+  }
+
   fun mapFriendlyLocation(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
+    locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let {
+      it.siteName = friendlyLocationName
+      it.locationType = locationType
+
+      locationRepository.save(it)
+
+      return
+    }
+
     locationRepository.save(Location(locationType, agencyId.toUpperCase().trim(), friendlyLocationName.toUpperCase().trim(), timeSource.dateTime()))
   }
 }
