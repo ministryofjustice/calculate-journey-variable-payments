@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
@@ -31,7 +33,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   lateinit var service: MapFriendlyLocationService
 
   @Test
-  internal fun `get new friendly location`() {
+  internal fun `get mapping for new friendly location`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
 
     mockMvc.get("/map-location/${agencyId}")
@@ -44,7 +46,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   }
 
   @Test
-  internal fun `get existing friendly location`() {
+  internal fun `get mapping for existing friendly location`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, "existing location", LocationType.AP))
 
     mockMvc.get("/map-location/${agencyId}")
@@ -57,15 +59,15 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   }
 
   @Test
-  internal fun `post map new location successful`() {
+  internal fun `map new location successful when mandatory criteria supplied`() {
     mockMvc.post("/map-location") {
       param("agencyId", "123456")
       param("locationName", "Friendly Location Name")
       param("locationType", "CC")
     }
             .andExpect { status { is3xxRedirection } }
-            .andExpect { flash { attribute("mappedLocationName", "Friendly Location Name") } }
-            .andExpect { flash { attribute("mappedAgencyId", "123456") } }
+            .andExpect { flash { attribute("flashAttrMappedLocationName", "Friendly Location Name") } }
+            .andExpect { flash { attribute("flashAttrMappedAgencyId", "123456") } }
             .andExpect { redirectedUrl("/journeys") }
 
     verify(service).locationAlreadyExists(agencyId, "Friendly Location Name")
@@ -73,7 +75,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   }
 
   @Test
-  internal fun `post map location fails`() {
+  internal fun `map new location fails when mandatory criteria not supplied`() {
     mockMvc.post("/map-location") {
       param("agencyId", "123456")
       param("locationName", "")
@@ -82,5 +84,25 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
             .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "NotEmpty") } }
             .andExpect { view { name("/map-location") } }
             .andExpect { status { isOk } }
+
+    verify(service, never()).locationAlreadyExists(any(), any())
+    verify(service, never()).mapFriendlyLocation(any(), any(), any())
+  }
+
+  @Test
+  internal fun `map new location fails when duplicate location supplied supplied`() {
+    whenever(service.locationAlreadyExists(agencyId, "Duplicate location")).thenReturn(true)
+
+    mockMvc.post("/map-location") {
+      param("agencyId", agencyId)
+      param("locationName", "Duplicate location")
+      param("locationType", "CC")
+    }
+            .andExpect { model { attributeErrorCount("form", 1) } }
+            .andExpect { view { name("/map-location") } }
+            .andExpect { status { isOk } }
+
+    verify(service).locationAlreadyExists(agencyId, "Duplicate location")
+    verify(service, never()).mapFriendlyLocation(any(), any(), any())
   }
 }

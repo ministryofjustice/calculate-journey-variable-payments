@@ -5,7 +5,13 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
@@ -76,14 +82,21 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     fun journeys(
             @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
             @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-            @ModelAttribute(name = "locationName") locationName: String,
-            @ModelAttribute(name = "agencyId") agencyId: String,
+            @ModelAttribute(name = "flashAttrMappedLocationName") locationName: String?,
+            @ModelAttribute(name = "flashAttrMappedAgencyId") agencyId: String?,
             model: ModelMap,
     ): String {
 
+        removeAttributesIf(locationName.isNullOrEmpty(), model, "flashAttrMappedLocationName", "flashAttrMappedAgencyId")
+
         model.addAttribute("journeysSummary", journeyService.journeysSummary(supplier, startOfMonth))
         model.addAttribute("journeys", journeyService.distinctJourneysExcludingPriced(supplier, startOfMonth))
+
         return "journeys"
+    }
+
+    private fun removeAttributesIf(condition : Boolean, model: ModelMap, vararg attributeNames: String) {
+        if (condition) attributeNames.forEach { model.remove(it) }
     }
 
     @RequestMapping(DASHBOARD_URL)

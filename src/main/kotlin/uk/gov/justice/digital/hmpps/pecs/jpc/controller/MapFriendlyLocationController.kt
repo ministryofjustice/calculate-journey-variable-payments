@@ -10,26 +10,32 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
+import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidDuplicateLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MapFriendlyLocationController.Companion.OPERATION_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, "operation")
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, OPERATION_ATTRIBUTE)
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
+
+  companion object {
+    const val OPERATION_ATTRIBUTE = "operation"
+  }
 
   @GetMapping("/map-location/{agency-id}")
   fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
 
     service.findAgencyLocationAndType(agencyId)?.let {
-      model.addAttribute("operation", "update")
+      model.addAttribute(OPERATION_ATTRIBUTE, "update")
       model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name))
 
       return "map-location"
     }
 
-    model.addAttribute("operation", "create")
+    model.addAttribute(OPERATION_ATTRIBUTE, "create")
     model.addAttribute("form", MapLocationForm(agencyId = agencyId))
 
     return "map-location"
@@ -41,20 +47,15 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
       return "/map-location"
     }
 
-    if (service.locationAlreadyExists(form.agencyId, form.locationName)) {
-      // TODO need to display error
-
-      return "/map-location"
-    }
-
     service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
-    redirectAttributes.addFlashAttribute("mappedLocationName", form.locationName)
-    redirectAttributes.addFlashAttribute("mappedAgencyId", form.agencyId)
+    redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
+    redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
 
     return RedirectView("/journeys", true)
   }
 
+  @ValidDuplicateLocation
   data class MapLocationForm(
           @get: NotEmpty(message = "Enter NOMIS agency id")
           val agencyId: String,

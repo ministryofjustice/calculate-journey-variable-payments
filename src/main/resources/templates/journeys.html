@@ -23,16 +23,14 @@
         </ol>
     </div>
 
-    <div
-            class="ba bw2 b--green flex justify-between items-center ph4 pv3 mt2"
+    <div class="ba bw2 b--green flex justify-between items-center ph4 pv3 mt2"
             data-module="app-message"
             data-allow-dismiss tabindex="-1"
             role="alert"
             aria-labelledby="app-message__heading"
-            th:if="${mappedLocationName}"
-    >
+            th:unless="${flashAttrMappedLocationName == null}">
         <p class="govuk-heading-m govuk-!-font-weight-bold ma0" id="app-message__heading" th:inline="text">
-            [[${mappedAgencyId}]] successfully mapped to [[${mappedLocationName}]]
+            [[${flashAttrMappedAgencyId}]] successfully mapped to [[${flashAttrMappedLocationName}]]
         </p>
         <a href="/journeys" class="govuk-link">Dismiss</a>
     </div>
@@ -96,22 +94,22 @@
             </thead>
             <thbody class="govuk-table__body">
                 <tr class="govuk-table__row" th:each="journey: ${journeys}">
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromSiteName ?: "Not
-                        mapped"}]]
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromSiteName ?: journey.fromNomisAgencyId}]]</td>
+                    <td>
+                        <span th:unless="${journey.fromSiteName == null}" th:inline="text">[[${journey.fromLocationType}]]</span>
+                        <span th:if="${journey.fromSiteName == null}">
+                            <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId}}" class="ma0 govuk-link">Map location</a>
+                        </span>
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType ?: "Not
-                        mapped"}]]
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toSiteName ?: journey.toNomisAgencyId}]]</td>
+                    <td>
+                        <span th:unless="${journey.toSiteName == null}" th:inline="text">[[${journey.toLocationType}]]</span>
+                        <span th:if="${journey.toSiteName == null}">
+                            <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">Map location</a>
+                        </span>
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toSiteName ?: "Not
-                        mapped"}]]
-                    </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType ?: "Not
-                        mapped"}]]
-                    </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.volume}]]
-                    </td>
-                    <td class="govuk-table__cell" scope="row"
-                        th:inline="text">
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.volume}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">
                         <span th:unless="${journey.unitPriceInPence == null}" th:inline="text">£[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]</span>
                         <span th:if="${journey.unitPriceInPence == null}">
                             <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">Add prices</a>

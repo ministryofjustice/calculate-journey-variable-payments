@@ -10,7 +10,7 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-    <a href="/dashboard" class="govuk-back-link">Back</a>
+    <a href="/journeys" class="govuk-back-link">Back</a>
 
     <div class="mv4">
         <div th:if="${operation == 'create'}">
@@ -24,7 +24,7 @@
     </div>
 
     <form th:action="@{/map-location}" th:object="${form}" method="post">
-        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('locationName')} ? 'govuk-form-group--error'">
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
             <ol class="list pl0">
                 <li class="mv3">
                     <p class="govuk-label govuk-body govuk-!-font-weight-bold">Pick up location</p>
@@ -34,8 +34,8 @@
                 <li class="mv3">
                     <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-name">Maps to Schedule
                         34 location</label>
-                    <p th:if="${#fields.hasErrors('locationName')}" class="govuk-error-message">
-                        <span class="govuk-visually-hidden">Error:</span> <span th:errors="*{locationName}"></span>
+                    <p th:if="${#fields.hasErrors('*')}" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> <span th:errors="*"></span>
                     </p>
                     <input class="govuk-input govuk-input--width-20" id="location-name" name="location-name" type="text"
                            th:field="*{locationName}"
@@ -65,7 +65,7 @@
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
                 Confirm and save
             </button>
-            <a href="/dashboard" class="govuk-link">Cancel</a>
+            <a href="/journeys" class="govuk-link">Cancel</a>
         </div>
     </form>
 </div>

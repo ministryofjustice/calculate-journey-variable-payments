@@ -20,7 +20,7 @@ class MapFriendlyLocationService(private val locationRepository: LocationReposit
 
   fun mapFriendlyLocation(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let {
-      it.siteName = friendlyLocationName
+      it.siteName = friendlyLocationName.trim().toUpperCase()
       it.locationType = locationType
 
       locationRepository.save(it)
