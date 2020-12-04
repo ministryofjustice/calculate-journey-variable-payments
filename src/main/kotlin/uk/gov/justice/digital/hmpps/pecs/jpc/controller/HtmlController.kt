@@ -23,11 +23,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import javax.validation.Valid
-import javax.validation.constraints.DecimalMin
 
 
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
@@ -134,23 +134,6 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         }
 
         model.addAttribute(DATE_ATTRIBUTE, MonthYearParser.atStartOf(form.date))
-
-        return RedirectView(DASHBOARD_URL)
-    }
-
-    data class PriceForm(@DecimalMin("0.0") val price: Double)
-
-    @GetMapping("$ADD_PRICE_URL/{moveId}")
-    fun addPrice(@PathVariable moveId: String, model: ModelMap): Any {
-        model.addAttribute("form", PriceForm(price = 0.0))
-        return "add-price"
-    }
-
-    @PostMapping("$ADD_PRICE_URL/{moveId}")
-    fun savePrice(@PathVariable moveId: String, @Valid @ModelAttribute("form") form: PriceForm?, result: BindingResult, model: ModelMap): Any {
-        if (result.hasErrors()) {
-            return "add-price"
-        }
 
         return RedirectView(DASHBOARD_URL)
     }
