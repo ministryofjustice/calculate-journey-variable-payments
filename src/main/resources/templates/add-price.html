@@ -17,14 +17,15 @@
         <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add the price agreed with the supplier for this journey.</p>
     </div>
 
-<!--    <form th:action="@{/add-price}" th:object="${form}" method="post">-->
-    <form th:action="@{/add-price/1}" th:object="${form}" method="post">
-
+    <form th:action="@{/add-price}" th:object="${form}" method="post">
+        <input type="hidden" th:field="*{moveId}" class="dn"/>
+        <input type="hidden" th:field="*{from}" class="dn"/>
+        <input type="hidden" th:field="*{to}" class="dn"/>
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('price')} ? 'govuk-form-group--error'">
             <ol class="list pl0">
                 <li class="mv1">
                     <p class="govuk-label govuk-body govuk-!-font-weight-bold">Journey</p>
-                    <p th:inline="text" class="govuk-body">Location A to Loaction B</p>
+                    <p th:inline="text" class="govuk-body">Location [[*{from}]] to Location [[*{to}]]</p>
                 </li>
                 <li class="mv1">
                     <label class="govuk-label govuk-body govuk-!-font-weight-bold"
