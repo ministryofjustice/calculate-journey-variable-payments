@@ -110,9 +110,9 @@
                     </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.volume}]]</td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">
-                        <span th:unless="${journey.unitPriceInPence == null}" th:inline="text">£[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]</span>
-                        <span th:if="${journey.unitPriceInPence == null}">
-                            <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">Add prices</a>
+                        <span th:if="${journey.fromSiteName == null || journey.toSiteName == null}" th:inline="text">Awaiting location</span>
+                        <span th:unless="${journey.fromSiteName == null || journey.toSiteName == null}">
+                            <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">Add price</a>
                         </span>
                     </td>
                 </tr>
