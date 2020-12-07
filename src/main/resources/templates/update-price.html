@@ -10,14 +10,14 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-    <a href="/journeys" class="govuk-back-link">Back</a>
+    <a href="/dashboard" class="govuk-back-link">Back</a>
 
     <div class="mv4">
-        <h1 class="govuk-heading-xl mv2" th:inline="text">Add price</h1>
-        <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add the price agreed with the supplier for this journey.</p>
+        <h1 class="govuk-heading-xl mv2" th:inline="text">Update price</h1>
+        <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update price agreed with supplier for this journey.</p>
     </div>
 
-    <form th:action="@{/add-price}" th:object="${form}" method="post">
+    <form th:action="@{/update-price}" th:object="${form}" method="post">
         <input type="hidden" th:field="*{moveId}" class="dn"/>
         <input type="hidden" th:field="*{from}" class="dn"/>
         <input type="hidden" th:field="*{to}" class="dn"/>

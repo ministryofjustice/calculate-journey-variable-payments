@@ -26,7 +26,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
           val from: String,
           val to: String)
 
-  @GetMapping("${HtmlController.ADD_PRICE_URL}/{moveId}")
+  @GetMapping("/add-price/{moveId}")
   fun addPrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     val ids = agencyIds(moveId)
 
@@ -36,8 +36,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     return "add-price"
   }
 
-  @PostMapping(HtmlController.ADD_PRICE_URL)
-  fun savePrice(@Valid @ModelAttribute("form") form: PriceForm,
+  @PostMapping("/add-price")
+  fun addPrice(@Valid @ModelAttribute("form") form: PriceForm,
                 result: BindingResult,
                 model: ModelMap,
                 @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
@@ -49,6 +49,34 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     val ids = agencyIds(form.moveId)
 
     supplierPricingService.addPriceForSupplier(supplier, ids.first, ids.second, form.price)
+
+    return RedirectView(HtmlController.DASHBOARD_URL)
+  }
+
+  @GetMapping("/update-price/{moveId}")
+  fun updatePrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
+    val ids = agencyIds(moveId)
+
+    val sitesAndPrice = supplierPricingService.getExistingSiteNamesAndPrice(supplier, ids.first, ids.second)
+
+    model.addAttribute("form", PriceForm(moveId, sitesAndPrice.third, sitesAndPrice.first, sitesAndPrice.second))
+
+    return "update-price"
+  }
+
+  @PostMapping("/update-price")
+  fun updatePrice(@Valid @ModelAttribute("form") form: PriceForm,
+               result: BindingResult,
+               model: ModelMap,
+               @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
+
+    if (result.hasErrors()) {
+      return "update-price"
+    }
+
+    val ids = agencyIds(form.moveId)
+
+    supplierPricingService.updatePriceForSupplier(supplier, ids.first, ids.second, form.price)
 
     return RedirectView(HtmlController.DASHBOARD_URL)
   }
