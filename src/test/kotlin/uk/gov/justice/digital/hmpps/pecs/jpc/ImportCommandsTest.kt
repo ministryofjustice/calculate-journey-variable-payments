@@ -33,7 +33,7 @@ internal class ImportCommandsTest {
     commands.importReports(date, date.plusDays(1))
 
     verify(reportsImporter).import(date, date)
-    verify(reportsImporter).import(date, date.plusDays(1))
+    verify(reportsImporter).import(date.plusDays(1), date.plusDays(1))
     verify(reportsImporter, times(2)).import(any(), any())
   }
 }

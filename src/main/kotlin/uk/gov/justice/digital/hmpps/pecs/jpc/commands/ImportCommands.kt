@@ -36,7 +36,7 @@ class ImportCommands(@Autowired private val locationImporter: ManualLocationImpo
     if (to.isBefore(from)) throw RuntimeException("To date must be equal to or greater than from date.")
 
     for (i in 0..Period.between(from, to).days) {
-      reportsImporter.import(from, from.plusDays(i.toLong()))
+      reportsImporter.import(from.plusDays(i.toLong()), from.plusDays(i.toLong()))
     }
   }
 }
