@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
@@ -12,24 +13,43 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 class SupplierPricingService(val locationRepository: LocationRepository, val priceRepository: PriceRepository) {
 
   fun getSiteNamesForPricing(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Pair<String, String> {
-    val fromLocation = locationRepository.findByNomisAgencyId(fromAgencyId.trim().toUpperCase())
-            ?: throw RuntimeException("From NOMIS agency id '$fromAgencyId'not found.")
+    val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    val toLocation = locationRepository.findByNomisAgencyId(toAgencyId.trim().toUpperCase())
-            ?: throw RuntimeException("To NOMIS agency id '$toAgencyId'not found.")
+    priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, locations.first, locations.second)?.let {
+      throw RuntimeException("Supplier $supplier price already exists from ${locations.first.siteName} to ${locations.second.siteName}")
+    }
 
-    priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)?.let { throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName}") }
+    return Pair(locations.first.siteName, locations.second.siteName)
+  }
 
-    return Pair(fromLocation.siteName, toLocation.siteName)
+  fun getExistingSiteNamesAndPrice(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Triple<String, String, Double> {
+    val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
+    val price = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, locations.first, locations.second)
+            ?: throw RuntimeException("No matching price found for $supplier")
+
+    return Triple(locations.first.siteName, locations.second.siteName, price.priceInPence.toDouble() / 100)
   }
 
   fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Double) {
-    val fromLocation = locationRepository.findByNomisAgencyId(fromAgencyId.trim().toUpperCase())
-            ?: throw RuntimeException("From NOMIS agency id '$fromAgencyId'not found.")
+    val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    val toLocation = locationRepository.findByNomisAgencyId(toAgencyId.trim().toUpperCase())
-            ?: throw RuntimeException("To NOMIS agency id '$toAgencyId'not found.")
-
-    priceRepository.save(Price(supplier = supplier, fromLocation = fromLocation, toLocation = toLocation, priceInPence = price.toInt() * 100))
+    priceRepository.save(Price(supplier = supplier, fromLocation = locations.first, toLocation = locations.second, priceInPence = price.toInt() * 100))
   }
+
+  fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Double) {
+    val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
+    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, locations.first, locations.second)
+            ?: throw RuntimeException("No matching price found for $supplier")
+
+    priceRepository.save(existingPrice.apply { this.priceInPence = price.toInt() * 100 })
+  }
+
+  private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> {
+    val fromLocation = getLocationBy(from) ?: throw RuntimeException("From NOMIS agency id '$from' not found.")
+    val toLocation = getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found.")
+
+    return Pair(fromLocation, toLocation)
+  }
+
+  private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
 }

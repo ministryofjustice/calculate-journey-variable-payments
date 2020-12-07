@@ -24,7 +24,7 @@ data class Price(
         @JoinColumn(name = "to_location_id")
         val toLocation: Location,
 
-        val priceInPence: Int,
+        var priceInPence: Int,
 
         @NotNull
         val addedAt: LocalDateTime = LocalDateTime.now(),
