@@ -10,7 +10,8 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-    <a href="/journeys" class="govuk-back-link">Back</a>
+    <a href="/journeys" class="govuk-back-link" th:if="${operation == 'create'}">Back</a>
+    <a href="/search-journeys" class="govuk-back-link" th:if="${operation == 'update'}">Back</a>
 
     <div class="mv4">
         <div th:if="${operation == 'create'}">
@@ -65,7 +66,8 @@
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
                 Confirm and save
             </button>
-            <a href="/journeys" class="govuk-link">Cancel</a>
+            <a href="/journeys" class="govuk-link" th:if="${operation == 'create'}">Cancel</a>
+            <a href="/search-journeys" class="govuk-link" th:if="${operation == 'update'}">Cancel</a>
         </div>
     </form>
 </div>

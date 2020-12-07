@@ -47,26 +47,33 @@
                 <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none" width="60">Location type</th>
                 <th class="govuk-table__header" scope="col" aria-sort="none" width="190">Pick up date</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none" width="80">NOMIS ID</th>
+                <th class="govuk-table__header" scope="col" aria-sort="none" width="80">NOMIS Person ID</th>
             </tr>
             </thead>
             <thbody class="govuk-table__body">
                 <tr class="govuk-table__row" th:each="move: ${moves}">
-                    <td class="govuk-table__cell" scope="row"><a class="govuk-link" th:href="@{/moves/{id}(id=${move.moveId})}" th:inline="text">[[${move.reference}]]</a></td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromSiteName ?: "Not
-                        mapped"}]]</td>
+                    <td class="govuk-table__cell" scope="row"><a class="govuk-link"
+                                                                 th:href="@{/moves/{id}(id=${move.moveId})}"
+                                                                 th:inline="text">[[${move.reference}]]</a></td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromSiteName ?:
+                        move.fromNomisAgencyId}]]
+                    </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.fromLocationType ?: "Not
                         mapped"}]]
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toSiteName ?: "Not
-                        mapped"}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toSiteName ?:
+                        move.toNomisAgencyId ?: "Not
+                        mapped"}]]
+                    </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.toLocationType ?: "Not
                         mapped"}]]
                     </td>
                     <td class="govuk-table__cell" scope="row"
-                        th:text="${move.pickUpDateTime != null} ? ${#temporals.format(move.pickUpDateTime, 'dd MMM yyyy, HH:mm')} : ''">
+                        th:text="${move.pickUpDateTime != null} ? ${#temporals.format(move.pickUpDateTime, 'dd MMM yyyy, HH:mm')} : 'Not known'">
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.latestNomisBookingId}?: 'Not set']]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.latestNomisBookingId}?: 'Not
+                        set']]
+                    </td>
                 </tr>
             </thbody>
         </table>

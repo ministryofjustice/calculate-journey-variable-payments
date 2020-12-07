@@ -67,7 +67,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         model.addAttribute("months", MonthsWidget((startOfMonth), nextMonth = (startOfMonth.plusMonths(1)), previousMonth = (startOfMonth.minusMonths(1))))
         model.addAttribute("summary", moveTypeSummary.movesSummary)
         model.addAttribute("moves", moves)
-        model.addAttribute("moveType", moveType.toString())
+        model.addAttribute("moveType", moveType.text)
         return "moves-by-type"
     }
 

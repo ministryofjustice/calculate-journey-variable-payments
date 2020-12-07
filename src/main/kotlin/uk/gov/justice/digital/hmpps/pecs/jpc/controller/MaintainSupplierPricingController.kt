@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.format.annotation.NumberFormat
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -21,7 +22,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
   data class PriceForm(
           val moveId: String,
-          @get: Positive val price: Double,
+          @NumberFormat(pattern="#0.00") @get: Positive val price: Double,
           val from: String,
           val to: String)
 
@@ -31,7 +32,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val fromAndToSite = supplierPricingService.getSiteNamesForPricing(supplier, ids.first, ids.second)
 
-    model.addAttribute("form", PriceForm(moveId, 0.0, fromAndToSite.first, fromAndToSite.second))
+    model.addAttribute("form", PriceForm(moveId, 0.00, fromAndToSite.first, fromAndToSite.second))
     return "add-price"
   }
 

@@ -126,7 +126,7 @@
                     </div>
                 </dl>
 
-                <div>
+                <div th:each="journey, iter: ${move.journeys}">
 
                     <div th:switch="${#lists.size(move.journeys)}">
                         <h2 th:case="'1'" class="govuk-heading-m ma0 pb2" th:inline="text">Journey details</h2>
@@ -135,7 +135,7 @@
                             [[${#lists.size(move.journeys)}]] details</h2>
                     </div>
 
-                    <dl class="govuk-summary-list" th:each="journey, iter: ${move.journeys}">
+                    <dl class="govuk-summary-list" >
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 Pick up location
