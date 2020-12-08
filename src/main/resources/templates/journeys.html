@@ -82,45 +82,50 @@
     </div>
 
     <section class="mt3">
-
-        <table class="govuk-table">
+        <table class="govuk-table" th:fragment="journey-table">
             <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Pick up location type</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location type</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Total volume</th>
-                <th class="govuk-table__header" scope="col" aria-sort="none">Unit price</th>
-            </tr>
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header" scope="col" aria-sort="none">Pick up</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">Pick up location type</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">Drop off</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">Drop off location type</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">Total volume</th>
+                    <th class="govuk-table__header" scope="col" aria-sort="none">Unit price</th>
+                </tr>
             </thead>
-            <thbody class="govuk-table__body">
+            <tbody class="govuk-table__body">
                 <tr class="govuk-table__row" th:each="journey: ${journeys}">
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromSiteName ?: journey.fromNomisAgencyId}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromSiteName ?:
+                        journey.fromNomisAgencyId}]]
+                    </td>
                     <td class="govuk-table__cell" scope="row">
-                        <span th:unless="${journey.fromSiteName == null}" th:inline="text">[[${journey.fromLocationType}]]</span>
                         <span th:if="${journey.fromSiteName == null}">
                             <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId}}" class="ma0 govuk-link">Map location</a>
                         </span>
+                        <span th:unless="${journey.fromSiteName == null}"
+                              th:inline="text">[[${journey.fromLocationType}]]</span>
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toSiteName ?: journey.toNomisAgencyId}]]</td>
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toSiteName ?:
+                        journey.toNomisAgencyId}]]
+                    </td>
                     <td class="govuk-table__cell" scope="row">
-                        <span th:unless="${journey.toSiteName == null}" th:inline="text">[[${journey.toLocationType}]]</span>
                         <span th:if="${journey.toSiteName == null}">
                             <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">Map location</a>
                         </span>
+                        <span th:unless="${journey.toSiteName == null}"
+                              th:inline="text">[[${journey.toLocationType}]]</span>
                     </td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.volume}]]</td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">
                         <span th:if="${journey.fromSiteName == null || journey.toSiteName == null}" th:inline="text">Awaiting location</span>
                         <span th:unless="${journey.fromSiteName == null || journey.toSiteName == null}">
-                            <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">Add price</a>
+                            <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
+                               class="ma0 govuk-link">Add price</a>
                         </span>
                     </td>
                 </tr>
-            </thbody>
+            </tbody>
         </table>
-
     </section>
 
 </div>

@@ -12,8 +12,18 @@
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
     <section class="mt5">
-        <h2 class="govuk-heading-m pt1 bt bw2">0 results found for <span th:text="${form.from}"/> <span th:text="${form.to}"/>
-        </h2>
+        <div th:if="${pickUpLocation != '' && dropOffLocation != ''}">
+            <p class="govuk-heading-m mv5">0 results found for pick up location <span th:text="${pickUpLocation}"/> and
+                drop off location <span
+                        th:text="${dropOffLocation}"/>.</p>
+        </div>
+        <div th:if="${pickUpLocation != '' && dropOffLocation == ''}">
+            <p class="govuk-heading-m mv5">0 results found for pick up location <span th:text="${pickUpLocation}"/>.</p>
+        </div>
+        <div th:if="${pickUpLocation == '' && dropOffLocation != ''}">
+            <p class="govuk-heading-m mv5">0 results found for drop off location <span th:text="${dropOffLocation}"/>.
+            </p>
+        </div>
     </section>
 
 </div>

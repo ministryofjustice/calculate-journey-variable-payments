@@ -11,17 +11,13 @@
 
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
-    <div class="govuk-breadcrumbs ">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="/search-journeys" th:inline="text">Search journeys</a>
-            </li>
-        </ol>
+    <div class="mv4">
+        <h1 class="govuk-heading-xl ma0">Manage Journey Price Catalogue</h1>
     </div>
 
     <div class="flex justify-between items-end mv4">
         <div class="flex-auto">
-            <h1 class="govuk-heading-xl ma0">Manage Journey Price Catalogue</h1>
+            <a href="/search-journeys" class="govuk-link govuk-heading-s ma0">Search journeys</a>
         </div>
         <div>
             <a th:href="@{|/generate-prices-spreadsheet/|}"
@@ -31,8 +27,7 @@
     </div>
 
     <section class="mt3">
-
-        <table class="govuk-table">
+        <table class="govuk-table" th:fragment="journey-table">
             <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th class="govuk-table__header" scope="col" aria-sort="none">Pick up</th>
@@ -42,33 +37,30 @@
                 <th class="govuk-table__header" scope="col" aria-sort="none">Unit price</th>
             </tr>
             </thead>
-            <thbody class="govuk-table__body">
-                <tr class="govuk-table__row" th:each="journey: ${journeys}">
-                    <td class="govuk-table__cell" scope="row" th:inline="text">
-                        <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId}}" class="ma0 govuk-link">
-                            <span th:inline="text"> [[${journey.fromSiteName}]]</span>
-                        </a>
-                    </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType}]]
-                    </td>
-
-                    <td class="govuk-table__cell" scope="row" th:inline="text">
-                        <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">
-                            <span th:inline="text"> [[${journey.toSiteName}]]</span>
-                        </a>
-                    </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType}]]
-                    </td>
-                    <td class="govuk-table__cell" scope="row"
-                        th:inline="text">
-                        <a th:href="@{'/update-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link">
-                            <span th:inline="text">£[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]</span>
-                        </a>
-                    </td>
-                </tr>
-            </thbody>
+            <tbody class="govuk-table__body">
+            <tr class="govuk-table__row" th:each="journey: ${journeys}">
+                <td class="govuk-table__cell" scope="row" th:inline="text">
+                    <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId}}" class="ma0 govuk-link">
+                        <span th:inline="text"> [[${journey.fromSiteName}]]</span>
+                    </a>
+                </td>
+                <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType}]]</td>
+                <td class="govuk-table__cell" scope="row" th:inline="text">
+                    <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link"
+                       th:inline="text">
+                        [[${journey.toSiteName}]]
+                    </a>
+                </td>
+                <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType}]]</td>
+                <td class="govuk-table__cell" scope="row">
+                    <a th:href="@{'/update-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
+                       class="ma0 govuk-link" th:inline="text">
+                        £[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]
+                    </a>
+                </td>
+            </tr>
+            </tbody>
         </table>
-
     </section>
 
 </div>

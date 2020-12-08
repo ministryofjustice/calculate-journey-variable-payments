@@ -11,60 +11,55 @@ import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidDuplicateLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MapFriendlyLocationController.Companion.OPERATION_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, OPERATION_ATTRIBUTE)
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE)
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
 
-  companion object {
-    const val OPERATION_ATTRIBUTE = "operation"
-  }
+    @GetMapping("/map-location/{agency-id}")
+    fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
 
-  @GetMapping("/map-location/{agency-id}")
-  fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
+        service.findAgencyLocationAndType(agencyId)?.let {
+            model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name, operation = "update"))
 
-    service.findAgencyLocationAndType(agencyId)?.let {
-      model.addAttribute(OPERATION_ATTRIBUTE, "update")
-      model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name))
+            return "map-location"
+        }
 
-      return "map-location"
+        model.addAttribute("form", MapLocationForm(agencyId = agencyId, operation = "create"))
+
+        return "map-location"
     }
 
-    model.addAttribute(OPERATION_ATTRIBUTE, "create")
-    model.addAttribute("form", MapLocationForm(agencyId = agencyId))
+    @PostMapping("/map-location")
+    fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): Any {
+        if (result.hasErrors()) {
+            return "/map-location"
+        }
 
-    return "map-location"
-  }
+        service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
-  @PostMapping("/map-location")
-  fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): Any {
-    if (result.hasErrors()) {
-      return "/map-location"
+        redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
+        redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
+
+        return if (form.operation == "create") RedirectView("/journeys", true) else RedirectView("/search-journeys", true)
     }
 
-    service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
+    @ValidDuplicateLocation
+    data class MapLocationForm(
+            @get: NotEmpty(message = "Enter NOMIS agency id")
+            val agencyId: String,
 
-    redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
-    redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
+            @get: NotEmpty(message = "Enter Schedule 34 location")
+            val locationName: String = "",
 
-    return RedirectView("/journeys", true)
-  }
+            @get: NotEmpty(message = "Enter Schedule 34 location type")
+            val locationType: String = "",
 
-  @ValidDuplicateLocation
-  data class MapLocationForm(
-          @get: NotEmpty(message = "Enter NOMIS agency id")
-          val agencyId: String,
-
-          @get: NotEmpty(message = "Enter Schedule 34 location")
-          val locationName: String = "",
-
-          @get: NotEmpty(message = "Enter Schedule 34 location type")
-          val locationType: String = ""
-  )
+            val operation: String = "create",
+    )
 }
 
