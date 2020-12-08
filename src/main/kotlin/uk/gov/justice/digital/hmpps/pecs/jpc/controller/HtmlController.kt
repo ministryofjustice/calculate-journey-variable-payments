@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.SessionAttributes
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
+import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DATE_ATTRIBUTE
@@ -95,7 +97,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         return "journeys"
     }
 
-    private fun removeAttributesIf(condition : Boolean, model: ModelMap, vararg attributeNames: String) {
+    private fun removeAttributesIf(condition: Boolean, model: ModelMap, vararg attributeNames: String) {
         if (condition) attributeNames.forEach { model.remove(it) }
     }
 
@@ -145,29 +147,52 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     }
 
     @ValidJourneySearch
-    data class SearchJourneyForm (val from: String? = null, val to: String? = null)
+    data class SearchJourneyForm(val from: String? = null, val to: String? = null)
 
     @PostMapping(SEARCH_JOURNEYS_URL)
     fun performJourneySearch(
             @Valid @ModelAttribute("form") form: SearchJourneyForm,
             result: BindingResult,
             @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-            model: ModelMap): Any {
+            model: ModelMap, redirectAttributes: RedirectAttributes,
+    ): String {
 
         if (result.hasErrors()) {
             return "search-journeys"
         }
 
-        val journeys = journeyService.distinctPricedJourneys(supplier, form.from, form.to)
-
-        return if(journeys.isEmpty()) "no-search-journeys-results" else {
-            model.addAttribute("journeys", journeys)
-            "search-journeys-results"
+        val url = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
+        if (form.from != null && form.from != "") {
+            url.queryParam(PICK_UP_ATTRIBUTE, form.from)
+        }
+        if (form.to != null && form.to != "") {
+            url.queryParam(DROP_OFF_ATTRIBUTE, form.to)
         }
 
+        return "redirect:${url.build().toUri()}"
+    }
+
+    @GetMapping(SEARCH_JOURNEYS_RESULTS_URL)
+    fun searchJourneys(@RequestParam(name = PICK_UP_ATTRIBUTE, required = false) pickUpLocation: String?, @RequestParam(name = DROP_OFF_ATTRIBUTE, required = false) dropOffLocation: String?, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): Any {
+        if ((pickUpLocation == null || pickUpLocation == "") && (dropOffLocation == null || dropOffLocation == "")) {
+            return RedirectView(SEARCH_JOURNEYS_URL)
+        }
+
+        val journeys = journeyService.distinctPricedJourneys(supplier, pickUpLocation, dropOffLocation)
+
+        if (journeys.isEmpty()) {
+            model.addAttribute("pickUpLocation", pickUpLocation ?: "")
+            model.addAttribute("message", dropOffLocation ?: "")
+            return "no-search-journeys-results"
+        } else {
+            model.addAttribute("journeys", journeys)
+            return "search-journeys-results"
+        }
     }
 
     companion object {
+        const val PICK_UP_ATTRIBUTE = "pick-up"
+        const val DROP_OFF_ATTRIBUTE = "drop-off"
         const val DATE_ATTRIBUTE = "date"
         const val SUPPLIER_ATTRIBUTE = "supplier"
         const val START_OF_MONTH_DATE_ATTRIBUTE = "startOfMonthDate"
@@ -180,6 +205,6 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         const val MOVES_URL = "/moves"
         const val JOURNEYS_URL = "/journeys"
         const val SEARCH_JOURNEYS_URL = "/search-journeys"
-        const val ADD_PRICE_URL = "/add-price"
+        const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
     }
 }
