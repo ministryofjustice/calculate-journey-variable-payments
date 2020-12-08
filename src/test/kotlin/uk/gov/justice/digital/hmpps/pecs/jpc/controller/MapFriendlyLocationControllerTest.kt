@@ -38,7 +38,6 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
     mockMvc.get("/map-location/${agencyId}")
             .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId)) } }
-            .andExpect { model { attribute("operation", "create" ) } }
             .andExpect { view { name("map-location") } }
             .andExpect { status { isOk } }
 
@@ -50,8 +49,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, "existing location", LocationType.AP))
 
     mockMvc.get("/map-location/${agencyId}")
-            .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP.name)) } }
-            .andExpect { model { attribute("operation", "update" ) } }
+            .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP.name, "update")) } }
             .andExpect { view { name("map-location") } }
             .andExpect { status { isOk } }
 
