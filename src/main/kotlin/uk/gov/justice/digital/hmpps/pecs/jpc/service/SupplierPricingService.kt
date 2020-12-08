@@ -22,26 +22,26 @@ class SupplierPricingService(val locationRepository: LocationRepository, val pri
     return Pair(locations.first.siteName, locations.second.siteName)
   }
 
-  fun getExistingSiteNamesAndPrice(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Triple<String, String, Double> {
+  fun getExistingSiteNamesAndPrice(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Triple<String, String, Money> {
     val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val price = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, locations.first, locations.second)
             ?: throw RuntimeException("No matching price found for $supplier")
 
-    return Triple(locations.first.siteName, locations.second.siteName, price.priceInPence.toDouble() / 100)
+    return Triple(locations.first.siteName, locations.second.siteName, Money(price.priceInPence))
   }
 
-  fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Double) {
+  fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Money) {
     val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    priceRepository.save(Price(supplier = supplier, fromLocation = locations.first, toLocation = locations.second, priceInPence = price.toInt() * 100))
+    priceRepository.save(Price(supplier = supplier, fromLocation = locations.first, toLocation = locations.second, priceInPence = price.pence))
   }
 
-  fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Double) {
+  fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
     val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, locations.first, locations.second)
             ?: throw RuntimeException("No matching price found for $supplier")
 
-    priceRepository.save(existingPrice.apply { this.priceInPence = price.toInt() * 100 })
+    priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> {

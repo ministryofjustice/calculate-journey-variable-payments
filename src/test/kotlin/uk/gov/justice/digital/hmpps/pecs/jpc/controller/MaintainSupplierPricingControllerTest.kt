@@ -11,10 +11,12 @@ import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 
 @SpringBootTest
@@ -35,7 +37,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   private val toAgencyId = "BBBBBB"
 
   @Test
-  internal fun `cam navigate to add price page`() {
+  internal fun `can initiate add price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
     }
@@ -48,5 +50,22 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             .andExpect { status { isOk } }
 
     verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)
+  }
+
+  @Test
+  internal fun `can add price for Serco`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.SERCO)
+    }
+
+    mockMvc.post("/add-price") {
+      session = mockSession
+      param("moveId", "${fromAgencyId}-${toAgencyId}")
+      param("price", "100.24")
+    }
+            .andExpect { redirectedUrl("/dashboard") }
+            .andExpect { status { is3xxRedirection } }
+
+    verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24))
   }
 }

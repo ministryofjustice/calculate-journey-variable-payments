@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -15,12 +15,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class SupplierPricingServiceTest {
 
+  private val priceInPence: Int = 10024
   private val locationRepository: LocationRepository = mock()
   private val fromLocation: Location = mock { on { siteName } doReturn "from site" }
   private val toLocation: Location = mock { on { siteName } doReturn "to site" }
   private val priceRepository: PriceRepository = mock()
-  private val price: Price = mock { on { priceInPence } doReturn 1000 }
+  private val price: Price = mock { on { priceInPence } doReturn priceInPence }
   private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository)
+  private val priceCaptor = argumentCaptor<Price>()
 
   @Test
   internal fun `site names returned for new pricing`() {
@@ -41,11 +43,13 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
 
-    service.addPriceForSupplier(Supplier.SERCO, "from", "to", 100.0)
+    service.addPriceForSupplier(Supplier.SERCO, "from", "to", Money.valueOf(100.24))
 
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
-    verify(priceRepository).save(any())
+    verify(priceRepository).save(priceCaptor.capture())
+
+    assertThat(priceCaptor.firstValue.priceInPence).isEqualTo(10024)
   }
 
   @Test
@@ -56,7 +60,7 @@ internal class SupplierPricingServiceTest {
 
     val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to")
 
-    assertThat(result).isEqualTo(Triple("from site", "to site", 10.0))
+    assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)
@@ -68,11 +72,12 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)).thenReturn(price)
 
-    service.updatePriceForSupplier(Supplier.SERCO, "from", "to", 200.0)
+    service.updatePriceForSupplier(Supplier.SERCO, "from", "to", Money.Factory.valueOf(200.35))
 
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)
-    verify(priceRepository).save(any())
+    verify(priceRepository).save(price)
+    verify(price).priceInPence = 20035
   }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import javax.validation.Valid
 import javax.validation.constraints.Positive
@@ -23,8 +24,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   data class PriceForm(
           val moveId: String,
           @NumberFormat(pattern="#0.00") @get: Positive val price: Double,
-          val from: String,
-          val to: String)
+          val from: String?,
+          val to: String?)
 
   @GetMapping("/add-price/{moveId}")
   fun addPrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
@@ -48,7 +49,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val ids = agencyIds(form.moveId)
 
-    supplierPricingService.addPriceForSupplier(supplier, ids.first, ids.second, form.price)
+    supplierPricingService.addPriceForSupplier(supplier, ids.first, ids.second, Money.valueOf(form.price))
 
     return RedirectView(HtmlController.DASHBOARD_URL)
   }
@@ -59,7 +60,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val sitesAndPrice = supplierPricingService.getExistingSiteNamesAndPrice(supplier, ids.first, ids.second)
 
-    model.addAttribute("form", PriceForm(moveId, sitesAndPrice.third, sitesAndPrice.first, sitesAndPrice.second))
+    model.addAttribute("form", PriceForm(moveId, sitesAndPrice.third.pounds(), sitesAndPrice.first, sitesAndPrice.second))
 
     return "update-price"
   }
@@ -76,7 +77,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val ids = agencyIds(form.moveId)
 
-    supplierPricingService.updatePriceForSupplier(supplier, ids.first, ids.second, form.price)
+    supplierPricingService.updatePriceForSupplier(supplier, ids.first, ids.second, Money.valueOf(form.price))
 
     return RedirectView(HtmlController.DASHBOARD_URL)
   }
