@@ -14,11 +14,11 @@
     <a href="/search-journeys" class="govuk-back-link" th:if="${operation == 'update'}">Back</a>
 
     <div class="mv4">
-        <div th:if="${operation == 'create'}">
+        <div th:if="${form.operation == 'create'}">
             <h1 class="govuk-heading-xl mv2" th:inline="text">Map location</h1>
             <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add a Schedule 34 location name for this NOMIS agency ID.</p>
         </div>
-        <div th:if="${operation == 'update'}">
+        <div th:if="${form.operation == 'update'}">
             <h1 class="govuk-heading-xl mv2" th:inline="text">Update location</h1>
             <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update Schedule 34 location.</p>
         </div>
@@ -31,6 +31,7 @@
                     <p class="govuk-label govuk-body govuk-!-font-weight-bold">Pick up location</p>
                     <p th:text="*{agencyId}" class="govuk-body ma0"></p>
                     <input type="hidden" th:field="*{agencyId}" class="dn"/>
+                    <input type="hidden" th:field="*{operation}" class="dn"/>
                 </li>
                 <li class="mv3">
                     <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-name">Maps to Schedule
@@ -66,8 +67,8 @@
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
                 Confirm and save
             </button>
-            <a href="/journeys" class="govuk-link" th:if="${operation == 'create'}">Cancel</a>
-            <a href="/search-journeys" class="govuk-link" th:if="${operation == 'update'}">Cancel</a>
+            <a href="/journeys" class="govuk-link" th:if="${form.operation == 'create'}">Cancel</a>
+            <a href="/search-journeys" class="govuk-link" th:if="${form.operation == 'update'}">Cancel</a>
         </div>
     </form>
 </div>
