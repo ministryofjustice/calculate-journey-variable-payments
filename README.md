@@ -41,7 +41,34 @@ If you prefer to run the app from the command line, you can do so from the root 
 export $(cat .env | xargs)  # If you want to set or update the current shell environment
 ./gradlew bootRun '
 ```
-### Running imports of locations, prices and reporting data
+
+### Data for pricing journeys/moves
+
+Pricing data makes its way into the service via two mechanisms. Via a daily CRON job (which at time of writing runs in 
+the early hours of the morning) and via a manual process (with the view the manual process will be going away). The 
+CRON job is configured in the helm config of this project via the **CRON_IMPORT_REPORTS** environment variable.
+
+The data itself falls into three distinct types:
+
+1. Schedule 34 location data - this represents the allowed contracted locations for moves within Book a Secure Move, in 
+   Excel spreadsheet format. Upon receipt of this spreadsheet it is (manually) uploaded to a secure S3 bucket.
+2. Supplier pricing data - this represents the agreed prices with the suppliers for moves 'from' and 'to' the schedule 
+   34 locations i.e. it is dependent on the Schedule 34 locations, in Excel spreadsheet format. There is a separate 
+   pricing spreadsheet for each supplier. Upon receipt of a supplier price spreadsheet it is (manually) uploaded to a 
+   secure S3 bucket.
+3. Move reporting data - these are JSON files representing all the of the supplier moves, stored in a secure S3 bucket. 
+   These files are uploaded automatically to S3 by an independent process not managed by this application.  The files 
+   are pulled into the application via the daily early morning CRON job to be used for calculating journey prices.
+
+### Manually importing locations, supplier prices and reporting data
+
+**IMPORTANT:**
+
+- EXTREME CARE SHOULD BE TAKEN WHEN RUNNING LOCATION AND PRICING IMPORTS IN PRODUCTION, EXISTING LOCATIONS AND PRICES 
+  WILL BE REMOVED!!
+- TO MANUALLY IMPORT DATA IN PRODUCTION YOU WILL NEED TO GO DIRECTLY ONTO ONE OF THE KUBE PODS.
+- MANUALLY IMPORTING REPORTING DATA IS MAINLY TO SUPPORT LOADING OF BACK-FILLED SUPPLIER REPORTING DATA. IT CAN BE SLOW, 
+  IF YOU HAVE TO IMPORT A LOT OF DATA THEN ALLOW PLENTY OF TIME AND ALSO CONSIDER TIME OF EXECUTION.
 
 Start by running the following from the command line to take you into the Spring shell.
 
