@@ -1,15 +1,24 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import com.beust.klaxon.Json
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.persistence.*
+import javax.persistence.CascadeType
+import javax.persistence.Column
+import javax.persistence.ConstraintMode
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.FetchType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToMany
+import javax.persistence.Table
+import javax.persistence.Transient
 
 @Entity
 @Table(name = "MOVES")
@@ -87,11 +96,11 @@ data class Move(
         @Column(name = "vehicle_registration", nullable = true)
         val vehicleRegistration: String?,
 
-        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
         @JoinColumn(name="move_id")
         val journeys: MutableSet<Journey> = mutableSetOf(),
 
-        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
+        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
         @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
         val events: MutableSet<Event> = mutableSetOf()
 )
