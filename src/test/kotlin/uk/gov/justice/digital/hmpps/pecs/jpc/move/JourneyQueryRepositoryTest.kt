@@ -54,7 +54,7 @@ internal class JourneyQueryRepositoryTest {
     fun beforeEach(){
         locationRepository.save(wyi)
         locationRepository.save(gni)
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO))
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2020))
 
         moveRepository.save(standardMove)
         journeyRepository.save(journeyModel1)
@@ -75,19 +75,19 @@ internal class JourneyQueryRepositoryTest {
         locationRepository.save(locationX)
         locationRepository.save(locationY)
 
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = locationX, priceInPence = 201, supplier = Supplier.SERCO))
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = locationX, priceInPence = 201, supplier = Supplier.SERCO, effectiveYear = 2020))
 
-        val moveWithUnbillableJourney = standardMove.copy(moveId = "M2")
+        val moveWithNonBillableJourney = standardMove.copy(moveId = "M2")
         val journey3 = journey(moveId = "M2", journeyId = "J3", billable = false, toNomisAgencyId = locationX.nomisAgencyId)
 
         val moveWithUnmappedLocation = standardMove.copy(moveId = "M3")
         val journey4 = journey(moveId = "M3", journeyId = "J4", billable = true, fromNomisAgencyId = "unmappedNomisAgencyId")
 
-        val moveWithUpricedLocation = standardMove.copy(moveId = "M4")
+        val moveWithUpricedJourney = standardMove.copy(moveId = "M4")
         val journey5 = journey(moveId = "M4", journeyId = "J5", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
 
-        moveRepository.save(moveWithUnbillableJourney) // not unpriced just because journey is not billable
-        moveRepository.save(moveWithUpricedLocation) // unpriced but has location
+        moveRepository.save(moveWithNonBillableJourney) // not unpriced just because journey is not billable
+        moveRepository.save(moveWithUpricedJourney) // unpriced in 2020, but priced in 2021
         moveRepository.save(moveWithUnmappedLocation) // unpriced since it has no mapped location
 
         journeyRepository.save(journey3)
@@ -104,6 +104,29 @@ internal class JourneyQueryRepositoryTest {
 
         // Ordered by unmapped from locations first
         assertThat(unpricedUniqueJourneys[0].fromNomisAgencyId).isEqualTo("unmappedNomisAgencyId")
+    }
+
+
+    @Test
+    fun `2021 prices don't appear in 2020 journeys`() {
+
+        val locationY  = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationY", siteName = "apple")
+        locationRepository.save(locationY)
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = locationY, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2021))
+
+        val moveWithUpriced2020Journey = standardMove.copy(moveId = "M2")
+        val journeyNotPricedFor2020 = journey(moveId = "M2", journeyId = "J2", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
+
+        moveRepository.save(moveWithUpriced2020Journey)
+        journeyRepository.save(journeyNotPricedFor2020)
+
+        entityManager.flush()
+
+        val summaries = journeyQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(summaries).isEqualTo(JourneysSummary(2, 999, 0, 1, Supplier.SERCO))
+
+        val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(Supplier.SERCO, moveDate, moveDate)
+        assertThat(unpricedUniqueJourneys.size).isEqualTo(1)
     }
 
     @Test

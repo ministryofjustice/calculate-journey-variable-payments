@@ -50,7 +50,7 @@ internal class MovePersisterTest {
         locationRepository.save(fromLocation)
         locationRepository.save(toLocation)
 
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = fromLocation, toLocation = toLocation, priceInPence = 999, supplier = Supplier.SERCO))
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = fromLocation, toLocation = toLocation, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2020))
 
         redirectMove = reportMoveFactory()
 
@@ -163,11 +163,38 @@ internal class MovePersisterTest {
     }
 
     @Test
+    fun `Journey with move start event in Sept 2021 persisted with 2021 effective year`() {
+
+        val redirectReportWith2021Journey = redirectReport.copy(journeysWithEvents = listOf(redirectReport.journeysWithEvents[0].copy(events = listOf(
+                        journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.plusYears(1).atStartOfDay().plusHours(5))))))
+
+        persister.persist(listOf(redirectReportWith2021Journey))
+        entityManager.flush()
+
+        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+        assertThat(retrievedMove.journeys.toList().first().effectiveYear).isEqualTo(2021)
+    }
+
+    @Test
+    fun `Journey with no journey start event, with a move date in Sept 2021 is persisted with 2021 effective year`() {
+
+        val redirectReportWith2021Move = redirectReport.copy(move = redirectReport.move.copy(moveDate = LocalDate.of(2021, 9, 1)),
+                journeysWithEvents = listOf(redirectReport.journeysWithEvents[0].copy(events =listOf())))
+
+        persister.persist(listOf(redirectReportWith2021Move))
+        entityManager.flush()
+
+        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+        assertThat(retrievedMove.journeys.toList().first().effectiveYear).isEqualTo(2021)
+    }
+
+    @Test
     fun `Persist new journey`() {
         persister.persist(listOf(redirectReport))
 
         val newJourney = reportJourneyFactory(journeyId = "J400")
-        val journeyEvents = listOf(journeyEventFactory(journeyEventId = "JE400", type = EventType.JOURNEY_LODGING.value, occurredAt = from.atStartOfDay().plusHours(10)))
+        val journeyEvents = listOf(
+                journeyEventFactory(journeyEventId = "JE400", type = EventType.JOURNEY_LODGING.value, occurredAt = from.atStartOfDay().plusHours(10)))
 
         val reportWithNewJourney = Report(
                 move = redirectMove,

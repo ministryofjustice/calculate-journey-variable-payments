@@ -57,7 +57,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             " left join JOURNEYS j on j.move_id = sm.move_id " +
             " left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
             " left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
-            " left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id " +
+            " left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year " +
             " where sm.move_type is not null and sm.supplier = ? and sm.drop_off_or_cancelled >= ? and sm.drop_off_or_cancelled < ? " +
             " group by sm.move_id) as s on m.move_id = s.move_id " +
             "GROUP BY m.move_type"
@@ -78,7 +78,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         "m.first_names, m.last_name, m.date_of_birth, m.latest_nomis_booking_id, m.gender, m.ethnicity, " +
         "fl.site_name as from_site_name, fl.location_type as from_location_type, " +
         "tl.site_name as to_site_name, tl.location_type as to_location_type, " +
-        "j.journey_id, j.supplier as journey_supplier, j.client_timestamp as journey_client_timestamp, " +
+        "j.journey_id, j.effective_year, j.supplier as journey_supplier, j.client_timestamp as journey_client_timestamp, " +
         "j.updated_at as journey_updated_at, j.billable, j.vehicle_registration, j.state as journey_state, " +
         "j.from_nomis_agency_id as journey_from_nomis_agency_id, j.to_nomis_agency_id as journey_to_nomis_agency_id, " +
         "j.pick_up as journey_pick_up, j.drop_off as journey_drop_off, j.notes as journey_notes, " +
@@ -91,7 +91,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         "left join JOURNEYS j on j.move_id = m.move_id " +
         "left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
         "left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
-        "left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id "
+        "left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year "
 
     val moveJourneyRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
         with(resultSet) {
@@ -141,7 +141,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                     vehicleRegistration = getString("vehicle_registration"),
                     billable = getBoolean("billable"),
                     notes = getString("journey_notes"),
-                    priceInPence = if (getInt("price_in_pence") == 0 && wasNull()) null else getInt("price_in_pence")
+                    priceInPence = if (getInt("price_in_pence") == 0 && wasNull()) null else getInt("price_in_pence"),
+                    effectiveYear = getInt("effective_year")
                 )
             }
 

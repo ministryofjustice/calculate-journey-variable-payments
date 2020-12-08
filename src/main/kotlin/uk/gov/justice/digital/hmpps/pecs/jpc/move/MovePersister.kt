@@ -4,6 +4,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
+import java.time.LocalDate
 
 @Component
 class MovePersister(private val moveRepository: MoveRepository) {
@@ -36,7 +38,7 @@ class MovePersister(private val moveRepository: MoveRepository) {
 
                     // merge journeys and their events
                     val existingJourneys = existingMove.journeys
-                    val newJourneys = report.journeysWithEvents.map { reportJourneyWithEventsToJourney(existingMove.moveId, it) }
+                    val newJourneys = report.journeysWithEvents.map { reportJourneyWithEventsToJourney(existingMove.moveId, existingMove.moveDate, it) }
 
                     val mergedJourneys =
                             existingJourneys.filterNot { ej -> newJourneys.any { ej.journeyId == it.journeyId } } +
@@ -74,7 +76,7 @@ class MovePersister(private val moveRepository: MoveRepository) {
                             dateOfBirth = report.person?.dateOfBirth,
                             ethnicity = report.person?.ethnicity,
                             gender = report.person?.gender,
-                            journeys = mergedReport.journeysWithEvents.map { reportJourneyWithEventsToJourney(moveId, it) }.toMutableSet(),
+                            journeys = mergedReport.journeysWithEvents.map { reportJourneyWithEventsToJourney(moveId, moveDate, it) }.toMutableSet(),
                             events = mergedReport.moveEvents.toMutableSet()
                     )
 
@@ -115,7 +117,7 @@ class MovePersister(private val moveRepository: MoveRepository) {
         }
     }
 
-    fun reportJourneyWithEventsToJourney(moveId: String, reportJourneyWithEvents: ReportJourneyWithEvents): Journey {
+    fun reportJourneyWithEventsToJourney(moveId: String, moveDate: LocalDate?, reportJourneyWithEvents: ReportJourneyWithEvents): Journey {
         with(reportJourneyWithEvents) {
 
             val pickUp = Event.getLatestByType(reportJourneyWithEvents.events, EventType.JOURNEY_START)?.occurredAt
@@ -135,7 +137,8 @@ class MovePersister(private val moveRepository: MoveRepository) {
                  billable = reportJourney.billable,
                  vehicleRegistration = reportJourney.vehicleRegistration,
                  notes = reportJourneyWithEvents.events.notes(),
-                 events = events.toMutableSet()
+                 events = events.toMutableSet(),
+                 effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: LocalDate.now())
             )
         }
     }

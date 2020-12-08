@@ -1,13 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.*
 import javax.validation.constraints.NotNull
 
 @Entity
-@Table(name = "PRICES", indexes = [Index(name = "supplier_from_to_index", columnList = "supplier, from_location_id, to_location_id", unique = true)])
+@Table(name = "PRICES", indexes = [Index(name = "supplier_from_to_year_index", columnList = "supplier, from_location_id, to_location_id, effective_year", unique = true)])
 data class Price(
         @Id
         @Column(name = "price_id", nullable = false)
@@ -28,6 +29,9 @@ data class Price(
 
         @NotNull
         val addedAt: LocalDateTime = LocalDateTime.now(),
+
+        @Column(name = "effective_year", nullable = false)
+        val effectiveYear: Int
 ){
         fun journey() = "${fromLocation.nomisAgencyId}-${toLocation.nomisAgencyId}"
 
@@ -45,3 +49,5 @@ enum class Supplier {
 }
 
 fun <T : Enum<*>> T.equalsStringCaseInsensitive(value: String) = this.name == value.toUpperCase()
+
+fun effectiveYearForDate(date: LocalDate)= if(date.monthValue >= 9) date.year else date.year -1

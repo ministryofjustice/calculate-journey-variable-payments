@@ -59,7 +59,7 @@ internal class MoveQueryRepositoryTest {
     fun beforeEach(){
         locationRepository.save(wyi)
         locationRepository.save(gni)
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO))
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2020))
 
         moveRepository.save(standardMove)
         journeyRepository.save(journeyModel1)
