@@ -127,6 +127,7 @@ internal class JourneyQueryRepositoryTest {
 
         val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(Supplier.SERCO, moveDate, moveDate)
         assertThat(unpricedUniqueJourneys.size).isEqualTo(1)
+        assertThat(unpricedUniqueJourneys[0].totalPriceInPence).isEqualTo(0)
     }
 
     @Test

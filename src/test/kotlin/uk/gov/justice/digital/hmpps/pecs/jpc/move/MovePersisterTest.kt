@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import
 
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
@@ -34,6 +35,9 @@ internal class MovePersisterTest {
 
     @Autowired
     lateinit var entityManager: TestEntityManager
+
+    @Autowired
+    lateinit var timeSource: TimeSource
 
     final val from: LocalDate = LocalDate.of(2020, 9, 1)
     final val to: LocalDate = LocalDate.of(2020, 9, 6)
@@ -78,7 +82,7 @@ internal class MovePersisterTest {
                 )
         )
 
-        persister = MovePersister(moveRepository)
+        persister = MovePersister(moveRepository, timeSource)
     }
 
 

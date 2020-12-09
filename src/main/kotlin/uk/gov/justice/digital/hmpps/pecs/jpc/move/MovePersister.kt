@@ -2,13 +2,14 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 
 @Component
-class MovePersister(private val moveRepository: MoveRepository) {
+class MovePersister(private val moveRepository: MoveRepository, private val timeSource: TimeSource) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -138,7 +139,7 @@ class MovePersister(private val moveRepository: MoveRepository) {
                  vehicleRegistration = reportJourney.vehicleRegistration,
                  notes = reportJourneyWithEvents.events.notes(),
                  events = events.toMutableSet(),
-                 effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: LocalDate.now())
+                 effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: timeSource.date())
             )
         }
     }
