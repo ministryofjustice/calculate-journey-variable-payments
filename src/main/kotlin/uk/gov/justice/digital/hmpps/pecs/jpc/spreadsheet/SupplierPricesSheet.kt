@@ -11,7 +11,7 @@ internal class SupplierPricesSheet(workbook: Workbook, header: Header) : PriceSh
   override fun writeMove(move: Move) {}
 
   fun writePrices(prices: List<Price>) {
-    prices.forEach {
+    prices.sortedBy { price -> price.fromLocation.siteName + price.toLocation.siteName }.forEach {
       val row = createRow()
       row.addCell(0, it.fromLocation.siteName)
       row.addCell(1, it.toLocation.siteName)

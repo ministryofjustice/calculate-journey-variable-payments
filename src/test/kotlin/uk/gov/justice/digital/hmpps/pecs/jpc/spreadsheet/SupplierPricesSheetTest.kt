@@ -32,13 +32,13 @@ internal class SupplierPricesSheetTest(@Autowired private val template: JPCTempl
     }
 
     @Test
-    internal fun `original prices are copied over to output spreadsheet`() {
+    internal fun `prices are copied over and sorted to output spreadsheet`() {
         supplierPricesSheet.writePrices(listOf(
-                Price(UUID.randomUUID(), Supplier.SERCO ,location("FROM SITE A"), location("TO SITE A"), 10024, effectiveYear = 2020),
-                Price(UUID.randomUUID(), Supplier.SERCO , location("FROM SITE B"), location("TO SITE B"), 20059, effectiveYear = 2020)))
+                Price(UUID.randomUUID(), Supplier.SERCO ,location("FROM SITE B"), location("TO SITE B"), 10024, effectiveYear = 2020),
+                Price(UUID.randomUUID(), Supplier.SERCO , location("FROM SITE A"), location("TO SITE A"), 20059, effectiveYear = 2020)))
 
-        assertOnPriceRow(supplierPricesSheet.sheet.getRow(10), PriceRow("FROM SITE A", "TO SITE A", 100.24))
-        assertOnPriceRow(supplierPricesSheet.sheet.getRow(11), PriceRow("FROM SITE B", "TO SITE B", 200.59))
+        assertOnPriceRow(supplierPricesSheet.sheet.getRow(10), PriceRow("FROM SITE A", "TO SITE A", 200.59))
+        assertOnPriceRow(supplierPricesSheet.sheet.getRow(11), PriceRow("FROM SITE B", "TO SITE B", 100.24))
     }
 
     private fun assertOnPriceRow(row: Row, priceRow: PriceRow) {
