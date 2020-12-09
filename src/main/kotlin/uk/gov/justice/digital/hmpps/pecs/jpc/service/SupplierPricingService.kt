@@ -33,7 +33,7 @@ class SupplierPricingService(val locationRepository: LocationRepository, val pri
   fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Money) {
     val locations = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    priceRepository.save(Price(supplier = supplier, fromLocation = locations.first, toLocation = locations.second, priceInPence = price.pence))
+    priceRepository.save(Price(supplier = supplier, fromLocation = locations.first, toLocation = locations.second, priceInPence = price.pence, effectiveYear = 2020))
   }
 
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {

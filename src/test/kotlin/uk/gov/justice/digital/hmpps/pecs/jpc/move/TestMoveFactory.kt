@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -67,7 +68,8 @@ fun journey(
         billable = billable,
         priceInPence = 100,
         vehicleRegistration = "REG200",
-        notes = "some notes"
+        notes = "some notes",
+        effectiveYear = effectiveYearForDate(defaultDate)
 )
 
 fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(

@@ -26,7 +26,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             from  JOURNEYS j
                      left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
-                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id
+                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
             where j.supplier = ? and p.price_in_pence is not null
         """.trimIndent() +
                 (if(fromSiteName.isNullOrBlank()) "" else  " and jfl.site_name = ? ") +
@@ -86,8 +86,9 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                      inner join JOURNEYS j on j.move_id = m.move_id
                      left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
-                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id
-                     where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ?
+                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
+                     where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ? 
+                        and m.drop_off_or_cancelled < ?
             GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, p.price_in_pence
             $havingOnlyUnpriced
             ORDER BY null_locations_and_prices_sum desc, volume desc
@@ -116,23 +117,23 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 )
             }
         }
+        
+        val journeysSummarySQL = """
+           select count(js.journey) as journey_count, sum(js.price_in_pence) as total_price_in_pence, 
+           sum (js.volume_unlocationed) as count_without_locations, sum(js.volume_unpriced) as count_unpriced from(
+                select distinct CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id) as journey, 
+                max(case when jfl.location_id is null or jtl.location_id is null then 1 else 0 end) as volume_unlocationed, 
+                sum(case when j.billable then p.price_in_pence else 0 end) as price_in_pence, 
+                max(case when p.price_in_pence is null then 1 else 0 end) as volume_unpriced 
+             from MOVES m 
+             inner join JOURNEYS j on j.move_id = m.move_id  
+             left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id 
+             left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id 
+             left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
+             where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ?  
+             and m.drop_off_or_cancelled < ?
+             GROUP BY journey) as js""".trimIndent()
 
-        val journeysSummarySQL = "select count(js.journey) as journey_count,\n" +
-            "       sum(js.price_in_pence) as total_price_in_pence,\n" +
-            "       sum (js.volume_unlocationed) as count_without_locations,\n" +
-            "       sum(js.volume_unpriced) as count_unpriced from(\n" +
-            "            select distinct CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id) as journey,\n" +
-            "                            max(case when jfl.location_id is null or jtl.location_id is null then 1 else 0 end) as volume_unlocationed,\n" +
-            "                            sum(case when j.billable then p.price_in_pence else 0 end) as price_in_pence,\n" +
-            "                            max(case when p.price_in_pence is null then 1 else 0 end) as volume_unpriced\n" +
-            "             from MOVES m\n" +
-            "             inner join JOURNEYS j on j.move_id = m.move_id " +
-            "             left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id\n" +
-            "             left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id\n" +
-            "             left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id\n" +
-            "             where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
-            "\n" +
-            "    GROUP BY journey) as js"
 
         return jdbcTemplate.query(journeysSummarySQL,
                 arrayOf(

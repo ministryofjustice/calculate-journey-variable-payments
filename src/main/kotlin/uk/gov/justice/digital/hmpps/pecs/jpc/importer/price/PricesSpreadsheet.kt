@@ -51,7 +51,9 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
                 supplier = supplier,
                 fromLocation = fromLocation,
                 toLocation = toLocation,
-                priceInPence = price)
+                priceInPence = price,
+                effectiveYear = 2020 // TODO remove this once we're not importing from spreadhsheet anymore
+        )
     }
 
     fun addError(row: Row, error: Throwable) = errors.add(PricesSpreadsheetError(supplier, row.rowNum + ROW_OFFSET, error.cause?.cause
