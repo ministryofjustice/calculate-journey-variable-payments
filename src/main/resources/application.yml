@@ -5,7 +5,7 @@ spring:
     database: POSTGRESQL
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     platform: postgres
