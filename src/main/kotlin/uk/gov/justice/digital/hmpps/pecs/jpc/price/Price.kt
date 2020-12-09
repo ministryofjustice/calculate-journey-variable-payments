@@ -35,6 +35,7 @@ data class Price(
 ){
         fun journey() = "${fromLocation.nomisAgencyId}-${toLocation.nomisAgencyId}"
 
+        fun price() = Money(priceInPence)
 }
 
 enum class Supplier {

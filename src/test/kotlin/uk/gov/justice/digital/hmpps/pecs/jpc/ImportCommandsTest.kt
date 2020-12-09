@@ -16,7 +16,7 @@ internal class ImportCommandsTest {
   private val locationImporter: ManualLocationImporter = mock()
   private val manualPriceImporter: ManualPriceImporter = mock()
   private val reportsImporter: ReportsImporter = mock()
-  private val date: LocalDate = LocalDate.EPOCH
+  private val date: LocalDate = LocalDate.of(2020, 9, 30)
 
   private val commands: ImportCommands = ImportCommands(locationImporter, manualPriceImporter, reportsImporter)
 
@@ -33,7 +33,7 @@ internal class ImportCommandsTest {
     commands.importReports(date, date.plusDays(1))
 
     verify(reportsImporter).import(date, date)
-    verify(reportsImporter).import(date.plusDays(1), date.plusDays(1))
+    verify(reportsImporter).import(LocalDate.of(2020, 10, 1), LocalDate.of(2020, 10, 1))
     verify(reportsImporter, times(2)).import(any(), any())
   }
 }

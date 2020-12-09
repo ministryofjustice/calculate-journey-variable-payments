@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.service
+package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
 /**
  * Simple value object to encapsulate a monetary amount in pence.

@@ -1,9 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.*
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import org.apache.poi.ss.usermodel.BuiltinFormats
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -97,7 +102,6 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         }
     }
 
-
     fun writeJourneyRows(journeys: Collection<Journey>) {
         journeys.forEachIndexed { i, j ->
             writeJourneyRow(i, j)
@@ -131,5 +135,4 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     protected abstract fun writeMove(move: Move)
 
     data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
-
 }
