@@ -48,6 +48,7 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
         redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
 
         if (form.operation == "create") {
+            redirectAttributes.addFlashAttribute("flashMessage", "location-mapped")
             return "redirect:/journeys"
         }
 
@@ -61,6 +62,7 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
             if (to != "") {
                 url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
             }
+            redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
             return "redirect:${url.build().toUri()}"
         }
 

@@ -1,0 +1,47 @@
+<div th:fragment="flash-messages">
+    <div
+            class="ba bw2 b--green flex justify-between items-center pa3 mt2"
+            data-module="app-message"
+            data-allow-dismiss tabindex="-1"
+            role="alert"
+            aria-labelledby="app-message__heading"
+            th:if="${flashMessage}"
+    >
+        <div th:switch="${flashMessage}">
+            <div th:case="'location-mapped'">
+                <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+                    Location updated
+                </p>
+                <p class="govuk-body ma0" id="app-message__heading" th:inline="text"> [[${flashAttrMappedAgencyId}]]
+                    successfully mapped to [[${flashAttrMappedLocationName}]]</p>
+            </div>
+            <div th:case="'location-updated'">
+                <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+                    Location updated
+                </p>
+                <p class="govuk-body ma0" id="app-message__heading" th:inline="text"> [[${flashAttrMappedAgencyId}]]
+                    successfully mapped to [[${flashAttrMappedLocationName}]]</p>
+            </div>
+            <div th:case="'price-created'">
+                <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+                    Price added
+                </p>
+                <p class="govuk-body ma0" id="app-message__heading" th:inline="text">
+                    Journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]] priced at
+                    £[[${#numbers.formatDecimal(flashAttrPrice, 1, 'COMMA', 2, 'POINT')}]]
+                </p>
+            </div>
+            <div th:case="'price-updated'">
+                <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+                    Price updated
+                </p>
+                <p class="govuk-body ma0" id="app-message__heading" th:inline="text">
+                    Journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]] priced at
+                    £[[${#numbers.formatDecimal(flashAttrPrice, 1, 'COMMA', 2, 'POINT')}]]
+                </p>
+            </div>
+            <div th:case="*"></div>
+        </div>
+        <a th:href="${dismissFallback}" class="govuk-link" onclick="event.preventDefault();this.parentElement.remove()">Dismiss</a>
+    </div>
+</div>

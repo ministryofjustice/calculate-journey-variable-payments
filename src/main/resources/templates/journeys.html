@@ -23,19 +23,7 @@
         </ol>
     </div>
 
-    <div
-            class="ba bw2 b--green flex justify-between items-center ph4 pv3 mt2"
-            data-module="app-message"
-            data-allow-dismiss tabindex="-1"
-            role="alert"
-            aria-labelledby="app-message__heading"
-            th:if="${success}"
-    >
-        <p class="govuk-heading-m govuk-!-font-weight-bold ma0" id="app-message__heading" th:inline="text">
-            [[${flashAttrMappedAgencyId}]] successfully mapped to [[${flashAttrMappedLocationName}]]
-        </p>
-        <a href="/journeys" class="govuk-link">Dismiss</a>
-    </div>
+    <div th:replace="fragments/flash-messages.html :: flash-messages(dismissFallback='/journeys')"></div>
 
     <div class="flex justify-between items-end mv4">
         <div class="flex-auto">

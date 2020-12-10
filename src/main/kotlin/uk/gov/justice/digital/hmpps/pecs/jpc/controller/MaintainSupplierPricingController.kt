@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -42,7 +43,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   fun addPrice(@Valid @ModelAttribute("form") form: PriceForm,
                 result: BindingResult,
                 model: ModelMap,
-                @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
+                @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier, redirectAttributes: RedirectAttributes
+  ): Any {
 
     if (result.hasErrors()) {
       return "add-price"
@@ -52,6 +54,10 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     supplierPricingService.addPriceForSupplier(supplier, ids.first, ids.second, Money.valueOf(form.price))
 
+    redirectAttributes.addFlashAttribute("flashMessage", "price-created")
+    redirectAttributes.addFlashAttribute("flashAttrLocationFrom", form.from)
+    redirectAttributes.addFlashAttribute("flashAttrLocationTo", form.to)
+    redirectAttributes.addFlashAttribute("flashAttrPrice", form.price)
     return RedirectView(HtmlController.DASHBOARD_URL)
   }
 
@@ -70,7 +76,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   fun updatePrice(@Valid @ModelAttribute("form") form: PriceForm,
                result: BindingResult,
                model: ModelMap,
-               @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): String {
+               @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier, redirectAttributes: RedirectAttributes): String {
 
     if (result.hasErrors()) {
       return "update-price"
@@ -79,6 +85,11 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     val ids = agencyIds(form.moveId)
 
     supplierPricingService.updatePriceForSupplier(supplier, ids.first, ids.second, Money.valueOf(form.price))
+
+    redirectAttributes.addFlashAttribute("flashMessage", "price-updated")
+    redirectAttributes.addFlashAttribute("flashAttrLocationFrom", form.from)
+    redirectAttributes.addFlashAttribute("flashAttrLocationTo", form.to)
+    redirectAttributes.addFlashAttribute("flashAttrPrice", form.price)
 
     val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
     val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
