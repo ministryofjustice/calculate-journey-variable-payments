@@ -13,27 +13,25 @@ import java.time.LocalDate
 @Component
 class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
-    fun distinctPricedJourneys(supplier: Supplier, fromSiteName: String?, toSiteName: String?): List<JourneyWithPrice>{
-        val selectDistinctJourneysSQL = """
-             select distinct
-                   j.from_nomis_agency_id                                     as journey_from_nomis_agency_id,
-                   jfl.site_name                                              as journey_from_site_name,
-                   jfl.location_type                                          as journey_from_location_type,
-                   j.to_nomis_agency_id                                       as journey_to_nomis_agency_id,
-                   jtl.site_name                                              as journey_to_site_name,
-                   jtl.location_type                                          as journey_to_location_type,
-                   p.price_in_pence                                           as unit_price_in_pence
-            from  JOURNEYS j
-                     left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
-                     left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
-                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
-            where j.supplier = ? and p.price_in_pence is not null
+    fun prices(supplier: Supplier, fromSiteName: String?, toSiteName: String?, effectiveYear: Int): List<JourneyWithPrice>{
+        val selectPricesSQL = """
+        select jfl.nomis_agency_id as journey_from_nomis_agency_id,
+        jfl.site_name       as journey_from_site_name,
+        jfl.location_type   as journey_from_location_type,
+        jtl.nomis_agency_id as journey_to_nomis_agency_id,
+        jtl.site_name       as journey_to_site_name,
+        jtl.location_type   as journey_to_location_type,
+        p.price_in_pence    as unit_price_in_pence
+        from PRICES p
+         inner join LOCATIONS jfl on p.from_location_id = jfl.location_id
+         inner join LOCATIONS jtl on p.to_location_id = jtl.location_id
+            where p.supplier = ? 
         """.trimIndent() +
                 (if(fromSiteName.isNullOrBlank()) "" else  " and jfl.site_name = ? ") +
-                (if(toSiteName.isNullOrBlank()) "" else  " and jtl.site_name = ? ")
+                (if(toSiteName.isNullOrBlank()) "" else  " and jtl.site_name = ? ") +
+                " and p.effective_year = ? "
 
-
-        val distinctJourneysRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
+        val pricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
             with(resultSet) {
                 JourneyWithPrice(
                     fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
@@ -48,8 +46,9 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 )
             }
         }
-        val placeholders = listOf(supplier.name, fromSiteName, toSiteName).filter { !it.isNullOrBlank() }.toTypedArray()
-        return jdbcTemplate.query(selectDistinctJourneysSQL, placeholders, distinctJourneysRowMapper)
+
+        val placeholders = (listOf(supplier.name, fromSiteName, toSiteName).filter { !it.isNullOrBlank() } + effectiveYear).toTypedArray()
+        return jdbcTemplate.query(selectPricesSQL, placeholders, pricesRowMapper)
     }
 
     fun distinctJourneysAndPriceInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, excludePriced: Boolean = true): List<JourneyWithPrice> {

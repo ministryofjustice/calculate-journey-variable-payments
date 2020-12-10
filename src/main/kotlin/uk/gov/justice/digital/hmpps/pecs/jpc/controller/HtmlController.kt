@@ -25,9 +25,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.SUPPLIER_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
@@ -185,7 +185,9 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
             return RedirectView(SEARCH_JOURNEYS_URL)
         }
 
-        val journeys = journeyService.distinctPricedJourneys(supplier, pickUpLocation, dropOffLocation)
+        val startOfMonth = model.getAttribute(DATE_ATTRIBUTE) as LocalDate
+        val effectiveYear = effectiveYearForDate(startOfMonth)
+        val journeys = journeyService.prices(supplier, pickUpLocation, dropOffLocation, effectiveYear)
 
         if (journeys.isEmpty()) {
             model.addAttribute("pickUpLocation", pickUpLocation ?: "")
