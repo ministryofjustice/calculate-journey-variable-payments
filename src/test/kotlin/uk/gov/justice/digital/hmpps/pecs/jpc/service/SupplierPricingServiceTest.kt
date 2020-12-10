@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier

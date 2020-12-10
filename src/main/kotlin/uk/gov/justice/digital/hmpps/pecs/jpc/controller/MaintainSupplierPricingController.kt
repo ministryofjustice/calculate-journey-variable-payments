@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import javax.validation.Valid
 import javax.validation.constraints.Positive
