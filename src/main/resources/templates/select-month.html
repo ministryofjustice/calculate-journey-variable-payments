@@ -10,7 +10,6 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-    <a href="/dashboard" class="govuk-back-link">Back</a>
 
     <form th:action="@{/select-month}" th:object="${form}" method="post">
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('date')} ? 'govuk-form-group--error'">

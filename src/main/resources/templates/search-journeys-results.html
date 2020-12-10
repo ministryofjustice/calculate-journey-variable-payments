@@ -11,6 +11,8 @@
 
 <div class="govuk-width-container" layout:fragment="content" th:inline="text">
 
+    <div th:replace="fragments/flash-messages.html :: flash-messages(dismissFallback='/journeys')"></div>
+
     <div class="mv4">
         <h1 class="govuk-heading-xl ma0">Manage Journey Price Catalogue</h1>
     </div>

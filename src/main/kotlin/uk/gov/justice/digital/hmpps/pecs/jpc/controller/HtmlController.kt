@@ -18,7 +18,9 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DATE_ATTRIBUTE
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DROP_OFF_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.END_OF_MONTH_DATE_ATTRIBUTE
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.START_OF_MONTH_DATE_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.SUPPLIER_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
@@ -35,7 +37,7 @@ import javax.validation.Valid
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
 
 @Controller
-@SessionAttributes(SUPPLIER_ATTRIBUTE, DATE_ATTRIBUTE, START_OF_MONTH_DATE_ATTRIBUTE, END_OF_MONTH_DATE_ATTRIBUTE)
+@SessionAttributes(SUPPLIER_ATTRIBUTE, DATE_ATTRIBUTE, START_OF_MONTH_DATE_ATTRIBUTE, END_OF_MONTH_DATE_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 class HtmlController(@Autowired val moveService: MoveService, @Autowired val journeyService: JourneyService) {
 
     @RequestMapping("/")
@@ -160,14 +162,19 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         if (result.hasErrors()) {
             return "search-journeys"
         }
+        val from = form.from?.trim() ?: ""
+        val to = form.to?.trim() ?: ""
 
         val url = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
-        if (form.from != null && form.from != "") {
-            url.queryParam(PICK_UP_ATTRIBUTE, form.from)
+        if (from != "") {
+            url.queryParam(PICK_UP_ATTRIBUTE, from)
         }
-        if (form.to != null && form.to != "") {
-            url.queryParam(DROP_OFF_ATTRIBUTE, form.to)
+        if (to != "") {
+            url.queryParam(DROP_OFF_ATTRIBUTE, to)
         }
+
+        model.addAttribute(PICK_UP_ATTRIBUTE, from)
+        model.addAttribute(DROP_OFF_ATTRIBUTE, to)
 
         return "redirect:${url.build().toUri()}"
     }
