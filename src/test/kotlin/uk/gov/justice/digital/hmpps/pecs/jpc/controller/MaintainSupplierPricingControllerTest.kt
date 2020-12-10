@@ -63,7 +63,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("moveId", "${fromAgencyId}-${toAgencyId}")
       param("price", "100.24")
     }
-            .andExpect { redirectedUrl("/dashboard") }
+            .andExpect { redirectedUrl("/journeys") }
             .andExpect { status { is3xxRedirection } }
 
     verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24))
