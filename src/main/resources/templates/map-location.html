@@ -10,8 +10,6 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-    <a href="/journeys" class="govuk-back-link" th:if="${operation == 'create'}">Back</a>
-    <a href="/search-journeys" class="govuk-back-link" th:if="${operation == 'update'}">Back</a>
 
     <div class="mv4">
         <div th:if="${form.operation == 'create'}">
