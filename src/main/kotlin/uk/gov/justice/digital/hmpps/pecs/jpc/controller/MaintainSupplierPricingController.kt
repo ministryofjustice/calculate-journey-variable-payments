@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.view.RedirectView
+import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
@@ -18,7 +19,7 @@ import javax.validation.Valid
 import javax.validation.constraints.Positive
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE)
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, HtmlController.PICK_UP_ATTRIBUTE, HtmlController.DROP_OFF_ATTRIBUTE)
 class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
 
   data class PriceForm(
@@ -55,7 +56,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   }
 
   @GetMapping("/update-price/{moveId}")
-  fun updatePrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
+  fun updatePrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): String {
     val ids = agencyIds(moveId)
 
     val sitesAndPrice = supplierPricingService.getExistingSiteNamesAndPrice(supplier, ids.first, ids.second)
@@ -69,7 +70,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   fun updatePrice(@Valid @ModelAttribute("form") form: PriceForm,
                result: BindingResult,
                model: ModelMap,
-               @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
+               @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): String {
 
     if (result.hasErrors()) {
       return "update-price"
@@ -79,7 +80,16 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     supplierPricingService.updatePriceForSupplier(supplier, ids.first, ids.second, Money.valueOf(form.price))
 
-    return RedirectView(HtmlController.DASHBOARD_URL)
+    val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
+    val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+    val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+    if (from != "") {
+      url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)
+    }
+    if (to != "") {
+      url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
+    }
+    return "redirect:${url.build().toUri()}"
   }
 
   private fun agencyIds(combined: String) = Pair(combined.split("-")[0].trim().toUpperCase(), combined.split("-")[1].trim().toUpperCase())

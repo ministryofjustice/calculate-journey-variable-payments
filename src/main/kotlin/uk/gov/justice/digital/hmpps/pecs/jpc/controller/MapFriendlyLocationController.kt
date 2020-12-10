@@ -9,15 +9,17 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
-import org.springframework.web.servlet.view.RedirectView
+import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidDuplicateLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DROP_OFF_ATTRIBUTE
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE)
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, HtmlController.PICK_UP_ATTRIBUTE, HtmlController.DROP_OFF_ATTRIBUTE)
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
 
     @GetMapping("/map-location/{agency-id}")
@@ -35,7 +37,7 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
     }
 
     @PostMapping("/map-location")
-    fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): Any {
+    fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
         if (result.hasErrors()) {
             return "/map-location"
         }
@@ -45,7 +47,24 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
         redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
         redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
 
-        return if (form.operation == "create") RedirectView("/journeys", true) else RedirectView("/search-journeys", true)
+        if (form.operation == "create") {
+            return "redirect:/journeys"
+        }
+
+        if (form.operation == "update") {
+            val from = model.getAttribute(PICK_UP_ATTRIBUTE)
+            val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
+            val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+            if (from != "") {
+                url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)
+            }
+            if (to != "") {
+                url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
+            }
+            return "redirect:${url.build().toUri()}"
+        }
+
+        throw Throwable("Invalid operation ${form.operation}")
     }
 
     @ValidDuplicateLocation
