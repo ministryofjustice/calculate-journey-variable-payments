@@ -58,7 +58,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     redirectAttributes.addFlashAttribute("flashAttrLocationFrom", form.from)
     redirectAttributes.addFlashAttribute("flashAttrLocationTo", form.to)
     redirectAttributes.addFlashAttribute("flashAttrPrice", form.price)
-    return RedirectView(HtmlController.DASHBOARD_URL)
+    return RedirectView(HtmlController.JOURNEYS_URL)
   }
 
   @GetMapping("/update-price/{moveId}")
