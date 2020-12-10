@@ -8,7 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ManualPriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ReportsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
 
 /**
  * These commands are a temporary measure/solution to allow manually running the import of locations, prices and reporting data.
@@ -35,8 +35,8 @@ class ImportCommands(@Autowired private val locationImporter: ManualLocationImpo
   fun importReports(from: LocalDate, to: LocalDate) {
     if (to.isBefore(from)) throw RuntimeException("To date must be equal to or greater than from date.")
 
-    for (i in 0..Period.between(from, to).days) {
-      reportsImporter.import(from.plusDays(i.toLong()), from.plusDays(i.toLong()))
+    for (i in 0..ChronoUnit.DAYS.between(from, to)) {
+      reportsImporter.import(from.plusDays(i), from.plusDays(i))
     }
   }
 }

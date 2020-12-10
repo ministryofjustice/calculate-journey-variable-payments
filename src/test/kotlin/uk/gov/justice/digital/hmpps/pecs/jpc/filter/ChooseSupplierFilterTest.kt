@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc
+package uk.gov.justice.digital.hmpps.pecs.jpc.filter
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock

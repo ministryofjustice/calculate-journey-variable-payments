@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc
+package uk.gov.justice.digital.hmpps.pecs.jpc.commands
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -35,5 +35,12 @@ internal class ImportCommandsTest {
     verify(reportsImporter).import(date, date)
     verify(reportsImporter).import(LocalDate.of(2020, 10, 1), LocalDate.of(2020, 10, 1))
     verify(reportsImporter, times(2)).import(any(), any())
+  }
+
+  @Test
+  internal fun `import spanning entire leap year of reporting data`() {
+    commands.importReports(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 12, 31))
+
+    verify(reportsImporter, times(366)).import(any(), any())
   }
 }
