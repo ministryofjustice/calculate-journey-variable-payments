@@ -15,8 +15,8 @@ class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.ge
             row.addCell(0, it.fromSiteName())
             row.addCell(1, it.toSiteName())
             row.addCell(2, it.volume)
-            row.addCell(3, it.unitPriceInPounds(), ::dataFormatPound)
-            row.addCell(4, it.totalPriceInPounds(), ::dataFormatPound)
+            row.addCell(3, it.unitPriceInPounds(), fillWhitePound)
+            row.addCell(4, it.totalPriceInPounds(), fillWhitePound)
         }
     }
 }
