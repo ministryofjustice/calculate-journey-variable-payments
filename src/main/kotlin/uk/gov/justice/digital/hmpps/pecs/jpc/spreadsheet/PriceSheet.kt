@@ -1,54 +1,62 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.BuiltinFormats
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.FillPatternType
-import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 
-
 abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
-    private val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
-
-    private val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat( 10 ))
-
     protected val rowIndex: AtomicInteger = AtomicInteger(10)
-
     protected fun createRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.createRow(rIndex)
-
     protected fun getRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.getRow(rIndex)
 
-    protected fun fillBlue(cellStyle: CellStyle){
-        cellStyle.fillForegroundColor = IndexedColors.BLUE.getIndex()
-        cellStyle.fillPattern = FillPatternType.SPARSE_DOTS
-    }
+    protected val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
+    protected val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat( 10 ))
 
-    protected fun fillGrey(cellStyle: CellStyle){
-        cellStyle.fillForegroundColor = IndexedColors.GREY_25_PERCENT.getIndex()
-        cellStyle.fillPattern = FillPatternType.LEAST_DOTS
-    }
+    protected val fillGrey = sheet.workbook.createCellStyle()
+    protected val fillBlue = sheet.workbook.createCellStyle()
 
-    protected fun fillWhite(cellStyle: CellStyle){  } // do nothing
+    protected val fillGreyPound = sheet.workbook.createCellStyle()
+    protected val fillBluePound = sheet.workbook.createCellStyle()
+    protected val fillWhitePound = sheet.workbook.createCellStyle()
 
-    protected fun dataFormatPercentage(cellStyle: CellStyle){
-        cellStyle.dataFormat = formatPercentage
-    }
-
-    protected fun dataFormatPound(cellStyle: CellStyle){
-        cellStyle.dataFormat = formatPound
-    }
+    protected val fillGreyPercentage = sheet.workbook.createCellStyle()
+    protected val fillBluePercentage = sheet.workbook.createCellStyle()
+    protected val fillWhitePercentage = sheet.workbook.createCellStyle()
 
 
     init {
+        fillGrey.fillForegroundColor = IndexedColors.GREY_25_PERCENT.getIndex()
+        fillGrey.fillPattern = FillPatternType.LEAST_DOTS
+
+        fillGreyPound.fillForegroundColor = fillGrey.fillForegroundColor
+        fillGreyPound.fillPattern = fillGrey.fillPattern
+        fillGreyPound.dataFormat = formatPound
+
+        fillGreyPercentage.fillForegroundColor = fillGrey.fillForegroundColor
+        fillGreyPercentage.fillPattern = fillGrey.fillPattern
+        fillGreyPercentage.dataFormat = formatPercentage
+
+        fillBlue.fillForegroundColor = IndexedColors.BLUE.getIndex()
+        fillBlue.fillPattern = FillPatternType.SPARSE_DOTS
+
+        fillBluePound.fillForegroundColor = fillBlue.fillForegroundColor
+        fillBluePound.fillPattern = fillBluePound.fillPattern
+        fillBluePound.dataFormat = formatPound
+
+        fillBluePercentage.fillForegroundColor = fillBlue.fillForegroundColor
+        fillBluePercentage.fillPattern = fillBluePound.fillPattern
+        fillBluePercentage.dataFormat = formatPercentage
+
+        fillWhitePound.dataFormat = formatPound
+        fillWhitePercentage.dataFormat = formatPercentage
+
         applyHeader()
     }
+
 
     private fun applyHeader() {
         sheet.getRow(0).getCell(1).setCellValue(header.dateRun)
@@ -59,7 +67,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
 
     protected open fun writeMoveRow(move: Move, isShaded: Boolean, showNotes: Boolean = true){
-        val fill = if(isShaded) ::fillBlue else ::fillWhite
+        val fill = if(isShaded) fillBlue else null
         val row = createRow()
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(move) {
@@ -74,14 +82,15 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(8, dropOffOrCancelledTime())
             add(9, vehicleRegistration)
             add(10, prisonNumber)
-            if(hasPrice()) row.addCell(11, totalInPounds(), fill, ::dataFormatPound) else add(11, "NOT PRESENT")
+            if(hasPrice()) row.addCell(11, totalInPounds(), if(isShaded) fillBluePound else fillWhitePound) else add(11, "NOT PRESENT")
             add(12, "") // billable is empty for a move
             add(13, if(showNotes) notes else "")
         }
     }
 
     protected open fun writeJourneyRow(journeyNumber: Int, journey: Journey){
-        val fill = if(journeyNumber % 2 == 1) ::fillGrey else ::fillWhite
+        val isShaded = journeyNumber % 2 == 1
+        val fill = if(isShaded) fillGrey else null
         val row = createRow()
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(journey) {
@@ -96,7 +105,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(8, dropOffOrTime())
             add(9, vehicleRegistration)
             add(10, "") // prison number is empty for a journey
-            if(hasPrice()) row.addCell(11, priceInPounds(), fill, ::dataFormatPound) else add(11, "NOT PRESENT")
+            if(hasPrice()) row.addCell(11, priceInPounds(), if(isShaded) fillGreyPound else fillWhitePound) else add(11, "NOT PRESENT")
             add(12, isBillable())
             add(13, notes)
         }
@@ -112,13 +121,11 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
      * Write the value to the cell for the given col index
      * @param col - index of the column to create the cell for this row
      * @param value - String, Double or Int value to write to the cell
-     * @param styleAppliers - vararg of style functions to apply to the cell
+     * @param cellStyle - optional CellStyle to set on the cell
      */
-    protected fun <T>Row.addCell(col: Int, value: T?, vararg styleAppliers: (cs: CellStyle) -> Unit){
-        val cellStyle = sheet.workbook.createCellStyle()
-        styleAppliers.forEach { it(cellStyle) }
+    protected fun <T>Row.addCell(col: Int, value: T?, cellStyle: CellStyle? = null){
         val cell = createCell(col)
-        cell.cellStyle = cellStyle
+        cellStyle?.let { cell.cellStyle = it }
 
         when(value){
             is String -> cell.setCellValue(value)
@@ -136,3 +143,4 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
 }
+

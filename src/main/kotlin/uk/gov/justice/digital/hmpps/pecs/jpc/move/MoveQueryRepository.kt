@@ -165,9 +165,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     fun movesForMoveTypeInDateRange(supplier: Supplier, moveType: MoveType, startDate: LocalDate, endDateInclusive: LocalDate, limit: Int = 50, offset: Long = 0): List<Move> {
         val movesAndJourneys = jdbcTemplate.query(moveJourneySelectSQL +
             "where m.supplier = ? and m.move_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
-            "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST " +
-            "LIMIT $limit OFFSET $offset",
-            arrayOf(
+            "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
+                arrayOf(
                 supplier.name,
                 moveType.name,
                 Timestamp.valueOf(startDate.atStartOfDay()),

@@ -24,9 +24,9 @@ class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(workbook.get
 
     private fun writeSummary(rIndex: Int, movesSummary: MovesSummary){
         val row = getRow(rIndex)
-        row.addCell(1, movesSummary.percentage, ::dataFormatPercentage)
+        row.addCell(1, movesSummary.percentage, fillWhitePercentage)
         row.addCell(2, movesSummary.volume)
         row.addCell(3, movesSummary.volumeUnpriced)
-        row.addCell(4, movesSummary.totalPriceInPounds, ::dataFormatPound)
+        row.addCell(4, movesSummary.totalPriceInPounds, fillWhitePound)
     }
 }

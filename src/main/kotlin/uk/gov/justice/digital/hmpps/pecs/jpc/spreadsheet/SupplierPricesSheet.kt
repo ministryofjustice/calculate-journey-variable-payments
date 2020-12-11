@@ -15,7 +15,7 @@ internal class SupplierPricesSheet(workbook: Workbook, header: Header) : PriceSh
       val row = createRow()
       row.addCell(0, it.fromLocation.siteName)
       row.addCell(1, it.toLocation.siteName)
-      row.addCell(2, it.price().pounds(), ::dataFormatPound)
+      row.addCell(2, it.price().pounds(), fillWhitePound)
     }
   }
 }
