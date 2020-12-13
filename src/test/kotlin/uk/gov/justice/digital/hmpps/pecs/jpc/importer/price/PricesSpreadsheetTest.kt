@@ -86,7 +86,7 @@ internal class PricesSpreadsheetTest {
 
         @Test
         internal fun `cannot map row to price when from site not found`() {
-            row.getCell(1).setCellValue("unknown from site")
+            row.getCell(1).setCellValue("UNKNOWN from site")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
                     .isInstanceOf(RuntimeException::class.java)
@@ -114,7 +114,7 @@ internal class PricesSpreadsheetTest {
 
         @Test
         internal fun `cannot map row to price when to site not found`() {
-            row.getCell(2).setCellValue("unknown to site")
+            row.getCell(2).setCellValue("UNKNOWN to site")
 
             assertThatThrownBy { spreadsheet.mapToPrice(row) }
                     .isInstanceOf(RuntimeException::class.java)

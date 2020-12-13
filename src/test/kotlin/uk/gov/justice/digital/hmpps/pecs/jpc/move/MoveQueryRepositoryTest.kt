@@ -13,9 +13,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -138,14 +136,4 @@ internal class MoveQueryRepositoryTest {
         assertThat(movesCount).isEqualTo(1)
     }
 
-    @Test
-    fun `paging`(){
-        val moves = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)
-        val pageNo = 0
-        val pageSize = 50
-
-        val paging: Pageable = PageRequest.of(pageNo, pageSize)
-        val movesPage = MovesPage(moves, paging, 1)
-        println(movesPage)
-    }
 }

@@ -2,12 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDateTime
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
-import javax.persistence.Transient
+import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
 @Entity
@@ -28,8 +25,10 @@ data class Event constructor(
         @Column(name = "event_type")
         val type: String,
 
-        @Transient
-        val supplier: String? = null,
+        @SupplierParser
+        @Enumerated(EnumType.STRING)
+        @Column(name = "supplier")
+        val supplier: Supplier? = null,
 
         @Json(name = "eventable_type")
         @get: NotBlank(message = "eventable type cannot be blank")
@@ -64,6 +63,7 @@ data class Event constructor(
 
         fun fromJson(json: String): Event? {
             return Klaxon().
+            fieldConverter(SupplierParser::class, supplierConverter).
             fieldConverter(EventDateTime::class, dateTimeConverter).
             parse<Event>(json)
         }

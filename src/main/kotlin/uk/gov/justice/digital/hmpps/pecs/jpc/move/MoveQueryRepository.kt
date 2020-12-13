@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.sql.ResultSet
@@ -71,27 +69,31 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 movesSummaryRowMapper)
     }
 
-    val moveJourneySelectSQL = "select " +
-        "m.move_id, m.updated_at, m.supplier, m.status, m.move_type, " +
-        "m.reference, m.move_date, m.from_nomis_agency_id, m.to_nomis_agency_id, m.pick_up, m.drop_off_or_cancelled, m.notes, " +
-        "m.prison_number, m.vehicle_registration, " +
-        "m.first_names, m.last_name, m.date_of_birth, m.latest_nomis_booking_id, m.gender, m.ethnicity, " +
-        "fl.site_name as from_site_name, fl.location_type as from_location_type, " +
-        "tl.site_name as to_site_name, tl.location_type as to_location_type, " +
-        "j.journey_id, j.effective_year, j.supplier as journey_supplier, j.client_timestamp as journey_client_timestamp, " +
-        "j.updated_at as journey_updated_at, j.billable, j.vehicle_registration, j.state as journey_state, " +
-        "j.from_nomis_agency_id as journey_from_nomis_agency_id, j.to_nomis_agency_id as journey_to_nomis_agency_id, " +
-        "j.pick_up as journey_pick_up, j.drop_off as journey_drop_off, j.notes as journey_notes, " +
-        "jfl.site_name as journey_from_site_name, jfl.location_type as journey_from_location_type, " +
-        "jtl.site_name as journey_to_site_name, jtl.location_type as journey_to_location_type, " +
-        "CASE WHEN j.billable THEN p.price_in_pence ELSE NULL END as price_in_pence " +
-        "from MOVES m " +
-        "left join LOCATIONS fl on m.from_nomis_agency_id = fl.nomis_agency_id " +
-        "left join LOCATIONS tl on m.to_nomis_agency_id = tl.nomis_agency_id " +
-        "left join JOURNEYS j on j.move_id = m.move_id " +
-        "left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
-        "left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
-        "left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year "
+    val moveJourneySelectSQL = """
+        select  
+        m.move_id, m.updated_at, m.supplier, m.status, m.move_type,  
+        m.reference, m.move_date, m.from_nomis_agency_id, m.to_nomis_agency_id, m.pick_up, m.drop_off_or_cancelled, m.notes,  
+        m.prison_number, m.vehicle_registration, m.report_from_location_type, m.report_to_location_type,  
+        m.first_names, m.last_name, m.date_of_birth, m.latest_nomis_booking_id, m.gender, m.ethnicity,  
+        fl.site_name as from_site_name, fl.location_type as from_location_type,  
+        tl.site_name as to_site_name, tl.location_type as to_location_type,  
+        j.journey_id, j.effective_year, j.supplier as journey_supplier, j.client_timestamp as journey_client_timestamp,  
+        j.updated_at as journey_updated_at, j.billable, j.vehicle_registration, j.state as journey_state,  
+        j.from_nomis_agency_id as journey_from_nomis_agency_id, j.to_nomis_agency_id as journey_to_nomis_agency_id,  
+        j.pick_up as journey_pick_up, j.drop_off as journey_drop_off, j.notes as journey_notes,  
+        jfl.site_name as journey_from_site_name, jfl.location_type as journey_from_location_type,  
+        jtl.site_name as journey_to_site_name, jtl.location_type as journey_to_location_type,  
+        CASE WHEN j.billable THEN p.price_in_pence ELSE NULL END as price_in_pence  
+        from MOVES m  
+            left join LOCATIONS fl on m.from_nomis_agency_id = fl.nomis_agency_id  
+            left join LOCATIONS tl on m.to_nomis_agency_id = tl.nomis_agency_id  
+            left join JOURNEYS j on j.move_id = m.move_id  
+            left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id  
+            left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id  
+            left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year 
+    """.trimIndent()
+            
+
 
     val moveJourneyRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
         with(resultSet) {
@@ -119,7 +121,9 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 lastName = getString("last_name"),
                 ethnicity = getString("ethnicity"),
                 gender = getString("gender"),
-                dateOfBirth = getDate("date_of_birth")?.toLocalDate()
+                dateOfBirth = getDate("date_of_birth")?.toLocalDate(),
+                reportFromLocationType = getString("report_from_location_type"),
+                reportToLocationType = getString("report_to_location_type")
             )
             val journeyId = getString("journey_id")
             val journey = journeyId?.let { // there is a journey for this move

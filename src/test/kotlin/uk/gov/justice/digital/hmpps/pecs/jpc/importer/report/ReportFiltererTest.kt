@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import java.time.LocalDate
 
@@ -17,7 +18,7 @@ internal class ReportFiltererTest {
     )
 
     private val cancelled = Report(
-            move = reportMoveFactory(moveId = "M2", status = "cancelled"),
+            move = reportMoveFactory(moveId = "M2", status = MoveStatus.cancelled),
             moveEvents =  listOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
             journeysWithEvents = listOf(JourneyWithEvents(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true)))
     )
@@ -120,7 +121,7 @@ internal class ReportFiltererTest {
     private val cancelledBillable = Report(
             move = reportMoveFactory(
                     moveId = "M9",
-                    status = MoveStatus.CANCELLED.name.toLowerCase(),
+                    status = MoveStatus.cancelled,
                     fromLocation = fromPrisonNomisAgencyId(),
                     fromLocationType = "prison",
                     toLocation = toCourtNomisAgencyId(),

@@ -44,7 +44,7 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
     }
 
 //    @Test
-//    fun `ReportPerson populated correctly`(){
+//    fun `Person populated correctly`(){
 //        // This should pick up the latest person file
 //        val person = moves.toList()[0].person
 //        assertThat(person?.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
@@ -59,30 +59,30 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
                 LocalDate.of(2020, 9, 3))
 
         // This should only pick up the completed and cancelled moves
-        Assertions.assertEquals(setOf("M1", "M2", "M20",  "M3", "M30"), content.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M1", "M2", "M20",  "M3", "M30"), content.map { it.move.moveId }.toSet())
     }
 
     @Test
     fun `Standard moves should only include completed moves with one billable, completed journey`() {
         val standardReports = ReportFilterer.standardMoveReports(moves)
-        Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.move.moveId }.toSet())
     }
 
     @Test
     fun `Redirect moves should only include completed moves with two billable journeys`() {
         val redirectionReports = ReportFilterer.redirectionReports(moves)
-        Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.move.moveId }.toSet())
     }
 
     @Test
     fun `Long haul moves should only include completed moves with two billable journeys`() {
         val longHaulReports = ReportFilterer.longHaulReports(moves)
-        Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.move.moveId }.toSet())
     }
 
     @Test
     fun `Cancelled, billable moves should only include moves cancelled before 3pm the day before the move`() {
         val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(moves)
-        Assertions.assertEquals(setOf("M61"), cancelledBillableReports.map { it.move.id }.toSet())
+        Assertions.assertEquals(setOf("M61"), cancelledBillableReports.map { it.move.moveId }.toSet())
     }
 }

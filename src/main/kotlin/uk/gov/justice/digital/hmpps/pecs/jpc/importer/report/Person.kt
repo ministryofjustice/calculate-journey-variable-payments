@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 
-data class ReportPerson(
+data class Person(
 
         @get: NotBlank(message = "id cannot be blank")
         val id: String,
@@ -42,11 +42,11 @@ data class ReportPerson(
 
         ) {
     companion object {
-        fun fromJson(json: String): ReportPerson? {
+        fun fromJson(json: String): Person? {
             return Klaxon().
             fieldConverter(EventDate::class, dateConverter).
             fieldConverter(EventDateTime::class, dateTimeConverter).
-            parse<ReportPerson>(json)
+            parse<Person>(json)
         }
     }
 }

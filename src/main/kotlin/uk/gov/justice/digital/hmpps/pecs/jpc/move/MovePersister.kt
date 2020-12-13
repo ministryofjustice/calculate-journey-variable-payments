@@ -21,7 +21,7 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
         reports.forEach { report ->
 
             Result.runCatching {
-                val moveId = report.move.id
+                val moveId = report.move.moveId
 
                 val pickUp = Event.getLatestByType(report.moveEvents, EventType.MOVE_START)?.occurredAt
                 val dropOff = Event.getLatestByType(report.moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
@@ -55,8 +55,8 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                         moveId = moveId,
                         profileId = profileId,
                         updatedAt = updatedAt,
-                        supplier = Supplier.valueOfCaseInsensitive(supplier),
-                        status = MoveStatus.valueOfCaseInsensitive(status),
+                        supplier = supplier,
+                        status = status,
                         moveType = mergedReport.moveType(),
                         reference = reference,
                         moveDate = moveDate,
@@ -64,8 +64,10 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                         toNomisAgencyId = toNomisAgencyId,
                         pickUpDateTime = pickUp,
                         dropOffOrCancelledDateTime = dropOff ?: cancelled,
+                            reportFromLocationType = reportFromLocationType,
+                            reportToLocationType = reportToLocationType,
                         vehicleRegistration = report.journeysWithEvents.withIndex().joinToString(separator = ", ") {
-                            it.value.reportJourney.vehicleRegistration ?: ""
+                            it.value.journey.vehicleRegistration ?: ""
                         },
                         notes = report.moveEvents.notes(),
                         prisonNumber = maybeExistingMove?.prisonNumber,
@@ -96,17 +98,18 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
     fun journeyToReportJourneyWithEvents(journey: Journey): JourneyWithEvents {
         with(journey) {
             return JourneyWithEvents(
-                reportJourney = ReportJourney(
-                    id = journeyId,
+                journey = Journey(
+                    journeyId = journeyId,
                     updatedAt = updatedAt,
                     moveId = moveId,
                     billable = billable,
-                    state = state.name,
-                    supplier = supplier.name,
-                    clientTimestamp = clientTimeStamp,
+                    state = state,
+                    supplier = supplier,
+                    clientTimeStamp = clientTimeStamp,
                     vehicleRegistration = vehicleRegistration,
                     fromNomisAgencyId = fromNomisAgencyId,
-                    toNomisAgencyId = toNomisAgencyId
+                    toNomisAgencyId = toNomisAgencyId,
+                    effectiveYear = effectiveYear,
                     ),
                     events = journey.events.toList())
         }
@@ -119,18 +122,18 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
             val dropOff = Event.getLatestByType(journeyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
 
             return Journey(
-                journeyId = journeyWithEvents.reportJourney.id,
-                supplier = Supplier.valueOfCaseInsensitive(reportJourney.supplier),
-                clientTimeStamp = reportJourney.clientTimestamp,
-                updatedAt = reportJourney.updatedAt,
+                journeyId = journeyWithEvents.journey.journeyId,
+                supplier = journey.supplier,
+                clientTimeStamp = journey.clientTimeStamp,
+                updatedAt = journey.updatedAt,
                 moveId = moveId,
-                state = JourneyState.valueOfCaseInsensitive(reportJourney.state),
-                fromNomisAgencyId = reportJourney.fromNomisAgencyId,
-                toNomisAgencyId = reportJourney.toNomisAgencyId,
+                state = journey.state,
+                fromNomisAgencyId = journey.fromNomisAgencyId,
+                toNomisAgencyId = journey.toNomisAgencyId,
                 pickUpDateTime = pickUp,
                 dropOffDateTime = dropOff,
-                billable = reportJourney.billable,
-                vehicleRegistration = reportJourney.vehicleRegistration,
+                billable = journey.billable,
+                vehicleRegistration = journey.vehicleRegistration,
                 notes = journeyWithEvents.events.notes(),
                 events = events.toMutableSet(),
                 effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: timeSource.date())

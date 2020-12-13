@@ -1,19 +1,23 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.slf4j.LoggerFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportMove.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.equalsStringCaseInsensitive
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 object ReportFilterer {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private fun Report.hasStatus(status: MoveStatus) = status.equalsStringCaseInsensitive(move.status)
+    private fun Report.hasStatus(status: MoveStatus) = status == move.status
 
     private fun List<Event>.hasEventType(eventType: EventType) = this.find { it.hasType(eventType) } != null
 
-    private fun completedMoves(journeysEvents: Collection<Report>) = journeysEvents.asSequence().filter { it.hasStatus(MoveStatus.COMPLETED) }
+    private fun completedMoves(journeysEvents: Collection<Report>) = journeysEvents.asSequence().filter { it.hasStatus(MoveStatus.completed) }
 
     /**
      * For a cancelled move to be billable it must be a previously accepted prison to prison move in a cancelled state.
@@ -21,27 +25,28 @@ object ReportFilterer {
      */
     fun cancelledBillableMoves(journeysEvents: Collection<Report>): Sequence<Report> {
         return journeysEvents.asSequence().filter { report ->
-            report.hasStatus(MoveStatus.CANCELLED) &&
+            report.hasStatus(MoveStatus.cancelled) &&
             CANCELLATION_REASON_CANCELLED_BY_PMU == report.move.cancellationReason &&
-            report.move.fromLocationType == "prison" &&
+            report.move.reportFromLocationType == "prison" &&
             report.move.toNomisAgencyId != null &&
-            report.move.toLocationType == "prison" &&
+            report.move.reportToLocationType == "prison" &&
             report.moveEvents.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
             report.moveEvents.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
             report.move.moveDate != null && report.moveEvents.find{
-                it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(report.move.moveDate.atStartOfDay()) ?: false
+                it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(report.move.moveDate?.atStartOfDay()) ?: false
         }.map { it.copy(journeysWithEvents = listOf(JourneyWithEvents( // fake journey with events
-                ReportJourney(
-                        id = "FAKE",
+                Journey(
+                        journeyId = "FAKE",
                         updatedAt = LocalDateTime.now(),
-                        moveId = it.move.id,
+                        moveId = it.move.moveId,
                         billable = true,
                         supplier = it.move.supplier,
-                        clientTimestamp = LocalDateTime.now(),
+                        clientTimeStamp = LocalDateTime.now(),
                         fromNomisAgencyId = it.move.fromNomisAgencyId,
                         toNomisAgencyId = it.move.toNomisAgencyId!!,
-                        state = JourneyState.CANCELLED.name,
-                        vehicleRegistration = null
+                        state = JourneyState.cancelled,
+                        vehicleRegistration = null,
+                        effectiveYear = effectiveYearForDate(it.move.moveDate ?: LocalDate.now())
                 ),
                 listOf())))
         }
@@ -54,10 +59,10 @@ object ReportFilterer {
      */
     fun standardMoveReports(journeysEvents: Collection<Report>): Sequence<Report> {
         return completedMoves(journeysEvents).filter { report ->
-            with(report.journeysWithEvents.map { it.reportJourney }) {
-                count { it.stateIsAnyOf(JourneyState.COMPLETED) } == 1 &&
-                count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 1 &&
-                count { it.stateIsAnyOf(JourneyState.CANCELLED) } == 0
+            with(report.journeysWithEvents.map { it.journey }) {
+                count { it.stateIsAnyOf(JourneyState.completed) } == 1 &&
+                count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 1 &&
+                count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
             }
         }
     }
@@ -73,8 +78,8 @@ object ReportFilterer {
                 report.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
             ) &&
             report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
-            with(report.journeysWithEvents.map { it.reportJourney }) {
-                count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 2
+            with(report.journeysWithEvents.map { it.journey }) {
+                count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 2
             }
         }
     }
@@ -87,8 +92,8 @@ object ReportFilterer {
         return completedMoves(moves).filter { report ->
             report.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
                     report.hasNoneOf(EventType.MOVE_REDIRECT) &&
-                    with(report.journeysWithEvents.map { it.reportJourney }) {
-                        count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } in 2..3
+                    with(report.journeysWithEvents.map { it.journey }) {
+                        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
                     }
         }   
     }
@@ -125,8 +130,8 @@ object ReportFilterer {
                 }
                 else -> {
                     report.moveEvents.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
-                    with(report.journeysWithEvents.map { it.reportJourney }) {
-                        count { it.stateIsAnyOf(JourneyState.COMPLETED, JourneyState.CANCELLED) && it.billable } == 2
+                    with(report.journeysWithEvents.map { it.journey }) {
+                        count { it.stateIsAnyOf(JourneyState.completed, JourneyState.cancelled) && it.billable } == 2
                     }
                 }
             }

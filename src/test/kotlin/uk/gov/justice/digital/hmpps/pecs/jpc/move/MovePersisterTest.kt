@@ -42,7 +42,7 @@ internal class MovePersisterTest {
     final val from: LocalDate = LocalDate.of(2020, 9, 1)
     final val to: LocalDate = LocalDate.of(2020, 9, 6)
 
-    lateinit var redirectMove: ReportMove
+    lateinit var redirectMove: Move
     lateinit var redirectReport: Report
 
     lateinit var movePersister: MovePersister
@@ -59,8 +59,8 @@ internal class MovePersisterTest {
 
         redirectMove = reportMoveFactory()
 
-        val journey1 = reportJourneyFactory().copy(id = "J1", billable = true, vehicleRegistration = "REG1")
-        val journey2 = reportJourneyFactory().copy(id = "J2", billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
+        val journey1 = reportJourneyFactory().copy(journeyId = "J1", billable = true, vehicleRegistration = "REG1")
+        val journey2 = reportJourneyFactory().copy(journeyId = "J2", billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
 
         val moveStartEvent = moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
         val moveRedirectEvent = moveEventFactory(eventId = "E2", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7))
@@ -93,7 +93,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(redirectReport))
 
         entityManager.flush()
-        val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedRedirectMove = moveRepository.findById(redirectMove.moveId).get()
 
         assertThat(retrievedRedirectMove.notes).isEqualTo("MoveRedirect: This was redirected.")
         assertThat(retrievedRedirectMove.vehicleRegistration).isEqualTo("REG1, REG2")
@@ -114,7 +114,7 @@ internal class MovePersisterTest {
         personPersister.persist(listOf(reportPerson))
 
         entityManager.flush()
-        val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedRedirectMove = moveRepository.findById(redirectMove.moveId).get()
 
         // PII data should be populated
         assertThat(retrievedRedirectMove.ethnicity).isEqualTo("White American")
@@ -127,7 +127,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(redirectReport.copy(move = redirectMove.copy(moveDate = LocalDate.of(2020, 1, 1)))))
         entityManager.flush()
 
-        val retrievedAgainRedirectMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedAgainRedirectMove = moveRepository.findById(redirectMove.moveId).get()
         assertThat(retrievedAgainRedirectMove.moveDate).isEqualTo(LocalDate.of(2020, 1, 1))
         assertThat(retrievedAgainRedirectMove.lastName).isEqualTo("Kid")
     }
@@ -140,7 +140,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(redirectReport.copy(move = redirectMove.copy(reference = "NEWREF"))))
 
         entityManager.flush()
-        val retrievedRedirectMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedRedirectMove = moveRepository.findById(redirectMove.moveId).get()
 
         // The ref should be the updated ref
         assertThat(retrievedRedirectMove.reference).isEqualTo("NEWREF")
@@ -178,7 +178,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(reportWithNewEvent))
         entityManager.flush()
 
-        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
 
         // Previous and new events should be present
         assertThat(retrievedMove.events.map { it.id }).containsExactlyInAnyOrder("E1", "E2", "E3", "E400")
@@ -193,7 +193,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(redirectReportWith2021Journey))
         entityManager.flush()
 
-        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
         assertThat(retrievedMove.journeys.toList().first().effectiveYear).isEqualTo(2021)
     }
 
@@ -206,7 +206,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(redirectReportWith2021Move))
         entityManager.flush()
 
-        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
         assertThat(retrievedMove.journeys.toList().first().effectiveYear).isEqualTo(2021)
     }
 
@@ -226,7 +226,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(reportWithNewJourney))
         entityManager.flush()
 
-        val retrievedMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
 
         // Previous and new journeys should be present
         assertThat(retrievedMove.journeys.map { it.journeyId }).containsExactlyInAnyOrder("J1", "J2", "J400")
@@ -235,11 +235,11 @@ internal class MovePersisterTest {
     @Test
     fun `Persist non complete move then complete it`() {
 
-        val journey1 = reportJourneyFactory().copy(id = "J1", billable = true, vehicleRegistration = "REG1")
+        val journey1 = reportJourneyFactory().copy(journeyId = "J1", billable = true, vehicleRegistration = "REG1")
         val moveStartEvent = moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
 
         val inTransitReport = Report(
-            move = reportMoveFactory(status = MoveStatus.IN_TRANSIT.name),
+            move = reportMoveFactory(status = MoveStatus.in_transit),
             moveEvents = listOf(moveStartEvent),
             journeysWithEvents = listOf(
                 JourneyWithEvents(journey1, listOf(
@@ -251,14 +251,14 @@ internal class MovePersisterTest {
 
         movePersister.persist(listOf(inTransitReport))
         entityManager.flush()
-        val retrievedInTransitMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedInTransitMove = moveRepository.findById(redirectMove.moveId).get()
         assertThat(retrievedInTransitMove.moveType).isNull() // should not have a move type yet - it's in_transit
 
         val journeyCompleteEvent = journeyEventFactory(journeyEventId = "J1", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
         val moveCompleteEvent = moveEventFactory(eventId = "E3", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
 
         val completedReportWithNewJourney = Report(
-            move = inTransitReport.move.copy(status = MoveStatus.COMPLETED.name),
+            move = inTransitReport.move.copy(status = MoveStatus.completed),
             journeysWithEvents = listOf(JourneyWithEvents(journey1, listOf(journeyCompleteEvent))),
             moveEvents = listOf(moveCompleteEvent)
         )
@@ -266,7 +266,7 @@ internal class MovePersisterTest {
         movePersister.persist(listOf(completedReportWithNewJourney))
         entityManager.flush()
 
-        val retrievedCompletedMove = moveRepository.findById(redirectMove.id).get()
+        val retrievedCompletedMove = moveRepository.findById(redirectMove.moveId).get()
         assertThat(retrievedCompletedMove.moveType).isEqualTo(MoveType.STANDARD)
     }
 }

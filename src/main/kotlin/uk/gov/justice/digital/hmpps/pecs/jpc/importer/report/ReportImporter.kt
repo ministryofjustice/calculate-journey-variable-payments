@@ -26,7 +26,7 @@ class ReportImporter(
         )
     }
 
-    fun importProfilesPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<ReportPerson>{
+    fun importProfilesPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person>{
         val profilesContent = getContents("profiles", from, to)
         val peopleContent = getContents("people", from, to)
         return ReportParser.parsePeople( profileFiles = profilesContent, peopleFiles = peopleContent)

@@ -20,7 +20,7 @@ fun move(
         updatedAt = defaultDateTime,
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
-        status = MoveStatus.COMPLETED,
+        status = MoveStatus.completed,
         reference = "REF1",
         moveDate = moveDate,
         fromNomisAgencyId = fromNomisAgencyId,
@@ -31,6 +31,8 @@ fun move(
         toLocationType = LocationType.PR,
         pickUpDateTime = moveDate.atStartOfDay(),
         dropOffOrCancelledDateTime = dropOffOrCancelledDateTime,
+        reportFromLocationType = "prison",
+        reportToLocationType = null,
         notes = "some notes",
         prisonNumber = "PR101",
         firstNames = "Billy the",
@@ -46,7 +48,7 @@ fun journey(
         journeyId: String = "J1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
-        state: JourneyState = JourneyState.COMPLETED,
+        state: JourneyState = JourneyState.completed,
         billable: Boolean = true,
         pickUpDateTime: LocalDateTime? = moveDate.atStartOfDay(),
         dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
@@ -81,5 +83,6 @@ fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, e
         occurredAt = moveDate.atStartOfDay(),
         recordedAt = moveDate.atStartOfDay(),
         notes = null,
-        details = null
+        details = null,
+        supplier = Supplier.SERCO
 )

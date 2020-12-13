@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.equalsStringCaseInsensitive
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 @Component
 object ReportParser {
@@ -31,26 +33,26 @@ object ReportParser {
 
     fun parseAsPersonIdToProfileId(profileFiles: List<String>): Map<String, String> {
         logger.info("Parsing profiles")
-        return read(profileFiles) { ReportProfile.fromJson(it) }.associateBy(keySelector = { it.personId }, valueTransform = { it.id })
+        return read(profileFiles) { Profile.fromJson(it) }.associateBy(keySelector = { it.personId }, valueTransform = { it.id })
     }
 
-    fun parseAsPerson(peopleFiles: List<String>): Sequence<ReportPerson> {
+    fun parseAsPerson(peopleFiles: List<String>): Sequence<Person> {
         logger.info("Parsing people")
-        return read(peopleFiles) { ReportPerson.fromJson(it) }
+        return read(peopleFiles) { Person.fromJson(it) }
     }
 
-    fun parseAsMoves(moveFiles: List<String>): Collection<ReportMove> {
+    fun parseAsMoves(moveFiles: List<String>): Collection<Move> {
         logger.info("Parsing moves")
-        return read(moveFiles) { ReportMove.fromJson(it) }.
-        associateBy(ReportMove::id).values // associateBy will only include latest Move by id
+        return read(moveFiles) { Move.fromJson(it) }.
+        associateBy(Move::moveId).values // associateBy will only include latest Move by id
     }
 
 
-    fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<ReportJourney>> {
+    fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
         logger.info("Parsing journeys")
-        return read(journeyFiles) { ReportJourney.fromJson(it) }.
-        filter {  (JourneyState.COMPLETED.equalsStringCaseInsensitive(it.state) || JourneyState.CANCELLED.equalsStringCaseInsensitive(it.state)) }.
-        associateBy(ReportJourney::id).values.groupBy(ReportJourney::moveId) // associateBy will only include latest Journey by id
+        return read(journeyFiles) { Journey.fromJson(it) }.
+        filter {  (JourneyState.completed == it.state || JourneyState.cancelled == it.state) }.
+        associateBy(Journey::journeyId).values.groupBy(Journey::moveId) // associateBy will only include latest Journey by id
     }
 
     fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
@@ -69,12 +71,12 @@ object ReportParser {
         return moves.map { move ->
             Report(
                 move = move,
-                journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey -> JourneyWithEvents(reportJourney = journey, events = events.getOrDefault(journey.id, listOf())) },
-                moveEvents = events.getOrDefault(move.id, listOf()))
+                journeysWithEvents = journeys.getOrDefault(move.moveId, listOf()).map { journey -> JourneyWithEvents(journey = journey, events = events.getOrDefault(journey.journeyId, listOf())) },
+                moveEvents = events.getOrDefault(move.moveId, listOf()))
         }
     }
 
-    fun parsePeople(profileFiles: List<String>, peopleFiles: List<String>): Sequence<ReportPerson> {
+    fun parsePeople(profileFiles: List<String>, peopleFiles: List<String>): Sequence<Person> {
         val personIdToProfileId = parseAsPersonIdToProfileId(profileFiles)
         val people = parseAsPerson(peopleFiles)
 

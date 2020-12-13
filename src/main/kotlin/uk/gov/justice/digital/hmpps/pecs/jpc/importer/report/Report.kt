@@ -1,9 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 
 data class Report(
-        val move: ReportMove,
+        val move: Move,
         val moveEvents: List<Event> = listOf(),
         val journeysWithEvents: List<JourneyWithEvents> = listOf()
         ) {
@@ -25,6 +27,6 @@ data class Report(
 
 }
 
-data class JourneyWithEvents(val reportJourney: ReportJourney, val events: List<Event> = listOf()){
+data class JourneyWithEvents(val journey: Journey, val events: List<Event> = listOf()){
 
 }
