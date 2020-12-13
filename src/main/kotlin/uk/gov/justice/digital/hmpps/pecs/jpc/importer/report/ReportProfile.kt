@@ -5,7 +5,7 @@ import com.beust.klaxon.Klaxon
 import java.time.LocalDateTime
 import javax.validation.constraints.NotBlank
 
-data class Profile(
+data class ReportProfile(
 
         @get: NotBlank(message = "id cannot be blank")
         val id: String,
@@ -20,10 +20,10 @@ data class Profile(
 
         ) {
     companion object {
-        fun fromJson(json: String): Profile? {
+        fun fromJson(json: String): ReportProfile? {
             return Klaxon().
             fieldConverter(EventDateTime::class, dateTimeConverter).
-            parse<Profile>(json)
+            parse<ReportProfile>(json)
         }
     }
 }

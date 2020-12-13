@@ -57,8 +57,8 @@ fun reportMoveFactory(
     return move
 }
 
-fun personFactory(personId: String = defaultPersonId): Person {
-    return Person(
+fun reportPersonFactory(personId: String = defaultPersonId): ReportPerson {
+    return ReportPerson(
             id = personId,
             updatedAt = defaultDateTime,
             prisonNumber = "PRISON1",
@@ -72,8 +72,8 @@ fun personFactory(personId: String = defaultPersonId): Person {
 
 fun profileFactory(
         profileId: String = defaultProfileId,
-        personId: String = defaultPersonId): Profile {
-    return Profile(profileId, defaultDateTime, personId)
+        personId: String = defaultPersonId): ReportProfile {
+    return ReportProfile(profileId, defaultDateTime, personId)
 }
 
 fun moveEventFactory(

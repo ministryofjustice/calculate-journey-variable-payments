@@ -13,14 +13,14 @@ object ReportFilterer {
 
     private fun List<Event>.hasEventType(eventType: EventType) = this.find { it.hasType(eventType) } != null
 
-    private fun completedMoves(reports: Collection<Report>) = reports.asSequence().filter { it.hasStatus(MoveStatus.COMPLETED) }
+    private fun completedMoves(journeysEvents: Collection<Report>) = journeysEvents.asSequence().filter { it.hasStatus(MoveStatus.COMPLETED) }
 
     /**
      * For a cancelled move to be billable it must be a previously accepted prison to prison move in a cancelled state.
      * It must have a cancellation reason of cancelled_by_pmu and have been cancelled after 3pm the day before the move date
      */
-    fun cancelledBillableMoves(reports: Collection<Report>): Sequence<Report> {
-        return reports.asSequence().filter { report ->
+    fun cancelledBillableMoves(journeysEvents: Collection<Report>): Sequence<Report> {
+        return journeysEvents.asSequence().filter { report ->
             report.hasStatus(MoveStatus.CANCELLED) &&
             CANCELLATION_REASON_CANCELLED_BY_PMU == report.move.cancellationReason &&
             report.move.fromLocationType == "prison" &&
@@ -30,7 +30,7 @@ object ReportFilterer {
             report.moveEvents.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
             report.move.moveDate != null && report.moveEvents.find{
                 it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(report.move.moveDate.atStartOfDay()) ?: false
-        }.map { it.copy(journeysWithEvents = listOf(ReportJourneyWithEvents( // fake journey with events
+        }.map { it.copy(journeysWithEvents = listOf(JourneyWithEvents( // fake journey with events
                 ReportJourney(
                         id = "FAKE",
                         updatedAt = LocalDateTime.now(),
@@ -52,8 +52,8 @@ object ReportFilterer {
      * To be priced as a standard move, the journey as well as the move must be completed
      * There also should be no redirects after the move starts, but shouldn't need to check for this
      */
-    fun standardMoveReports(reports: Collection<Report>): Sequence<Report> {
-        return completedMoves(reports).filter { report ->
+    fun standardMoveReports(journeysEvents: Collection<Report>): Sequence<Report> {
+        return completedMoves(journeysEvents).filter { report ->
             with(report.journeysWithEvents.map { it.reportJourney }) {
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) } == 1 &&
                 count { it.stateIsAnyOf(JourneyState.COMPLETED) && it.billable } == 1 &&

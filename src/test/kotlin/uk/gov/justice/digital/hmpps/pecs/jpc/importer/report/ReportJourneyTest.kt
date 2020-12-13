@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-internal class ReportTest {
+internal class ReportJourneyTest {
 
     val date: LocalDate = LocalDate.now()
 
@@ -17,9 +17,8 @@ internal class ReportTest {
 
     val report = Report(
             move = reportMoveFactory(),
-            person = personFactory(),
             moveEvents = listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
-            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(), listOf(journeyStartEvent, journeyCancelEvent)))
+            journeysWithEvents = listOf(JourneyWithEvents(reportJourneyFactory(), listOf(journeyStartEvent, journeyCancelEvent)))
     )
 
     @Test

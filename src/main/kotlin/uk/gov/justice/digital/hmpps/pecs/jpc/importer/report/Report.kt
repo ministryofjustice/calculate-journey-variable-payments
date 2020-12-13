@@ -4,9 +4,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 
 data class Report(
         val move: ReportMove,
-        val person: Person?,
         val moveEvents: List<Event> = listOf(),
-        val journeysWithEvents: List<ReportJourneyWithEvents> = listOf()) {
+        val journeysWithEvents: List<JourneyWithEvents> = listOf()
+        ) {
 
     /**
      * Returns the nullable MoveType for the Report
@@ -25,6 +25,6 @@ data class Report(
 
 }
 
-data class ReportJourneyWithEvents(val reportJourney: ReportJourney, val events: List<Event> = listOf()){
+data class JourneyWithEvents(val reportJourney: ReportJourney, val events: List<Event> = listOf()){
 
 }

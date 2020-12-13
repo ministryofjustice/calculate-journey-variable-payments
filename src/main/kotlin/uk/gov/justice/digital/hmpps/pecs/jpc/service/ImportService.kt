@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.location.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovePersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.Duration
 import java.time.LocalDate
@@ -17,7 +18,8 @@ class ImportService(
         private val locationsImporter: LocationsImporter,
         private val priceImporter: PriceImporter,
         private val reportImporter: ReportImporter,
-        private val reportPersister: MovePersister) {
+        private val movePersister: MovePersister,
+        private val personPersister: PersonPersister) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -26,11 +28,20 @@ class ImportService(
     fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier) }
 
     fun importReports(reportsFrom: LocalDate, reportsTo: LocalDate) {
-        logger.info("Importing reports from '$reportsFrom', moves to '$reportsTo'.")
+        importMovesJourneysEvents(reportsFrom, reportsTo)
+        importProfilesPeople(reportsFrom, reportsTo)
+    }
 
-        val reports = import { reportImporter.import(reportsFrom, reportsTo) }
+    fun importMovesJourneysEvents(reportsFrom: LocalDate, reportsTo: LocalDate) {
+        logger.info("Importing moves, journeys and events from '$reportsFrom' to '$reportsTo'.")
+        val movesJourneysEvents = import { reportImporter.importMovesJourneysEvents(reportsFrom, reportsTo) }
+        movesJourneysEvents?.let { movePersister.persist(it.toList()) }
+    }
 
-        reports?.let { reportPersister.persist(it.toList()) }
+    fun importProfilesPeople(reportsFrom: LocalDate, reportsTo: LocalDate) {
+        logger.info("Importing profiles and people from '$reportsFrom', moves to '$reportsTo'.")
+        val profilesPeople = import { reportImporter.importProfilesPeople(reportsFrom, reportsTo) }
+        profilesPeople?.let{ personPersister.persist(it.toList())}
     }
 
     /**

@@ -29,14 +29,14 @@ object ReportParser {
         }.filterNotNull()
     }
 
-    fun parseAsProfileIdToPersonId(profileFiles: List<String>): Map<String, String> {
+    fun parseAsPersonIdToProfileId(profileFiles: List<String>): Map<String, String> {
         logger.info("Parsing profiles")
-        return read(profileFiles) { Profile.fromJson(it) }.associateBy(keySelector = { it.id }, valueTransform = { it.personId })
+        return read(profileFiles) { ReportProfile.fromJson(it) }.associateBy(keySelector = { it.personId }, valueTransform = { it.id })
     }
 
-    fun parseAsPersonIdToPerson(peopleFiles: List<String>): Map<String, Person> {
+    fun parseAsPerson(peopleFiles: List<String>): Sequence<ReportPerson> {
         logger.info("Parsing people")
-        return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
+        return read(peopleFiles) { ReportPerson.fromJson(it) }
     }
 
     fun parseAsMoves(moveFiles: List<String>): Collection<ReportMove> {
@@ -61,24 +61,25 @@ object ReportParser {
         groupBy(Event::eventableId)
     }
 
-    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Report> {
+    fun parseMovesJourneysEvents(moveFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Report> {
         val moves = parseAsMoves(moveFiles)
-        val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
-        val people = parseAsPersonIdToPerson(peopleFiles)
         val journeys = parseAsMoveIdToJourneys(journeyFiles)
         val events = parseAsEventableIdToEvents(eventFiles)
 
         return moves.map { move ->
             Report(
-                    move = move,
-                    person = move.profileId?.let {people[profileId2PersonId[it]]},
-                    journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey ->
-                        ReportJourneyWithEvents(reportJourney = journey, events = events.getOrDefault(journey.id, listOf()))
-                    },
-                    moveEvents = events.getOrDefault(move.id, listOf()
-                    )
-            )
+                move = move,
+                journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey -> JourneyWithEvents(reportJourney = journey, events = events.getOrDefault(journey.id, listOf())) },
+                moveEvents = events.getOrDefault(move.id, listOf()))
         }
+    }
+
+    fun parsePeople(profileFiles: List<String>, peopleFiles: List<String>): Sequence<ReportPerson> {
+        val personIdToProfileId = parseAsPersonIdToProfileId(profileFiles)
+        val people = parseAsPerson(peopleFiles)
+
+        // Return people with profile ids
+        return people.map { it.copy(profileId = personIdToProfileId[it.id]) }.filterNot { it.profileId == null }
     }
 
 }

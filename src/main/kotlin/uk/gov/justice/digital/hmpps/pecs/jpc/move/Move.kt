@@ -27,6 +27,9 @@ data class Move(
         @Column(name = "move_id")
         val moveId: String,
 
+        @Column(name = "profile_id")
+        val profileId: String? = null,
+
         @Column(name = "updated_at")
         val updatedAt: LocalDateTime,
 
@@ -85,7 +88,7 @@ data class Move(
         val lastName: String? = null,
 
         @Column(name = "date_of_birth", nullable = true)
-        val dateOfBirth: LocalDate?,
+        val dateOfBirth: LocalDate? = null,
 
         @Column(name = "gender", nullable = true)
         val gender: String? = null,

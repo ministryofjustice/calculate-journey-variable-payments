@@ -15,19 +15,21 @@ class ReportImporter(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Report>{
+    fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Report>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)
-        val profilesContent = getContents("profiles", from, to)
-        val peopleContent = getContents("people", from, to)
-        return ReportParser.parseAll(
+        return ReportParser.parseMovesJourneysEvents(
                 moveFiles = movesContent,
                 journeyFiles = journeysContent,
                 eventFiles = eventsContent,
-                profileFiles = profilesContent,
-                peopleFiles = peopleContent
         )
+    }
+
+    fun importProfilesPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<ReportPerson>{
+        val profilesContent = getContents("profiles", from, to)
+        val peopleContent = getContents("people", from, to)
+        return ReportParser.parsePeople( profileFiles = profilesContent, peopleFiles = peopleContent)
     }
 
     private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{
