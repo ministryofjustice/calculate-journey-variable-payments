@@ -23,7 +23,7 @@ data class Journey(
         val updatedAt: LocalDateTime,
 
         @Json(name = "move_id")
-        @Column(name = "move_id")
+        @Column(name = "move_id", nullable = false)
         val moveId: String,
 
         @SupplierParser

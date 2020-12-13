@@ -34,7 +34,7 @@ object ReportFilterer {
             report.moveEvents.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
             report.move.moveDate != null && report.moveEvents.find{
                 it.hasType(EventType.MOVE_CANCEL)}?.occurredAt?.plusHours(9)?.isAfter(report.move.moveDate?.atStartOfDay()) ?: false
-        }.map { it.copy(journeysWithEvents = listOf(JourneyWithEvents( // fake journey with events
+        }.map { it.copy(journeys = listOf( // fake journey with events
                 Journey(
                         journeyId = "FAKE",
                         updatedAt = LocalDateTime.now(),
@@ -47,8 +47,7 @@ object ReportFilterer {
                         state = JourneyState.cancelled,
                         vehicleRegistration = null,
                         effectiveYear = effectiveYearForDate(it.move.moveDate ?: LocalDate.now())
-                ),
-                listOf())))
+                )))
         }
     }
 
@@ -59,7 +58,7 @@ object ReportFilterer {
      */
     fun standardMoveReports(journeysEvents: Collection<Report>): Sequence<Report> {
         return completedMoves(journeysEvents).filter { report ->
-            with(report.journeysWithEvents.map { it.journey }) {
+            with(report.journeys.map { it }) {
                 count { it.stateIsAnyOf(JourneyState.completed) } == 1 &&
                 count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 1 &&
                 count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
@@ -78,7 +77,7 @@ object ReportFilterer {
                 report.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
             ) &&
             report.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
-            with(report.journeysWithEvents.map { it.journey }) {
+            with(report.journeys.map { it }) {
                 count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 2
             }
         }
@@ -92,7 +91,7 @@ object ReportFilterer {
         return completedMoves(moves).filter { report ->
             report.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
                     report.hasNoneOf(EventType.MOVE_REDIRECT) &&
-                    with(report.journeysWithEvents.map { it.journey }) {
+                    with(report.journeys.map { it }) {
                         count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
                     }
         }   
@@ -130,7 +129,7 @@ object ReportFilterer {
                 }
                 else -> {
                     report.moveEvents.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
-                    with(report.journeysWithEvents.map { it.journey }) {
+                    with(report.journeys.map { it }) {
                         count { it.stateIsAnyOf(JourneyState.completed, JourneyState.cancelled) && it.billable } == 2
                     }
                 }

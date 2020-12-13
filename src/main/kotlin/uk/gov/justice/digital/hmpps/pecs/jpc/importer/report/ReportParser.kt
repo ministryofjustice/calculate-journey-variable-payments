@@ -71,8 +71,10 @@ object ReportParser {
         return moves.map { move ->
             Report(
                 move = move,
-                journeysWithEvents = journeys.getOrDefault(move.moveId, listOf()).map { journey -> JourneyWithEvents(journey = journey, events = events.getOrDefault(journey.journeyId, listOf())) },
-                moveEvents = events.getOrDefault(move.moveId, listOf()))
+                moveEvents = events.getOrDefault(move.moveId, listOf()),
+                journeys = journeys.getOrDefault(move.moveId, listOf()).map {
+                    journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf()).toMutableSet()) }
+            )
         }
     }
 

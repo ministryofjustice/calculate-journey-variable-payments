@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 
@@ -35,7 +34,7 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
 
                     // merge journeys and their events
                     val existingJourneys = existingMove.journeys
-                    val newJourneys = report.journeysWithEvents.map { reportJourneyWithEventsToJourney(existingMove.moveId, existingMove.moveDate, it) }
+                    val newJourneys = report.journeys
 
                     val mergedJourneys =
                         existingJourneys.filterNot { ej -> newJourneys.any { ej.journeyId == it.journeyId } } +
@@ -47,7 +46,7 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
 
                     report.copy(
                             moveEvents = mergedMoveEvents,
-                            journeysWithEvents = mergedJourneys.map { journeyToReportJourneyWithEvents(it) })
+                            journeys = mergedJourneys)
                 } ?: report
 
                 with(mergedReport.move) {
@@ -66,8 +65,8 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                         dropOffOrCancelledDateTime = dropOff ?: cancelled,
                             reportFromLocationType = reportFromLocationType,
                             reportToLocationType = reportToLocationType,
-                        vehicleRegistration = report.journeysWithEvents.withIndex().joinToString(separator = ", ") {
-                            it.value.journey.vehicleRegistration ?: ""
+                        vehicleRegistration = report.journeys.withIndex().joinToString(separator = ", ") {
+                            it.value.vehicleRegistration ?: ""
                         },
                         notes = report.moveEvents.notes(),
                         prisonNumber = maybeExistingMove?.prisonNumber,
@@ -77,7 +76,7 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                         lastName = maybeExistingMove?.lastName,
                         gender =  maybeExistingMove?.gender,
                         ethnicity = maybeExistingMove?.ethnicity,
-                        journeys = mergedReport.journeysWithEvents.map { reportJourneyWithEventsToJourney(moveId, moveDate, it) }.toMutableSet(),
+                        journeys = mergedReport.journeys.map { addFieldsToJourney(moveDate, it) }.toMutableSet(),
                         events = mergedReport.moveEvents.toMutableSet()
                     )
 
@@ -95,52 +94,18 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
         }
     }
 
-    fun journeyToReportJourneyWithEvents(journey: Journey): JourneyWithEvents {
-        with(journey) {
-            return JourneyWithEvents(
-                journey = Journey(
-                    journeyId = journeyId,
-                    updatedAt = updatedAt,
-                    moveId = moveId,
-                    billable = billable,
-                    state = state,
-                    supplier = supplier,
-                    clientTimeStamp = clientTimeStamp,
-                    vehicleRegistration = vehicleRegistration,
-                    fromNomisAgencyId = fromNomisAgencyId,
-                    toNomisAgencyId = toNomisAgencyId,
-                    effectiveYear = effectiveYear,
-                    ),
-                    events = journey.events.toList())
-        }
+
+    fun addFieldsToJourney(moveDate: LocalDate?, journey: Journey): Journey {
+
+        val pickUp = Event.getLatestByType(journey.events, EventType.JOURNEY_START)?.occurredAt
+        val dropOff = Event.getLatestByType(journey.events, EventType.JOURNEY_COMPLETE)?.occurredAt
+
+        return journey.copy(
+            pickUpDateTime = pickUp,
+            dropOffDateTime = dropOff,
+            effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: timeSource.date())
+        )
     }
-
-    fun reportJourneyWithEventsToJourney(moveId: String, moveDate: LocalDate?, journeyWithEvents: JourneyWithEvents): Journey {
-        with(journeyWithEvents) {
-
-            val pickUp = Event.getLatestByType(journeyWithEvents.events, EventType.JOURNEY_START)?.occurredAt
-            val dropOff = Event.getLatestByType(journeyWithEvents.events, EventType.JOURNEY_COMPLETE)?.occurredAt
-
-            return Journey(
-                journeyId = journeyWithEvents.journey.journeyId,
-                supplier = journey.supplier,
-                clientTimeStamp = journey.clientTimeStamp,
-                updatedAt = journey.updatedAt,
-                moveId = moveId,
-                state = journey.state,
-                fromNomisAgencyId = journey.fromNomisAgencyId,
-                toNomisAgencyId = journey.toNomisAgencyId,
-                pickUpDateTime = pickUp,
-                dropOffDateTime = dropOff,
-                billable = journey.billable,
-                vehicleRegistration = journey.vehicleRegistration,
-                notes = journeyWithEvents.events.notes(),
-                events = events.toMutableSet(),
-                effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: timeSource.date())
-            )
-        }
-    }
-
 }
 
 private val noteworthyEvents = listOf(

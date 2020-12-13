@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import java.time.LocalDate
@@ -12,142 +13,136 @@ internal class ReportFiltererTest {
     val to = LocalDate.of(2020, 9, 11)
 
     private val standard = Report(
-            move = reportMoveFactory(),
-            moveEvents = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
-            journeysWithEvents = listOf(JourneyWithEvents(reportJourneyFactory(journeyId = "J1M1", billable = true)))
+        move = reportMoveFactory(),
+        moveEvents = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
+        journeys = listOf(reportJourneyFactory(journeyId = "J1M1", billable = true))
     )
 
     private val cancelled = Report(
-            move = reportMoveFactory(moveId = "M2", status = MoveStatus.cancelled),
-            moveEvents =  listOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
-            journeysWithEvents = listOf(JourneyWithEvents(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true)))
+        move = reportMoveFactory(moveId = "M2", status = MoveStatus.cancelled),
+        moveEvents =  listOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
+        journeys = listOf(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true))
     )
 
 
     private val completedUnbillable = Report(
-            move = reportMoveFactory(moveId = "M4"),
-            moveEvents = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
-            journeysWithEvents = listOf(JourneyWithEvents(reportJourneyFactory(journeyId = "J1M4", moveId = "M4", billable = false)))
+        move = reportMoveFactory(moveId = "M4"),
+        moveEvents = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
+        journeys = listOf(reportJourneyFactory(journeyId = "J1M4", moveId = "M4", billable = false))
     )
 
     private val completedRedirection = Report(
-            move = reportMoveFactory(moveId = "M5"),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M5", occurredAt = from.atStartOfDay()),
-                    moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(2)),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(4))
-            ),
-            journeysWithEvents = listOf(
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J1M5", moveId = "M5", billable = true)),
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J2M5", moveId = "M5", billable = true))
-            )
+        move = reportMoveFactory(moveId = "M5"),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_START.value, moveId = "M5", occurredAt = from.atStartOfDay()),
+            moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(2)),
+            moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(4))
+        ),
+        journeys = listOf(
+            reportJourneyFactory(journeyId = "J1M5", moveId = "M5", billable = true),
+            reportJourneyFactory(journeyId = "J2M5", moveId = "M5", billable = true)
+        )
     )
 
     private val completedLongHaulMoveLodgingEvents = Report(
-            move = reportMoveFactory(moveId = "M6"),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M6", occurredAt = from.atStartOfDay()),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
-                    moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
-                    moveEventFactory(type = EventType.MOVE_LODGING_END.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4))
-
-
+        move = reportMoveFactory(moveId = "M6"),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_START.value, moveId = "M6", occurredAt = from.atStartOfDay()),
+            moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
+            moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
+            moveEventFactory(type = EventType.MOVE_LODGING_END.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4))
             ),
-            journeysWithEvents = listOf(
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J1M6", moveId = "M6", billable = true),
-                            listOf()),
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J2M6", moveId = "M6", billable = true))
+            journeys = listOf(
+                reportJourneyFactory(journeyId = "J1M6", moveId = "M6", billable = true),
+                reportJourneyFactory(journeyId = "J2M6", moveId = "M6", billable = true)
             )
     )
 
     private val completedLongHaulJourneyLodgingEvents = Report(
-            move = reportMoveFactory(moveId = "M6a"),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M6a", occurredAt = from.atStartOfDay()),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
-                    moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
-                    moveEventFactory(type = EventType.MOVE_LODGING_END.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4))
+        move = reportMoveFactory(moveId = "M6a"),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_START.value, moveId = "M6a", occurredAt = from.atStartOfDay()),
+            moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
+            moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
+            moveEventFactory(type = EventType.MOVE_LODGING_END.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4))
 
-
-            ),
-            journeysWithEvents = listOf(
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J1M6a", moveId = "M6a", billable = true),
-                            listOf(journeyEventFactory(type = EventType.JOURNEY_LODGING.value))),
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J2M6a", moveId = "M6a", billable = true))
-            )
+        ),
+        journeys = listOf(
+            reportJourneyFactory(journeyId = "J1M6a", moveId = "M6a", billable = true, events = mutableSetOf(journeyEventFactory(type = EventType.JOURNEY_LODGING.value))),
+            reportJourneyFactory(journeyId = "J2M6a", moveId = "M6a", billable = true)
+        )
     )
 
 
     private val multiTypeMove = Report(
-            move = reportMoveFactory(moveId = "M7"),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
-                    moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
-                    moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(4))
-            ),
-            journeysWithEvents = listOf(
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J1M6", moveId = "M7", billable = true)),
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J2M6", moveId = "M7", billable = true))
-            )
+        move = reportMoveFactory(moveId = "M7"),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
+            moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
+            moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
+            moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(4))
+        ),
+        journeys = listOf(
+            reportJourneyFactory(journeyId = "J1M6", moveId = "M7", billable = true),
+            reportJourneyFactory(journeyId = "J2M6", moveId = "M7", billable = true)
+        )
     )
 
     private val completedLockoutJourneyLockoutEvent = Report(
-            move = reportMoveFactory(moveId = "M8"),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8", occurredAt = from.atStartOfDay()),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8", occurredAt = from.atStartOfDay().plusHours(4))
-            ),
-            journeysWithEvents = listOf(
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true),
-                            listOf(journeyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))),
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J2M8", moveId = "M8", billable = true))
-            )
+        move = reportMoveFactory(moveId = "M8"),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8", occurredAt = from.atStartOfDay()),
+            moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8", occurredAt = from.atStartOfDay().plusHours(4))
+        ),
+        journeys = listOf(
+            reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true, events = mutableSetOf(journeyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))),
+            reportJourneyFactory(journeyId = "J2M8", moveId = "M8", billable = true)
+        )
     )
 
     private val completedLockoutMoveLockoutEvent = Report(
-            move = reportMoveFactory(moveId = "M8b"),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8b", occurredAt = from.atStartOfDay()),
-                    moveEventFactory(type = "MoveLockout", moveId = "M8b"),
-                    moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8b", occurredAt = from.atStartOfDay().plusHours(4))
-            ),
-            journeysWithEvents = listOf(
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J1M8b", moveId = "M8b", billable = true)),
-                    JourneyWithEvents(reportJourneyFactory(journeyId = "J2M8b", moveId = "M8b", billable = true))
-            )
+        move = reportMoveFactory(moveId = "M8b"),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8b", occurredAt = from.atStartOfDay()),
+            moveEventFactory(type = "MoveLockout", moveId = "M8b"),
+            moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8b", occurredAt = from.atStartOfDay().plusHours(4))
+        ),
+        journeys = listOf(
+            reportJourneyFactory(journeyId = "J1M8b", moveId = "M8b", billable = true),
+            reportJourneyFactory(journeyId = "J2M8b", moveId = "M8b", billable = true)
+        )
     )
 
     private val cancelledBillable = Report(
-            move = reportMoveFactory(
-                    moveId = "M9",
-                    status = MoveStatus.cancelled,
-                    fromLocation = fromPrisonNomisAgencyId(),
-                    fromLocationType = "prison",
-                    toLocation = toCourtNomisAgencyId(),
-                    toLocationType = "prison",
-                    cancellationReason = "cancelled_by_pmu",
-                    date = to
-            ),
-            moveEvents = listOf(
-                    moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
-                    moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
-            ),
-            journeysWithEvents = listOf()
+        move = reportMoveFactory(
+            moveId = "M9",
+            status = MoveStatus.cancelled,
+            fromLocation = fromPrisonNomisAgencyId(),
+            fromLocationType = "prison",
+            toLocation = toCourtNomisAgencyId(),
+            toLocationType = "prison",
+            cancellationReason = "cancelled_by_pmu",
+            date = to
+        ),
+        moveEvents = listOf(
+            moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
+            moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
+        ),
+        journeys = listOf()
     )
 
 
     private val reports = listOf(
-            standard,
-            cancelled,
-            completedUnbillable,
-            completedRedirection,
-            completedLongHaulMoveLodgingEvents,
-            completedLongHaulJourneyLodgingEvents,
-            completedLockoutJourneyLockoutEvent,
-            completedLockoutMoveLockoutEvent,
-            multiTypeMove,
-            cancelledBillable
+        standard,
+        cancelled,
+        completedUnbillable,
+        completedRedirection,
+        completedLongHaulMoveLodgingEvents,
+        completedLongHaulJourneyLodgingEvents,
+        completedLockoutJourneyLockoutEvent,
+        completedLockoutMoveLockoutEvent,
+        multiTypeMove,
+        cancelledBillable
     )
 
 

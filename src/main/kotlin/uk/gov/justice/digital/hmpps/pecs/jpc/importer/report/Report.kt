@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 data class Report(
         val move: Move,
         val moveEvents: List<Event> = listOf(),
-        val journeysWithEvents: List<JourneyWithEvents> = listOf()
+        val journeys: List<Journey> = listOf()
         ) {
 
     /**
@@ -23,10 +23,6 @@ data class Report(
 
     fun getEvents(vararg ets: EventType) =
             this.moveEvents.filter { ets.map{it.value}.contains(it.type) } +
-            this.journeysWithEvents.flatMap { it.events }.filter{ ets.map{it.value}.contains(it.type)  }
-
-}
-
-data class JourneyWithEvents(val journey: Journey, val events: List<Event> = listOf()){
+            this.journeys.flatMap { it.events }.filter{ ets.map{it.value}.contains(it.type)  }
 
 }

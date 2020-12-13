@@ -114,7 +114,9 @@ fun reportJourneyFactory(
         billable: Boolean = false,
         fromLocation: String = fromPrisonNomisAgencyId(),
         toLocation : String = toCourtNomisAgencyId(),
-        vehicleRegistration: String? ="UHE-92"
+        vehicleRegistration: String? ="UHE-92",
+        effectiveYear: Int? = null,
+        events: MutableSet<Event> = mutableSetOf()
 
 ): Journey {
     val journey = Journey(
@@ -128,7 +130,8 @@ fun reportJourneyFactory(
             vehicleRegistration=vehicleRegistration,
             fromNomisAgencyId=fromLocation,
             toNomisAgencyId=toLocation,
-            effectiveYear = 2020)
+            effectiveYear = effectiveYear,
+            events = events)
     return journey
 }
 

@@ -145,7 +145,7 @@ internal class ReportParserTest {
         assertThat(move1.moveEvents.map{it.id}).containsExactly("E1", "E4")
 
         // Move1's first journey should have event 3
-        assertThat(move1.journeysWithEvents[0].events.map { it.id }).containsExactly("E3")
+        assertThat(move1.journeys[0].events.map { it.id }).containsExactly("E3")
 
         // Move 1 should have Person PE1
        // assertThat(move1.person?.id).isEqualTo("PE1")
