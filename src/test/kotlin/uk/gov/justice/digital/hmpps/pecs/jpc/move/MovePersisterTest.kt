@@ -63,18 +63,30 @@ internal class MovePersisterTest {
 
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = fromLocation, toLocation = toLocation, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2020))
 
-        val journey1 = reportJourneyFactory().copy(journeyId = "J1", billable = true, vehicleRegistration = "REG1")
-        val journey2 = reportJourneyFactory().copy(journeyId = "J2", billable = true, fromNomisAgencyId = "NOT_MAPPED", vehicleRegistration = "REG2")
+        val journey1 = reportJourneyFactory().copy(
+            journeyId = "J1",
+            billable = true,
+            vehicleRegistration = "REG1",
+            events = reportJourneyFactory().events +
+                listOf(
+                    journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                    journeyEventFactory(journeyEventId = "E5", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                )
+        )
+        val journey2 = reportJourneyFactory().copy(
+            journeyId = "J2", billable = true,
+            fromNomisAgencyId = "NOT_MAPPED",
+            vehicleRegistration = "REG2",
+            events = reportJourneyFactory().events +
+                listOf(
+                    journeyEventFactory(journeyEventId = "E6", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
+                    journeyEventFactory(journeyEventId = "E7", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
+                )
+        )
 
         val moveStartEvent = moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
         val moveRedirectEvent = moveEventFactory(eventId = "E2", type = EventType.MOVE_REDIRECT.value, notes = "This was redirected.", occurredAt = from.atStartOfDay().plusHours(7))
         val moveCompleteEvent = moveEventFactory(eventId = "E3", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
-
-        journey1.events.addAll(mutableSetOf(journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                journeyEventFactory(journeyEventId = "E5", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))))
-
-        journey2.events.addAll(mutableSetOf(journeyEventFactory(journeyEventId = "E6", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5)),
-                journeyEventFactory(journeyEventId = "E7", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))))
 
         redirectMove = reportMoveFactory(
             events = mutableSetOf(moveStartEvent, moveRedirectEvent, moveCompleteEvent),
@@ -180,10 +192,12 @@ internal class MovePersisterTest {
     @Test
     fun `Journey with move start event in Sept 2021 persisted with 2021 effective year`() {
 
-        redirectMove.journeys.find { it.journeyId == "J1" }?.events?.clear()
-        redirectMove.journeys.toList()[0].events.add(journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.plusYears(1).atStartOfDay().plusHours(5)))
+        val journey = reportJourneyFactory().copy(
+            events = listOf(journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.plusYears(1).atStartOfDay().plusHours(5)))
+        )
+        val moveToPersist = redirectMove.copy(journeys = mutableSetOf(journey))
 
-        movePersister.persist(listOf(redirectMove))
+        movePersister.persist(listOf(moveToPersist))
         entityManager.flush()
 
         val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
@@ -195,7 +209,7 @@ internal class MovePersisterTest {
 
         val redirectMoveWith2021Move = redirectMove.copy(
             moveDate = LocalDate.of(2021, 9, 1),
-            journeys = mutableSetOf(redirectMove.journeys.toList()[0].copy(events = mutableSetOf())))
+            journeys = mutableSetOf(redirectMove.journeys.toList()[0].copy(events = listOf())))
 
         movePersister.persist(listOf(redirectMoveWith2021Move))
         entityManager.flush()
@@ -210,7 +224,7 @@ internal class MovePersisterTest {
 
         val newJourney = reportJourneyFactory(
             journeyId = "J400",
-            events = mutableSetOf(journeyEventFactory(journeyEventId = "JE400", type = EventType.JOURNEY_LODGING.value, occurredAt = from.atStartOfDay().plusHours(10))))
+            events = listOf(journeyEventFactory(journeyEventId = "JE400", type = EventType.JOURNEY_LODGING.value, occurredAt = from.atStartOfDay().plusHours(10))))
 
         val moveWithNewJourney = redirectMove.copy(
             journeys = mutableSetOf(newJourney)
@@ -232,7 +246,7 @@ internal class MovePersisterTest {
                 journeyId = "J1",
                 billable = true,
                 vehicleRegistration = "REG1",
-                events = mutableSetOf(journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5))))
+                events = listOf(journeyEventFactory(journeyEventId = "E4", type = EventType.JOURNEY_START.value, occurredAt = from.atStartOfDay().plusHours(5))))
 
         val moveStartEvent = moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
 
@@ -250,10 +264,10 @@ internal class MovePersisterTest {
         val journeyCompleteEvent = journeyEventFactory(journeyEventId = "J1", type = EventType.JOURNEY_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
         val moveCompleteEvent = moveEventFactory(eventId = "E3", type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay().plusHours(10))
 
-        journey1.events.add(journeyCompleteEvent)
+        val journeyWithMoveCompleteEvent = journey1.copy(events = journey1.events + journeyCompleteEvent)
         val completedMoveWithNewJourney = inTransitMove.copy(
             status = MoveStatus.completed,
-            journeys = mutableSetOf(journey1),
+            journeys = mutableSetOf(journeyWithMoveCompleteEvent),
             events = mutableSetOf(moveCompleteEvent)
         )
 

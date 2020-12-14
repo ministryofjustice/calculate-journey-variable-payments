@@ -120,7 +120,7 @@ fun reportJourneyFactory(
         toLocation : String = toCourtNomisAgencyId(),
         vehicleRegistration: String? ="UHE-92",
         effectiveYear: Int? = null,
-        events: MutableSet<Event> = mutableSetOf()
+        events: List<Event> = listOf()
 
 ): Journey {
     val journey = Journey(

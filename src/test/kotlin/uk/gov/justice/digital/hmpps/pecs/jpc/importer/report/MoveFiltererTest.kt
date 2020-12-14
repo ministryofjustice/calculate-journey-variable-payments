@@ -68,7 +68,7 @@ internal class MoveFiltererTest {
 
         ),
         journeys = mutableSetOf(
-            reportJourneyFactory(journeyId = "J1M6a", moveId = "M6a", billable = true, events = mutableSetOf(journeyEventFactory(type = EventType.JOURNEY_LODGING.value))),
+            reportJourneyFactory(journeyId = "J1M6a", moveId = "M6a", billable = true, events = listOf(journeyEventFactory(type = EventType.JOURNEY_LODGING.value))),
             reportJourneyFactory(journeyId = "J2M6a", moveId = "M6a", billable = true)
         )
     )
@@ -95,7 +95,7 @@ internal class MoveFiltererTest {
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8", occurredAt = from.atStartOfDay().plusHours(4))
         ),
         journeys = mutableSetOf(
-            reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true, events = mutableSetOf(journeyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))),
+            reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true, events = listOf(journeyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))),
             reportJourneyFactory(journeyId = "J2M8", moveId = "M8", billable = true)
         )
     )

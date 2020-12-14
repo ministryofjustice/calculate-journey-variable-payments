@@ -9,19 +9,26 @@ import java.time.LocalDate
 
 
 @Service
-class MoveService(private val moveQueryRepository: MoveQueryRepository, private val eventRepository: EventRepository) {
+class MoveService(private val moveQueryRepository: MoveQueryRepository,
+                  private val journeyRepository: JourneyRepository,
+                  private val eventRepository: EventRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun move(moveId: String) : Move {
+    fun moveWithJourneysAndEvents(moveId: String) : Move {
         val move = moveQueryRepository.move(moveId)
+        val journeys = journeyRepository.findAllByMoveId(moveId)
         val moveEvents = eventRepository.findAllByEventableId(move.moveId)
-        move.addEvents(*moveEvents.toTypedArray())
-        move.journeys.forEach{
-            val journeyEvents = eventRepository.findAllByEventableId(it.journeyId)
-            it.addEvents(*journeyEvents.toTypedArray())
+        val journeyId2Events = eventRepository.findByEventableIdIn(move.journeys.map { it.journeyId }).groupBy { it.eventableId }
+
+        val journeysWithEvents = journeys.map {
+            it.copy(events = journeyId2Events[it.journeyId] ?: listOf())
         }
-        return move
+
+        return move.copy(
+            events = moveEvents.toMutableSet(),
+            journeys = journeysWithEvents.toMutableSet()
+        )
     }
 
 

@@ -51,7 +51,8 @@ fun journey(
         state: JourneyState = JourneyState.completed,
         billable: Boolean = true,
         pickUpDateTime: LocalDateTime? = moveDate.atStartOfDay(),
-        dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
+        dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10),
+        events: List<Event> = listOf()
 ) = Journey(
         journeyId = journeyId,
         supplier = move().supplier,
@@ -71,7 +72,9 @@ fun journey(
         priceInPence = 100,
         vehicleRegistration = "REG200",
         notes = "some notes",
-        effectiveYear = effectiveYearForDate(defaultDate)
+        events = events,
+        effectiveYear = effectiveYearForDate(defaultDate
+        )
 )
 
 fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(

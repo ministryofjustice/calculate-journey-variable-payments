@@ -77,7 +77,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
 
     @RequestMapping("$MOVES_URL/{moveId}")
     fun moves(@PathVariable moveId: String, model: ModelMap): String {
-        val move = moveService.move(moveId)
+        val move = moveService.moveWithJourneysAndEvents(moveId)
         model.addAttribute(MOVE_ATTRIBUTE, move)
         return "move"
     }

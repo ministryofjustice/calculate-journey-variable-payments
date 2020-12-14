@@ -17,7 +17,7 @@ internal class ReportJourneyTest {
 
     val move = reportMoveFactory(
         events= mutableSetOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
-        journeys = mutableSetOf(reportJourneyFactory(events = mutableSetOf(journeyStartEvent, journeyCancelEvent)))
+        journeys = mutableSetOf(reportJourneyFactory(events = listOf(journeyStartEvent, journeyCancelEvent)))
     )
 
     @Test

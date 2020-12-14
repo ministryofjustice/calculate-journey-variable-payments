@@ -22,8 +22,7 @@ internal class MoveRepositoryTest {
     fun `save report model`() {
 
         val moveModel = move(moveId = UUID.randomUUID().toString())
-        val journeyModel = journey(moveId = moveModel.moveId)
-        journeyModel.addEvents(event(eventId = "E1", eventableId = journeyModel.journeyId))
+        val journeyModel = journey(moveId = moveModel.moveId, events = listOf(event(eventId = "E1", eventableId = journey().journeyId)))
 
         moveModel.addJourneys(journeyModel)
         moveModel.addEvents(event(eventId = "E2", eventableId = moveModel.moveId))

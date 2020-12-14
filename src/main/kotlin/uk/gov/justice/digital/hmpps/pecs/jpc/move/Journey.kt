@@ -84,7 +84,7 @@ data class Journey(
 
         @Json(ignored = true)
         @Transient
-        val events: MutableSet<Event> = mutableSetOf(),
+        val events: List<Event> = listOf(),
 
         @Json(ignored = true)
         @Transient
@@ -98,10 +98,6 @@ data class Journey(
 
         override fun toString(): String {
                 return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
-        }
-
-        fun addEvents(vararg events: Event) {
-                this.events += events
         }
 
         fun hasPrice() = priceInPence != null

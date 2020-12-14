@@ -83,7 +83,7 @@ class MovePersister(private val moveRepository: MoveRepository,
                 val dropOff = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
 
                 journey.copy(
-                    events = mutableSetOf(),
+                    events = listOf(),
                     pickUpDateTime = pickUp,
                     dropOffDateTime = dropOff,
                     effectiveYear = pickUp?.year ?: effectiveYearForDate(move.moveDate ?: timeSource.date())
@@ -105,7 +105,7 @@ class MovePersister(private val moveRepository: MoveRepository,
                 vehicleRegistration = null,
                 notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
                 effectiveYear = effectiveYearForDate(move.moveDate ?: LocalDate.now()),
-                events = mutableSetOf()
+                events = listOf()
         )
     }
 }
