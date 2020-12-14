@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
+package uk.gov.justice.digital.hmpps.pecs.jpc.importer.move
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -12,6 +12,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import java.time.LocalDate
 
 @ExtendWith(SpringExtension::class)
@@ -21,14 +24,14 @@ import java.time.LocalDate
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autowired timeSource: TimeSource) {
+internal class ReportingImporterTest(@Autowired provider: ReportingProvider, @Autowired timeSource: TimeSource) {
 
     val importer: ReportImporter = ReportImporter(provider, timeSource)
 
     val from = LocalDate.of(2020, 9, 1)
     val to = LocalDate.of(2020, 9, 6)
 
-    private lateinit var moves: Collection<Report>
+    private lateinit var moves: Collection<Move>
 
     @BeforeEach
     fun beforeEach() {
@@ -59,30 +62,32 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
                 LocalDate.of(2020, 9, 3))
 
         // This should only pick up the completed and cancelled moves
-        Assertions.assertEquals(setOf("M1", "M2", "M20",  "M3", "M30"), content.map { it.move.moveId }.toSet())
+        Assertions.assertEquals(setOf("M1", "M2", "M20",  "M3", "M30"), content.map { it.moveId }.toSet())
     }
 
     @Test
     fun `Standard moves should only include completed moves with one billable, completed journey`() {
-        val standardReports = ReportFilterer.standardMoveReports(moves)
-        Assertions.assertEquals(setOf("M2", "M3"), standardReports.map { it.move.moveId }.toSet())
+        val standardMoves = movesFilteredBy(MoveFilterer::isStandardMove)
+        Assertions.assertEquals(setOf("M2", "M3"), standardMoves.map { it.moveId }.toSet())
     }
 
     @Test
     fun `Redirect moves should only include completed moves with two billable journeys`() {
-        val redirectionReports = ReportFilterer.redirectionReports(moves)
-        Assertions.assertEquals(setOf("M20"), redirectionReports.map { it.move.moveId }.toSet())
+        val redirectionMoves = movesFilteredBy(MoveFilterer::isRedirectionMove)
+        Assertions.assertEquals(setOf("M20"), redirectionMoves.map { it.moveId }.toSet())
     }
 
     @Test
     fun `Long haul moves should only include completed moves with two billable journeys`() {
-        val longHaulReports = ReportFilterer.longHaulReports(moves)
-        Assertions.assertEquals(setOf("M30"), longHaulReports.map { it.move.moveId }.toSet())
+        val longHaulMoves = movesFilteredBy(MoveFilterer::isLongHaulMove)
+        Assertions.assertEquals(setOf("M30"), longHaulMoves.map { it.moveId }.toSet())
     }
 
     @Test
     fun `Cancelled, billable moves should only include moves cancelled before 3pm the day before the move`() {
-        val cancelledBillableReports = ReportFilterer.cancelledBillableMoves(moves)
-        Assertions.assertEquals(setOf("M61"), cancelledBillableReports.map { it.move.moveId }.toSet())
+        val cancelledBillableMoves = movesFilteredBy(MoveFilterer::isCancelledBillableMove)
+        Assertions.assertEquals(setOf("M61"), cancelledBillableMoves.map { it.moveId }.toSet())
     }
+
+    private fun movesFilteredBy(filterer: (m: Move) -> Boolean) = moves.filter(filterer)
 }

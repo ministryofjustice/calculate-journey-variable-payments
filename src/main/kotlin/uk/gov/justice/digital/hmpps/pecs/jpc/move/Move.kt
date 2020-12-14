@@ -269,6 +269,26 @@ data class Move(
                 result = 31 * result + (vehicleRegistration?.hashCode() ?: 0)
                 return result
         }
+
+        /**
+         * Returns the nullable MoveType for the Report
+         * This goes through each filterer in turn to see if it is that MoveType
+         * If it doesn't find any matching MoveType, return null
+         */
+        fun moveType() : MoveType? {
+            return MoveType.values().
+                firstOrNull { it.hasMoveType(this) }
+        }
+
+
+        fun hasAllOf(vararg ets: EventType) = getEvents(*ets).size == ets.size
+        fun hasAnyOf(vararg ets: EventType) = getEvents(*ets).isNotEmpty()
+        fun hasNoneOf(vararg ets: EventType) = !hasAnyOf(*ets)
+
+        fun getEvents(vararg ets: EventType) =
+                this.events.filter { ets.map{it.value}.contains(it.type) } +
+                        this.journeys.flatMap { it.events }.filter{ ets.map{it.value}.contains(it.type)  }
+
 }
 
 enum class MoveStatus {

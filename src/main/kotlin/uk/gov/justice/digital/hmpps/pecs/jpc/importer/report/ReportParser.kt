@@ -63,17 +63,16 @@ object ReportParser {
         groupBy(Event::eventableId)
     }
 
-    fun parseMovesJourneysEvents(moveFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Report> {
+    fun parseMovesJourneysEvents(moveFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Move> {
         val moves = parseAsMoves(moveFiles)
         val journeys = parseAsMoveIdToJourneys(journeyFiles)
         val events = parseAsEventableIdToEvents(eventFiles)
 
         return moves.map { move ->
-            Report(
-                move = move,
-                moveEvents = events.getOrDefault(move.moveId, listOf()),
+            move.copy(
+                events = events.getOrDefault(move.moveId, listOf()).toMutableSet(),
                 journeys = journeys.getOrDefault(move.moveId, listOf()).map {
-                    journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf()).toMutableSet()) }
+                        journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf()).toMutableSet()) }.toMutableSet()
             )
         }
     }

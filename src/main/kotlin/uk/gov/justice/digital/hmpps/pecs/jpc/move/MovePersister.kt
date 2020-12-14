@@ -12,29 +12,27 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun persist(reports: List<Report>) {
+    fun persist(moves: List<Move>) {
 
         var counter = 1
-        logger.info("Persisting ${reports.size} moves")
+        logger.info("Persisting ${moves.size} moves")
 
-        reports.forEach { report ->
-
+        moves.forEach { move ->
             Result.runCatching {
-                val moveId = report.move.moveId
 
-                val pickUp = Event.getLatestByType(report.moveEvents, EventType.MOVE_START)?.occurredAt
-                val dropOff = Event.getLatestByType(report.moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
-                val cancelled = Event.getLatestByType(report.moveEvents, EventType.MOVE_CANCEL)?.occurredAt
+                val pickUp = Event.getLatestByType(move.events, EventType.MOVE_START)?.occurredAt
+                val dropOff = Event.getLatestByType(move.events, EventType.MOVE_COMPLETE)?.occurredAt
+                val cancelled = Event.getLatestByType(move.events, EventType.MOVE_CANCEL)?.occurredAt
 
-                val maybeExistingMove = moveRepository.findById(moveId).orElse(null)
+                val maybeExistingMove = moveRepository.findById(move.moveId).orElse(null)
 
-                val mergedReport = maybeExistingMove?.let { existingMove ->
+                val mergeMove = maybeExistingMove?.let { existingMove ->
                     // merge move events
-                    val mergedMoveEvents = (existingMove.events + report.moveEvents).distinctBy { it.id }
+                    val mergedMoveEvents = (existingMove.events + move.events).distinctBy { it.id }
 
                     // merge journeys and their events
                     val existingJourneys = existingMove.journeys
-                    val newJourneys = report.journeys
+                    val newJourneys = move.journeys
 
                     val mergedJourneys =
                         existingJourneys.filterNot { ej -> newJourneys.any { ej.journeyId == it.journeyId } } +
@@ -44,19 +42,19 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                                 } ?: nj
                             }.toMutableSet()
 
-                    report.copy(
-                            moveEvents = mergedMoveEvents,
-                            journeys = mergedJourneys)
-                } ?: report
+                    move.copy(
+                            events = mergedMoveEvents.toMutableSet(),
+                            journeys = mergedJourneys.toMutableSet())
+                } ?: move
 
-                with(mergedReport.move) {
+                with(mergeMove) {
                     val newMove = Move(
-                        moveId = moveId,
+                        moveId = move.moveId,
                         profileId = profileId,
                         updatedAt = updatedAt,
                         supplier = supplier,
                         status = status,
-                        moveType = mergedReport.moveType(),
+                        moveType = mergeMove.moveType(),
                         reference = reference,
                         moveDate = moveDate,
                         fromNomisAgencyId = fromNomisAgencyId,
@@ -65,10 +63,10 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                         dropOffOrCancelledDateTime = dropOff ?: cancelled,
                             reportFromLocationType = reportFromLocationType,
                             reportToLocationType = reportToLocationType,
-                        vehicleRegistration = report.journeys.withIndex().joinToString(separator = ", ") {
+                        vehicleRegistration = move.journeys.withIndex().joinToString(separator = ", ") {
                             it.value.vehicleRegistration ?: ""
                         },
-                        notes = report.moveEvents.notes(),
+                        //notes = move.events.notes(),
                         prisonNumber = maybeExistingMove?.prisonNumber,
                         latestNomisBookingId = maybeExistingMove?.latestNomisBookingId,
                         dateOfBirth = maybeExistingMove?.dateOfBirth,
@@ -76,14 +74,14 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
                         lastName = maybeExistingMove?.lastName,
                         gender =  maybeExistingMove?.gender,
                         ethnicity = maybeExistingMove?.ethnicity,
-                        journeys = mergedReport.journeys.map { addFieldsToJourney(moveDate, it) }.toMutableSet(),
-                        events = mergedReport.moveEvents.toMutableSet()
+                        journeys = mergeMove.journeys.map { addFieldsToJourney(moveDate, it) }.toMutableSet(),
+                        events = mergeMove.events.toMutableSet()
                     )
 
                     moveRepository.save(newMove)
 
                     if (counter++ % 1000 == 0) {
-                        logger.info("Persisted $counter moves out of ${reports.size} (flushing moves to the database).")
+                        logger.info("Persisted $counter moves out of ${moves.size} (flushing moves to the database).")
                         moveRepository.flush()
                     }
                 }

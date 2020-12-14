@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import java.time.LocalDate
 import kotlin.streams.toList
 
@@ -15,7 +16,7 @@ class ReportImporter(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Report>{
+    fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Move>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)

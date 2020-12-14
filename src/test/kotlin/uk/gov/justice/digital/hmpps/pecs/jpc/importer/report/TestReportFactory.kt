@@ -42,7 +42,9 @@ fun reportMoveFactory(
         toLocation : String = toCourtNomisAgencyId(),
         toLocationType: String = "court",
         cancellationReason: String = "",
-        date: LocalDate = defaultDate
+        date: LocalDate = defaultDate,
+        events: MutableSet<Event> = mutableSetOf(),
+        journeys: MutableSet<Journey> = mutableSetOf()
     ): Move {
     val move = Move(
             moveId = moveId,
@@ -60,7 +62,9 @@ fun reportMoveFactory(
             notes = "",
             vehicleRegistration = null,
             dropOffOrCancelledDateTime = null,
-            moveType = null
+            moveType = null,
+            events = events,
+            journeys = journeys
     )
     return move
 }

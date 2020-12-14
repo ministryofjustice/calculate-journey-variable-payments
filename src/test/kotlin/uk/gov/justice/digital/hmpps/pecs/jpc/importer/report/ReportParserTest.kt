@@ -139,13 +139,13 @@ internal class ReportParserTest {
                 eventFiles = eventReports()
         )
 
-        val move1 = movesWithJourneysAndEvents.find { it.move.moveId == "M1" }!!
+        val move1 = movesWithJourneysAndEvents.find { it.moveId == "M1" }!!
 
         // Move1 should have two events
-        assertThat(move1.moveEvents.map{it.id}).containsExactly("E1", "E4")
+        assertThat(move1.events.map{it.id}).containsExactly("E1", "E4")
 
         // Move1's first journey should have event 3
-        assertThat(move1.journeys[0].events.map { it.id }).containsExactly("E3")
+        assertThat(move1.journeys.toList()[0].events.map { it.id }).containsExactly("E3")
 
         // Move 1 should have Person PE1
        // assertThat(move1.person?.id).isEqualTo("PE1")
