@@ -25,10 +25,7 @@ class MoveService(private val moveQueryRepository: MoveQueryRepository,
             it.copy(events = journeyId2Events[it.journeyId] ?: listOf())
         }
 
-        return move.copy(
-            events = moveEvents.toMutableSet(),
-            journeys = journeysWithEvents.toMutableSet()
-        )
+        return move.copy(events = moveEvents, journeys = journeysWithEvents)
     }
 
 

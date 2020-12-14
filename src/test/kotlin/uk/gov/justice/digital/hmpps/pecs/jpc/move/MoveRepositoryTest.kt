@@ -21,11 +21,12 @@ internal class MoveRepositoryTest {
     @Test
     fun `save report model`() {
 
-        val moveModel = move(moveId = UUID.randomUUID().toString())
-        val journeyModel = journey(moveId = moveModel.moveId, events = listOf(event(eventId = "E1", eventableId = journey().journeyId)))
-
-        moveModel.addJourneys(journeyModel)
-        moveModel.addEvents(event(eventId = "E2", eventableId = moveModel.moveId))
+        val move = move()
+        val journeyModel = journey(moveId = move.moveId, events = listOf(event(eventId = "E1", eventableId = journey().journeyId)))
+        val moveModel = move.copy(
+            events = listOf(event(eventId = "E2", eventableId = move.moveId)),
+            journeys = listOf(journeyModel)
+        )
 
         val persistedReport = moveRepository.save(moveModel)
 

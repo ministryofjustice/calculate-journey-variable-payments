@@ -13,32 +13,32 @@ internal class MoveFiltererTest {
     val to = LocalDate.of(2020, 9, 11)
 
     private val standard = reportMoveFactory(
-        events = mutableSetOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
-        journeys = mutableSetOf(reportJourneyFactory(journeyId = "J1M1", billable = true))
+        events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
+        journeys = listOf(reportJourneyFactory(journeyId = "J1M1", billable = true))
     )
     
     private val cancelled = reportMoveFactory(
         moveId = "M2",
         status = MoveStatus.cancelled,
-        events = mutableSetOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
-        journeys = mutableSetOf(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true))
+        events = listOf(moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M2", occurredAt = to.atStartOfDay())),
+        journeys = listOf(reportJourneyFactory(journeyId = "J1M2", moveId = "M2", billable = true))
     )
 
 
     private val completedUnbillable = reportMoveFactory(
         moveId = "M4",
-        events = mutableSetOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
-        journeys = mutableSetOf(reportJourneyFactory(journeyId = "J1M4", moveId = "M4", billable = false))
+        events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M4", occurredAt = from.atStartOfDay())),
+        journeys = listOf(reportJourneyFactory(journeyId = "J1M4", moveId = "M4", billable = false))
     )
 
     private val completedRedirection = reportMoveFactory(
         moveId = "M5",
-        events = mutableSetOf(
+        events = listOf(
             moveEventFactory(type = EventType.MOVE_START.value, moveId = "M5", occurredAt = from.atStartOfDay()),
             moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(2)),
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M5", occurredAt = from.atStartOfDay().plusHours(4))
         ),
-        journeys = mutableSetOf(
+        journeys = listOf(
             reportJourneyFactory(journeyId = "J1M5", moveId = "M5", billable = true),
             reportJourneyFactory(journeyId = "J2M5", moveId = "M5", billable = true)
         )
@@ -46,13 +46,13 @@ internal class MoveFiltererTest {
 
     private val completedLongHaulMoveLodgingEvents = reportMoveFactory(
         moveId = "M6",
-        events = mutableSetOf(
+        events = listOf(
             moveEventFactory(type = EventType.MOVE_START.value, moveId = "M6", occurredAt = from.atStartOfDay()),
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
             moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4)),
             moveEventFactory(type = EventType.MOVE_LODGING_END.value, moveId = "M6", occurredAt = from.atStartOfDay().plusHours(4))
             ),
-        journeys = mutableSetOf(
+        journeys = listOf(
             reportJourneyFactory(journeyId = "J1M6", moveId = "M6", billable = true),
             reportJourneyFactory(journeyId = "J2M6", moveId = "M6", billable = true)
             )
@@ -60,14 +60,14 @@ internal class MoveFiltererTest {
 
     private val completedLongHaulJourneyLodgingEvents = reportMoveFactory(
         moveId = "M6a",
-        events = mutableSetOf(
+        events = listOf(
             moveEventFactory(type = EventType.MOVE_START.value, moveId = "M6a", occurredAt = from.atStartOfDay()),
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
             moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4)),
             moveEventFactory(type = EventType.MOVE_LODGING_END.value, moveId = "M6a", occurredAt = from.atStartOfDay().plusHours(4))
 
         ),
-        journeys = mutableSetOf(
+        journeys = listOf(
             reportJourneyFactory(journeyId = "J1M6a", moveId = "M6a", billable = true, events = listOf(journeyEventFactory(type = EventType.JOURNEY_LODGING.value))),
             reportJourneyFactory(journeyId = "J2M6a", moveId = "M6a", billable = true)
         )
@@ -76,13 +76,13 @@ internal class MoveFiltererTest {
 
     private val multiTypeMove = reportMoveFactory(
         moveId = "M7",
-        events = mutableSetOf(
+        events = listOf(
             moveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
             moveEventFactory(type = EventType.MOVE_REDIRECT.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
             moveEventFactory(type = EventType.MOVE_LODGING_START.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(2)),
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M7", occurredAt = from.atStartOfDay().plusHours(4))
         ),
-        journeys = mutableSetOf(
+        journeys = listOf(
             reportJourneyFactory(journeyId = "J1M6", moveId = "M7", billable = true),
             reportJourneyFactory(journeyId = "J2M6", moveId = "M7", billable = true)
         )
@@ -90,11 +90,11 @@ internal class MoveFiltererTest {
 
     private val completedLockoutJourneyLockoutEvent = reportMoveFactory(
         moveId = "M8",
-        events = mutableSetOf(
+        events = listOf(
             moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8", occurredAt = from.atStartOfDay()),
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8", occurredAt = from.atStartOfDay().plusHours(4))
         ),
-        journeys = mutableSetOf(
+        journeys = listOf(
             reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true, events = listOf(journeyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))),
             reportJourneyFactory(journeyId = "J2M8", moveId = "M8", billable = true)
         )
@@ -102,12 +102,12 @@ internal class MoveFiltererTest {
 
     private val completedLockoutMoveLockoutEvent = reportMoveFactory(
         moveId = "M8b",
-        events = mutableSetOf(
+        events = listOf(
             moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8b", occurredAt = from.atStartOfDay()),
             moveEventFactory(type = "MoveLockout", moveId = "M8b"),
             moveEventFactory(type = EventType.MOVE_COMPLETE.value, moveId = "M8b", occurredAt = from.atStartOfDay().plusHours(4))
         ),
-        journeys = mutableSetOf(
+        journeys = listOf(
             reportJourneyFactory(journeyId = "J1M8b", moveId = "M8b", billable = true),
             reportJourneyFactory(journeyId = "J2M8b", moveId = "M8b", billable = true)
         )
@@ -122,11 +122,11 @@ internal class MoveFiltererTest {
         toLocationType = "prison",
         cancellationReason = "cancelled_by_pmu",
         date = to,
-        events= mutableSetOf(
+        events= listOf(
             moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
             moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
         ),
-        journeys = mutableSetOf()
+        journeys = listOf()
     )
 
     @Test

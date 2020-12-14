@@ -16,7 +16,7 @@ object MoveFilterer {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private fun MutableSet<Event>.hasEventType(eventType: EventType) = this.find { it.hasType(eventType) } != null
+    private fun List<Event>.hasEventType(eventType: EventType) = this.find { it.hasType(eventType) } != null
 
     private fun isCompleted(move: Move) = move.status == MoveStatus.completed
 

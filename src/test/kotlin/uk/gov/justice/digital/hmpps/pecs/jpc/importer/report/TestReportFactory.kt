@@ -43,8 +43,8 @@ fun reportMoveFactory(
         toLocationType: String = "court",
         cancellationReason: String = "",
         date: LocalDate = defaultDate,
-        events: MutableSet<Event> = mutableSetOf(),
-        journeys: MutableSet<Journey> = mutableSetOf()
+        events: List<Event> = listOf(),
+        journeys: List<Journey> = listOf()
     ): Move {
     val move = Move(
             moveId = moveId,

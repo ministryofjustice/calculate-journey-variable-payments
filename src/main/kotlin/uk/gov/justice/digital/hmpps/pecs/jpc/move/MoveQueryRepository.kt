@@ -161,7 +161,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
         val moves = movesAndJourneys.keys.map { k ->
             val mjs = movesAndJourneys.getValue(k)
-            mjs[0].move.copy(journeys = mjs.mapNotNull { it.journey }.toMutableSet())
+            mjs[0].move.copy(journeys = mjs.mapNotNull { it.journey })
         }
         return moves[0]
     }
@@ -180,7 +180,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
         return movesAndJourneys.keys.map { k ->
             val mjs = movesAndJourneys.getValue(k)
-            mjs[0].move.copy(journeys = mjs.mapNotNull { it.journey }.toMutableSet())
+            mjs[0].move.copy(journeys = mjs.mapNotNull { it.journey })
         }
     }
 

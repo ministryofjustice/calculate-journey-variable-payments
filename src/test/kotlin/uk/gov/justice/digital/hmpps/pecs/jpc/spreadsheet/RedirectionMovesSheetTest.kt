@@ -21,7 +21,7 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
 
         val journey1 = journey()
         val journey2 = journey(journeyId = "J2")
-        val move = move(journeys = mutableSetOf(journey1, journey2))
+        val move = move(journeys = listOf(journey1, journey2))
         val moves = listOf(move)
         
         val sheet = RedirectionMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))

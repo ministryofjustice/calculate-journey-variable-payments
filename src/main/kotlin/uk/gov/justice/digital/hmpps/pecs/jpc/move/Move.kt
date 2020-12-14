@@ -8,18 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.ConstraintMode
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.FetchType
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
-import javax.persistence.Table
-import javax.persistence.Transient
+import javax.persistence.*
 
 @Entity
 @Table(name = "MOVES")
@@ -147,21 +136,13 @@ data class Move(
 
         @Json(ignored = true)
         @Transient
-        val journeys: MutableSet<Journey> = mutableSetOf(),
+        val journeys: List<Journey> = listOf(),
 
         @Json(ignored = true)
         @Transient
-        val events: MutableSet<Event> = mutableSetOf()
+        val events: List<Event> = listOf()
 )
 {
-
-        fun addJourneys(vararg journeys: Journey) {
-                this.journeys += journeys
-        }
-
-        fun addEvents(vararg events: Event) {
-                this.events += events
-        }
 
         fun totalInPence() = if(journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy { it.priceInPence ?: 0 }
 

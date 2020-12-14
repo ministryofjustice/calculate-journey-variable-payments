@@ -70,9 +70,9 @@ object ReportParser {
 
         return moves.map { move ->
             move.copy(
-                events = events.getOrDefault(move.moveId, listOf()).toMutableSet(),
+                events = events.getOrDefault(move.moveId, listOf()),
                 journeys = journeys.getOrDefault(move.moveId, listOf()).map {
-                        journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf())) }.toMutableSet()
+                        journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf())) }
             )
         }
     }
