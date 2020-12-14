@@ -45,7 +45,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     whenever(service.getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
-            .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", 00.0, "from", "to")) } }
+            .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "0.00", "from", "to")) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
