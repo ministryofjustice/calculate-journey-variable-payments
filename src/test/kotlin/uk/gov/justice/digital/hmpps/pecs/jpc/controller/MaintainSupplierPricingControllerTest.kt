@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
@@ -67,5 +69,41 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             .andExpect { status { is3xxRedirection } }
 
     verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24))
+  }
+
+  @Test
+  internal fun `cannot add price with characters for Serco`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.SERCO)
+    }
+
+    mockMvc.post("/add-price") {
+      session = mockSession
+      param("moveId", "${fromAgencyId}-${toAgencyId}")
+      param("price", "1O.00")
+    }
+            .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+            .andExpect { view { name("add-price") } }
+            .andExpect { status { isOk } }
+
+    verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
+  }
+
+  @Test
+  internal fun `cannot add negative price for Serco`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.SERCO)
+    }
+
+    mockMvc.post("/add-price") {
+      session = mockSession
+      param("moveId", "${fromAgencyId}-${toAgencyId}")
+      param("price", "-10.00")
+    }
+            .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+            .andExpect { view { name("add-price") } }
+            .andExpect { status { isOk } }
+
+    verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
   }
 }
