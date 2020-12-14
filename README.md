@@ -58,7 +58,8 @@ The data itself falls into three distinct types:
    secure S3 bucket.
 3. Move reporting data - these are JSON files representing all the of the supplier moves, stored in a secure S3 bucket. 
    These files are uploaded automatically to S3 by an independent process not managed by this application.  The files 
-   are pulled into the application via the daily early morning CRON job to be used for calculating journey prices.
+   are pulled into the application via the daily early morning CRON job to be used for calculating journey prices. It is
+   important to understand that the reports (are always) being pulled based on the previous day.
 
 ### Manually importing locations, supplier prices and reporting data
 

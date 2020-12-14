@@ -15,15 +15,7 @@ spring:
       url: "spring.jpa.database: HSQL"
 
   flyway:
-    enabled: true
-    baselineOnMigrate: true
-    schemas: OFFENDER_EVENTS
-    locations: classpath:/db/migration/h2,classpath:/db/migration
-    url: 'jdbc:h2:mem:jpc;MODE=PostgreSQL;DB_CLOSE_DELAY=-1'
-    user: jpc
-    password: letmein
-    placeholders:
-      database_password: letmein
+    enabled: false
 
 server:
   port: 8080
