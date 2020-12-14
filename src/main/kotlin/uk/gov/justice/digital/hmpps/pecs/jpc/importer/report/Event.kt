@@ -56,6 +56,37 @@ data class Event constructor(
 ) {
 
     fun hasType(et: EventType) = type == et.value
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Event
+
+        if (id != other.id) return false
+        if (updatedAt != other.updatedAt) return false
+        if (type != other.type) return false
+        if (supplier != other.supplier) return false
+        if (eventableType != other.eventableType) return false
+        if (eventableId != other.eventableId) return false
+        if (occurredAt != other.occurredAt) return false
+        if (recordedAt != other.recordedAt) return false
+        if (notes != other.notes) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + (supplier?.hashCode() ?: 0)
+        result = 31 * result + eventableType.hashCode()
+        result = 31 * result + eventableId.hashCode()
+        result = 31 * result + occurredAt.hashCode()
+        result = 31 * result + recordedAt.hashCode()
+        result = 31 * result + (notes?.hashCode() ?: 0)
+        return result
+    }
 
     companion object {
         fun     getLatestByType(events: Collection<Event>, eventType: EventType): Event? =

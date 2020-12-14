@@ -83,8 +83,7 @@ data class Journey(
         val notes: String? = null,
 
         @Json(ignored = true)
-        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-        @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+        @Transient
         val events: MutableSet<Event> = mutableSetOf(),
 
         @Json(ignored = true)

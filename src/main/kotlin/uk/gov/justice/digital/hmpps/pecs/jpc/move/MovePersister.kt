@@ -6,9 +6,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 @Component
-class MovePersister(private val moveRepository: MoveRepository, private val timeSource: TimeSource) {
+class MovePersister(private val moveRepository: MoveRepository,
+                    private val journeyRepository: JourneyRepository,
+                    private val eventRepository: EventRepository,
+                    private val timeSource: TimeSource) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -17,91 +22,90 @@ class MovePersister(private val moveRepository: MoveRepository, private val time
         var counter = 1
         logger.info("Persisting ${moves.size} moves")
 
-        moves.forEach { move ->
-            Result.runCatching {
+        moves.forEach { newMove ->
+           // Result.runCatching {
 
-                val pickUp = Event.getLatestByType(move.events, EventType.MOVE_START)?.occurredAt
-                val dropOff = Event.getLatestByType(move.events, EventType.MOVE_COMPLETE)?.occurredAt
-                val cancelled = Event.getLatestByType(move.events, EventType.MOVE_CANCEL)?.occurredAt
+                val moveId = newMove.moveId
+                val maybeExistingMove = moveRepository.findById(newMove.moveId).orElse(null)
 
-                val maybeExistingMove = moveRepository.findById(move.moveId).orElse(null)
+                val journeys = (newMove.journeys +
+                        (maybeExistingMove?.let { journeyRepository.findAllByMoveId(moveId) }
+                                ?: listOf())).distinctBy { it.journeyId }
 
-                val mergeMove = maybeExistingMove?.let { existingMove ->
-                    // merge move events
-                    val mergedMoveEvents = (existingMove.events + move.events).distinctBy { it.id }
+                val moveEvents = (newMove.events +
+                        (maybeExistingMove?.let { eventRepository.findAllByEventableId(moveId) }
+                                ?: listOf())).distinctBy { it.id }
 
-                    // merge journeys and their events
-                    val existingJourneys = existingMove.journeys
-                    val newJourneys = move.journeys
+                val journeyEvents = (newMove.journeys.flatMap { it.events } +
+                        (maybeExistingMove?.let { eventRepository.findByEventableIdIn(journeys.map { it.journeyId }) }
+                                ?: listOf())).distinctBy { it.id }
 
-                    val mergedJourneys =
-                        existingJourneys.filterNot { ej -> newJourneys.any { ej.journeyId == it.journeyId } } +
-                            newJourneys.map { nj ->
-                                existingJourneys.find { it.journeyId == nj.journeyId }?.let {
-                                    nj.copy(events = (nj.events + it.events).distinctBy { it.id }.toMutableSet())
-                                } ?: nj
-                            }.toMutableSet()
+                val pickUp = Event.getLatestByType(moveEvents, EventType.MOVE_START)?.occurredAt
+                val dropOff = Event.getLatestByType(moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
+                val cancelled = Event.getLatestByType(moveEvents, EventType.MOVE_CANCEL)?.occurredAt
 
-                    move.copy(
-                            events = mergedMoveEvents.toMutableSet(),
-                            journeys = mergedJourneys.toMutableSet())
-                } ?: move
-
-                with(mergeMove) {
-                    val newMove = Move(
-                        moveId = move.moveId,
-                        profileId = profileId,
-                        updatedAt = updatedAt,
-                        supplier = supplier,
-                        status = status,
-                        moveType = mergeMove.moveType(),
-                        reference = reference,
-                        moveDate = moveDate,
-                        fromNomisAgencyId = fromNomisAgencyId,
-                        toNomisAgencyId = toNomisAgencyId,
+                val moveToSave = newMove.copy(
+                        moveType = newMove.moveType(),
                         pickUpDateTime = pickUp,
                         dropOffOrCancelledDateTime = dropOff ?: cancelled,
-                            reportFromLocationType = reportFromLocationType,
-                            reportToLocationType = reportToLocationType,
-                        vehicleRegistration = move.journeys.withIndex().joinToString(separator = ", ") {
+                        vehicleRegistration = journeys.withIndex().joinToString(separator = ", ") {
                             it.value.vehicleRegistration ?: ""
                         },
-                        //notes = move.events.notes(),
-                        prisonNumber = maybeExistingMove?.prisonNumber,
-                        latestNomisBookingId = maybeExistingMove?.latestNomisBookingId,
-                        dateOfBirth = maybeExistingMove?.dateOfBirth,
-                        firstNames = maybeExistingMove?.firstNames,
-                        lastName = maybeExistingMove?.lastName,
-                        gender =  maybeExistingMove?.gender,
-                        ethnicity = maybeExistingMove?.ethnicity,
-                        journeys = mergeMove.journeys.map { addFieldsToJourney(moveDate, it) }.toMutableSet(),
-                        events = mergeMove.events.toMutableSet()
-                    )
+                        notes = moveEvents.notes(),
+                )
 
-                    moveRepository.save(newMove)
+                moveRepository.save(moveToSave)
 
-                    if (counter++ % 1000 == 0) {
-                        logger.info("Persisted $counter moves out of ${moves.size} (flushing moves to the database).")
-                        moveRepository.flush()
-                    }
+                val journeysToSave = processJourneys(moveToSave, journeys, journeyEvents)
+                journeyRepository.saveAll(journeysToSave)
+
+                eventRepository.saveAll(moveEvents + journeyEvents)
+
+                if (counter++ % 1000 == 0) {
+                    logger.info("Persisted $counter moves out of ${moves.size} (flushing moves to the database).")
+                    moveRepository.flush()
                 }
 
-            }.onFailure { logger.warn(it.message) }
+       //     }.onFailure { logger.warn(it.message) }
 
             moveRepository.flush()
         }
     }
 
 
-    fun addFieldsToJourney(moveDate: LocalDate?, journey: Journey): Journey {
+    fun processJourneys(move: Move, journeys:List<Journey>, journeyEvents: List<Event>): List<Journey> {
+        return if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty())
+            listOf(fakeCancelledJourney(move)) // add a fake cancelled journey
+        else
+            journeys.map { journey ->
+                val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
+                val pickUp = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_START)?.occurredAt
+                val dropOff = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
 
-        val pickUp = Event.getLatestByType(journey.events, EventType.JOURNEY_START)?.occurredAt
-        val dropOff = Event.getLatestByType(journey.events, EventType.JOURNEY_COMPLETE)?.occurredAt
+                journey.copy(
+                    events = mutableSetOf(),
+                    pickUpDateTime = pickUp,
+                    dropOffDateTime = dropOff,
+                    effectiveYear = pickUp?.year ?: effectiveYearForDate(move.moveDate ?: timeSource.date())
+                )
+            }
+    }
 
-        return journey.copy(
-            pickUpDateTime = pickUp,
-            dropOffDateTime = dropOff,
-            effectiveYear = pickUp?.year ?: effectiveYearForDate(moveDate ?: timeSource.date())
+    fun fakeCancelledJourney(move: Move): Journey {
+        return Journey(
+                journeyId = UUID.randomUUID().toString(),
+                updatedAt = LocalDateTime.now(),
+                moveId = move.moveId,
+                billable = true,
+                supplier = move.supplier,
+                clientTimeStamp = LocalDateTime.now(),
+                fromNomisAgencyId = move.fromNomisAgencyId,
+                toNomisAgencyId = move.toNomisAgencyId!!,
+                state = JourneyState.cancelled,
+                vehicleRegistration = null,
+                notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
+                effectiveYear = effectiveYearForDate(move.moveDate ?: LocalDate.now()),
+                events = mutableSetOf()
         )
     }
 }

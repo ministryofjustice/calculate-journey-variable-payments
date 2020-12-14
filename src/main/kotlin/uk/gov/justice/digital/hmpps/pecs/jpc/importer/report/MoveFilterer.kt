@@ -37,26 +37,6 @@ object MoveFilterer {
     }
 
 
-    fun addFakeCancellationJourney(move: Move){
-        move.copy(
-            journeys = mutableSetOf( // fake journey with events
-                Journey(
-                    journeyId = "FAKE",
-                    updatedAt = LocalDateTime.now(),
-                    moveId = move.moveId,
-                    billable = true,
-                    supplier = move.supplier,
-                    clientTimeStamp = LocalDateTime.now(),
-                    fromNomisAgencyId = move.fromNomisAgencyId,
-                    toNomisAgencyId = move.toNomisAgencyId!!,
-                    state = JourneyState.cancelled,
-                    vehicleRegistration = null,
-                    effectiveYear = effectiveYearForDate(move.moveDate ?: LocalDate.now())
-                )
-            )
-        )
-    }
-
     /**
      * A standard move is a completed move with a single completed journey that is billable, and no cancelled journeys
      * To be priced as a standard move, the journey as well as the move must be completed
@@ -94,10 +74,10 @@ object MoveFilterer {
     fun isLockoutMove(move: Move): Boolean {
         return isCompleted(move) &&
             move.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
-                    move.hasNoneOf(EventType.MOVE_REDIRECT) &&
-                    with(move.journeys.map { it }) {
-                        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
-                    }
+            move.hasNoneOf(EventType.MOVE_REDIRECT) &&
+            with(move.journeys.map { it }) {
+                count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
+            }
     }
 
     /**
@@ -117,10 +97,7 @@ object MoveFilterer {
     fun isRedirectionMove(move: Move): Boolean {
         return isCompleted(move) &&
             move.hasAnyOf(EventType.MOVE_REDIRECT) &&
-            move.hasNoneOf(
-                    EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END,
-                    EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT
-            ) &&
+            move.hasNoneOf(EventType.JOURNEY_LODGING, EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
             when (val moveStartDate = move.events.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
                 null -> {
                     logger.warn("No move start date event found for move $move")
@@ -130,8 +107,7 @@ object MoveFilterer {
                     move.events.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
                     with(move.journeys.map { it }) {
                         count { it.stateIsAnyOf(JourneyState.completed, JourneyState.cancelled) && it.billable } == 2
-                    }
-
+                }
             }
         }
     }

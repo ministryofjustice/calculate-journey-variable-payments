@@ -146,13 +146,11 @@ data class Move(
         val vehicleRegistration: String? = null,
 
         @Json(ignored = true)
-        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name="move_id")
+        @Transient
         val journeys: MutableSet<Journey> = mutableSetOf(),
 
         @Json(ignored = true)
-        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
-        @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
+        @Transient
         val events: MutableSet<Event> = mutableSetOf()
 )
 {
