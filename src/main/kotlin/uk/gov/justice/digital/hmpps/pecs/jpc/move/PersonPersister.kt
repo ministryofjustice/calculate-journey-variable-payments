@@ -15,15 +15,27 @@ class PersonPersister(private val personRepository: PersonRepository,
 
     fun persistPeople(people: List<Person>) {
         logger.info("Persisting ${people.size} people")
+        var counter = 1
         people.forEach { person ->
-            Result.runCatching { personRepository.save(person) }
+            Result.runCatching { personRepository.save(person)
+                if (counter++ % 1000 == 0) {
+                    logger.info("Persisted $counter moves out of ${people.size} (flushing moves to the database).")
+                    personRepository.flush()
+                }
+            }.onFailure { logger.warn("Error inserting person id ${person.personId}" + it.message) }
         }
     }
 
     fun persistProfiles(profiles: List<Profile>) {
-        logger.info("Persisting ${profiles.size} people")
+        logger.info("Persisting ${profiles.size} profiles")
+        var counter = 1
         profiles.forEach { profile ->
-            Result.runCatching { profileRepository.save(profile) }
+            Result.runCatching { profileRepository.save(profile)
+                if (counter++ % 1000 == 0) {
+                    logger.info("Persisted $counter moves out of ${profiles.size} (flushing moves to the database).")
+                    profileRepository.flush()
+                }
+            }.onFailure { logger.warn("Error inserting $profile" + it.message) }
         }
     }
 }

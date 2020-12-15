@@ -95,6 +95,9 @@ data class Journey(
         val effectiveYear: Int? = null
         ) {
 
+        init {
+                notes = notes?.take(255)
+        }
 
         override fun toString(): String {
                 return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
@@ -127,11 +130,6 @@ data class Journey(
         }
 
         fun stateIsAnyOf(vararg states: JourneyState) = states.contains(state)
-
-        init {
-                notes = notes?.take(255)
-        }
-
 }
 
 enum class JourneyState() {

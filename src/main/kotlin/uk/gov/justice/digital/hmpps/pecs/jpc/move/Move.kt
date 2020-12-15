@@ -119,6 +119,10 @@ data class Move(
         val person: Person? = null
 )
 {
+        init {
+                notes = notes.take(255)
+                cancellationReasonComment = cancellationReasonComment?.take(255)
+        }
 
         fun totalInPence() = if(journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy { it.priceInPence ?: 0 }
 
@@ -229,12 +233,6 @@ data class Move(
         fun getEvents(vararg ets: EventType) =
                 this.events.filter { ets.map{it.value}.contains(it.type) } +
                         this.journeys.flatMap { it.events }.filter{ ets.map{it.value}.contains(it.type)  }
-
-        init {
-                notes = notes.take(255)
-                cancellationReasonComment = cancellationReasonComment?.take(255)
-        }
-
 }
 
 enum class MoveStatus {

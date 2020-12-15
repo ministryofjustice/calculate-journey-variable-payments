@@ -46,15 +46,6 @@ internal class ReportingImporterTest(@Autowired provider: ReportingProvider, @Au
         Assertions.assertEquals(listOf("2020/08/30/2020-08-30-moves.jsonl", "2020/08/31/2020-08-31-moves.jsonl"), fileNames)
     }
 
-//    @Test
-//    fun `Person populated correctly`(){
-//        // This should pick up the latest person file
-//        val person = moves.toList()[0].person
-//        assertThat(person?.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
-//        assertThat(person?.prisonNumber).isEqualTo("PRISON1")
-//
-//    }
-
     @Test
     fun `Get files for date should ignore missing days`() {
         val content = importer.importMovesJourneysEvents(

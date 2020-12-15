@@ -1,17 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
-
 @Service
-class MoveService(private val moveQueryRepository: MoveQueryRepository,
-                  private val journeyRepository: JourneyRepository,
-                  private val eventRepository: EventRepository) {
+class MoveService(private val moveQueryRepository: MoveQueryRepository, private val eventRepository: EventRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 

@@ -89,7 +89,7 @@ object MoveFilterer {
         !isLongHaulMove(move) &&
         !isLockoutMove(move)
 
-/**Ω
+/**
      * A simple redirect is a completed move with 2 billable (cancelled or completed) journeys and
      * exactly one move redirect event that happened after the move started
      * If there is no move start event, it logs a warning and continues

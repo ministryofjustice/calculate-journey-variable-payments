@@ -44,8 +44,19 @@ class MovePersister(private val moveRepository: MoveRepository,
                 val dropOff = Event.getLatestByType(moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
                 val cancelled = Event.getLatestByType(moveEvents, EventType.MOVE_CANCEL)?.occurredAt
 
+                // calculate move type
+                val journeyId2Events = journeyEvents.groupBy { it.eventableId }
+                val journeysWithEvents = journeys.map {
+                    it.copy(events = journeyId2Events[it.journeyId] ?: listOf())
+                }
+                // This is just used to calculated moveType
+                val moveWithJourneysAndEvents = newMove.copy(
+                      events = moveEvents,
+                      journeys = journeysWithEvents
+                )
+
                 val moveToSave = newMove.copy(
-                        moveType = newMove.moveType(),
+                        moveType = moveWithJourneysAndEvents.moveType(),
                         pickUpDateTime = pickUp,
                         dropOffOrCancelledDateTime = dropOff ?: cancelled,
                         vehicleRegistration = journeys.withIndex().joinToString(separator = ", ") {

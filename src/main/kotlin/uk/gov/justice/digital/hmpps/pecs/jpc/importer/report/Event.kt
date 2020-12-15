@@ -55,6 +55,10 @@ data class Event constructor(
         var notes: String?,
 ) {
 
+    init {
+        notes = notes?.take(255)
+    }
+
     fun hasType(et: EventType) = type == et.value
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -99,11 +103,6 @@ data class Event constructor(
             parse<Event>(json)
         }
     }
-
-    init {
-        notes = notes?.take(255)
-    }
-
 }
 
 enum class EventType(val value: String) {

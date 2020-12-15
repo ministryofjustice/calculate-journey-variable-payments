@@ -22,14 +22,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.*
     lateinit var moveQueryRepository: MoveQueryRepository
 
     @MockBean
-    lateinit var journeyRepository: JourneyRepository
-
-    @MockBean
     lateinit var eventRepository: EventRepository
 
     @Test
     fun `move by move id`(){
-        val service = MoveService(moveQueryRepository, journeyRepository, eventRepository)
+        val service = MoveService(moveQueryRepository, eventRepository)
         val journey = journey()
         val move = move(journeys = listOf(journey))
 

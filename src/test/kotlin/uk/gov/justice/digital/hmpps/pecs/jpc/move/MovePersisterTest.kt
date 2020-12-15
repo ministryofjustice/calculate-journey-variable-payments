@@ -262,8 +262,8 @@ internal class MovePersisterTest {
             cancellationReason = "cancelled_by_pmu",
             date = to,
             events= listOf(
-                moveEventFactory(type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
-                moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
+                moveEventFactory(eventId = "E1", type = EventType.MOVE_ACCEPT.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(24)),
+                moveEventFactory(eventId = "E2", type = EventType.MOVE_CANCEL.value, moveId = "M9", occurredAt = to.atStartOfDay().minusHours(2))
             ),
         )
         movePersister.persist(listOf(cancelledBillable))
