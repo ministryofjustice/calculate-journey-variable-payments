@@ -19,17 +19,17 @@ import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, HtmlController.PICK_UP_ATTRIBUTE, HtmlController.DROP_OFF_ATTRIBUTE)
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
 
     @GetMapping("/map-location/{agency-id}")
     fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
-        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
-        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+        val from = model.getAttribute(PICK_UP_ATTRIBUTE)
+        val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
         val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
 
-        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
-        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
+        from.takeUnless { it == "" }.apply { url.queryParam(PICK_UP_ATTRIBUTE, from) }
+        to.takeUnless { it == "" }.apply { url.queryParam(DROP_OFF_ATTRIBUTE, to) }
 
         model.addAttribute("cancelLink", url.build().toUriString())
 
@@ -46,17 +46,17 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
 
     @PostMapping("/map-location")
     fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
-        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
-        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+        val from = model.getAttribute(PICK_UP_ATTRIBUTE)
+        val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
         val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
 
-        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
-        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
+        from.takeUnless { it == "" }.apply { url.queryParam(PICK_UP_ATTRIBUTE, from) }
+        to.takeUnless { it == "" }.apply { url.queryParam(DROP_OFF_ATTRIBUTE, to) }
 
         model.addAttribute("cancelLink", url.build().toUriString())
 
         if (result.hasErrors()) {
-            return "/map-location"
+            return "map-location"
         }
 
         service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
