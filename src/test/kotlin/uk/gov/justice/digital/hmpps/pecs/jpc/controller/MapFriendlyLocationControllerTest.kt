@@ -80,7 +80,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       param("locationType", "CC")
     }
             .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "NotEmpty") } }
-            .andExpect { view { name("/map-location") } }
+            .andExpect { view { name("map-location") } }
             .andExpect { status { isOk } }
 
     verify(service, never()).locationAlreadyExists(any(), any())
@@ -97,7 +97,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       param("locationType", "CC")
     }
             .andExpect { model { attributeErrorCount("form", 1) } }
-            .andExpect { view { name("/map-location") } }
+            .andExpect { view { name("map-location") } }
             .andExpect { status { isOk } }
 
     verify(service).locationAlreadyExists(agencyId, "Duplicate location")
