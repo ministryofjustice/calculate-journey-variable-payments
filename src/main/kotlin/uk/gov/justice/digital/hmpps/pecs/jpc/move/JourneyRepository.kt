@@ -1,9 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import org.springframework.data.repository.CrudRepository
-import java.util.*
+import org.springframework.data.jpa.repository.JpaRepository
 
-interface JourneyRepository : CrudRepository<Journey, String> {
+interface JourneyRepository : JpaRepository<Journey, String> {
 
     fun findAllByMoveId(moveId: String) : List<Journey>
 }

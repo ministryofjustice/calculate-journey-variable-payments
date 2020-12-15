@@ -75,6 +75,8 @@ class MovePersister(private val moveRepository: MoveRepository,
                 if (counter++ % 1000 == 0) {
                     logger.info("Persisted $counter moves out of ${moves.size} (flushing moves to the database).")
                     moveRepository.flush()
+                    journeyRepository.flush()
+                    eventRepository.flush()
                 }
 
             }.onFailure { logger.warn("Error inserting $newMove" + it.message) }
