@@ -9,13 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Import
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -44,6 +40,12 @@ internal class MoveQueryRepositoryTest {
     @Autowired
     lateinit var journeyRepository: JourneyRepository
 
+    @Autowired
+    lateinit var personRepository: PersonRepository
+
+    @Autowired
+    lateinit var profileRepository: ProfileRepository
+
 
     @Autowired
     lateinit var entityManager: TestEntityManager
@@ -62,6 +64,7 @@ internal class MoveQueryRepositoryTest {
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2020))
 
         moveRepository.save(standardMove)
+
         journeyRepository.save(journeyModel1)
         journeyRepository.save(journeyModel2)
 
@@ -72,12 +75,24 @@ internal class MoveQueryRepositoryTest {
     @Test
     fun `move should be priced if all journeys are billable`() {
         val move = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        // Move should be priced
+        assertTrue(move.hasPrice())
+    }
+
+    @Test
+    fun `move PII data should be present`() {
+        personRepository.save(person())
+        profileRepository.save(profile())
+
+        entityManager.flush()
+
+        val move = moveQueryRepository.moveWithPersonAndJourneys(standardMove.moveId)
 
         // Move should be priced
         assertTrue(move.hasPrice())
 
-        assertThat(move.firstNames).isEqualTo("Billy the")
-        assertThat(move.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
+        assertThat(move.person?.firstNames).isEqualTo("Billy the")
+        assertThat(move.person?.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
     }
 
     @Test
@@ -138,14 +153,4 @@ internal class MoveQueryRepositoryTest {
         assertThat(movesCount).isEqualTo(1)
     }
 
-    @Test
-    fun `paging`(){
-        val moves = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)
-        val pageNo = 0
-        val pageSize = 50
-
-        val paging: Pageable = PageRequest.of(pageNo, pageSize)
-        val movesPage = MovesPage(moves, paging, 1)
-        println(movesPage)
-    }
 }

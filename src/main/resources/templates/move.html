@@ -41,32 +41,32 @@
                         <dt class="govuk-summary-list__key">
                             NOMIS Person ID
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${null}?: 'No NOMIS Person ID issued'"></dd>
+                        <dd class="govuk-summary-list__value" th:text="${move.person?.prisonNumber}?: 'Not set'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             First
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.firstNames}?: 'Not known'"></dd>
+                        <dd class="govuk-summary-list__value" th:text="${move.person?.firstNames}?: 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Last
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.lastName}?: 'Not known'"></dd>
+                        <dd class="govuk-summary-list__value" th:text="${move.person?.lastName}?: 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Date of birth
                         </dt>
                         <dd class="govuk-summary-list__value"
-                            th:text="${move.dateOfBirth != null} ? ${#temporals.format(move.dateOfBirth, 'dd MM yyyy')} : 'Not known'"></dd>
+                            th:text="${move.person?.dateOfBirth != null} ? ${#temporals.format(move.person?.dateOfBirth, 'dd MM yyyy')} : 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Gender
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.gender}?: 'Not known'"></dd>
+                        <dd class="govuk-summary-list__value" th:text="${move.person?.gender}?: 'Not known'"></dd>
                     </div>
                 </dl>
 

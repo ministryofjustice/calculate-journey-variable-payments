@@ -1,27 +1,26 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
-
 
 @Service
 class MoveService(private val moveQueryRepository: MoveQueryRepository, private val eventRepository: EventRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun move(moveId: String) : Move {
-        val move = moveQueryRepository.move(moveId)
+    fun moveWithPersonJourneysAndEvents(moveId: String) : Move {
+        val move = moveQueryRepository.moveWithPersonAndJourneys(moveId)
         val moveEvents = eventRepository.findAllByEventableId(move.moveId)
-        move.addEvents(*moveEvents.toTypedArray())
-        move.journeys.forEach{
-            val journeyEvents = eventRepository.findAllByEventableId(it.journeyId)
-            it.addEvents(*journeyEvents.toTypedArray())
+        val journeyId2Events = eventRepository.findByEventableIdIn(move.journeys.map { it.journeyId }).groupBy { it.eventableId }
+
+        val journeysWithEvents = move.journeys.map {
+            it.copy(events = journeyId2Events[it.journeyId] ?: listOf())
         }
-        return move
+
+        return move.copy(events = moveEvents, journeys = journeysWithEvents)
     }
 
 
@@ -29,12 +28,6 @@ class MoveService(private val moveQueryRepository: MoveQueryRepository, private 
 
     fun movesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate) =
             moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate))
-
-    fun paginatedMovesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate, pageable: Pageable): MovesPage {
-        val moves = moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate), pageable.pageSize, pageable.offset)
-        val totalCount = moveQueryRepository.moveCountInDateRange(supplier, startDate, endOfMonth(startDate))
-        return MovesPage(moves, pageable, totalCount.toLong())
-    }
 
     fun summaryForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate): MovesTypeSummary {
         val endDate = endOfMonth(startDate)

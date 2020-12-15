@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
+import com.beust.klaxon.Json
+import com.beust.klaxon.Klaxon
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.persistence.*
@@ -12,74 +12,95 @@ import javax.persistence.*
 @Entity
 @Table(name = "JOURNEYS")
 data class Journey(
+        @Json(name = "id")
         @Id
         @Column(name = "journey_id")
         val journeyId: String,
 
+        @EventDateTime
+        @Json(name = "updated_at")
         @Column(name = "updated_at")
         val updatedAt: LocalDateTime,
 
-        @Column(name = "move_id")
+        @Json(name = "move_id")
+        @Column(name = "move_id", nullable = false)
         val moveId: String,
 
+        @SupplierParser
         @Enumerated(EnumType.STRING)
+        @Column(name = "supplier", nullable = false)
         val supplier: Supplier,
 
+        @EventDateTime
+        @Json(name = "client_timestamp")
         @Column(name = "client_timestamp")
         val clientTimeStamp: LocalDateTime?,
 
+        @JourneyStateParser
         @Enumerated(EnumType.STRING)
+        @Column(name = "state", nullable = false)
         val state: JourneyState,
 
+        @Json(name = "from_location")
         @Column(name = "from_nomis_agency_id", nullable = false)
         val fromNomisAgencyId: String,
 
+        @Json(ignored = true)
         @Transient
         val fromSiteName: String? = null,
 
+        @Json(ignored = true)
         @Transient
         val fromLocationType: LocationType? = null,
 
-        @Column(name = "to_nomis_agency_id", nullable = true)
+        @Json(name = "to_location")
+        @Column(name = "to_nomis_agency_id")
         val toNomisAgencyId: String?,
 
+        @Json(ignored = true)
         @Transient
         val toSiteName: String? = null,
 
+        @Json(ignored = true)
         @Transient
         val toLocationType: LocationType? = null,
 
-        @Column(name = "pick_up", nullable = true)
+        @Json(ignored = true)
+        @Column(name = "pick_up")
         val pickUpDateTime: LocalDateTime? = null,
 
+        @Json(ignored = true)
         @Column(name = "drop_off", nullable = true)
         val dropOffDateTime: LocalDateTime? = null,
 
+        @Json(name = "vehicle_registration")
         @Column(name = "vehicle_registration", nullable = true)
         val vehicleRegistration: String? = null,
 
         val billable: Boolean,
 
-        val notes: String? = null,
+        @Json(ignored = true)
+        var notes: String? = null,
 
-        @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL), orphanRemoval = true)
-        @JoinColumn(name="eventable_id", foreignKey = javax.persistence.ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT))
-        val events: MutableSet<Event> = mutableSetOf(),
+        @Json(ignored = true)
+        @Transient
+        val events: List<Event> = listOf(),
 
+        @Json(ignored = true)
         @Transient
         val priceInPence: Int? = null,
 
+        @Json(ignored = true)
         @Column(name = "effective_year", nullable = false       )
-        val effectiveYear: Int
+        val effectiveYear: Int? = null
         ) {
 
+        init {
+                notes = notes?.take(255)
+        }
 
         override fun toString(): String {
                 return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
-        }
-
-        fun addEvents(vararg events: Event) {
-                this.events += events
         }
 
         fun hasPrice() = priceInPence != null
@@ -98,5 +119,28 @@ data class Journey(
         companion object{
                 private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                 private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+                fun fromJson(json: String): Journey? {
+                        return Klaxon().
+                        fieldConverter(JourneyStateParser::class, journeyStateConverter).
+                        fieldConverter(SupplierParser::class, supplierConverter).
+                        fieldConverter(EventDateTime::class, dateTimeConverter).
+                        parse<Journey>(json)
+                }
+        }
+
+        fun stateIsAnyOf(vararg states: JourneyState) = states.contains(state)
+}
+
+enum class JourneyState() {
+        proposed,
+        in_progress,
+        rejected,
+        cancelled,
+        completed,
+        unknown;
+
+        companion object{
+                fun valueOfCaseInsensitive(value: String?) = kotlin.runCatching { JourneyState.valueOf(value!!.toLowerCase()) }.getOrDefault(JourneyState.unknown)
         }
 }

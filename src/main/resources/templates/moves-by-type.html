@@ -71,7 +71,7 @@
                     <td class="govuk-table__cell" scope="row"
                         th:text="${move.pickUpDateTime != null} ? ${#temporals.format(move.pickUpDateTime, 'dd MMM yyyy, HH:mm')} : 'Not known'">
                     </td>
-                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.latestNomisBookingId}?: 'Not
+                    <td class="govuk-table__cell" scope="row" th:inline="text">[[${move.person?.prisonNumber}?: 'Not
                         set']]
                     </td>
                 </tr>

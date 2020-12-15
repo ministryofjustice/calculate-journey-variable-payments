@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
-import java.util.*
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -21,20 +20,32 @@ internal class MoveRepositoryTest {
     @Test
     fun `save report model`() {
 
-        val moveModel = move(moveId = UUID.randomUUID().toString())
-        val journeyModel = journey(moveId = moveModel.moveId)
-        journeyModel.addEvents(event(eventId = "E1", eventableId = journeyModel.journeyId))
-
-        moveModel.addJourneys(journeyModel)
-        moveModel.addEvents(event(eventId = "E2", eventableId = moveModel.moveId))
+        val move = move().copy(notes = "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffs" +
+                "fasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfas" +
+                "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaf" +
+                "fsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaff" +
+                "sfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasa" +
+                "dfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsa" +
+                "fafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasa" +
+                "dfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafaf" +
+                "affsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadf" +
+                "afafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaf" +
+                "fsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafa" +
+                "fsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfas")
+        val journeyModel = journey(moveId = move.moveId, events = listOf(event(eventId = "E1", eventableId = journey().journeyId)))
+        val moveModel = move.copy(
+            events = listOf(event(eventId = "E2", eventableId = move.moveId)),
+            journeys = listOf(journeyModel)
+        )
 
         val persistedReport = moveRepository.save(moveModel)
 
         entityManager.flush()
         entityManager.clear()
 
-        val retrievedReport = moveRepository.findById(persistedReport.moveId).get()
+        val retrievedMove = moveRepository.findById(persistedReport.moveId).get()
 
-        assertThat(retrievedReport).isEqualTo(moveModel)
+        assertThat(retrievedMove).isEqualTo(moveModel)
+        assertThat(retrievedMove.notes).contains("adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffs")
     }
 }

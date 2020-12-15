@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-internal class ReportTest {
+internal class ReportJourneyTest {
 
     val date: LocalDate = LocalDate.now()
 
@@ -15,32 +15,30 @@ internal class ReportTest {
     val journeyStartEvent = journeyEventFactory(type = EventType.JOURNEY_START.value)
     val journeyCancelEvent = journeyEventFactory(type = EventType.JOURNEY_CANCEL.value)
 
-    val report = Report(
-            move = reportMoveFactory(),
-            person = personFactory(),
-            moveEvents = listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
-            journeysWithEvents = listOf(ReportJourneyWithEvents(reportJourneyFactory(), listOf(journeyStartEvent, journeyCancelEvent)))
+    val move = reportMoveFactory(
+        events= listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
+        journeys = listOf(reportJourneyFactory(events = listOf(journeyStartEvent, journeyCancelEvent)))
     )
 
     @Test
     fun `has any of`() {
-        assertThat(report.hasAnyOf(EventType.MOVE_ACCEPT)).isTrue
+        assertThat(move.hasAnyOf(EventType.MOVE_ACCEPT)).isTrue
     }
 
     @Test
     fun `has all of`() {
-        assertThat(report.hasAllOf(EventType.MOVE_ACCEPT, EventType.MOVE_REDIRECT, EventType.MOVE_CANCEL)).isTrue
-        assertThat(report.hasAllOf(EventType.MOVE_ACCEPT, EventType.JOURNEY_COMPLETE)).isFalse
+        assertThat(move.hasAllOf(EventType.MOVE_ACCEPT, EventType.MOVE_REDIRECT, EventType.MOVE_CANCEL)).isTrue
+        assertThat(move.hasAllOf(EventType.MOVE_ACCEPT, EventType.JOURNEY_COMPLETE)).isFalse
 
     }
 
     @Test
     fun `has none of`() {
-        assertThat(report.hasNoneOf(EventType.MOVE_ACCEPT)).isFalse
+        assertThat(move.hasNoneOf(EventType.MOVE_ACCEPT)).isFalse
     }
 
     @Test
     fun `get events`() {
-        assertThat(report.getEvents(EventType.MOVE_ACCEPT, EventType.MOVE_CANCEL, EventType.JOURNEY_START)).containsExactlyInAnyOrder(moveAcceptEvent, moveCancelEvent, journeyStartEvent)
+        assertThat(move.getEvents(EventType.MOVE_ACCEPT, EventType.MOVE_CANCEL, EventType.JOURNEY_START)).containsExactlyInAnyOrder(moveAcceptEvent, moveCancelEvent, journeyStartEvent)
     }
 }

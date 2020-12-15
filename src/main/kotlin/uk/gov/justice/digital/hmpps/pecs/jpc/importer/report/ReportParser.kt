@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.equalsStringCaseInsensitive
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 @Component
 object ReportParser {
@@ -29,56 +31,49 @@ object ReportParser {
         }.filterNotNull()
     }
 
-    fun parseAsProfileIdToPersonId(profileFiles: List<String>): Map<String, String> {
-        logger.info("Parsing profiles")
-        return read(profileFiles) { Profile.fromJson(it) }.associateBy(keySelector = { it.id }, valueTransform = { it.personId })
-    }
-
-    fun parseAsPersonIdToPerson(peopleFiles: List<String>): Map<String, Person> {
+    fun parseAsPerson(peopleFiles: List<String>): Sequence<Person> {
         logger.info("Parsing people")
-        return read(peopleFiles) { Person.fromJson(it) }.associateBy(Person::id)
+        return read(peopleFiles) { Person.fromJson(it) }
     }
 
-    fun parseAsMoves(moveFiles: List<String>): Collection<ReportMove> {
+    fun parseAsProfile(profileFiles: List<String>): Sequence<Profile> {
+        logger.info("Parsing profiles")
+        return read(profileFiles) { Profile.fromJson(it) }
+    }
+
+    fun parseAsMoves(moveFiles: List<String>): Collection<Move> {
         logger.info("Parsing moves")
-        return read(moveFiles) { ReportMove.fromJson(it) }.
-        associateBy(ReportMove::id).values // associateBy will only include latest Move by id
+        return read(moveFiles) { Move.fromJson(it) }.
+        associateBy(Move::moveId).values // associateBy will only include latest Move by id
     }
 
 
-    fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<ReportJourney>> {
+    fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
         logger.info("Parsing journeys")
-        return read(journeyFiles) { ReportJourney.fromJson(it) }.
-        filter {  (JourneyState.COMPLETED.equalsStringCaseInsensitive(it.state) || JourneyState.CANCELLED.equalsStringCaseInsensitive(it.state)) }.
-        associateBy(ReportJourney::id).values.groupBy(ReportJourney::moveId) // associateBy will only include latest Journey by id
+        return read(journeyFiles) { Journey.fromJson(it) }.
+        filter {  (JourneyState.completed == it.state || JourneyState.cancelled == it.state) }.
+        associateBy(Journey::journeyId).values.groupBy(Journey::moveId) // associateBy will only include latest Journey by id
     }
 
     fun parseAsEventableIdToEvents(eventFiles: List<String>): Map<String, List<Event>> {
         logger.info("Parsing events")
         return read(eventFiles) { Event.fromJson(it) }.
         filter { EventType.types.contains(it.type) }.
-        distinctBy { it.id }. // filter duplicates (shouldn't be any, but just in case)
+        distinctBy { it.eventId }. // filter duplicates (shouldn't be any, but just in case)
         groupBy(Event::eventableId)
     }
 
-    fun parseAll(moveFiles: List<String>, profileFiles: List<String>, peopleFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Report> {
+    fun parseMovesJourneysEvents(moveFiles: List<String>, journeyFiles: List<String>, eventFiles: List<String>): List<Move> {
         val moves = parseAsMoves(moveFiles)
-        val profileId2PersonId = parseAsProfileIdToPersonId(profileFiles)
-        val people = parseAsPersonIdToPerson(peopleFiles)
         val journeys = parseAsMoveIdToJourneys(journeyFiles)
         val events = parseAsEventableIdToEvents(eventFiles)
 
         return moves.map { move ->
-            Report(
-                    move = move,
-                    person = move.profileId?.let {people[profileId2PersonId[it]]},
-                    journeysWithEvents = journeys.getOrDefault(move.id, listOf()).map { journey ->
-                        ReportJourneyWithEvents(reportJourney = journey, events = events.getOrDefault(journey.id, listOf()))
-                    },
-                    moveEvents = events.getOrDefault(move.id, listOf()
-                    )
+            move.copy(
+                events = events.getOrDefault(move.moveId, listOf()),
+                journeys = journeys.getOrDefault(move.moveId, listOf()).map {
+                        journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf())) }
             )
         }
     }
-
 }

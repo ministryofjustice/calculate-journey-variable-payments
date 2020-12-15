@@ -43,7 +43,7 @@ internal class ChooseSupplierFilterTest {
     @Test
     internal fun `filter does not redirect when supplier already selected`() {
         whenever(request.session).thenReturn(session)
-        whenever(session.getAttribute("supplier")).thenReturn("serco")
+        whenever(session.getAttribute("supplier")).thenReturn("SERCO")
 
         filter.doFilter(request, response, filterChain)
 

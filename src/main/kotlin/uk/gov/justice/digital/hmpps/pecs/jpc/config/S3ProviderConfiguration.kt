@@ -81,7 +81,7 @@ class S3ProviderConfiguration {
                                     @Value("\${import-files.serco-prices}") sercoPricesFile: String): SercoPricesProvider {
         logger.info("Using AWS S3 provider for Serco prices file: $sercoPricesFile")
         return SercoPricesProvider {
-            logger.info("getting serco")
+            logger.info("getting SERCO")
             client.getObject(GetObjectRequest(bucketName, sercoPricesFile)).objectContent
         }
     }

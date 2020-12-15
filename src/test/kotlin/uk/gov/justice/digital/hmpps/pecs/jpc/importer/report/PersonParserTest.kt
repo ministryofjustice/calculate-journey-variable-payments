@@ -12,6 +12,6 @@ class PersonParserTest {
 
         val parsedPerson = Person.fromJson(personJson)
 
-        assertThat(personFactory()).isEqualTo(parsedPerson)
+        assertThat(reportPersonFactory()).isEqualTo(parsedPerson)
     }
 }

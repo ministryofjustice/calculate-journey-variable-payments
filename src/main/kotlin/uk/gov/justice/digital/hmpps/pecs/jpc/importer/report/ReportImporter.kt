@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import java.time.LocalDate
 import kotlin.streams.toList
 
@@ -15,19 +16,25 @@ class ReportImporter(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Report>{
+    fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Move>{
         val movesContent = getContents("moves", from, to)
         val journeysContent = getContents("journeys", from, to)
         val eventsContent = getContents("events", from, to)
-        val profilesContent = getContents("profiles", from, to)
-        val peopleContent = getContents("people", from, to)
-        return ReportParser.parseAll(
+        return ReportParser.parseMovesJourneysEvents(
                 moveFiles = movesContent,
                 journeyFiles = journeysContent,
                 eventFiles = eventsContent,
-                profileFiles = profilesContent,
-                peopleFiles = peopleContent
         )
+    }
+
+    fun importPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person>{
+        val peopleContent = getContents("people", from, to)
+        return ReportParser.parseAsPerson( peopleFiles = peopleContent)
+    }
+
+    fun importProfiles(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Profile>{
+        val profilesContent = getContents("profiles", from, to)
+        return ReportParser.parseAsProfile( profileFiles = profilesContent)
     }
 
     private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{

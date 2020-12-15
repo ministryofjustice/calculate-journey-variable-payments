@@ -18,7 +18,7 @@ internal class ReportMoveTest{
 
     @Test
     fun `Move model with a billable journey should be priced`(){
-        val move = move(journeys = mutableSetOf(journey()))
+        val move = move(journeys = listOf(journey()))
         assertThat(move.hasPrice()).isTrue
         assertThat(move.totalInPence()).isEqualTo(100)
         assertThat(move.totalInPounds()).isEqualTo(1.0)

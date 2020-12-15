@@ -40,12 +40,11 @@ data class Price(
 
 enum class Supplier {
         SERCO,
-        GEOAMEY;
+        GEOAMEY,
+        UNKNOWN;
 
         companion object{
-                fun valueOfCaseInsensitive(value: String): Supplier{
-                        return valueOf(value.toUpperCase())
-                }
+                fun valueOfCaseInsensitive(value: String?) = kotlin.runCatching { Supplier.valueOf(value!!.toUpperCase()) }.getOrDefault(Supplier.UNKNOWN)
         }
 }
 

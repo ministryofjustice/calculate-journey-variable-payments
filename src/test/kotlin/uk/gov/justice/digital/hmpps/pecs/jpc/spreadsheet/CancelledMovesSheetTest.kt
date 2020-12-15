@@ -9,7 +9,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.*
 
@@ -22,7 +21,7 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
 
     @Test
     internal fun `test cancelled prices`() {
-        val move = move(journeys = mutableSetOf(journey(state = JourneyState.CANCELLED)))
+        val move = move(journeys = listOf(journey(state = JourneyState.cancelled)))
         val moves = listOf(move)
         val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
         sheet.writeMoves(moves)

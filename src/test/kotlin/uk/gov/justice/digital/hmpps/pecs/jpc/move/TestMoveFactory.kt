@@ -9,18 +9,37 @@ import java.time.LocalDateTime
 
 val moveDate = LocalDate.of(2020, 9, 10)
 
+fun person() = Person(
+        personId = "PE1",
+        updatedAt = defaultDateTime,
+        prisonNumber = "PR101",
+        firstNames = "Billy the",
+        lastName = "Kid",
+        gender = "male",
+        ethnicity = "White",
+        dateOfBirth = LocalDate.of(1980, 12, 25),
+)
+
+fun profile() = Profile(
+        profileId = "PR1",
+        personId = "PE1",
+        updatedAt = defaultDateTime
+)
+
 fun move(
         moveId: String = "M1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
         dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
-        journeys: MutableSet<Journey> = mutableSetOf()
+        person: Person? = person(),
+        journeys: List<Journey> = listOf()
 ) = Move(
         moveId = moveId,
+        profileId = "PR1",
         updatedAt = defaultDateTime,
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
-        status = MoveStatus.COMPLETED,
+        status = MoveStatus.completed,
         reference = "REF1",
         moveDate = moveDate,
         fromNomisAgencyId = fromNomisAgencyId,
@@ -31,14 +50,11 @@ fun move(
         toLocationType = LocationType.PR,
         pickUpDateTime = moveDate.atStartOfDay(),
         dropOffOrCancelledDateTime = dropOffOrCancelledDateTime,
+        reportFromLocationType = "prison",
+        reportToLocationType = null,
         notes = "some notes",
-        prisonNumber = "PR101",
-        firstNames = "Billy the",
-        lastName = "Kid",
-        gender = "male",
-        ethnicity = "White",
-        dateOfBirth = LocalDate.of(1980, 12, 25),
         vehicleRegistration = "reg100",
+        person = person,
         journeys = journeys)
 
 fun journey(
@@ -46,10 +62,11 @@ fun journey(
         journeyId: String = "J1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
-        state: JourneyState = JourneyState.COMPLETED,
+        state: JourneyState = JourneyState.completed,
         billable: Boolean = true,
         pickUpDateTime: LocalDateTime? = moveDate.atStartOfDay(),
-        dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10)
+        dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10),
+        events: List<Event> = listOf()
 ) = Journey(
         journeyId = journeyId,
         supplier = move().supplier,
@@ -69,11 +86,13 @@ fun journey(
         priceInPence = 100,
         vehicleRegistration = "REG200",
         notes = "some notes",
-        effectiveYear = effectiveYearForDate(defaultDate)
+        events = events,
+        effectiveYear = effectiveYearForDate(defaultDate
+        )
 )
 
 fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(
-        id = eventId,
+        eventId = eventId,
         updatedAt = defaultDateTime,
         type = eventType.value,
         eventableType = "move",
@@ -81,5 +100,6 @@ fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, e
         occurredAt = moveDate.atStartOfDay(),
         recordedAt = moveDate.atStartOfDay(),
         notes = null,
-        details = null
+        details = null,
+        supplier = Supplier.SERCO
 )

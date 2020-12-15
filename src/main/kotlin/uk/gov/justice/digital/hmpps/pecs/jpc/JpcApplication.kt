@@ -4,7 +4,6 @@ import org.springframework.beans.factory.getBean
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.LocationAndPriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ManualLocationImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ManualPriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ReportsImporter
