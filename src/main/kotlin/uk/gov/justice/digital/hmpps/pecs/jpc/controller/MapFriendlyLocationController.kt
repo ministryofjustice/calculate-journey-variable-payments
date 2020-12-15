@@ -24,6 +24,14 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
 
     @GetMapping("/map-location/{agency-id}")
     fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
+        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
+        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+
+        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
+        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
+
+        model.addAttribute("cancelLink", url.build().toUriString())
 
         service.findAgencyLocationAndType(agencyId)?.let {
             model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name, operation = "update"))

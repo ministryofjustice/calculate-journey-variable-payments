@@ -144,7 +144,12 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
 
     @GetMapping(SEARCH_JOURNEYS_URL)
     fun searchJourneys(model: ModelMap): Any {
+        val startOfMonth = model.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate
+        val effectiveYear = effectiveYearForDate(startOfMonth)
+
         model.addAttribute("form", SearchJourneyForm())
+        model.addAttribute("contractualYearStart", "${effectiveYear}")
+        model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
         return "search-journeys"
     }
 
@@ -189,9 +194,12 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         val effectiveYear = effectiveYearForDate(startOfMonth)
         val journeys = journeyService.prices(supplier, pickUpLocation, dropOffLocation, effectiveYear)
 
+        model.addAttribute("contractualYearStart", "${effectiveYear}")
+        model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+
         if (journeys.isEmpty()) {
             model.addAttribute("pickUpLocation", pickUpLocation ?: "")
-            model.addAttribute("message", dropOffLocation ?: "")
+            model.addAttribute("dropOffLocation", dropOffLocation ?: "")
             return "no-search-journeys-results"
         } else {
             model.addAttribute("journeys", journeys)

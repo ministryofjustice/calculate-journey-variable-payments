@@ -51,14 +51,14 @@
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">
                 <span class="govuk-warning-text__assistive">Warning</span>
-                <span th:inline="text">Please note the added price will be effective for all instances of this journey undertaken by in [[${supplier}]] the current contractual year.</span>
+                <span th:inline="text"><span th:inline="text">Please note the added price will be effective for all instances of this journey undertaken by in [[${supplier}]] the current contractual year [[${contractualYearStart}]] to [[${contractualYearEnd}]].</span></span>
             </strong>
         </div>
         <div class="flex items-center">
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
                 Confirm and save
             </button>
-            <a href="/dashboard" class="govuk-link">Cancel</a>
+            <a th:href="${cancelLink}" class="govuk-link">Cancel</a>
         </div>
     </form>
 </div>

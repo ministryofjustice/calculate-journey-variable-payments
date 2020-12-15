@@ -14,7 +14,7 @@
     <div th:replace="fragments/flash-messages.html :: flash-messages(dismissFallback='/journeys')"></div>
 
     <div class="mv4">
-        <h1 class="govuk-heading-xl ma0">Manage Journey Price Catalogue</h1>
+        <h1 class="govuk-heading-xl ma0" th:inline="text">Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]</h1>
     </div>
 
     <div class="flex justify-between items-end mv4">
