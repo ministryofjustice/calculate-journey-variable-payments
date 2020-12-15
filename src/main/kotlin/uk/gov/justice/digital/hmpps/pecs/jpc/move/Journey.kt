@@ -80,7 +80,7 @@ data class Journey(
         val billable: Boolean,
 
         @Json(ignored = true)
-        val notes: String? = null,
+        var notes: String? = null,
 
         @Json(ignored = true)
         @Transient
@@ -127,6 +127,10 @@ data class Journey(
         }
 
         fun stateIsAnyOf(vararg states: JourneyState) = states.contains(state)
+
+        init {
+                notes = notes?.take(255)
+        }
 
 }
 

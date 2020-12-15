@@ -11,10 +11,10 @@ import javax.validation.constraints.NotBlank
 @Table(name = "EVENTS")
 data class Event constructor(
 
-        @get: NotBlank(message = "id cannot be blank")
+        @Json(name = "id")
         @Id
         @Column(name = "event_id")
-        val id: String,
+        val eventId: String,
 
         @EventDateTime
         @Json(name = "updated_at")
@@ -52,7 +52,7 @@ data class Event constructor(
         @Column(name = "recorded_at")
         val recordedAt: LocalDateTime,
 
-        val notes: String?,
+        var notes: String?,
 ) {
 
     fun hasType(et: EventType) = type == et.value
@@ -62,7 +62,7 @@ data class Event constructor(
 
         other as Event
 
-        if (id != other.id) return false
+        if (eventId != other.eventId) return false
         if (updatedAt != other.updatedAt) return false
         if (type != other.type) return false
         if (supplier != other.supplier) return false
@@ -76,7 +76,7 @@ data class Event constructor(
     }
 
     override fun hashCode(): Int {
-        var result = id.hashCode()
+        var result = eventId.hashCode()
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + type.hashCode()
         result = 31 * result + (supplier?.hashCode() ?: 0)
@@ -98,6 +98,10 @@ data class Event constructor(
             fieldConverter(EventDateTime::class, dateTimeConverter).
             parse<Event>(json)
         }
+    }
+
+    init {
+        notes = notes?.take(255)
     }
 
 }

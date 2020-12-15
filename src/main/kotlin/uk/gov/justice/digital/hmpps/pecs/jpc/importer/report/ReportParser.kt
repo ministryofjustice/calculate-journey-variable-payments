@@ -59,7 +59,7 @@ object ReportParser {
         logger.info("Parsing events")
         return read(eventFiles) { Event.fromJson(it) }.
         filter { EventType.types.contains(it.type) }.
-        distinctBy { it.id }. // filter duplicates (shouldn't be any, but just in case)
+        distinctBy { it.eventId }. // filter duplicates (shouldn't be any, but just in case)
         groupBy(Event::eventableId)
     }
 
@@ -82,7 +82,7 @@ object ReportParser {
         val people = parseAsPerson(peopleFiles)
 
         // Return people with profile ids
-        return people.map { it.copy(profileId = personIdToProfileId[it.id]) }.filterNot { it.profileId == null }
+        return people.map { it.copy(profileId = personIdToProfileId[it.personId]) }.filterNot { it.profileId == null }
     }
 
 }

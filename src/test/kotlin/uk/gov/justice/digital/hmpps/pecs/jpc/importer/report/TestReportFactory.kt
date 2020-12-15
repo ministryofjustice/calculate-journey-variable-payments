@@ -71,7 +71,7 @@ fun reportMoveFactory(
 
 fun reportPersonFactory(personId: String = defaultPersonId): Person {
     return Person(
-            id = personId,
+            personId = personId,
             updatedAt = defaultDateTime,
             prisonNumber = "PRISON1",
             latestNomisBookingId = null,
@@ -97,7 +97,7 @@ fun moveEventFactory(
         notes: String = ""
 ): Event {
     val event = Event(
-            id=eventId,
+            eventId=eventId,
             updatedAt = defaultDateTime,
             type=type,
             supplier= supplier,
@@ -148,7 +148,7 @@ fun journeyEventFactory(
         notes: String = ""
 ): Event {
     val event = Event(
-            id=journeyEventId,
+            eventId=journeyEventId,
             updatedAt = defaultDateTime,
             type=type,
             supplier= supplier,

@@ -15,13 +15,12 @@ class MoveService(private val moveQueryRepository: MoveQueryRepository,
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun moveWithJourneysAndEvents(moveId: String) : Move {
-        val move = moveQueryRepository.move(moveId)
-        val journeys = journeyRepository.findAllByMoveId(moveId)
+    fun moveWithPersonJourneysAndEvents(moveId: String) : Move {
+        val move = moveQueryRepository.moveWithPersonAndJourneys(moveId)
         val moveEvents = eventRepository.findAllByEventableId(move.moveId)
         val journeyId2Events = eventRepository.findByEventableIdIn(move.journeys.map { it.journeyId }).groupBy { it.eventableId }
 
-        val journeysWithEvents = journeys.map {
+        val journeysWithEvents = move.journeys.map {
             it.copy(events = journeyId2Events[it.journeyId] ?: listOf())
         }
 
@@ -33,12 +32,6 @@ class MoveService(private val moveQueryRepository: MoveQueryRepository,
 
     fun movesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate) =
             moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate))
-
-    fun paginatedMovesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate, pageable: Pageable): MovesPage {
-        val moves = moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate), pageable.pageSize, pageable.offset)
-        val totalCount = moveQueryRepository.moveCountInDateRange(supplier, startDate, endOfMonth(startDate))
-        return MovesPage(moves, pageable, totalCount.toLong())
-    }
 
     fun summaryForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate): MovesTypeSummary {
         val endDate = endOfMonth(startDate)

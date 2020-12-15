@@ -97,38 +97,10 @@ data class Move(
 
         @Json(name = "cancellation_reason_comment")
         @Column(name = "cancellation_reason_comment")
-        val cancellationReasonComment: String? = null,
+        var cancellationReasonComment: String? = null,
 
         @Json(ignored = true)
-        val notes: String = "",
-
-        @Json(ignored = true)
-        @Column(name="prison_number")
-        val prisonNumber: String? = null,
-
-        @Json(ignored = true)
-        @Column(name="latest_nomis_booking_id")
-        val latestNomisBookingId: Int? = null,
-
-        @Json(ignored = true)
-        @Column(name = "first_names")
-        val firstNames: String? = null,
-
-        @Json(ignored = true)
-        @Column(name = "last_name")
-        val lastName: String? = null,
-
-        @Json(ignored = true)
-        @Column(name = "date_of_birth")
-        val dateOfBirth: LocalDate? = null,
-
-        @Json(ignored = true)
-        @Column(name = "gender")
-        val gender: String? = null,
-
-        @Json(ignored = true)
-        @Column(name = "ethnicity")
-        val ethnicity: String? = null,
+        var notes: String = "",
 
         @Json(ignored = true)
         @Column(name = "vehicle_registration")
@@ -140,7 +112,11 @@ data class Move(
 
         @Json(ignored = true)
         @Transient
-        val events: List<Event> = listOf()
+        val events: List<Event> = listOf(),
+
+        @Json(ignored = true)
+        @Transient
+        val person: Person? = null
 )
 {
 
@@ -182,7 +158,7 @@ data class Move(
         }
 
         override fun toString(): String {
-                return "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes', prisonNumber=$prisonNumber, latestNomisBookingId=$latestNomisBookingId, firstNames=$firstNames, lastName=$lastName, dateOfBirth=$dateOfBirth, gender=$gender, ethnicity=$ethnicity, vehicleRegistration=$vehicleRegistration)"
+                return "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes', vehicleRegistration=$vehicleRegistration)"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -208,13 +184,6 @@ data class Move(
                 if (cancellationReason != other.cancellationReason) return false
                 if (cancellationReasonComment != other.cancellationReasonComment) return false
                 if (notes != other.notes) return false
-                if (prisonNumber != other.prisonNumber) return false
-                if (latestNomisBookingId != other.latestNomisBookingId) return false
-                if (firstNames != other.firstNames) return false
-                if (lastName != other.lastName) return false
-                if (dateOfBirth != other.dateOfBirth) return false
-                if (gender != other.gender) return false
-                if (ethnicity != other.ethnicity) return false
                 if (vehicleRegistration != other.vehicleRegistration) return false
 
                 return true
@@ -238,13 +207,6 @@ data class Move(
                 result = 31 * result + (cancellationReason?.hashCode() ?: 0)
                 result = 31 * result + (cancellationReasonComment?.hashCode() ?: 0)
                 result = 31 * result + notes.hashCode()
-                result = 31 * result + (prisonNumber?.hashCode() ?: 0)
-                result = 31 * result + (latestNomisBookingId ?: 0)
-                result = 31 * result + (firstNames?.hashCode() ?: 0)
-                result = 31 * result + (lastName?.hashCode() ?: 0)
-                result = 31 * result + (dateOfBirth?.hashCode() ?: 0)
-                result = 31 * result + (gender?.hashCode() ?: 0)
-                result = 31 * result + (ethnicity?.hashCode() ?: 0)
                 result = 31 * result + (vehicleRegistration?.hashCode() ?: 0)
                 return result
         }
@@ -267,6 +229,11 @@ data class Move(
         fun getEvents(vararg ets: EventType) =
                 this.events.filter { ets.map{it.value}.contains(it.type) } +
                         this.journeys.flatMap { it.events }.filter{ ets.map{it.value}.contains(it.type)  }
+
+        init {
+                notes = notes.take(255)
+                cancellationReasonComment = cancellationReasonComment?.take(255)
+        }
 
 }
 

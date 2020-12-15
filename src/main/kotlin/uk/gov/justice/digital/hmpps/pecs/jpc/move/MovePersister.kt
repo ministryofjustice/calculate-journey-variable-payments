@@ -23,7 +23,7 @@ class MovePersister(private val moveRepository: MoveRepository,
         logger.info("Persisting ${moves.size} moves")
 
         moves.forEach { newMove ->
-           // Result.runCatching {
+            Result.runCatching {
 
                 val moveId = newMove.moveId
                 val maybeExistingMove = moveRepository.findById(newMove.moveId).orElse(null)
@@ -34,11 +34,11 @@ class MovePersister(private val moveRepository: MoveRepository,
 
                 val moveEvents = (newMove.events +
                         (maybeExistingMove?.let { eventRepository.findAllByEventableId(moveId) }
-                                ?: listOf())).distinctBy { it.id }
+                                ?: listOf())).distinctBy { it.eventId }
 
                 val journeyEvents = (newMove.journeys.flatMap { it.events } +
                         (maybeExistingMove?.let { eventRepository.findByEventableIdIn(journeys.map { it.journeyId }) }
-                                ?: listOf())).distinctBy { it.id }
+                                ?: listOf())).distinctBy { it.eventId }
 
                 val pickUp = Event.getLatestByType(moveEvents, EventType.MOVE_START)?.occurredAt
                 val dropOff = Event.getLatestByType(moveEvents, EventType.MOVE_COMPLETE)?.occurredAt
@@ -66,7 +66,7 @@ class MovePersister(private val moveRepository: MoveRepository,
                     moveRepository.flush()
                 }
 
-       //     }.onFailure { logger.warn(it.message) }
+            }.onFailure { logger.warn("Error inserting $newMove" + it.message) }
 
             moveRepository.flush()
         }

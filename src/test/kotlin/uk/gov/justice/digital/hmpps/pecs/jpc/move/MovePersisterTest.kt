@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -94,7 +93,6 @@ internal class MovePersisterTest {
         )
 
         movePersister = MovePersister(moveRepository, journeyRepository, eventRepository, timeSource)
-        personPersister = PersonPersister(moveRepository, timeSource)
     }
 
     @Test
@@ -108,37 +106,10 @@ internal class MovePersisterTest {
         assertThat(retrievedRedirectMove.vehicleRegistration).isEqualTo("REG1, REG2")
 
         // This move should have the 3 move events
-        assertThat(moveEvents(retrievedRedirectMove.moveId).map { it.id }).containsExactlyInAnyOrder("E1", "E2", "E3")
+        assertThat(moveEvents(retrievedRedirectMove.moveId).map { it.eventId }).containsExactlyInAnyOrder("E1", "E2", "E3")
 
         // It should have the 2 journeys
         assertThat(journeys(retrievedRedirectMove.moveId).map { it.journeyId }).containsExactlyInAnyOrder("J1", "J2")
-    }
-
-
-    @Ignore
-    fun `Persist PII data`() {
-        movePersister.persist(listOf(redirectMove))
-
-        val reportPerson = reportPersonFactory().copy(profileId = defaultProfileId)
-        personPersister.persist(listOf(reportPerson))
-
-        entityManager.flush()
-        val retrievedRedirectMove = moveRepository.findById(redirectMove.moveId).get()
-
-        // PII data should be populated
-        assertThat(retrievedRedirectMove.ethnicity).isEqualTo("White American")
-        assertThat(retrievedRedirectMove.gender).isEqualTo("male")
-        assertThat(retrievedRedirectMove.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
-        assertThat(retrievedRedirectMove.firstNames).isEqualTo("Billy the")
-        assertThat(retrievedRedirectMove.lastName).isEqualTo("Kid")
-
-        // persist report again and check move date is updated and PII data left intact
-        movePersister.persist(listOf(redirectMove.copy(moveDate = LocalDate.of(2020, 1, 1))))
-        entityManager.flush()
-
-        val retrievedAgainRedirectMove = moveRepository.findById(redirectMove.moveId).get()
-        assertThat(retrievedAgainRedirectMove.moveDate).isEqualTo(LocalDate.of(2020, 1, 1))
-        assertThat(retrievedAgainRedirectMove.lastName).isEqualTo("Kid")
     }
 
     @Test
@@ -186,7 +157,7 @@ internal class MovePersisterTest {
         val retrievedMove = moveRepository.findById(moveWithNewEvent.moveId).get()
 
         // Previous and new events should be present
-        assertThat(moveEvents(retrievedMove.moveId).map { it.id }).containsExactlyInAnyOrder("E1", "E2", "E3", "E400")
+        assertThat(moveEvents(retrievedMove.moveId).map { it.eventId }).containsExactlyInAnyOrder("E1", "E2", "E3", "E400")
     }
 
     @Test

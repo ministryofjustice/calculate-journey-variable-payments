@@ -20,7 +20,7 @@ class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workb
             add(5, moveDate())
             add(6, dropOffOrCancelledDate())
             add(7, dropOffOrCancelledTime())
-            add(8, prisonNumber)
+            add(8, person?.prisonNumber)
             if(hasPrice()) row.addCell(9, totalInPounds(), if(isShaded) fillBluePound else fillWhitePound) else add(9, "NOT PRESENT")
             add(10, notes)
         }

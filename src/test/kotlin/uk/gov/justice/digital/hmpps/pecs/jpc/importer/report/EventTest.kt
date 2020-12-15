@@ -8,7 +8,7 @@ internal class EventTest {
     @Test
     fun `get latest by type returns the latest event`(){
         val moveCancelFirst = moveEventFactory() // MOVE_CANCEL
-        val moveCancelLast= moveCancelFirst.copy(id = "ME2", occurredAt = moveCancelFirst.occurredAt.plusHours(3))
+        val moveCancelLast= moveCancelFirst.copy(eventId = "ME2", occurredAt = moveCancelFirst.occurredAt.plusHours(3))
 
         assertThat(Event.getLatestByType(listOf(moveCancelLast, moveCancelFirst), EventType.MOVE_CANCEL)).isEqualTo(moveCancelLast)
     }

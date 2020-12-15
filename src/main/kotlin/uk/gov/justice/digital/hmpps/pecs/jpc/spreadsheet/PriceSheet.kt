@@ -81,7 +81,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(7, dropOffOrCancelledDate())
             add(8, dropOffOrCancelledTime())
             add(9, vehicleRegistration)
-            add(10, prisonNumber)
+            add(10, person?.prisonNumber)
             if(hasPrice()) row.addCell(11, totalInPounds(), if(isShaded) fillBluePound else fillWhitePound) else add(11, "NOT PRESENT")
             add(12, "") // billable is empty for a move
             add(13, if(showNotes) notes else "")

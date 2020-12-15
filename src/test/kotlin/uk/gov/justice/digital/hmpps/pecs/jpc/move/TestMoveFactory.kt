@@ -9,14 +9,28 @@ import java.time.LocalDateTime
 
 val moveDate = LocalDate.of(2020, 9, 10)
 
+fun person() = Person(
+        personId = "PE1",
+        profileId = "PR1",
+        updatedAt = defaultDateTime,
+        prisonNumber = "PR101",
+        firstNames = "Billy the",
+        lastName = "Kid",
+        gender = "male",
+        ethnicity = "White",
+        dateOfBirth = LocalDate.of(1980, 12, 25),
+)
+
 fun move(
         moveId: String = "M1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
         dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
+        person: Person? = person(),
         journeys: List<Journey> = listOf()
 ) = Move(
         moveId = moveId,
+        profileId = "PR1",
         updatedAt = defaultDateTime,
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
@@ -34,13 +48,8 @@ fun move(
         reportFromLocationType = "prison",
         reportToLocationType = null,
         notes = "some notes",
-        prisonNumber = "PR101",
-        firstNames = "Billy the",
-        lastName = "Kid",
-        gender = "male",
-        ethnicity = "White",
-        dateOfBirth = LocalDate.of(1980, 12, 25),
         vehicleRegistration = "reg100",
+        person = person,
         journeys = journeys)
 
 fun journey(
@@ -78,7 +87,7 @@ fun journey(
 )
 
 fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(
-        id = eventId,
+        eventId = eventId,
         updatedAt = defaultDateTime,
         type = eventType.value,
         eventableType = "move",
