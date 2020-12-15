@@ -43,6 +43,9 @@ internal class MoveQueryRepositoryTest {
     @Autowired
     lateinit var personRepository: PersonRepository
 
+    @Autowired
+    lateinit var profileRepository: ProfileRepository
+
 
     @Autowired
     lateinit var entityManager: TestEntityManager
@@ -79,6 +82,8 @@ internal class MoveQueryRepositoryTest {
     @Test
     fun `move PII data should be present`() {
         personRepository.save(person())
+        profileRepository.save(profile())
+
         entityManager.flush()
 
         val move = moveQueryRepository.moveWithPersonAndJourneys(standardMove.moveId)

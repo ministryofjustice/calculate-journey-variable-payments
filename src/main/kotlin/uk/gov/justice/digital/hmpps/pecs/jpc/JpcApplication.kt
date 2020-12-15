@@ -20,11 +20,11 @@ fun main(args: Array<String>) {
       (context.getBean(ManualLocationImporter::class) as ManualLocationImporter).let { SpringApplication.exit(context, it.import()) }
     }
 
-    context.environment.getProperty("import-SERCO-prices")?.let {
+    context.environment.getProperty("import-serco-prices")?.let {
       (context.getBean(ManualPriceImporter::class) as ManualPriceImporter).let { SpringApplication.exit(context, it.import(Supplier.SERCO)) }
     }
 
-    context.environment.getProperty("import-GEOAMEY-prices")?.let {
+    context.environment.getProperty("import-geoamey-prices")?.let {
       (context.getBean(ManualPriceImporter::class) as ManualPriceImporter).let { SpringApplication.exit(context, it.import(Supplier.GEOAMEY)) }
     }
 

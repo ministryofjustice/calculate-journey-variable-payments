@@ -11,7 +11,6 @@ val moveDate = LocalDate.of(2020, 9, 10)
 
 fun person() = Person(
         personId = "PE1",
-        profileId = "PR1",
         updatedAt = defaultDateTime,
         prisonNumber = "PR101",
         firstNames = "Billy the",
@@ -19,6 +18,12 @@ fun person() = Person(
         gender = "male",
         ethnicity = "White",
         dateOfBirth = LocalDate.of(1980, 12, 25),
+)
+
+fun profile() = Profile(
+        profileId = "PR1",
+        personId = "PE1",
+        updatedAt = defaultDateTime
 )
 
 fun move(

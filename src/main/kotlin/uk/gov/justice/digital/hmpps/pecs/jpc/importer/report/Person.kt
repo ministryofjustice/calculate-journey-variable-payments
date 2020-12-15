@@ -51,11 +51,7 @@ data class Person(
 
         @Json(name = "ethnicity")
         @Column(name = "ethnicity")
-        val ethnicity: String? = null,
-
-        @Json(ignored = true)
-        @Column(name = "profile_id", nullable = false)
-        val profileId: String? = null
+        val ethnicity: String? = null
 
         ) {
     companion object {

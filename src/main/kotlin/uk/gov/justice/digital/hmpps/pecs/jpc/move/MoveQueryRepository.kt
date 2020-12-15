@@ -85,7 +85,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         jtl.site_name as journey_to_site_name, jtl.location_type as journey_to_location_type,  
         CASE WHEN j.billable THEN p.price_in_pence ELSE NULL END as price_in_pence  
         from MOVES m 
-            left join PEOPLE pp on m.profile_id = pp.profile_id
+            left join PROFILES pr on m.profile_id = pr.profile_id
+            left join PEOPLE pp on pr.person_id = pp.person_id
             left join LOCATIONS fl on m.from_nomis_agency_id = fl.nomis_agency_id  
             left join LOCATIONS tl on m.to_nomis_agency_id = tl.nomis_agency_id  
             left join JOURNEYS j on j.move_id = m.move_id  
@@ -124,7 +125,6 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                 // There is a person for this move
                 Person(
                     personId = it,
-                    profileId = getString("profile_id"),
                     updatedAt = getTimestamp("person_updated_at").toLocalDateTime(),
                     prisonNumber = getString("prison_number"),
                     latestNomisBookingId = getInt("latest_nomis_booking_id"),

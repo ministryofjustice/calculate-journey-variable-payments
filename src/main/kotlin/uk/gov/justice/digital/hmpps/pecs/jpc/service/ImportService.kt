@@ -29,7 +29,7 @@ class ImportService(
 
     fun importReports(reportsFrom: LocalDate, reportsTo: LocalDate) {
         importMovesJourneysEvents(reportsFrom, reportsTo)
-        importProfilesPeople(reportsFrom, reportsTo)
+        importPeopleProfiles(reportsFrom, reportsTo)
     }
 
     fun importMovesJourneysEvents(reportsFrom: LocalDate, reportsTo: LocalDate) {
@@ -38,10 +38,14 @@ class ImportService(
         movesJourneysEvents?.let { movePersister.persist(it.toList()) }
     }
 
-    fun importProfilesPeople(reportsFrom: LocalDate, reportsTo: LocalDate) {
-        logger.info("Importing profiles and people from '$reportsFrom', moves to '$reportsTo'.")
-        val profilesPeople = import { reportImporter.importProfilesPeople(reportsFrom, reportsTo) }
-        profilesPeople?.let{ personPersister.persist(it.toList())}
+    fun importPeopleProfiles(reportsFrom: LocalDate, reportsTo: LocalDate) {
+        logger.info("Importing people from '$reportsFrom' to '$reportsTo'.")
+        val people = import { reportImporter.importPeople(reportsFrom, reportsTo) }
+        people?.let{ personPersister.persistPeople(it.toList())}
+
+        logger.info("Importing profiles from '$reportsFrom' to '$reportsTo'.")
+        val profiles = import { reportImporter.importProfiles(reportsFrom, reportsTo) }
+        profiles?.let{ personPersister.persistProfiles(it.toList())}
     }
 
     /**

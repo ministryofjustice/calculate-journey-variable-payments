@@ -31,14 +31,14 @@ object ReportParser {
         }.filterNotNull()
     }
 
-    fun parseAsPersonIdToProfileId(profileFiles: List<String>): Map<String, String> {
-        logger.info("Parsing profiles")
-        return read(profileFiles) { Profile.fromJson(it) }.associateBy(keySelector = { it.personId }, valueTransform = { it.id })
-    }
-
     fun parseAsPerson(peopleFiles: List<String>): Sequence<Person> {
         logger.info("Parsing people")
         return read(peopleFiles) { Person.fromJson(it) }
+    }
+
+    fun parseAsProfile(profileFiles: List<String>): Sequence<Profile> {
+        logger.info("Parsing profiles")
+        return read(profileFiles) { Profile.fromJson(it) }
     }
 
     fun parseAsMoves(moveFiles: List<String>): Collection<Move> {
@@ -76,13 +76,4 @@ object ReportParser {
             )
         }
     }
-
-    fun parsePeople(profileFiles: List<String>, peopleFiles: List<String>): Sequence<Person> {
-        val personIdToProfileId = parseAsPersonIdToProfileId(profileFiles)
-        val people = parseAsPerson(peopleFiles)
-
-        // Return people with profile ids
-        return people.map { it.copy(profileId = personIdToProfileId[it.personId]) }.filterNot { it.profileId == null }
-    }
-
 }

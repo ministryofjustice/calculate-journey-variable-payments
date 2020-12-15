@@ -27,10 +27,14 @@ class ReportImporter(
         )
     }
 
-    fun importProfilesPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person>{
-        val profilesContent = getContents("profiles", from, to)
+    fun importPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person>{
         val peopleContent = getContents("people", from, to)
-        return ReportParser.parsePeople( profileFiles = profilesContent, peopleFiles = peopleContent)
+        return ReportParser.parseAsPerson( peopleFiles = peopleContent)
+    }
+
+    fun importProfiles(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Profile>{
+        val profilesContent = getContents("profiles", from, to)
+        return ReportParser.parseAsProfile( profileFiles = profilesContent)
     }
 
     private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{
