@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import java.time.LocalDate
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,6 +43,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   internal fun `can initiate add price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", LocalDate.now())
     }
 
     whenever(service.getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)).thenReturn(Pair("from", "to"))

@@ -14,12 +14,14 @@ import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, HtmlController.PICK_UP_ATTRIBUTE, HtmlController.DROP_OFF_ATTRIBUTE)
+@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, HtmlController.PICK_UP_ATTRIBUTE, HtmlController.DROP_OFF_ATTRIBUTE, HtmlController.DATE_ATTRIBUTE)
 class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
 
     data class PriceForm(
@@ -32,12 +34,16 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     )
 
     @GetMapping("/add-price/{moveId}")
-    fun addPrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
+    fun addPrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier, ): Any {
         val ids = agencyIds(moveId)
 
         val fromAndToSite = supplierPricingService.getSiteNamesForPricing(supplier, ids.first, ids.second)
+        val startOfMonth = model.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate
+        val effectiveYear = effectiveYearForDate(startOfMonth)
 
         model.addAttribute("form", PriceForm(moveId, "0.00", fromAndToSite.first, fromAndToSite.second))
+        model.addAttribute("contractualYearStart", "${effectiveYear}")
+        model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
         return "add-price"
     }
 
@@ -74,8 +80,21 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         val ids = agencyIds(moveId)
 
         val sitesAndPrice = supplierPricingService.getExistingSiteNamesAndPrice(supplier, ids.first, ids.second)
+        val startOfMonth = model.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate
+        val effectiveYear = effectiveYearForDate(startOfMonth)
 
         model.addAttribute("form", PriceForm(moveId, sitesAndPrice.third.pounds().toString(), sitesAndPrice.first, sitesAndPrice.second))
+        model.addAttribute("contractualYearStart", "${effectiveYear}")
+        model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+
+        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
+        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+
+        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
+        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
+
+        model.addAttribute("cancelLink", url.build().toUriString())
 
         return "update-price"
     }

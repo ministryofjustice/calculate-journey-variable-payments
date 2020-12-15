@@ -15,17 +15,18 @@
 
     <section class="mt5">
         <div th:if="${pickUpLocation != '' && dropOffLocation != ''}">
-            <p class="govuk-heading-m mv5">0 results found for pick up location <span th:text="${pickUpLocation}"/> and
+            <p class="govuk-heading-m mt5">0 results found for pick up location <span th:text="${pickUpLocation}"/> and
                 drop off location <span
                         th:text="${dropOffLocation}"/>.</p>
         </div>
         <div th:if="${pickUpLocation != '' && dropOffLocation == ''}">
-            <p class="govuk-heading-m mv5">0 results found for pick up location <span th:text="${pickUpLocation}"/>.</p>
+            <p class="govuk-heading-m mt5">0 results found for pick up location <span th:text="${pickUpLocation}"/>.</p>
         </div>
         <div th:if="${pickUpLocation == '' && dropOffLocation != ''}">
-            <p class="govuk-heading-m mv5">0 results found for drop off location <span th:text="${dropOffLocation}"/>.
+            <p class="govuk-heading-m mt5">0 results found for drop off location <span th:text="${dropOffLocation}"/>.
             </p>
         </div>
+        <a class="govuk-link dib mb5" href="/search-journeys">Search again</a>
     </section>
 
 </div>

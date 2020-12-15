@@ -66,7 +66,7 @@
                 Confirm and save
             </button>
             <a href="/journeys" class="govuk-link" th:if="${form.operation == 'create'}">Cancel</a>
-            <a href="/search-journeys" class="govuk-link" th:if="${form.operation == 'update'}">Cancel</a>
+            <a th:href="${cancelLink}" class="govuk-link" th:if="${form.operation == 'update'}">Cancel</a>
         </div>
     </form>
 </div>
