@@ -46,6 +46,15 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
 
     @PostMapping("/map-location")
     fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
+        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
+        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+
+        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
+        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
+
+        model.addAttribute("cancelLink", url.build().toUriString())
+
         if (result.hasErrors()) {
             return "/map-location"
         }
@@ -61,15 +70,6 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
         }
 
         if (form.operation == "update") {
-            val from = model.getAttribute(PICK_UP_ATTRIBUTE)
-            val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
-            val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
-            if (from != "") {
-                url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)
-            }
-            if (to != "") {
-                url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
-            }
             redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
             return "redirect:${url.build().toUri()}"
         }
