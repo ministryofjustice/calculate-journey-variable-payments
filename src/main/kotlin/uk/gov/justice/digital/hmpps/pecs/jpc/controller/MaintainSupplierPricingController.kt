@@ -106,6 +106,13 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
             model: ModelMap,
             @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
             redirectAttributes: RedirectAttributes, ): Any {
+        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
+        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
+        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+
+        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
+        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
+
         val price = parseAmount(form.price)
 
         if (price == null) {
@@ -113,6 +120,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         }
 
         if (result.hasErrors()) {
+            model.addAttribute("cancelLink", url.build().toUriString())
             return "update-price"
         }
 
@@ -124,13 +132,6 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         redirectAttributes.addFlashAttribute("flashAttrLocationFrom", form.from)
         redirectAttributes.addFlashAttribute("flashAttrLocationTo", form.to)
         redirectAttributes.addFlashAttribute("flashAttrPrice", form.price)
-
-        val from = model.getAttribute(HtmlController.PICK_UP_ATTRIBUTE)
-        val to = model.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE)
-        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
-
-        from.takeUnless { it == "" }.apply { url.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from) }
-        to.takeUnless { it == "" }.apply { url.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to) }
 
         return RedirectView(url.build().toUriString())
     }
