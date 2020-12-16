@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 import javax.persistence.*
 
 @Entity
-@Table(name = "JOURNEYS")
+@Table(name = "JOURNEYS", indexes = [Index(name = "move_id_index", columnList = "move_id", unique = false)])
 data class Journey(
         @Json(name = "id")
         @Id

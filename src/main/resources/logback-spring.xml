@@ -52,6 +52,16 @@
     <appender-ref ref="consoleAppender"/>
   </logger>
 
+<!--  <logger name="org.hibernate.engine.jdbc.batch.internal.BatchingBatch" additivity="false" level="DEBUG">-->
+<!--    <appender-ref ref="logAppender"/>-->
+<!--    <appender-ref ref="consoleAppender"/>-->
+<!--  </logger>-->
+
+<!--  <logger name="org.hibernate" additivity="false" level="INFO">-->
+<!--    <appender-ref ref="logAppender"/>-->
+<!--    <appender-ref ref="consoleAppender"/>-->
+<!--  </logger>-->
+
   <root level="INFO">
     <appender-ref ref="logAppender"/>
   </root>

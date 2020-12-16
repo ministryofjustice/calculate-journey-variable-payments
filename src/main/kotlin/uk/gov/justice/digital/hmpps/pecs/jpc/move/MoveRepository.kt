@@ -5,5 +5,6 @@ import java.util.*
 
 interface MoveRepository : JpaRepository<Move, String>{
 
-    fun findByProfileId(profileId : String): Optional<Move>
+    fun findAllByMoveIdIn(ids: List<String>): List<Move>
+
 }
