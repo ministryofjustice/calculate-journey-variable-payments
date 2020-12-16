@@ -170,7 +170,6 @@
                             </dt>
                             <dd class="govuk-summary-list__value" th:switch="${#lists.size(journey.events)}">
                                 <p th:case="'0'"></p>
-                                <p th:case="'1'" th:text="${move.events[0]}"></p>
                                 <div th:case="*">
                                     <ul class="pl2">
                                         <li th:each="event: ${journey.events}">

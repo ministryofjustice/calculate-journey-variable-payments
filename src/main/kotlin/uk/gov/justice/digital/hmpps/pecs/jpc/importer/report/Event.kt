@@ -8,7 +8,7 @@ import javax.persistence.*
 import javax.validation.constraints.NotBlank
 
 @Entity
-@Table(name = "EVENTS")
+@Table(name = "EVENTS", indexes = [Index(name = "eventable_id_index", columnList = "eventable_id", unique = false)])
 data class Event constructor(
 
         @Json(name = "id")

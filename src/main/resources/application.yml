@@ -7,6 +7,12 @@ spring:
     hibernate:
       ddl-auto: create
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate.jdbc.batch_size: 5
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.batch_versioned_data: true
+      hibernate.generate_statistics: false
   datasource:
     platform: postgres
     url: ${APP_DB_URL}
