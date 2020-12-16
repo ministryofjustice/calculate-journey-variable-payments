@@ -32,6 +32,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   private val mockSession = MockHttpSession(wac.servletContext)
 
+  private val effectiveDate = LocalDate.now()
+
   @MockBean
   lateinit var service: SupplierPricingService
 
@@ -43,13 +45,15 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   internal fun `can initiate add price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
-      this.setAttribute("date", LocalDate.now())
+      this.setAttribute("date", effectiveDate)
     }
 
     whenever(service.getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
             .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "0.00", "from", "to")) } }
+            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
@@ -77,6 +81,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   internal fun `cannot add price with characters for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", effectiveDate)
     }
 
     mockMvc.post("/add-price") {
@@ -85,6 +90,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("price", "1O.00")
     }
             .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
@@ -95,6 +102,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   internal fun `cannot add negative price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", effectiveDate)
     }
 
     mockMvc.post("/add-price") {
@@ -103,6 +111,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("price", "-10.00")
     }
             .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
