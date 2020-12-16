@@ -40,8 +40,8 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         fillGreyPercentage.fillPattern = fillGrey.fillPattern
         fillGreyPercentage.dataFormat = formatPercentage
 
-        fillBlue.fillForegroundColor = IndexedColors.BLUE.getIndex()
-        fillBlue.fillPattern = FillPatternType.SPARSE_DOTS
+        fillBlue.fillForegroundColor = IndexedColors.LIGHT_YELLOW.getIndex()
+        fillBlue.fillPattern = FillPatternType.SOLID_FOREGROUND
 
         fillBluePound.fillForegroundColor = fillBlue.fillForegroundColor
         fillBluePound.fillPattern = fillBluePound.fillPattern
