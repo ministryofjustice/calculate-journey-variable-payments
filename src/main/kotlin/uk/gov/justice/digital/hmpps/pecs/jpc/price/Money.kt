@@ -13,6 +13,8 @@ data class Money(val pence: Int) {
 
   fun pounds() = pence.toDouble() / 100
 
+  override fun toString(): String = "%.2f".format(pounds())
+
   companion object Factory {
     fun valueOf(pounds: Double) = Money((pounds * 100).toInt())
   }

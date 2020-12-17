@@ -36,7 +36,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     @GetMapping("/add-price/{moveId}")
     fun addPrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier, ): Any {
         val (fromSite, toSite) = agencyIds(moveId).let { (from, to) -> supplierPricingService.getSiteNamesForPricing(supplier, from, to) }
-        val effectiveYear = effectiveYearForDate(model.getStartOfMonth())
+        val effectiveYear = model.getEffectiveYear()
 
         model.apply {
             addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
@@ -58,7 +58,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
         if (result.hasErrors()) {
-            val effectiveYear = effectiveYearForDate(model.getStartOfMonth())
+            val effectiveYear = model.getEffectiveYear()
 
             model.addAttribute("contractualYearStart", "$effectiveYear")
             model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
@@ -81,11 +81,10 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     @GetMapping("/update-price/{moveId}")
     fun updatePrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): String {
         val (fromSite, toSite, price) = agencyIds(moveId).let { (from, to) -> supplierPricingService.getExistingSiteNamesAndPrice(supplier, from, to) }
-        val startOfMonth = model.getStartOfMonth()
-        val effectiveYear = effectiveYearForDate(startOfMonth)
+        val effectiveYear = model.getEffectiveYear()
 
         model.apply {
-            addAttribute("form", PriceForm(moveId, price.pounds().toString(), fromSite, toSite))
+            addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
             addAttribute("contractualYearStart", "$effectiveYear")
             addAttribute("contractualYearEnd", "${effectiveYear + 1}")
         }
@@ -106,8 +105,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
         if (result.hasErrors()) {
-            val startOfMonth = model.getStartOfMonth()
-            val effectiveYear = effectiveYearForDate(startOfMonth)
+            val effectiveYear = model.getEffectiveYear()
             model.addAttribute("contractualYearStart", "$effectiveYear")
             model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
             model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
@@ -143,7 +141,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     private fun ModelMap.getToLocation() = this.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE).takeUnless { it == "" }
 
-    private fun ModelMap.getStartOfMonth() = this.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate
+    private fun ModelMap.getEffectiveYear() = effectiveYearForDate(this.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate)
 
     private fun UriComponentsBuilder.fromQueryParam(from: Any) { this.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)}
 
