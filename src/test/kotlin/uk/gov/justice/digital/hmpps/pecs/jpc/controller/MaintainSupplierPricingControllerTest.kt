@@ -118,4 +118,23 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
   }
+
+  @Test
+  internal fun `can initiate update price for Geoamey`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.GEOAMEY)
+      this.setAttribute("date", effectiveDate)
+    }
+
+    whenever(service.getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(Triple("from", "to", Money(1000)))
+
+    mockMvc.get("/update-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
+            .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "10.00", "from", "to")) } }
+            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
+            .andExpect { view { name("update-price") } }
+            .andExpect { status { isOk } }
+
+    verify(service).getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)
+  }
 }
