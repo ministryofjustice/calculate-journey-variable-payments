@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,12 +33,12 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   lateinit var moveService: MoveService
 
   @Test
-  internal fun `find a move by valid reference id redirects to move details page`() {
+  internal fun `find a move by valid lowercase reference id with whitespace correctly redirects to move details page`() {
 
     whenever(moveService.findMoveByReference("REF1")).thenReturn(Optional.of(move()))
 
     mockMvc.post("/find-move") {
-      param("reference", "REF1")
+      param("reference", "ref1 ")
     }
             .andExpect { redirectedUrl("/moves/M1") }
             .andExpect { status { is3xxRedirection } }
@@ -46,16 +47,30 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   }
 
   @Test
-  internal fun `find a move by invalid reference id redirects to search form`() {
+  internal fun `find a move by a non-existent reference id calls the move service then redirects to search form`() {
 
     whenever(moveService.findMoveByReference("REF1")).thenReturn(Optional.of(move()))
 
     mockMvc.post("/find-move") {
-      param("reference", "BAD_REF")
+      param("reference", "nonexistentref")
     }
-            .andExpect { redirectedUrl("/find-move/?no-results-for=BAD_REF") }
+            .andExpect { redirectedUrl("/find-move/?no-results-for=nonexistentref") }
             .andExpect { status { is3xxRedirection } }
 
-    verify(moveService).findMoveByReference("BAD_REF")
+    verify(moveService).findMoveByReference("NONEXISTENTREF")
+  }
+
+  @Test
+  internal fun `find a move by invalid reference id redirects to search form without calling the move service`() {
+
+    whenever(moveService.findMoveByReference("REF1")).thenReturn(Optional.of(move()))
+
+    mockMvc.post("/find-move") {
+      param("reference", "select * from moves")
+    }
+            .andExpect { redirectedUrl("/find-move/?no-results-for=invalid-reference") }
+            .andExpect { status { is3xxRedirection } }
+
+    verifyNoMoreInteractions(moveService)
   }
 }

@@ -157,9 +157,10 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
             result: BindingResult, model: ModelMap,
             redirectAttributes: RedirectAttributes): String {
 
-        if(form.reference.isNullOrBlank()) return "redirect:$FIND_MOVE_URL/?no-results-for="
+        val moveRef = form.reference.toUpperCase().trim()
+        if(!moveRef.matches("[A-Za-z0-9]+".toRegex())) return "redirect:$FIND_MOVE_URL/?no-results-for=invalid-reference"
 
-        val maybeMove = moveService.findMoveByReference(form.reference.toUpperCase().trim())
+        val maybeMove = moveService.findMoveByReference(moveRef)
         val uri = maybeMove.orElse(null)?.let{ "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
         return "redirect:$uri"
     }
