@@ -106,6 +106,10 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
         if (result.hasErrors()) {
+            val startOfMonth = model.getStartOfMonth()
+            val effectiveYear = effectiveYearForDate(startOfMonth)
+            model.addAttribute("contractualYearStart", "$effectiveYear")
+            model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
             model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
             return "update-price"
         }
