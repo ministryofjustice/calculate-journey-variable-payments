@@ -25,15 +25,8 @@
 
     <div th:replace="fragments/flash-messages.html :: flash-messages(dismissFallback='/journeys')"></div>
 
-    <div class="flex justify-between items-end mv4">
-        <div class="flex-auto">
-            <h1 class="govuk-heading-xl ma0">Journeys for review</h1>
-        </div>
-        <div>
-            <a th:href="@{|/generate-prices-spreadsheet/|}"
-               th:attr="download=${'moves-' + '.csv'}"
-               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
-        </div>
+    <div class="mv4">
+        <h1 class="govuk-heading-xl ma0">Journeys for review</h1>
     </div>
 
     <div class="bg-govuk-colour-blue ph3 mt3 flex">
