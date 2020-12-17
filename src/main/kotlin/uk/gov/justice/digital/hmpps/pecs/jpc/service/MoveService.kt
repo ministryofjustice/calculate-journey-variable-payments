@@ -7,7 +7,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
 @Service
-class MoveService(private val moveQueryRepository: MoveQueryRepository, private val eventRepository: EventRepository) {
+class MoveService(
+        private val moveQueryRepository: MoveQueryRepository,
+        private val moveRepository: MoveRepository,
+        private val eventRepository: EventRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -25,6 +28,8 @@ class MoveService(private val moveQueryRepository: MoveQueryRepository, private 
 
 
     fun moves(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.movesInDateRange(supplier, startDate, endOfMonth(startDate))
+
+    fun findMoveByReference(ref: String) = moveRepository.findByReference(ref)
 
     fun movesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate) =
             moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate))

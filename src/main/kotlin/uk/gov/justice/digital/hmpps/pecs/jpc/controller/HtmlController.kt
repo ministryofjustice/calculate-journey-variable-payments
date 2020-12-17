@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
+import java.util.*
 import javax.validation.Valid
 
 
@@ -142,6 +143,27 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         return RedirectView(DASHBOARD_URL)
     }
 
+
+    data class FindMoveForm(val reference: String = "")
+    @GetMapping(FIND_MOVE_URL)
+    fun findMove(model: ModelMap): Any {
+        model.addAttribute("form", FindMoveForm())
+        return "find-move"
+    }
+
+    @PostMapping(FIND_MOVE_URL)
+    fun performFindMove(
+            @Valid @ModelAttribute("form") form: FindMoveForm,
+            result: BindingResult, model: ModelMap,
+            redirectAttributes: RedirectAttributes): String {
+
+        if(form.reference.isNullOrBlank()) return "redirect:$FIND_MOVE_URL/?no-results-for="
+
+        val maybeMove = moveService.findMoveByReference(form.reference.toUpperCase().trim())
+        val uri = maybeMove.orElse(null)?.let{ "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
+        return "redirect:$uri"
+    }
+
     @GetMapping(SEARCH_JOURNEYS_URL)
     fun searchJourneys(model: ModelMap): Any {
         val startOfMonth = model.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate
@@ -152,6 +174,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
         return "search-journeys"
     }
+
 
     @ValidJourneySearch
     data class SearchJourneyForm(val from: String? = null, val to: String? = null)
@@ -223,5 +246,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         const val JOURNEYS_URL = "/journeys"
         const val SEARCH_JOURNEYS_URL = "/search-journeys"
         const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
+        const val FIND_MOVE_URL = "/find-move"
+
     }
 }

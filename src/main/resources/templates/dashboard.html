@@ -76,6 +76,11 @@
 
     <section class="mt5">
         <h2 class="govuk-heading-m pt1 bt bw2">Moves by type</h2>
+
+        <div>
+            <a th:href="@{'/find-move'}" class="govuk-heading-s govuk-link">Find by move reference ID</a>
+        </div>
+
         <div th:each="summary: ${summaries}">
             <div th:include="fragments/move-by-type.html :: move" class="mv3"></div>
         </div>

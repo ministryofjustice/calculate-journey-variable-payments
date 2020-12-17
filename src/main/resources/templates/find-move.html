@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+
+    <div class="mv4">
+        <h1 class="govuk-heading-xl mv2" th:inline="text">Find move by move reference ID</h1>
+    </div>
+
+
+    <form th:action="@{/find-move}" th:object="${form}" method="post">
+
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
+            <div th:switch="${#request.getParameter('no-results-for')}">
+                <p th:case="${null}"></p>
+                <p th:case="''" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span> Please enter a move reference ID
+                </p>
+                <p th:case="*" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span> Could not find move for that move reference ID
+                </p>
+            </div>
+            <ol class="pl0 list">
+                <li class="mv3">
+                    <div class="govuk-form-group">
+                        <div id="event-name-hint" class="govuk-hint">
+                            <span class="db govuk-!-font-weight-bold">Enter a move reference ID to search all moves</span>
+                            For example XRN1295V
+                        </div>
+                        <input class="govuk-input govuk-input--width-20" id="reference" name="reference" type="text"
+                               aria-describedby="from-hint" th:field="*{reference}"
+                               th:classappend="${#fields.hasErrors('reference')} ? 'govuk-input--error'">
+                    </div>
+            </ol>
+        </div>
+
+        <div class="flex items-center">
+            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+                Find Move
+            </button>
+            <a href="/dashboard" class="govuk-link">Cancel</a>
+        </div>
+    </form>
+
+</div>
+
+</body>
+
+</html>

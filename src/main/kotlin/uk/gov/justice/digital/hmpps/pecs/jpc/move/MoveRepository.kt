@@ -7,4 +7,5 @@ interface MoveRepository : JpaRepository<Move, String>{
 
     fun findAllByMoveIdIn(ids: List<String>): List<Move>
 
+    fun findByReference(ref: String) : Optional<Move>
 }
