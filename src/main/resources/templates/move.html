@@ -115,7 +115,7 @@
                             <p th:case="'1'" th:text="${move.events[0]}"></p>
                             <div th:case="*">
                                 <ul class="pl2">
-                                    <li th:each="event: ${move.events}">
+                                    <li th:each="event: ${#lists.sort(move.events)}">
                                         <span th:replace="fragments/event-type.html :: eventType (type=${event.type})"></span>,
                                         <span th:text="${event.notes}?: '(no notes)'"></span>,
                                         <span th:text="${#temporals.format(event.occurredAt, 'dd MMM yyyy, HH:mm')}"></span>

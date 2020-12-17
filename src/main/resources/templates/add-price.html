@@ -11,12 +11,29 @@
 
 <div class="govuk-width-container" layout:fragment="content">
 
-    <div class="mv4">
-        <h1 class="govuk-heading-xl mv2" th:inline="text">Add price</h1>
-        <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add the price agreed with the supplier for this journey.</p>
-    </div>
-
     <form th:action="@{/add-price}" th:object="${form}" method="post">
+        <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
+             data-module="govuk-error-summary" th:if="${#fields.hasErrors('price')}">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    <li>
+                        <a href="#price">Enter a valid price in the correct
+                            format</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mv4">
+            <h1 class="govuk-heading-xl mv2" th:inline="text">Add price</h1>
+            <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add the price agreed with the
+                supplier for this journey.</p>
+        </div>
+
+
         <input type="hidden" th:field="*{moveId}" class="dn"/>
         <input type="hidden" th:field="*{from}" class="dn"/>
         <input type="hidden" th:field="*{to}" class="dn"/>
@@ -28,10 +45,10 @@
                 </li>
                 <li class="mv1">
                     <label class="govuk-label govuk-body govuk-!-font-weight-bold"
-                           for="event-name">
+                           for="price">
                         Add price
                     </label>
-                    <div id="event-name-hint" class="govuk-hint">
+                    <div id="price-hint" class="govuk-hint">
                         Example £100.00
                     </div>
                     <p th:if="${#fields.hasErrors('price')}" class="govuk-error-message">
@@ -40,8 +57,8 @@
                     </p>
                     <div class="govuk-input__wrapper">
                         <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                        <input class="govuk-input govuk-input--width-5" id="event-name" name="price" type="text"
-                               aria-describedby="event-name-hint" th:field="*{price}"
+                        <input class="govuk-input govuk-input--width-5" id="price" name="price" type="text"
+                               aria-describedby="price-hint" th:field="*{price}"
                                th:classappend="${#fields.hasErrors('price')} ? 'govuk-input--error'">
                     </div>
                 </li>

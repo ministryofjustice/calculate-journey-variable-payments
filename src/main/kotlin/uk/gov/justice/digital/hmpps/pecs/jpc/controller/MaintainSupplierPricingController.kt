@@ -106,6 +106,10 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
         if (result.hasErrors()) {
+            val startOfMonth = model.getStartOfMonth()
+            val effectiveYear = effectiveYearForDate(startOfMonth)
+            model.addAttribute("contractualYearStart", "$effectiveYear")
+            model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
             model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
             return "update-price"
         }
@@ -128,7 +132,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         getFromLocation()?.apply { url.fromQueryParam( this) }
         getToLocation()?.apply { url.toQueryParam( this) }
 
-        return url.build().toUriString()
+        return url.toUriString()
     }
 
     private fun agencyIds(combined: String) = Pair(combined.split("-")[0].trim().toUpperCase(), combined.split("-")[1].trim().toUpperCase())

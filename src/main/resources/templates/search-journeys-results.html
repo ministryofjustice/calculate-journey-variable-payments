@@ -17,15 +17,8 @@
         <h1 class="govuk-heading-xl ma0" th:inline="text">Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]</h1>
     </div>
 
-    <div class="flex justify-between items-end mv4">
-        <div class="flex-auto">
-            <a href="/search-journeys" class="govuk-link govuk-heading-s ma0">Search journeys</a>
-        </div>
-        <div>
-            <a th:href="@{|/generate-prices-spreadsheet/|}"
-               th:attr="download=${'moves-' + '.csv'}"
-               class="ma0 govuk-link govuk-heading-s download-icon">Download all moves</a>
-        </div>
+    <div class="mv4">
+        <a href="/search-journeys" class="govuk-link govuk-heading-s ma0">Search journeys</a>
     </div>
 
     <section class="mt3">
