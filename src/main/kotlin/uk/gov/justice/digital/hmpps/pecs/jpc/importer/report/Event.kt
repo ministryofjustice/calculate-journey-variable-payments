@@ -53,7 +53,7 @@ data class Event constructor(
         val recordedAt: LocalDateTime,
 
         var notes: String?,
-) {
+): Comparable<Event> {
 
     init {
         notes = notes?.take(255)
@@ -90,6 +90,10 @@ data class Event constructor(
         result = 31 * result + recordedAt.hashCode()
         result = 31 * result + (notes?.hashCode() ?: 0)
         return result
+    }
+
+    override operator fun compareTo(other: Event): Int {
+        return this.occurredAt.compareTo(other.occurredAt)
     }
 
     companion object {
