@@ -26,7 +26,7 @@
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
             <ol class="list pl0">
                 <li class="mv3">
-                    <p class="govuk-label govuk-body govuk-!-font-weight-bold">Pick up location</p>
+                    <p class="govuk-label govuk-body govuk-!-font-weight-bold">Location</p>
                     <p th:text="*{agencyId}" class="govuk-body ma0"></p>
                     <input type="hidden" th:field="*{agencyId}" class="dn"/>
                     <input type="hidden" th:field="*{operation}" class="dn"/>
@@ -60,6 +60,13 @@
                     </select>
                 </li>
             </ol>
+        </div>
+        <div class="govuk-warning-text mv3">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                <span th:inline="text">Mapping a Schedule 34 location name will not update location names in NOMIS.</span>
+            </strong>
         </div>
         <div class="flex items-center">
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
