@@ -21,9 +21,9 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
 
     @Test
     internal fun `test cancelled prices`() {
-        val move = move(journeys = listOf(journey(state = JourneyState.cancelled)))
+        val move = moveM1(journeys = listOf(journeyJ1(state = JourneyState.cancelled)))
         val moves = listOf(move)
-        val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
+        val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
         sheet.writeMoves(moves)
 
         assertCellEquals(sheet, 10, 0, "REF1")

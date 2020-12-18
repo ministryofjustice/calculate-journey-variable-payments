@@ -167,13 +167,13 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         }
     }
 
-    fun moveWithPersonAndJourneys(moveId: String): Move {
-        val movePersonJourney = jdbcTemplate.query("$moveJourneySelectSQL where m.move_id = ? ",
-            arrayOf(moveId),
+    fun moveWithPersonAndJourneys(moveId: String, supplier: Supplier): Move? {
+        val movePersonJourney = jdbcTemplate.query("$moveJourneySelectSQL where m.move_id = ? and m.supplier = ? ",
+            arrayOf(moveId, supplier.name),
             moveJourneyRowMapper).groupBy { it.move.moveId }
 
         val moves = movePersonJourney.keys.map { k -> movePersonJourney.getValue(k).move() }
-        return moves[0]
+        return if(moves.isEmpty()) null else moves[0]
     }
 
     fun movesForMoveTypeInDateRange(supplier: Supplier, moveType: MoveType, startDate: LocalDate, endDateInclusive: LocalDate, limit: Int = 50, offset: Long = 0): List<Move> {

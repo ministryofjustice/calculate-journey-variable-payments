@@ -20,7 +20,7 @@ internal class MoveRepositoryTest {
     @Test
     fun `save report model`() {
 
-        val move = move().copy(notes = "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffs" +
+        val move = moveM1().copy(notes = "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffs" +
                 "fasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfas" +
                 "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaf" +
                 "fsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaff" +
@@ -32,9 +32,9 @@ internal class MoveRepositoryTest {
                 "afafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaf" +
                 "fsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafa" +
                 "fsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfas")
-        val journeyModel = journey(moveId = move.moveId, events = listOf(event(eventId = "E1", eventableId = journey().journeyId)))
+        val journeyModel = journeyJ1(moveId = move.moveId, events = listOf(eventE1(eventId = "E1", eventableId = journeyJ1().journeyId)))
         val moveModel = move.copy(
-            events = listOf(event(eventId = "E2", eventableId = move.moveId)),
+            events = listOf(eventE1(eventId = "E2", eventableId = move.moveId)),
             journeys = listOf(journeyModel)
         )
 

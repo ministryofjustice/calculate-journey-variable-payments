@@ -14,22 +14,25 @@ class MoveService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun moveWithPersonJourneysAndEvents(moveId: String) : Move {
-        val move = moveQueryRepository.moveWithPersonAndJourneys(moveId)
-        val moveEvents = eventRepository.findAllByEventableId(move.moveId)
-        val journeyId2Events = eventRepository.findByEventableIdIn(move.journeys.map { it.journeyId }).groupBy { it.eventableId }
+    fun moveWithPersonJourneysAndEvents(moveId: String, supplier: Supplier) : Move? {
+        val maybeMove = moveQueryRepository.moveWithPersonAndJourneys(moveId, supplier)
 
-        val journeysWithEvents = move.journeys.map {
-            it.copy(events = journeyId2Events[it.journeyId] ?: listOf())
+        return maybeMove?.let {
+            val moveEvents = eventRepository.findAllByEventableId(it.moveId)
+            val journeyId2Events = eventRepository.findByEventableIdIn(it.journeys.map { it.journeyId }).groupBy { it.eventableId }
+
+            val journeysWithEvents = it.journeys.map {journey ->
+                journey.copy(events = journeyId2Events[journey.journeyId] ?: listOf())
+            }
+
+            it.copy(events = moveEvents, journeys = journeysWithEvents)
         }
-
-        return move.copy(events = moveEvents, journeys = journeysWithEvents)
     }
 
 
     fun moves(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.movesInDateRange(supplier, startDate, endOfMonth(startDate))
 
-    fun findMoveByReference(ref: String) = moveRepository.findByReference(ref)
+    fun findMoveByReferenceAndSupplier(ref: String, supplier: Supplier) = moveRepository.findByReferenceAndSupplier(ref, supplier)
 
     fun movesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate) =
             moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate))

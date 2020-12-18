@@ -7,9 +7,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-val moveDate = LocalDate.of(2020, 9, 10)
+val defaultMoveDate10Sep2020 = LocalDate.of(2020, 9, 10)
 
-fun person() = Person(
+fun personPE1() = Person(
         personId = "PE1",
         updatedAt = defaultDateTime,
         prisonNumber = "PR101",
@@ -20,18 +20,18 @@ fun person() = Person(
         dateOfBirth = LocalDate.of(1980, 12, 25),
 )
 
-fun profile() = Profile(
+fun profilePR1() = Profile(
         profileId = "PR1",
         personId = "PE1",
         updatedAt = defaultDateTime
 )
 
-fun move(
+fun moveM1(
         moveId: String = "M1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
-        dropOffOrCancelledDateTime: LocalDateTime = moveDate.atStartOfDay().plusHours(10),
-        person: Person? = person(),
+        dropOffOrCancelledDateTime: LocalDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
+        person: Person? = personPE1(),
         journeys: List<Journey> = listOf()
 ) = Move(
         moveId = moveId,
@@ -41,14 +41,14 @@ fun move(
         moveType = MoveType.STANDARD,
         status = MoveStatus.completed,
         reference = "REF1",
-        moveDate = moveDate,
+        moveDate = defaultMoveDate10Sep2020,
         fromNomisAgencyId = fromNomisAgencyId,
         fromSiteName = "from",
         fromLocationType = LocationType.PR,
         toNomisAgencyId = toNomisAgencyId,
         toSiteName = "to",
         toLocationType = LocationType.PR,
-        pickUpDateTime = moveDate.atStartOfDay(),
+        pickUpDateTime = defaultMoveDate10Sep2020.atStartOfDay(),
         dropOffOrCancelledDateTime = dropOffOrCancelledDateTime,
         reportFromLocationType = "prison",
         reportToLocationType = null,
@@ -57,19 +57,19 @@ fun move(
         person = person,
         journeys = journeys)
 
-fun journey(
-        moveId: String = move().moveId,
+fun journeyJ1(
+        moveId: String = moveM1().moveId,
         journeyId: String = "J1",
         fromNomisAgencyId: String = "WYI",
         toNomisAgencyId: String = "GNI",
         state: JourneyState = JourneyState.completed,
         billable: Boolean = true,
-        pickUpDateTime: LocalDateTime? = moveDate.atStartOfDay(),
-        dropOffDateTime: LocalDateTime? = moveDate.atStartOfDay().plusHours(10),
+        pickUpDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay(),
+        dropOffDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
         events: List<Event> = listOf()
 ) = Journey(
         journeyId = journeyId,
-        supplier = move().supplier,
+        supplier = moveM1().supplier,
         clientTimeStamp = defaultDateTime,
         updatedAt = defaultDateTime,
         state = state,
@@ -91,14 +91,14 @@ fun journey(
         )
 )
 
-fun event(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = move().moveId) = Event(
+fun eventE1(eventId: String = "E1", eventType: EventType = EventType.MOVE_START, eventableId: String = moveM1().moveId) = Event(
         eventId = eventId,
         updatedAt = defaultDateTime,
         type = eventType.value,
         eventableType = "move",
         eventableId = eventableId,
-        occurredAt = moveDate.atStartOfDay(),
-        recordedAt = moveDate.atStartOfDay(),
+        occurredAt = defaultMoveDate10Sep2020.atStartOfDay(),
+        recordedAt = defaultMoveDate10Sep2020.atStartOfDay(),
         notes = null,
         details = null,
         supplier = Supplier.SERCO

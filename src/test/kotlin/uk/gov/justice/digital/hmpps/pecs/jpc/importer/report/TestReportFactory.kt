@@ -2,10 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.*
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,7 +19,8 @@ const val defaultJourneyEventId="JE1"
 const val defaultProfileId="PR1"
 const val defaultPersonId="PE1"
 
-val defaultSupplier =  Supplier.SERCO
+val defaultSupplierSerco =  Supplier.SERCO
+val defaultMoveTypeStandard = MoveType.STANDARD
 
 fun fromPrisonNomisAgencyId() = "WYI"
 fun WYIPrisonLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
@@ -34,7 +32,7 @@ fun notMappedNomisAgencyId() =  "NOT_MAPPED_AGENCY_ID"
 
 fun reportMoveFactory(
         moveId: String = defaultMoveId,
-        supplier: Supplier = defaultSupplier,
+        supplier: Supplier = defaultSupplierSerco,
         profileId: String = defaultProfileId,
         status: MoveStatus = MoveStatus.completed,
         fromLocation: String = fromPrisonNomisAgencyId(),
@@ -92,7 +90,7 @@ fun moveEventFactory(
         eventId : String = defaultMoveEventId,
         moveId: String = defaultMoveId,
         type: String = EventType.MOVE_CANCEL.value,
-        supplier: Supplier = defaultSupplier,
+        supplier: Supplier = defaultSupplierSerco,
         occurredAt: LocalDateTime = defaultDateTime,
         notes: String = ""
 ): Event {
@@ -114,7 +112,7 @@ fun reportJourneyFactory(
         journeyId: String = defaultJourneyId,
         moveId: String = defaultMoveId,
         state: JourneyState = JourneyState.completed,
-        supplier: Supplier = defaultSupplier,
+        supplier: Supplier = defaultSupplierSerco,
         billable: Boolean = false,
         fromLocation: String = fromPrisonNomisAgencyId(),
         toLocation : String = toCourtNomisAgencyId(),
@@ -143,7 +141,7 @@ fun journeyEventFactory(
         journeyEventId: String = defaultJourneyEventId,
         journeyId: String = defaultJourneyId,
         type: String = EventType.JOURNEY_START.value,
-        supplier: Supplier = defaultSupplier,
+        supplier: Supplier = defaultSupplierSerco,
         occurredAt: LocalDateTime = defaultDateTime,
         notes: String = ""
 ): Event {

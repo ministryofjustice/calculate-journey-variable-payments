@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.util.*
@@ -22,7 +22,7 @@ internal class SupplierPricesSheetTest(@Autowired private val template: JPCTempl
 
     private val workbook: Workbook = XSSFWorkbook(template.get())
 
-    private val header: PriceSheet.Header =PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO)
+    private val header: PriceSheet.Header =PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO)
 
     private val supplierPricesSheet: SupplierPricesSheet = SupplierPricesSheet(workbook, header)
 

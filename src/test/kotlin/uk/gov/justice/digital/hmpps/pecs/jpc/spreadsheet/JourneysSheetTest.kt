@@ -32,7 +32,7 @@ internal class JourneysSheetTest(@Autowired private val template: JPCTemplatePro
                 totalPriceInPence = 2200
         )
         
-        val sheet = JourneysSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
+        val sheet = JourneysSheet(workbook, PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
         sheet.writeJourneys(listOf(journey))
 
         assertCellEquals(sheet, 10, 0, "from") // from site name
@@ -57,7 +57,7 @@ internal class JourneysSheetTest(@Autowired private val template: JPCTemplatePro
                 totalPriceInPence = 0
         )
 
-        val sheet = JourneysSheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
+        val sheet = JourneysSheet(workbook, PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
         sheet.writeJourneys(listOf(journey))
 
         assertCellEquals(sheet, 10, 0, "from") // from site name
