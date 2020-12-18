@@ -1,6 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.usermodel.BuiltinFormats
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -15,6 +22,35 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     protected val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
     protected val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat( 10 ))
+    protected val formatDate = sheet.workbook.createDataFormat().getFormat("DD/MM/YYYY")
+    protected val formatMonthYear = sheet.workbook.createDataFormat().getFormat("MMMM YYYY")
+
+    protected val fontWhite: Font = sheet.workbook.createFont().apply {
+        color = IndexedColors.WHITE1.index
+    }
+
+    protected val headerMonthYearStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+        setFont(fontWhite)
+        fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        fillPattern = FillPatternType.SOLID_FOREGROUND
+        dataFormat = formatMonthYear
+        alignment = HorizontalAlignment.LEFT
+    }
+
+    protected val headerExportDateStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+        setFont(fontWhite)
+        fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        fillPattern = FillPatternType.SOLID_FOREGROUND
+        dataFormat = formatDate
+        alignment = HorizontalAlignment.LEFT
+    }
+
+    protected val headerSupplierNameStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+        setFont(fontWhite)
+        fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        fillPattern = FillPatternType.SOLID_FOREGROUND
+        alignment = HorizontalAlignment.LEFT
+    }
 
     protected val fillGrey = sheet.workbook.createCellStyle()
     protected val fillBlue = sheet.workbook.createCellStyle()
@@ -29,7 +65,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
 
     init {
-        fillGrey.fillForegroundColor = IndexedColors.GREY_25_PERCENT.getIndex()
+        fillGrey.fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
         fillGrey.fillPattern = FillPatternType.LEAST_DOTS
 
         fillGreyPound.fillForegroundColor = fillGrey.fillForegroundColor
@@ -57,12 +93,10 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         applyHeader()
     }
 
-
     private fun applyHeader() {
-        sheet.getRow(0).getCell(1).setCellValue(header.dateRun)
-        sheet.getRow(4).createCell(1).setCellValue(header.supplier.name)
-        sheet.getRow(5).getCell(1).setCellValue(header.dateRange.start)
-        sheet.getRow(5).getCell(3).setCellValue(header.dateRange.endInclusive)
+        sheet.getRow(2).addCell(2, header.dateRange.start, headerMonthYearStyle)
+        sheet.getRow(2).addCell(4, header.dateRun, headerExportDateStyle)
+        sheet.getRow(4).addCell(0,header.supplier.name, headerSupplierNameStyle)
     }
 
 
@@ -131,6 +165,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             is String -> cell.setCellValue(value)
             is Double -> cell.setCellValue(value)
             is Int -> cell.setCellValue(value.toDouble())
+            is LocalDate -> cell.setCellValue(value)
         }
     }
 
