@@ -23,7 +23,7 @@ internal class MovesSummarySheetTest(@Autowired private val template: JPCTemplat
         val longHaulSummary = MovesSummary(MoveType.LONG_HAUL, 50.0, 10, 10, 400)
         val summaries = MoveTypeSummaries(1, listOf(standardSummary, longHaulSummary, MovesSummary(), MovesSummary(), MovesSummary(), MovesSummary()))
 
-        val sheet = SummarySheet(workbook, PriceSheet.Header(moveDate, ClosedRangeLocalDate(moveDate, moveDate), Supplier.SERCO))
+        val sheet = SummarySheet(workbook, PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
         sheet.writeSummaries(summaries)
 
         // Standard move summaries at row 9

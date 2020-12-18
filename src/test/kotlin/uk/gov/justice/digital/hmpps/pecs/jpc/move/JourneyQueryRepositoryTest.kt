@@ -46,9 +46,9 @@ internal class JourneyQueryRepositoryTest {
     val wyi = WYIPrisonLocation()
     val gni = GNICourtLocation()
 
-    val standardMove = move( dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(5)) // should appear before the one above
-    val journeyModel1 = journey()
-    val journeyModel2 = journey(journeyId = "J2")
+    val standardMove = moveM1( dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5)) // should appear before the one above
+    val journeyModel1 = journeyJ1()
+    val journeyModel2 = journeyJ1(journeyId = "J2")
 
     @BeforeEach
     fun beforeEach(){
@@ -78,13 +78,13 @@ internal class JourneyQueryRepositoryTest {
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = locationX, priceInPence = 201, supplier = Supplier.SERCO, effectiveYear = 2020))
 
         val moveWithNonBillableJourney = standardMove.copy(moveId = "M2")
-        val journey3 = journey(moveId = "M2", journeyId = "J3", billable = false, toNomisAgencyId = locationX.nomisAgencyId)
+        val journey3 = journeyJ1(moveId = "M2", journeyId = "J3", billable = false, toNomisAgencyId = locationX.nomisAgencyId)
 
         val moveWithUnmappedLocation = standardMove.copy(moveId = "M3")
-        val journey4 = journey(moveId = "M3", journeyId = "J4", billable = true, fromNomisAgencyId = "unmappedNomisAgencyId")
+        val journey4 = journeyJ1(moveId = "M3", journeyId = "J4", billable = true, fromNomisAgencyId = "unmappedNomisAgencyId")
 
         val moveWithUpricedJourney = standardMove.copy(moveId = "M4")
-        val journey5 = journey(moveId = "M4", journeyId = "J5", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
+        val journey5 = journeyJ1(moveId = "M4", journeyId = "J5", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
 
         moveRepository.save(moveWithNonBillableJourney) // not unpriced just because journey is not billable
         moveRepository.save(moveWithUpricedJourney) // unpriced in 2020, but priced in 2021
@@ -96,10 +96,10 @@ internal class JourneyQueryRepositoryTest {
 
         entityManager.flush()
 
-        val summaries = journeyQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val summaries = journeyQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)
         assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2, Supplier.SERCO))
 
-        val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(Supplier.SERCO, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)
         assertThat(unpricedUniqueJourneys.size).isEqualTo(2)
 
         // Ordered by unmapped from locations first
@@ -115,17 +115,17 @@ internal class JourneyQueryRepositoryTest {
         priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = locationY, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2021))
 
         val moveWithUpriced2020Journey = standardMove.copy(moveId = "M2")
-        val journeyNotPricedFor2020 = journey(moveId = "M2", journeyId = "J2", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
+        val journeyNotPricedFor2020 = journeyJ1(moveId = "M2", journeyId = "J2", billable = true, fromNomisAgencyId = locationY.nomisAgencyId)
 
         moveRepository.save(moveWithUpriced2020Journey)
         journeyRepository.save(journeyNotPricedFor2020)
 
         entityManager.flush()
 
-        val summaries = journeyQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val summaries = journeyQueryRepository.journeysSummaryInDateRange(Supplier.SERCO, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)
         assertThat(summaries).isEqualTo(JourneysSummary(2, 999, 0, 1, Supplier.SERCO))
 
-        val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(Supplier.SERCO, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)
         assertThat(unpricedUniqueJourneys.size).isEqualTo(1)
         assertThat(unpricedUniqueJourneys[0].totalPriceInPence).isEqualTo(0)
     }

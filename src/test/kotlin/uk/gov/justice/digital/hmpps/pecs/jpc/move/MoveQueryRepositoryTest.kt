@@ -17,6 +17,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultMoveTypeStandard
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import java.time.LocalDate
 import java.util.UUID
 
@@ -53,15 +55,15 @@ internal class MoveQueryRepositoryTest {
     val wyi = WYIPrisonLocation()
     val gni = GNICourtLocation()
 
-    val standardMove = move( dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(5)) // should appear before the one above
-    val journeyModel1 = journey()
-    val journeyModel2 = journey(journeyId = "J2")
+    val standardMove = moveM1( dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5)) // should appear before the one above
+    val journeyModel1 = journeyJ1()
+    val journeyModel2 = journeyJ1(journeyId = "J2")
 
     @BeforeEach
     fun beforeEach(){
         locationRepository.save(wyi)
         locationRepository.save(gni)
-        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = Supplier.SERCO, effectiveYear = 2020))
+        priceRepository.save(Price(id = UUID.randomUUID(), fromLocation = wyi, toLocation = gni, priceInPence = 999, supplier = defaultSupplierSerco, effectiveYear = 2020))
 
         moveRepository.save(standardMove)
 
@@ -73,23 +75,29 @@ internal class MoveQueryRepositoryTest {
 
 
     @Test
+    fun `moveWithPersonAndJourneys with invalid moveId for supplier`() {
+        val move = moveQueryRepository.moveWithPersonAndJourneys(standardMove.moveId, Supplier.GEOAMEY)
+        assertThat(move).isNull()
+    }
+
+    @Test
     fun `move should be priced if all journeys are billable`() {
-        val move = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        val move = moveQueryRepository.movesForMoveTypeInDateRange(defaultSupplierSerco, defaultMoveTypeStandard, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)[0]
         // Move should be priced
         assertTrue(move.hasPrice())
     }
 
     @Test
     fun `move PII data should be present`() {
-        personRepository.save(person())
-        profileRepository.save(profile())
+        personRepository.save(personPE1())
+        profileRepository.save(profilePR1())
 
         entityManager.flush()
 
-        val move = moveQueryRepository.moveWithPersonAndJourneys(standardMove.moveId)
+        val move = moveQueryRepository.moveWithPersonAndJourneys(standardMove.moveId, defaultSupplierSerco)
 
         // Move should be priced
-        assertTrue(move.hasPrice())
+        assertTrue(move!!.hasPrice())
 
         assertThat(move.person?.firstNames).isEqualTo("Billy the")
         assertThat(move.person?.dateOfBirth).isEqualTo(LocalDate.of(1980, 12, 25))
@@ -98,15 +106,15 @@ internal class MoveQueryRepositoryTest {
     @Test
     fun `findAllForSupplierAndMovePriceTypeInDateRange a with non billable journey`() {
 
-        val nonBillableJourney = journey(journeyId = "J3", billable = false)
-        val journeyWithoutDropOffDate = journey(journeyId = "J4", pickUpDateTime = null, dropOffDateTime = null)
+        val nonBillableJourney = journeyJ1(journeyId = "J3", billable = false)
+        val journeyWithoutDropOffDate = journeyJ1(journeyId = "J4", pickUpDateTime = null, dropOffDateTime = null)
 
         journeyRepository.save(nonBillableJourney)
         journeyRepository.save(journeyWithoutDropOffDate)
 
         entityManager.flush()
 
-        val move = moveQueryRepository.movesForMoveTypeInDateRange(Supplier.SERCO, MoveType.STANDARD, moveDate, moveDate)[0]
+        val move = moveQueryRepository.movesForMoveTypeInDateRange(defaultSupplierSerco, defaultMoveTypeStandard, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)[0]
 
         assertThat(move.journeys.size).isEqualTo(4)
 
@@ -125,10 +133,10 @@ internal class MoveQueryRepositoryTest {
     fun `all summaries`() {
 
         val moveWithUnbillableJourney = standardMove.copy(moveId = "M2")
-        val journey3 = journey(moveId = "M2", journeyId = "J3", billable = false)
+        val journey3 = journeyJ1(moveId = "M2", journeyId = "J3", billable = false)
 
         val moveWithUnpricedJourney = standardMove.copy(moveId = "M3")
-        val journey4 = journey(moveId = "M3", journeyId = "J4", billable = true, fromNomisAgencyId = "UNPRICED")
+        val journey4 = journeyJ1(moveId = "M3", journeyId = "J4", billable = true, fromNomisAgencyId = "UNPRICED")
 
         val moveWithoutJourneys = standardMove.copy(moveId = "M4")
 
@@ -142,14 +150,14 @@ internal class MoveQueryRepositoryTest {
         entityManager.flush()
 
         // The moves with no journeys, unbillable journey and unpriced journey should come out as unpried
-        val summaries = moveQueryRepository.summariesInDateRange(Supplier.SERCO, moveDate, moveDate, 4)
-        assertThat(summaries).containsExactly(MovesSummary(MoveType.STANDARD, 1.0, 4, 2, 1998))
+        val summaries = moveQueryRepository.summariesInDateRange(defaultSupplierSerco, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020, 4)
+        assertThat(summaries).containsExactly(MovesSummary(defaultMoveTypeStandard, 1.0, 4, 2, 1998))
     }
 
 
     @Test
     fun `moves count`() {
-        val movesCount = moveQueryRepository.moveCountInDateRange(Supplier.SERCO, moveDate, moveDate)
+        val movesCount = moveQueryRepository.moveCountInDateRange(defaultSupplierSerco, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)
         assertThat(movesCount).isEqualTo(1)
     }
 

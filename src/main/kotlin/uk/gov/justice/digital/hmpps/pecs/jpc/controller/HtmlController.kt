@@ -2,16 +2,14 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.SessionAttributes
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
@@ -32,6 +30,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import javax.validation.Valid
+
+@ResponseStatus(value = HttpStatus.NOT_FOUND)
+class MoveNotFoundException(msg: String) : RuntimeException(msg)
 
 
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
@@ -76,10 +77,13 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     }
 
     @RequestMapping("$MOVES_URL/{moveId}")
-    fun moves(@PathVariable moveId: String, model: ModelMap): String {
-        val move = moveService.moveWithPersonJourneysAndEvents(moveId)
-        model.addAttribute(MOVE_ATTRIBUTE, move)
-        return "move"
+    fun moves(@PathVariable moveId: String, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): ModelAndView {
+        val maybeMove = moveService.moveWithPersonJourneysAndEvents(moveId, supplier)
+
+        return maybeMove?.let {
+            model.addAttribute(MOVE_ATTRIBUTE, maybeMove)
+            ModelAndView("move")
+        } ?: ModelAndView("error/404", HttpStatus.NOT_FOUND)
     }
 
     @RequestMapping(JOURNEYS_URL)
@@ -142,6 +146,29 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         return RedirectView(DASHBOARD_URL)
     }
 
+
+    data class FindMoveForm(val reference: String = "")
+    @GetMapping(FIND_MOVE_URL)
+    fun findMove(model: ModelMap): Any {
+        model.addAttribute("form", FindMoveForm())
+        return "find-move"
+    }
+
+    @PostMapping(FIND_MOVE_URL)
+    fun performFindMove(
+            @Valid @ModelAttribute("form") form: FindMoveForm,
+            @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
+            result: BindingResult, model: ModelMap,
+            redirectAttributes: RedirectAttributes): String {
+
+        val moveRef = form.reference.toUpperCase().trim()
+        if(!moveRef.matches("[A-Za-z0-9]+".toRegex())) return "redirect:$FIND_MOVE_URL/?no-results-for=invalid-reference"
+
+        val maybeMove = moveService.findMoveByReferenceAndSupplier(moveRef, supplier)
+        val uri = maybeMove.orElse(null)?.let{ "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
+        return "redirect:$uri"
+    }
+
     @GetMapping(SEARCH_JOURNEYS_URL)
     fun searchJourneys(model: ModelMap): Any {
         val startOfMonth = model.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate
@@ -152,6 +179,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
         return "search-journeys"
     }
+
 
     @ValidJourneySearch
     data class SearchJourneyForm(val from: String? = null, val to: String? = null)
@@ -223,5 +251,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
         const val JOURNEYS_URL = "/journeys"
         const val SEARCH_JOURNEYS_URL = "/search-journeys"
         const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
+        const val FIND_MOVE_URL = "/find-move"
+
     }
 }
