@@ -1,6 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.*
+import org.apache.poi.ss.usermodel.BuiltinFormats
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -15,21 +22,50 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
     protected val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
     protected val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat( 10 ))
+    protected val formatDate = sheet.workbook.createDataFormat().getFormat("DD/MM/YYYY")
+    protected val formatMonthYear = sheet.workbook.createDataFormat().getFormat("MMMM YYYY")
+
+    protected val fontWhite: Font = sheet.workbook.createFont().apply {
+        color = IndexedColors.WHITE1.index
+    }
+
+    protected val headerMonthYearStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+        setFont(fontWhite)
+        fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        fillPattern = FillPatternType.SOLID_FOREGROUND
+        dataFormat = formatMonthYear
+        alignment = HorizontalAlignment.LEFT
+    }
+
+    protected val headerExportDateStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+        setFont(fontWhite)
+        fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        fillPattern = FillPatternType.SOLID_FOREGROUND
+        dataFormat = formatDate
+        alignment = HorizontalAlignment.LEFT
+    }
+
+    protected val headerSupplierNameStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+        setFont(fontWhite)
+        fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+        fillPattern = FillPatternType.SOLID_FOREGROUND
+        alignment = HorizontalAlignment.LEFT
+    }
 
     protected val fillGrey = sheet.workbook.createCellStyle()
-    protected val fillBlue = sheet.workbook.createCellStyle()
+    protected val fillLemon = sheet.workbook.createCellStyle()
 
     protected val fillGreyPound = sheet.workbook.createCellStyle()
-    protected val fillBluePound = sheet.workbook.createCellStyle()
+    protected val fillLemonPound = sheet.workbook.createCellStyle()
     protected val fillWhitePound = sheet.workbook.createCellStyle()
 
     protected val fillGreyPercentage = sheet.workbook.createCellStyle()
-    protected val fillBluePercentage = sheet.workbook.createCellStyle()
+    protected val fillLemonPercentage = sheet.workbook.createCellStyle()
     protected val fillWhitePercentage = sheet.workbook.createCellStyle()
 
 
     init {
-        fillGrey.fillForegroundColor = IndexedColors.GREY_25_PERCENT.getIndex()
+        fillGrey.fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
         fillGrey.fillPattern = FillPatternType.LEAST_DOTS
 
         fillGreyPound.fillForegroundColor = fillGrey.fillForegroundColor
@@ -40,16 +76,16 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         fillGreyPercentage.fillPattern = fillGrey.fillPattern
         fillGreyPercentage.dataFormat = formatPercentage
 
-        fillBlue.fillForegroundColor = IndexedColors.LIGHT_YELLOW.getIndex()
-        fillBlue.fillPattern = FillPatternType.SOLID_FOREGROUND
+        fillLemon.fillForegroundColor = IndexedColors.LEMON_CHIFFON.index
+        fillLemon.fillPattern = FillPatternType.SOLID_FOREGROUND
 
-        fillBluePound.fillForegroundColor = fillBlue.fillForegroundColor
-        fillBluePound.fillPattern = fillBluePound.fillPattern
-        fillBluePound.dataFormat = formatPound
+        fillLemonPound.fillForegroundColor = fillLemon.fillForegroundColor
+        fillLemonPound.fillPattern = fillLemon.fillPattern
+        fillLemonPound.dataFormat = formatPound
 
-        fillBluePercentage.fillForegroundColor = fillBlue.fillForegroundColor
-        fillBluePercentage.fillPattern = fillBluePound.fillPattern
-        fillBluePercentage.dataFormat = formatPercentage
+        fillLemonPercentage.fillForegroundColor = fillLemon.fillForegroundColor
+        fillLemonPercentage.fillPattern = fillLemonPound.fillPattern
+        fillLemonPercentage.dataFormat = formatPercentage
 
         fillWhitePound.dataFormat = formatPound
         fillWhitePercentage.dataFormat = formatPercentage
@@ -57,17 +93,14 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         applyHeader()
     }
 
-
     private fun applyHeader() {
-        sheet.getRow(0).getCell(1).setCellValue(header.dateRun)
-        sheet.getRow(4).createCell(1).setCellValue(header.supplier.name)
-        sheet.getRow(5).getCell(1).setCellValue(header.dateRange.start)
-        sheet.getRow(5).getCell(3).setCellValue(header.dateRange.endInclusive)
+        sheet.getRow(2).addCell(2, header.dateRange.start, headerMonthYearStyle)
+        sheet.getRow(2).addCell(4, header.dateRun, headerExportDateStyle)
+        sheet.getRow(4).addCell(0,header.supplier.name, headerSupplierNameStyle)
     }
 
-
     protected open fun writeMoveRow(move: Move, isShaded: Boolean, showNotes: Boolean = true){
-        val fill = if(isShaded) fillBlue else null
+        val fill = if(isShaded) fillLemon else null
         val row = createRow()
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(move) {
@@ -82,7 +115,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(8, dropOffOrCancelledTime())
             add(9, vehicleRegistration)
             add(10, person?.prisonNumber)
-            if(hasPrice()) row.addCell(11, totalInPounds(), if(isShaded) fillBluePound else fillWhitePound) else add(11, "NOT PRESENT")
+            if(hasPrice()) row.addCell(11, totalInPounds(), if(isShaded) fillLemonPound else fillWhitePound) else add(11, "NOT PRESENT")
             add(12, "") // billable is empty for a move
             add(13, if(showNotes) notes else "")
         }
@@ -131,6 +164,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             is String -> cell.setCellValue(value)
             is Double -> cell.setCellValue(value)
             is Int -> cell.setCellValue(value.toDouble())
+            is LocalDate -> cell.setCellValue(value)
         }
     }
 

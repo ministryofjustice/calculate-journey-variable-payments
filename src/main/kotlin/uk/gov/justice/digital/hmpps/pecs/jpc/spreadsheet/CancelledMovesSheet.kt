@@ -8,7 +8,7 @@ class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workb
     override fun writeMove(move: Move) = writeMoveRow(move,rowIndex.get() % 2 == 0, false)
 
     override fun writeMoveRow(move: Move, isShaded: Boolean, showNotes: Boolean){
-        val fill = if(isShaded) fillBlue else null
+        val fill = if(isShaded) fillLemon else null
         val row = createRow()
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(move) {
@@ -21,7 +21,7 @@ class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workb
             add(6, dropOffOrCancelledDate())
             add(7, dropOffOrCancelledTime())
             add(8, person?.prisonNumber)
-            if(hasPrice()) row.addCell(9, totalInPounds(), if(isShaded) fillBluePound else fillWhitePound) else add(9, "NOT PRESENT")
+            if(hasPrice()) row.addCell(9, totalInPounds(), if(isShaded) fillLemonPound else fillWhitePound) else add(9, "NOT PRESENT")
             add(10, notes)
         }
     }
