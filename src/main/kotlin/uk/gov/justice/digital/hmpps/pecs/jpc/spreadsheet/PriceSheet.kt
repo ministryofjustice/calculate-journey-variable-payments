@@ -53,14 +53,14 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
     protected val fillGrey = sheet.workbook.createCellStyle()
-    protected val fillBlue = sheet.workbook.createCellStyle()
+    protected val fillLemon = sheet.workbook.createCellStyle()
 
     protected val fillGreyPound = sheet.workbook.createCellStyle()
-    protected val fillBluePound = sheet.workbook.createCellStyle()
+    protected val fillLemonPound = sheet.workbook.createCellStyle()
     protected val fillWhitePound = sheet.workbook.createCellStyle()
 
     protected val fillGreyPercentage = sheet.workbook.createCellStyle()
-    protected val fillBluePercentage = sheet.workbook.createCellStyle()
+    protected val fillLemonPercentage = sheet.workbook.createCellStyle()
     protected val fillWhitePercentage = sheet.workbook.createCellStyle()
 
 
@@ -76,16 +76,16 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         fillGreyPercentage.fillPattern = fillGrey.fillPattern
         fillGreyPercentage.dataFormat = formatPercentage
 
-        fillBlue.fillForegroundColor = IndexedColors.LEMON_CHIFFON.index
-        fillBlue.fillPattern = FillPatternType.SOLID_FOREGROUND
+        fillLemon.fillForegroundColor = IndexedColors.LEMON_CHIFFON.index
+        fillLemon.fillPattern = FillPatternType.SOLID_FOREGROUND
 
-        fillBluePound.fillForegroundColor = fillBlue.fillForegroundColor
-        fillBluePound.fillPattern = fillBlue.fillPattern
-        fillBluePound.dataFormat = formatPound
+        fillLemonPound.fillForegroundColor = fillLemon.fillForegroundColor
+        fillLemonPound.fillPattern = fillLemon.fillPattern
+        fillLemonPound.dataFormat = formatPound
 
-        fillBluePercentage.fillForegroundColor = fillBlue.fillForegroundColor
-        fillBluePercentage.fillPattern = fillBluePound.fillPattern
-        fillBluePercentage.dataFormat = formatPercentage
+        fillLemonPercentage.fillForegroundColor = fillLemon.fillForegroundColor
+        fillLemonPercentage.fillPattern = fillLemonPound.fillPattern
+        fillLemonPercentage.dataFormat = formatPercentage
 
         fillWhitePound.dataFormat = formatPound
         fillWhitePercentage.dataFormat = formatPercentage
@@ -100,7 +100,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
     }
 
     protected open fun writeMoveRow(move: Move, isShaded: Boolean, showNotes: Boolean = true){
-        val fill = if(isShaded) fillBlue else null
+        val fill = if(isShaded) fillLemon else null
         val row = createRow()
         fun <T>add(col: Int, value: T?) = row.addCell(col, value, fill)
         with(move) {
@@ -115,7 +115,7 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
             add(8, dropOffOrCancelledTime())
             add(9, vehicleRegistration)
             add(10, person?.prisonNumber)
-            if(hasPrice()) row.addCell(11, totalInPounds(), if(isShaded) fillBluePound else fillWhitePound) else add(11, "NOT PRESENT")
+            if(hasPrice()) row.addCell(11, totalInPounds(), if(isShaded) fillLemonPound else fillWhitePound) else add(11, "NOT PRESENT")
             add(12, "") // billable is empty for a move
             add(13, if(showNotes) notes else "")
         }
