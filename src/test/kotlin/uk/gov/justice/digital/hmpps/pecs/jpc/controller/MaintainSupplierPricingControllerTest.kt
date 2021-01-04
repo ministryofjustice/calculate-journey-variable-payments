@@ -19,6 +19,7 @@ import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.LocalDate
 
@@ -52,8 +53,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.get("/add-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
             .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "0.00", "from", "to")) } }
-            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
+            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
@@ -90,8 +91,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("price", "1O.00")
     }
             .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
-            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
+            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
@@ -111,8 +112,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("price", "-10.00")
     }
             .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
-            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
+            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
             .andExpect { view { name("add-price") } }
             .andExpect { status { isOk } }
 
@@ -130,8 +131,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.get("/update-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
             .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "10.00", "from", "to")) } }
-            .andExpect { model { attribute("contractualYearStart", effectiveDate.year.toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveDate.year + 1).toString()) } }
+            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
             .andExpect { view { name("update-price") } }
             .andExpect { status { isOk } }
 

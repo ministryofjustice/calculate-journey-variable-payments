@@ -76,11 +76,11 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         fillGreyPercentage.fillPattern = fillGrey.fillPattern
         fillGreyPercentage.dataFormat = formatPercentage
 
-        fillBlue.fillForegroundColor = IndexedColors.LIGHT_YELLOW.getIndex()
+        fillBlue.fillForegroundColor = IndexedColors.LEMON_CHIFFON.index
         fillBlue.fillPattern = FillPatternType.SOLID_FOREGROUND
 
         fillBluePound.fillForegroundColor = fillBlue.fillForegroundColor
-        fillBluePound.fillPattern = fillBluePound.fillPattern
+        fillBluePound.fillPattern = fillBlue.fillPattern
         fillBluePound.dataFormat = formatPound
 
         fillBluePercentage.fillForegroundColor = fillBlue.fillForegroundColor
@@ -98,7 +98,6 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
         sheet.getRow(2).addCell(4, header.dateRun, headerExportDateStyle)
         sheet.getRow(4).addCell(0,header.supplier.name, headerSupplierNameStyle)
     }
-
 
     protected open fun writeMoveRow(move: Move, isShaded: Boolean, showNotes: Boolean = true){
         val fill = if(isShaded) fillBlue else null
