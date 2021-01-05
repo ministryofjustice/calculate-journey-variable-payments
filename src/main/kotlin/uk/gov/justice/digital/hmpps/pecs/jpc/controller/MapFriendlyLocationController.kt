@@ -22,73 +22,72 @@ import javax.validation.constraints.NotEmpty
 @SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
 
-    @GetMapping("/map-location/{agency-id}")
-    fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
-        val from = model.getAttribute(PICK_UP_ATTRIBUTE)
-        val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
-        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+  @GetMapping("/map-location/{agency-id}")
+  fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
+    val from = model.getAttribute(PICK_UP_ATTRIBUTE)
+    val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
+    val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
 
-        from.takeUnless { it == "" }.apply { url.queryParam(PICK_UP_ATTRIBUTE, from) }
-        to.takeUnless { it == "" }.apply { url.queryParam(DROP_OFF_ATTRIBUTE, to) }
+    from.takeUnless { it == "" }.apply { url.queryParam(PICK_UP_ATTRIBUTE, from) }
+    to.takeUnless { it == "" }.apply { url.queryParam(DROP_OFF_ATTRIBUTE, to) }
 
-        model.addAttribute("cancelLink", url.build().toUriString())
+    model.addAttribute("cancelLink", url.build().toUriString())
 
-        service.findAgencyLocationAndType(agencyId)?.let {
-            model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name, operation = "update"))
+    service.findAgencyLocationAndType(agencyId)?.let {
+      model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name, operation = "update"))
 
-            return "map-location"
-        }
-
-        model.addAttribute("form", MapLocationForm(agencyId = agencyId, operation = "create"))
-
-        return "map-location"
+      return "map-location"
     }
 
-    @PostMapping("/map-location")
-    fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
-        val from = model.getAttribute(PICK_UP_ATTRIBUTE)
-        val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
-        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+    model.addAttribute("form", MapLocationForm(agencyId = agencyId, operation = "create"))
 
-        from.takeUnless { it == "" }.apply { url.queryParam(PICK_UP_ATTRIBUTE, from) }
-        to.takeUnless { it == "" }.apply { url.queryParam(DROP_OFF_ATTRIBUTE, to) }
+    return "map-location"
+  }
 
-        model.addAttribute("cancelLink", url.build().toUriString())
+  @PostMapping("/map-location")
+  fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
+    val from = model.getAttribute(PICK_UP_ATTRIBUTE)
+    val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
+    val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
 
-        if (result.hasErrors()) {
-            return "map-location"
-        }
+    from.takeUnless { it == "" }.apply { url.queryParam(PICK_UP_ATTRIBUTE, from) }
+    to.takeUnless { it == "" }.apply { url.queryParam(DROP_OFF_ATTRIBUTE, to) }
 
-        service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
+    model.addAttribute("cancelLink", url.build().toUriString())
 
-        redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
-        redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
-
-        if (form.operation == "create") {
-            redirectAttributes.addFlashAttribute("flashMessage", "location-mapped")
-            return "redirect:/journeys"
-        }
-
-        if (form.operation == "update") {
-            redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
-            return "redirect:${url.build().toUri()}"
-        }
-
-        throw Throwable("Invalid operation ${form.operation}")
+    if (result.hasErrors()) {
+      return "map-location"
     }
 
-    @ValidDuplicateLocation
-    data class MapLocationForm(
-            @get: NotEmpty(message = "Enter NOMIS agency id")
-            val agencyId: String,
+    service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
-            @get: NotEmpty(message = "Enter Schedule 34 location")
-            val locationName: String = "",
+    redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
+    redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
 
-            @get: NotEmpty(message = "Enter Schedule 34 location type")
-            val locationType: String = "",
+    if (form.operation == "create") {
+      redirectAttributes.addFlashAttribute("flashMessage", "location-mapped")
+      return "redirect:/journeys"
+    }
 
-            val operation: String = "create",
-    )
+    if (form.operation == "update") {
+      redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
+      return "redirect:${url.build().toUri()}"
+    }
+
+    throw Throwable("Invalid operation ${form.operation}")
+  }
+
+  @ValidDuplicateLocation
+  data class MapLocationForm(
+    @get: NotEmpty(message = "Enter NOMIS agency id")
+    val agencyId: String,
+
+    @get: NotEmpty(message = "Enter Schedule 34 location")
+    val locationName: String = "",
+
+    @get: NotEmpty(message = "Enter Schedule 34 location type")
+    val locationType: String = "",
+
+    val operation: String = "create",
+  )
 }
-

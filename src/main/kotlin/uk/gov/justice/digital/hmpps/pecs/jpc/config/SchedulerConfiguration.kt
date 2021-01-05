@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import javax.sql.DataSource
 
-
 @Configuration
 @ConditionalOnWebApplication
 @EnableScheduling

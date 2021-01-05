@@ -11,15 +11,15 @@ import org.springframework.context.event.EventListener
 @Configuration
 class VersionOutputter(buildProperties: BuildProperties) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val version = buildProperties.version
+  private val version = buildProperties.version
 
-    @EventListener(ApplicationReadyEvent::class)
-    fun logVersionOnStartup() {
-        logger.info("Version {} started", version)
-    }
+  @EventListener(ApplicationReadyEvent::class)
+  fun logVersionOnStartup() {
+    logger.info("Version {} started", version)
+  }
 
-    @Bean
-    fun versionContextInitializer() = ContextInitializer { it.component.setVersion(version) }
+  @Bean
+  fun versionContextInitializer() = ContextInitializer { it.component.setVersion(version) }
 }

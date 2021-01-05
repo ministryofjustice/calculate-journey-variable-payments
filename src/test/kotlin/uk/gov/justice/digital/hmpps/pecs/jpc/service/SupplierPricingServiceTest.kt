@@ -29,7 +29,13 @@ internal class SupplierPricingServiceTest {
   internal fun `site names returned for new pricing`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)).thenReturn(null)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocation(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation
+      )
+    ).thenReturn(null)
 
     val result = service.getSiteNamesForPricing(Supplier.SERCO, "from", "to")
 
@@ -57,7 +63,13 @@ internal class SupplierPricingServiceTest {
   internal fun `existing site names and price returned`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)).thenReturn(price)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocation(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation
+      )
+    ).thenReturn(price)
 
     val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to")
 
@@ -71,7 +83,13 @@ internal class SupplierPricingServiceTest {
   internal fun `update existing price for supplier`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)).thenReturn(price)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocation(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation
+      )
+    ).thenReturn(price)
 
     service.updatePriceForSupplier(Supplier.SERCO, "from", "to", Money.Factory.valueOf(200.35))
 

@@ -5,9 +5,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 
 interface EventRepository : JpaRepository<Event, String> {
 
-    fun findAllByEventableId(eventableId: String) : List<Event>
+  fun findAllByEventableId(eventableId: String): List<Event>
 
-    fun findAllByEventableIdIn(eventableIds: List<String>) : List<Event>
+  fun findAllByEventableIdIn(eventableIds: List<String>): List<Event>
 
-    fun findByEventableIdIn(eventableIds: List<String>) : List<Event>
+  fun findByEventableIdIn(eventableIds: List<String>): List<Event>
 }

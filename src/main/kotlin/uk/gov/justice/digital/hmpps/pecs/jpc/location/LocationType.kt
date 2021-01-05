@@ -5,24 +5,25 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.location
  */
 enum class LocationType(val label: String) {
 
-    AP("Airport"),
-    CC("Crown Court"),
-    CM("Combined Court"),
-    CO("County Court"),
-    HP("Hospital"),
-    IM("Immigration"),
-    MC("Mag Court"),
-    O("Other"),
-    PR("Prison"),
-    PS("Police"),
-    SCH("SCH"),
-    STC("STC"),
-    UNKNOWN("UNKNOWN");
+  AP("Airport"),
+  CC("Crown Court"),
+  CM("Combined Court"),
+  CO("County Court"),
+  HP("Hospital"),
+  IM("Immigration"),
+  MC("Mag Court"),
+  O("Other"),
+  PR("Prison"),
+  PS("Police"),
+  SCH("SCH"),
+  STC("STC"),
+  UNKNOWN("UNKNOWN");
 
-    companion object {
-        /**
-         * Attempts to map the supplied value to the supported locations types.  Returns null if no match found.
-         */
-        fun map(value: String): LocationType? = values().firstOrNull { it.label.toUpperCase() == value.toUpperCase().trim() }
-    }
+  companion object {
+    /**
+     * Attempts to map the supplied value to the supported locations types.  Returns null if no match found.
+     */
+    fun map(value: String): LocationType? =
+      values().firstOrNull { it.label.toUpperCase() == value.toUpperCase().trim() }
+  }
 }

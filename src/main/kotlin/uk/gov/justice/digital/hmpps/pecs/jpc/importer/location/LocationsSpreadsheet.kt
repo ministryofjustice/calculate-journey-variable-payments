@@ -16,50 +16,58 @@ private const val ROW_OFFSET = 1
 /**
  * Simple wrapper class to encapsulate the logic around access to data in the locations spreadsheet. When finished with the spreadsheet should be closed.
  */
-class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locationRepository: LocationRepository) : InboundSpreadsheet(spreadsheet) {
+class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locationRepository: LocationRepository) :
+  InboundSpreadsheet(spreadsheet) {
 
-    init {
-        val missingTabs = Tab.values().filter { spreadsheet.getSheet(it.label) == null }.toList()
+  init {
+    val missingTabs = Tab.values().filter { spreadsheet.getSheet(it.label) == null }.toList()
 
-        if (missingTabs.isNotEmpty()) throw RuntimeException("The following tabs are missing from the locations spreadsheet: ${missingTabs.joinToString { it.label }}")
+    if (missingTabs.isNotEmpty()) throw RuntimeException("The following tabs are missing from the locations spreadsheet: ${missingTabs.joinToString { it.label }}")
+  }
+
+  enum class Tab(val label: String) {
+    COURT("Courts"),
+    HOSPITAL("Hospitals"),
+    IMMIGRATION("Immigration"),
+    OTHER("Other"),
+    POLICE("Police"),
+    PRISON("Prisons"),
+    STCSCH("STC&SCH");
+  }
+
+  val errors: MutableList<LocationsSpreadsheetError> = mutableListOf()
+
+  /**
+   * Iterates through all data rows excluding the heading row.  Any errors will be caught and recorded against the spreadsheet.
+   */
+  fun forEachRowOn(tab: Tab, f: (location: Location) -> Unit) {
+    getRowsFrom(tab).forEach { row ->
+      Result.runCatching { f(toLocation(row)) }.onFailure { this.addError(tab, row, it) }
     }
+  }
 
-    enum class Tab(val label: String) {
-        COURT("Courts"),
-        HOSPITAL("Hospitals"),
-        IMMIGRATION("Immigration"),
-        OTHER("Other"),
-        POLICE("Police"),
-        PRISON("Prisons"),
-        STCSCH("STC&SCH");
-    }
+  /**
+   * Only rows containing locations are returned. The heading row is not included.
+   */
+  private fun getRowsFrom(tab: Tab): List<Row> =
+    spreadsheet.getSheet(tab.label).drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
 
-    val errors: MutableList<LocationsSpreadsheetError> = mutableListOf()
+  fun toLocation(row: Row): Location {
+    val locationType = LocationType.map(row.getFormattedStringCell(TYPE)!!)
+      ?: throw RuntimeException("Unsupported location type: " + row.getFormattedStringCell(TYPE))
+    val agency = row.getFormattedStringCell(AGENCY) ?: throw RuntimeException("Agency id cannot be blank")
+    val site = row.getFormattedStringCell(SITE) ?: throw RuntimeException("Site name cannot be blank")
 
-    /**
-     * Iterates through all data rows excluding the heading row.  Any errors will be caught and recorded against the spreadsheet.
-     */
-    fun forEachRowOn(tab: Tab, f: (location: Location) -> Unit) {
-        getRowsFrom(tab).forEach { row -> Result.runCatching { f(toLocation(row)) }.onFailure { this.addError(tab, row, it) } }
-    }
+    locationRepository.findByNomisAgencyId(agency)
+      .let { if (it != null) throw RuntimeException("Agency id '$agency' already exists") }
 
-    /**
-     * Only rows containing locations are returned. The heading row is not included.
-     */
-    private fun getRowsFrom(tab: Tab): List<Row> = spreadsheet.getSheet(tab.label).drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
+    return Location(
+      locationType = locationType,
+      nomisAgencyId = agency,
+      siteName = site
+    )
+  }
 
-    fun toLocation(row: Row): Location {
-        val locationType = LocationType.map(row.getFormattedStringCell(TYPE)!!) ?: throw RuntimeException("Unsupported location type: " + row.getFormattedStringCell(TYPE))
-        val agency = row.getFormattedStringCell(AGENCY) ?: throw RuntimeException("Agency id cannot be blank")
-        val site = row.getFormattedStringCell(SITE) ?: throw RuntimeException("Site name cannot be blank")
-
-        locationRepository.findByNomisAgencyId(agency).let { if (it != null) throw RuntimeException("Agency id '$agency' already exists") }
-
-        return Location(
-                locationType = locationType,
-                nomisAgencyId = agency,
-                siteName = site)
-    }
-
-    fun addError(tab: Tab, row: Row, error: Throwable) = errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
+  fun addError(tab: Tab, row: Row, error: Throwable) =
+    errors.add(LocationsSpreadsheetError(tab, row.rowNum + ROW_OFFSET, error.cause?.cause ?: error))
 }

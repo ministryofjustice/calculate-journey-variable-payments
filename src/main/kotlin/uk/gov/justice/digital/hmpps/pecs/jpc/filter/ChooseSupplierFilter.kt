@@ -13,25 +13,24 @@ import javax.servlet.http.HttpServletResponse
 
 class ChooseSupplierFilter(private val timeSource: TimeSource) : Filter {
 
-    @Throws(ServletException::class)
-    override fun init(filterConfig: FilterConfig?) {
-    }
+  @Throws(ServletException::class)
+  override fun init(filterConfig: FilterConfig?) {
+  }
 
-    @Throws(IOException::class, ServletException::class)
-    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
-        val req = request as HttpServletRequest
-        val res = response as HttpServletResponse
-        val session = req.session
-        val supplier = session.getAttribute("supplier")
+  @Throws(IOException::class, ServletException::class)
+  override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    val req = request as HttpServletRequest
+    val res = response as HttpServletResponse
+    val session = req.session
+    val supplier = session.getAttribute("supplier")
 
-        if (supplier == null) {
-            session.setAttribute("date", timeSource.date().withDayOfMonth(1))
-            res.sendRedirect("/choose-supplier")
-        } else {
-            chain.doFilter(request, response)
-        }
+    if (supplier == null) {
+      session.setAttribute("date", timeSource.date().withDayOfMonth(1))
+      res.sendRedirect("/choose-supplier")
+    } else {
+      chain.doFilter(request, response)
     }
+  }
 
-    override fun destroy() {
-    }
+  override fun destroy() {}
 }

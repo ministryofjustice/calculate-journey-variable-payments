@@ -26,7 +26,7 @@ class SupplierPricingService(val locationRepository: LocationRepository, val pri
   fun getExistingSiteNamesAndPrice(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Triple<String, String, Money> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val price = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
-            ?: throw RuntimeException("No matching price found for $supplier")
+      ?: throw RuntimeException("No matching price found for $supplier")
 
     return Triple(fromLocation.siteName, toLocation.siteName, Money(price.priceInPence))
   }
@@ -40,14 +40,16 @@ class SupplierPricingService(val locationRepository: LocationRepository, val pri
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
-            ?: throw RuntimeException("No matching price found for $supplier")
+      ?: throw RuntimeException("No matching price found for $supplier")
 
     priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =
-    Pair(getLocationBy(from) ?: throw RuntimeException("From NOMIS agency id '$from' not found."),
-            getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found."))
+    Pair(
+      getLocationBy(from) ?: throw RuntimeException("From NOMIS agency id '$from' not found."),
+      getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found.")
+    )
 
   private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
 }

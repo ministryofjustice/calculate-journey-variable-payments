@@ -7,7 +7,7 @@ import java.time.LocalDateTime
  * Simple SAM interface to enable easier control of time with the code (and unit tests).
  */
 fun interface TimeSource {
-    fun dateTime() : LocalDateTime
+  fun dateTime(): LocalDateTime
 
-    fun date(): LocalDate = dateTime().toLocalDate()
+  fun date(): LocalDate = dateTime().toLocalDate()
 }

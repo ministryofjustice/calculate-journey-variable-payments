@@ -36,15 +36,16 @@ internal class LogoutApplicationTest(@Autowired private val wac: WebApplicationC
       this.setAttribute("date", LocalDate.now().withDayOfMonth(1))
     }
 
-    mockMvc.get("/dashboard")  { session = mockSession }
-            .andExpect { status { isOk } }
-            .andExpect {
-              authenticated()
-                    .withAuthenticationName("Anonymous")
-                    .withRoles("PECS_JPC") }
-            .andDo { mockMvc.post("/logout") { session = mockSession } }
-            .andExpect { unauthenticated() }
-            .andExpect { status { isOk } }
-            .andReturn()
+    mockMvc.get("/dashboard") { session = mockSession }
+      .andExpect { status { isOk } }
+      .andExpect {
+        authenticated()
+          .withAuthenticationName("Anonymous")
+          .withRoles("PECS_JPC")
+      }
+      .andDo { mockMvc.post("/logout") { session = mockSession } }
+      .andExpect { unauthenticated() }
+      .andExpect { status { isOk } }
+      .andReturn()
   }
 }

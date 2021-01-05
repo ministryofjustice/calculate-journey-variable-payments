@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
-import java.lang.IllegalArgumentException
-
 /**
  * Simple value object to encapsulate a monetary amount in pence. Negative amounts are not allowed.
  */

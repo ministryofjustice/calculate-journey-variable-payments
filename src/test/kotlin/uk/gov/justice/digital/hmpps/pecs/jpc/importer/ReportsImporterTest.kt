@@ -20,25 +20,25 @@ import java.time.LocalDate
 @ContextConfiguration(classes = [TestConfig::class])
 internal class ReportsImporterTest(@Autowired val importService: ImportService) {
 
-    private val from: LocalDate = LocalDate.now()
+  private val from: LocalDate = LocalDate.now()
 
-    private val to: LocalDate = from.plusDays(1)
+  private val to: LocalDate = from.plusDays(1)
 
-    private val importServiceSpy: ImportService = mock {
-        on { importReports(from, to) } doAnswer { importService.importReports(from, to) }
-    }
+  private val importServiceSpy: ImportService = mock {
+    on { importReports(from, to) } doAnswer { importService.importReports(from, to) }
+  }
 
-    private val importer: ReportsImporter = ReportsImporter(importServiceSpy)
+  private val importer: ReportsImporter = ReportsImporter(importServiceSpy)
 
-    @Test
-    internal fun `returns successful exit code when import succeeds`() {
-        assertThat(importer.import(from, to).exitCode).isEqualTo(0)
-        verify(importServiceSpy).importReports(from, to)
-    }
+  @Test
+  internal fun `returns successful exit code when import succeeds`() {
+    assertThat(importer.import(from, to).exitCode).isEqualTo(0)
+    verify(importServiceSpy).importReports(from, to)
+  }
 
-    @Test
-    internal fun `returns failure exit code when import fails`() {
-        whenever(importServiceSpy.importReports(from, to)).doThrow(RuntimeException())
-        assertThat(importer.import(from, to).exitCode).isEqualTo(1)
-    }
+  @Test
+  internal fun `returns failure exit code when import fails`() {
+    whenever(importServiceSpy.importReports(from, to)).doThrow(RuntimeException())
+    assertThat(importer.import(from, to).exitCode).isEqualTo(1)
+  }
 }

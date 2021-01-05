@@ -25,7 +25,13 @@ internal class MapFriendlyLocationServiceTest {
 
   @Test
   internal fun `site name does not already exist when agency same`() {
-    whenever(locationRepository.findBySiteName("SITE NAME")).thenReturn(Location(LocationType.AP, "AGENCYID", "SITE NAME"))
+    whenever(locationRepository.findBySiteName("SITE NAME")).thenReturn(
+      Location(
+        LocationType.AP,
+        "AGENCYID",
+        "SITE NAME"
+      )
+    )
 
     assertThat(service.locationAlreadyExists("agencyId", "site name")).isFalse
   }

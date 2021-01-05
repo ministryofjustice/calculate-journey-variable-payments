@@ -16,24 +16,24 @@ import java.time.format.DateTimeFormatterBuilder
  */
 object MonthYearParser {
 
-    fun isValid(monthYear: String): Boolean {
-        return atStartOf(monthYear) != null
-    }
+  fun isValid(monthYear: String): Boolean {
+    return atStartOf(monthYear) != null
+  }
 
-    /**
-     * @return [LocalDate] at the beginning of the month for the given month and year if parsable, otherwise null.
-     */
-    fun atStartOf(monthYear: String): LocalDate? {
-        return Result.runCatching {
-            YearMonth.parse(monthYear.trim(), DateTimeFormatter.ofPattern("M/yyyy")).atDay(1)
-        }.getOrElse {
-            Result.runCatching {
-                YearMonth.parse(monthYear.trim(), DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMM yyyy").toFormatter()).atDay(1)
-            }.getOrElse {
-                Result.runCatching {
-                    YearMonth.parse(monthYear.trim(), DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMMM yyyy").toFormatter()).atDay(1)
-                }.getOrNull()
-            }
-        }
+  /**
+   * @return [LocalDate] at the beginning of the month for the given month and year if parsable, otherwise null.
+   */
+  fun atStartOf(monthYear: String): LocalDate? {
+    return Result.runCatching {
+      YearMonth.parse(monthYear.trim(), DateTimeFormatter.ofPattern("M/yyyy")).atDay(1)
+    }.getOrElse {
+      Result.runCatching {
+        YearMonth.parse(monthYear.trim(), DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMM yyyy").toFormatter()).atDay(1)
+      }.getOrElse {
+        Result.runCatching {
+          YearMonth.parse(monthYear.trim(), DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern("MMMM yyyy").toFormatter()).atDay(1)
+        }.getOrNull()
+      }
     }
+  }
 }

@@ -14,97 +14,112 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-
 @Configuration
 @ConditionalOnExpression("{'s3'}.contains('\${resources.provider}')")
 class S3ProviderConfiguration {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-    @Bean
-    @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun jpcAmazonS3(@Value("\${resources.endpoint.url:}") endpoint: String,
-                 @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
-                 @Value("\${JPC_AWS_ACCESS_KEY_ID:}") accessKey: String,
-                 @Value("\${JPC_AWS_SECRET_ACCESS_KEY:}") secretKey: String): AmazonS3 {
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun jpcAmazonS3(
+    @Value("\${resources.endpoint.url:}") endpoint: String,
+    @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
+    @Value("\${JPC_AWS_ACCESS_KEY_ID:}") accessKey: String,
+    @Value("\${JPC_AWS_SECRET_ACCESS_KEY:}") secretKey: String
+  ): AmazonS3 {
 
-        return amazonS3(endpoint, region, accessKey, secretKey)
+    return amazonS3(endpoint, region, accessKey, secretKey)
+  }
+
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun basmAmazonS3(
+    @Value("\${resources.endpoint.url:}") endpoint: String,
+    @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
+    @Value("\${BASM_AWS_ACCESS_KEY_ID:}") accessKey: String,
+    @Value("\${BASM_AWS_SECRET_ACCESS_KEY:}") secretKey: String
+  ): AmazonS3 {
+
+    return amazonS3(endpoint, region, accessKey, secretKey)
+  }
+
+  private fun amazonS3(endpoint: String, region: String, accessKey: String, secretKey: String): AmazonS3 {
+    logger.info("Using AWS configuration.")
+    val builder = if (endpoint.isNotEmpty()) {
+      // Localstack
+      logger.info("****Using localstack with endpoint: $endpoint*****")
+
+      AmazonS3ClientBuilder.standard()
+        .withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpoint, region))
+    } else {
+      // Real AWS S3
+      logger.info("****Using Real S3 with access key: $accessKey*****")
+
+      val awsCreds = BasicAWSCredentials(accessKey, secretKey)
+      AmazonS3ClientBuilder.standard()
+        .withRegion(region)
+        .withCredentials(
+          AWSStaticCredentialsProvider(awsCreds)
+        )
     }
 
-    @Bean
-    @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun basmAmazonS3(@Value("\${resources.endpoint.url:}") endpoint: String,
-                    @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
-                    @Value("\${BASM_AWS_ACCESS_KEY_ID:}") accessKey: String,
-                    @Value("\${BASM_AWS_SECRET_ACCESS_KEY:}") secretKey: String): AmazonS3 {
+    return builder.withPathStyleAccessEnabled(true).build()
+  }
 
-        return amazonS3(endpoint, region, accessKey, secretKey)
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun locationsResourceProvider(
+    @Qualifier("jpcAmazonS3") client: AmazonS3,
+    @Value("\${JPC_BUCKET_NAME}") bucketName: String,
+    @Value("\${import-files.locations}") locationsFile: String
+  ): Schedule34LocationsProvider {
+    logger.info("Using AWS S3 provider for Schedule 34 locations file: $locationsFile")
+
+    return Schedule34LocationsProvider {
+      logger.info("Getting locations using bucket $bucketName")
+      client.getObject(GetObjectRequest(bucketName, locationsFile)).objectContent
     }
+  }
 
-    private fun amazonS3 (endpoint: String, region: String, accessKey: String, secretKey: String) : AmazonS3{
-        logger.info("Using AWS configuration.")
-        val builder = if(endpoint.isNotEmpty()) {
-            // Localstack
-            logger.info("****Using localstack with endpoint: $endpoint*****")
-
-            AmazonS3ClientBuilder.standard().withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpoint, region))
-        }
-        else {
-            // Real AWS S3
-            logger.info("****Using Real S3 with access key: $accessKey*****")
-
-            val awsCreds = BasicAWSCredentials(accessKey, secretKey)
-            AmazonS3ClientBuilder.standard()
-                    .withRegion(region)
-                    .withCredentials(AWSStaticCredentialsProvider(awsCreds)
-                    )
-        }
-
-        return builder.withPathStyleAccessEnabled(true).build()
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun sercoPricesResourceProvider(
+    @Qualifier("jpcAmazonS3") client: AmazonS3,
+    @Value("\${JPC_BUCKET_NAME}") bucketName: String,
+    @Value("\${import-files.serco-prices}") sercoPricesFile: String
+  ): SercoPricesProvider {
+    logger.info("Using AWS S3 provider for Serco prices file: $sercoPricesFile")
+    return SercoPricesProvider {
+      logger.info("getting SERCO")
+      client.getObject(GetObjectRequest(bucketName, sercoPricesFile)).objectContent
     }
+  }
 
-    @Bean
-    @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun locationsResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-                                  @Value("\${import-files.locations}") locationsFile: String): Schedule34LocationsProvider {
-        logger.info("Using AWS S3 provider for Schedule 34 locations file: $locationsFile")
-
-        return Schedule34LocationsProvider {
-            logger.info("Getting locations using bucket $bucketName")
-            client.getObject(GetObjectRequest(bucketName, locationsFile)).objectContent
-        }
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun geoameyPricesResourceProvider(
+    @Qualifier("jpcAmazonS3") client: AmazonS3,
+    @Value("\${JPC_BUCKET_NAME}") bucketName: String,
+    @Value("\${import-files.geo-prices}") geoPricesFile: String
+  ): GeoameyPricesProvider {
+    logger.info("Using AWS S3 provider for Geoamey prices file: $geoPricesFile")
+    return GeoameyPricesProvider {
+      logger.info("getting geo")
+      client.getObject(GetObjectRequest(bucketName, geoPricesFile)).objectContent
     }
+  }
 
-    @Bean
-    @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun sercoPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-                                    @Value("\${import-files.serco-prices}") sercoPricesFile: String): SercoPricesProvider {
-        logger.info("Using AWS S3 provider for Serco prices file: $sercoPricesFile")
-        return SercoPricesProvider {
-            logger.info("getting SERCO")
-            client.getObject(GetObjectRequest(bucketName, sercoPricesFile)).objectContent
-        }
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun reportingResourceProvider(
+    @Qualifier("basmAmazonS3") client: AmazonS3,
+    @Value("\${BASM_BUCKET_NAME}") bucketName: String
+  ): ReportingProvider {
+    logger.info("Using AWS S3 resource provider for move.")
+    return ReportingProvider {
+      logger.debug("Using bucket $bucketName")
+      client.getObjectAsString(bucketName, it)
     }
-
-    @Bean
-    @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun geoameyPricesResourceProvider(@Qualifier("jpcAmazonS3") client: AmazonS3, @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-                                      @Value("\${import-files.geo-prices}") geoPricesFile: String): GeoameyPricesProvider {
-        logger.info("Using AWS S3 provider for Geoamey prices file: $geoPricesFile")
-        return GeoameyPricesProvider {
-            logger.info("getting geo")
-            client.getObject(GetObjectRequest(bucketName, geoPricesFile)).objectContent
-        }
-    }
-
-
-    @Bean
-    @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-    fun reportingResourceProvider(@Qualifier("basmAmazonS3") client: AmazonS3, @Value("\${BASM_BUCKET_NAME}") bucketName: String): ReportingProvider {
-        logger.info("Using AWS S3 resource provider for move.")
-        return ReportingProvider {
-            logger.debug("Using bucket $bucketName")
-            client.getObjectAsString(bucketName, it)
-        }
-    }
+  }
 }

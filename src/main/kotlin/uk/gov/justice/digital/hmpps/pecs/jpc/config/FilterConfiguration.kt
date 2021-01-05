@@ -11,15 +11,16 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion
 import uk.gov.justice.digital.hmpps.pecs.jpc.filter.ChooseSupplierFilter
 
 @Configuration
-class FilterRegistrationConfig {
+class FilterConfiguration {
 
-    @Autowired lateinit var timeSource: TimeSource
+  @Autowired
+  lateinit var timeSource: TimeSource
 
-    @Bean
-    fun chooseFilter(): FilterRegistrationBean<ChooseSupplierFilter> {
-        val registrationBean: FilterRegistrationBean<ChooseSupplierFilter> = FilterRegistrationBean<ChooseSupplierFilter>()
-        registrationBean.filter = ChooseSupplierFilter(timeSource)
-        registrationBean.addUrlPatterns(DASHBOARD_URL, SELECT_MONTH_URL, JOURNEYS_URL, MOVES_BY_TYPE_URL)
-        return registrationBean
-    }
+  @Bean
+  fun chooseFilter(): FilterRegistrationBean<ChooseSupplierFilter> {
+    val registrationBean: FilterRegistrationBean<ChooseSupplierFilter> = FilterRegistrationBean<ChooseSupplierFilter>()
+    registrationBean.filter = ChooseSupplierFilter(timeSource)
+    registrationBean.addUrlPatterns(DASHBOARD_URL, SELECT_MONTH_URL, JOURNEYS_URL, MOVES_BY_TYPE_URL)
+    return registrationBean
+  }
 }

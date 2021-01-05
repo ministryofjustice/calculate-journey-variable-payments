@@ -7,11 +7,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 @Target(AnnotationTarget.FIELD)
 annotation class SupplierParser
 
-val supplierConverter = object: Converter {
+val supplierConverter = object : Converter {
 
-    override fun canConvert(cls: Class<*>) = cls == Supplier::class.java
+  override fun canConvert(cls: Class<*>) = cls == Supplier::class.java
 
-    override fun fromJson(jv: JsonValue) = Supplier.valueOfCaseInsensitive(jv.string)
+  override fun fromJson(jv: JsonValue) = Supplier.valueOfCaseInsensitive(jv.string)
 
-    override fun toJson(value: Any) = """"${value}""""
+  override fun toJson(value: Any) =
+    """"$value""""
 }

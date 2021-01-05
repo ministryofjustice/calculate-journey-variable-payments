@@ -21,129 +21,170 @@ import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, HtmlController.PICK_UP_ATTRIBUTE, HtmlController.DROP_OFF_ATTRIBUTE, HtmlController.DATE_ATTRIBUTE)
+@SessionAttributes(
+  HtmlController.SUPPLIER_ATTRIBUTE,
+  HtmlController.PICK_UP_ATTRIBUTE,
+  HtmlController.DROP_OFF_ATTRIBUTE,
+  HtmlController.DATE_ATTRIBUTE
+)
 class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
 
-    data class PriceForm(
-            @get: NotNull(message = "Invalid message id")
-            val moveId: String,
-            @get: NotNull(message = "Add a price")
-            val price: String,
-            val from: String?,
-            val to: String?,
-    )
+  data class PriceForm(
+    @get: NotNull(message = "Invalid message id")
+    val moveId: String,
+    @get: NotNull(message = "Add a price")
+    val price: String,
+    val from: String?,
+    val to: String?,
+  )
 
-    @GetMapping("/add-price/{moveId}")
-    fun addPrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier, ): Any {
-        val (fromSite, toSite) = agencyIds(moveId).let { (from, to) -> supplierPricingService.getSiteNamesForPricing(supplier, from, to) }
-        val effectiveYear = model.getEffectiveYear()
+  @GetMapping("/add-price/{moveId}")
+  fun addPrice(
+    @PathVariable moveId: String,
+    model: ModelMap,
+    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
+  ): Any {
+    val (fromSite, toSite) = agencyIds(moveId).let { (from, to) ->
+      supplierPricingService.getSiteNamesForPricing(
+        supplier,
+        from,
+        to
+      )
+    }
+    val effectiveYear = model.getEffectiveYear()
 
-        model.apply {
-            addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
-            addAttribute("contractualYearStart", "$effectiveYear")
-            addAttribute("contractualYearEnd", "${effectiveYear + 1}")
-        }
-
-        return "add-price"
+    model.apply {
+      addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
+      addAttribute("contractualYearStart", "$effectiveYear")
+      addAttribute("contractualYearEnd", "${effectiveYear + 1}")
     }
 
-    @PostMapping("/add-price")
-    fun addPrice(
-            @Valid @ModelAttribute("form") form: PriceForm,
-            result: BindingResult,
-            model: ModelMap,
-            @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
-            redirectAttributes: RedirectAttributes, ): Any {
+    return "add-price"
+  }
 
-        val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
+  @PostMapping("/add-price")
+  fun addPrice(
+    @Valid @ModelAttribute("form") form: PriceForm,
+    result: BindingResult,
+    model: ModelMap,
+    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    redirectAttributes: RedirectAttributes,
+  ): Any {
 
-        if (result.hasErrors()) {
-            val effectiveYear = model.getEffectiveYear()
+    val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
-            model.addAttribute("contractualYearStart", "$effectiveYear")
-            model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+    if (result.hasErrors()) {
+      val effectiveYear = model.getEffectiveYear()
 
-            return "add-price"
-        }
+      model.addAttribute("contractualYearStart", "$effectiveYear")
+      model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
 
-        agencyIds(form.moveId).let { (from, to) -> supplierPricingService.addPriceForSupplier(supplier, from, to, price!!) }
-
-        redirectAttributes.apply {
-            addFlashAttribute("flashMessage", "price-created")
-            addFlashAttribute("flashAttrLocationFrom", form.from)
-            addFlashAttribute("flashAttrLocationTo", form.to)
-            addFlashAttribute("flashAttrPrice", form.price)
-        }
-
-        return RedirectView(HtmlController.JOURNEYS_URL)
+      return "add-price"
     }
 
-    @GetMapping("/update-price/{moveId}")
-    fun updatePrice(@PathVariable moveId: String, model: ModelMap, @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier): String {
-        val (fromSite, toSite, price) = agencyIds(moveId).let { (from, to) -> supplierPricingService.getExistingSiteNamesAndPrice(supplier, from, to) }
-        val effectiveYear = model.getEffectiveYear()
+    agencyIds(form.moveId).let { (from, to) -> supplierPricingService.addPriceForSupplier(supplier, from, to, price!!) }
 
-        model.apply {
-            addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
-            addAttribute("contractualYearStart", "$effectiveYear")
-            addAttribute("contractualYearEnd", "${effectiveYear + 1}")
-        }
-
-        model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
-
-        return "update-price"
+    redirectAttributes.apply {
+      addFlashAttribute("flashMessage", "price-created")
+      addFlashAttribute("flashAttrLocationFrom", form.from)
+      addFlashAttribute("flashAttrLocationTo", form.to)
+      addFlashAttribute("flashAttrPrice", form.price)
     }
 
-    @PostMapping("/update-price")
-    fun updatePrice(
-            @Valid @ModelAttribute("form") form: PriceForm,
-            result: BindingResult,
-            model: ModelMap,
-            @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
-            redirectAttributes: RedirectAttributes, ): Any {
+    return RedirectView(HtmlController.JOURNEYS_URL)
+  }
 
-        val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
+  @GetMapping("/update-price/{moveId}")
+  fun updatePrice(
+    @PathVariable moveId: String,
+    model: ModelMap,
+    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
+  ): String {
+    val (fromSite, toSite, price) = agencyIds(moveId).let { (from, to) ->
+      supplierPricingService.getExistingSiteNamesAndPrice(
+        supplier,
+        from,
+        to
+      )
+    }
+    val effectiveYear = model.getEffectiveYear()
 
-        if (result.hasErrors()) {
-            val effectiveYear = model.getEffectiveYear()
-            model.addAttribute("contractualYearStart", "$effectiveYear")
-            model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
-            model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
-            return "update-price"
-        }
-
-        agencyIds(form.moveId).let { (from, to) ->  supplierPricingService.updatePriceForSupplier(supplier, from, to, price!!)}
-
-        redirectAttributes.apply {
-            addFlashAttribute("flashMessage", "price-updated")
-            addFlashAttribute("flashAttrLocationFrom", form.from)
-            addFlashAttribute("flashAttrLocationTo", form.to)
-            addFlashAttribute("flashAttrPrice", form.price)
-        }
-
-        return RedirectView(model.getJourneySearchResultsUrl())
+    model.apply {
+      addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
+      addAttribute("contractualYearStart", "$effectiveYear")
+      addAttribute("contractualYearEnd", "${effectiveYear + 1}")
     }
 
-    private fun ModelMap.getJourneySearchResultsUrl(): String {
-        val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+    model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
 
-        getFromLocation()?.apply { url.fromQueryParam( this) }
-        getToLocation()?.apply { url.toQueryParam( this) }
+    return "update-price"
+  }
 
-        return url.toUriString()
+  @PostMapping("/update-price")
+  fun updatePrice(
+    @Valid @ModelAttribute("form") form: PriceForm,
+    result: BindingResult,
+    model: ModelMap,
+    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    redirectAttributes: RedirectAttributes,
+  ): Any {
+
+    val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
+
+    if (result.hasErrors()) {
+      val effectiveYear = model.getEffectiveYear()
+      model.addAttribute("contractualYearStart", "$effectiveYear")
+      model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+      model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
+      return "update-price"
     }
 
-    private fun agencyIds(combined: String) = Pair(combined.split("-")[0].trim().toUpperCase(), combined.split("-")[1].trim().toUpperCase())
+    agencyIds(form.moveId).let { (from, to) ->
+      supplierPricingService.updatePriceForSupplier(
+        supplier,
+        from,
+        to,
+        price!!
+      )
+    }
 
-    private fun parseAmount(value: String) = Result.runCatching { value.toDouble() }.getOrNull()?.takeIf { it > 0 }?.let { Money.valueOf(it) }
+    redirectAttributes.apply {
+      addFlashAttribute("flashMessage", "price-updated")
+      addFlashAttribute("flashAttrLocationFrom", form.from)
+      addFlashAttribute("flashAttrLocationTo", form.to)
+      addFlashAttribute("flashAttrPrice", form.price)
+    }
 
-    private fun ModelMap.getFromLocation() = this.getAttribute(HtmlController.PICK_UP_ATTRIBUTE).takeUnless { it == "" }
+    return RedirectView(model.getJourneySearchResultsUrl())
+  }
 
-    private fun ModelMap.getToLocation() = this.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE).takeUnless { it == "" }
+  private fun ModelMap.getJourneySearchResultsUrl(): String {
+    val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
 
-    private fun ModelMap.getEffectiveYear() = effectiveYearForDate(this.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate)
+    getFromLocation()?.apply { url.fromQueryParam(this) }
+    getToLocation()?.apply { url.toQueryParam(this) }
 
-    private fun UriComponentsBuilder.fromQueryParam(from: Any) { this.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)}
+    return url.toUriString()
+  }
 
-    private fun UriComponentsBuilder.toQueryParam(to: Any) { this.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)}
+  private fun agencyIds(combined: String) =
+    Pair(combined.split("-")[0].trim().toUpperCase(), combined.split("-")[1].trim().toUpperCase())
+
+  private fun parseAmount(value: String) =
+    Result.runCatching { value.toDouble() }.getOrNull()?.takeIf { it > 0 }?.let { Money.valueOf(it) }
+
+  private fun ModelMap.getFromLocation() = this.getAttribute(HtmlController.PICK_UP_ATTRIBUTE).takeUnless { it == "" }
+
+  private fun ModelMap.getToLocation() = this.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE).takeUnless { it == "" }
+
+  private fun ModelMap.getEffectiveYear() =
+    effectiveYearForDate(this.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate)
+
+  private fun UriComponentsBuilder.fromQueryParam(from: Any) {
+    this.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)
+  }
+
+  private fun UriComponentsBuilder.toQueryParam(to: Any) {
+    this.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
+  }
 }
