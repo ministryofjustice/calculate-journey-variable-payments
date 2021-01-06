@@ -63,7 +63,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("add-price") } }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
 
     verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)
   }
@@ -80,7 +80,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("price", "100.24")
     }
       .andExpect { redirectedUrl("/journeys") }
-      .andExpect { status { is3xxRedirection } }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24))
   }
@@ -101,7 +101,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("add-price") } }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
 
     verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
   }
@@ -122,7 +122,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("add-price") } }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
 
     verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
   }
@@ -154,7 +154,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("update-price") } }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
 
     verify(service).getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)
   }

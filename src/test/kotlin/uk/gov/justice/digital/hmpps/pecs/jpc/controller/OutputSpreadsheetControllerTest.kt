@@ -33,7 +33,7 @@ class OutputSpreadsheetControllerTest(@Autowired val mockMvc: MockMvc) {
 
     mockMvc.get("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01") { }
       .andExpect {
-        status { isOk }
+        status { isOk() }
         content { contentType("application/vnd.ms-excel") }
         header {
           string(

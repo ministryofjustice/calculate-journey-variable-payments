@@ -46,7 +46,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
 
     mockMvc.get("/moves/${move.moveId}") { session = mockSession }
       .andExpect { view { name("move") } }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
 
     verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)
   }
@@ -57,7 +57,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
     whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)).thenReturn(null)
 
     mockMvc.get("/moves/${move.moveId}") { session = mockSession }
-      .andExpect { status { isNotFound } }
+      .andExpect { status { isNotFound() } }
       .andExpect { view { name("error/404") } }
 
     verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)
@@ -73,7 +73,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       param("reference", "ref1 ")
     }
       .andExpect { redirectedUrl("/moves/M1") }
-      .andExpect { status { is3xxRedirection } }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)
   }
@@ -88,7 +88,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       param("reference", "nonexistentref")
     }
       .andExpect { redirectedUrl("/find-move/?no-results-for=nonexistentref") }
-      .andExpect { status { is3xxRedirection } }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("NONEXISTENTREF", defaultSupplierSerco)
   }
@@ -103,7 +103,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       param("reference", "select * from moves")
     }
       .andExpect { redirectedUrl("/find-move/?no-results-for=invalid-reference") }
-      .andExpect { status { is3xxRedirection } }
+      .andExpect { status { is3xxRedirection() } }
 
     verifyNoMoreInteractions(moveService)
   }

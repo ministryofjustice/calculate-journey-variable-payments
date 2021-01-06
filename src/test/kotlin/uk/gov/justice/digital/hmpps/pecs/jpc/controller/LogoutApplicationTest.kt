@@ -37,7 +37,7 @@ internal class LogoutApplicationTest(@Autowired private val wac: WebApplicationC
     }
 
     mockMvc.get("/dashboard") { session = mockSession }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
       .andExpect {
         authenticated()
           .withAuthenticationName("Anonymous")
@@ -45,7 +45,7 @@ internal class LogoutApplicationTest(@Autowired private val wac: WebApplicationC
       }
       .andDo { mockMvc.post("/logout") { session = mockSession } }
       .andExpect { unauthenticated() }
-      .andExpect { status { isOk } }
+      .andExpect { status { isOk() } }
       .andReturn()
   }
 }

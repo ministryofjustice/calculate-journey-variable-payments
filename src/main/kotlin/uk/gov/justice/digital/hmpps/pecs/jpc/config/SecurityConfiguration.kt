@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
-import com.nimbusds.oauth2.sdk.util.JSONArrayUtils
-import net.minidev.json.JSONArray
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
@@ -65,9 +63,8 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     return OAuth2UserService { userRequest ->
       val user = delegate.loadUser(userRequest)
       val jwt = JwtDecoders.fromIssuerLocation(issuer).decode(userRequest.accessToken.tokenValue)
-      val authorities = JSONArrayUtils.toStringList(jwt.claims["authorities"] as JSONArray?)
 
-      DefaultOAuth2User(authorities.stream().map { SimpleGrantedAuthority(it) }.toList(), user.attributes, "name")
+      DefaultOAuth2User(jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(), user.attributes, "name")
     }
   }
 
