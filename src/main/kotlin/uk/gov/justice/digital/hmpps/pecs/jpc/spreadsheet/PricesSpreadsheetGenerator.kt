@@ -16,11 +16,13 @@ import java.io.FileOutputStream
 import java.time.LocalDate
 
 @Component
-class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplateProvider,
-                                 @Autowired private val timeSource: TimeSource,
-                                 @Autowired private val moveService: MoveService,
-                                 @Autowired private val journeyService: JourneyService,
-                                 @Autowired private val supplierPrices: SupplierPrices) {
+class PricesSpreadsheetGenerator(
+  @Autowired private val template: JPCTemplateProvider,
+  @Autowired private val timeSource: TimeSource,
+  @Autowired private val moveService: MoveService,
+  @Autowired private val journeyService: JourneyService,
+  @Autowired private val supplierPrices: SupplierPrices
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -28,48 +30,29 @@ class PricesSpreadsheetGenerator(@Autowired private val template: JPCTemplatePro
     val dateGenerated = timeSource.date()
 
     XSSFWorkbook(template.get()).use { workbook ->
-
       val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
 
       val moves = moveService.moves(supplier, startDate)
       val journeys = journeyService.distinctJourneysIncludingPriced(supplier, startDate)
       val summaries = moveService.moveTypeSummaries(supplier, startDate)
 
-      StandardMovesSheet(workbook, header)
-              .also { logger.info("Adding standard prices.") }
-              .apply { writeMoves(moves[0]) }
+      StandardMovesSheet(workbook, header).also { logger.info("Adding standard prices.") }.apply { writeMoves(moves[0]) }
 
-      RedirectionMovesSheet(workbook, header)
-              .also { logger.info("Adding redirect prices.") }
-              .apply { writeMoves(moves[1]) }
+      RedirectionMovesSheet(workbook, header).also { logger.info("Adding redirect prices.") }.apply { writeMoves(moves[1]) }
 
-      LongHaulMovesSheet(workbook, header)
-              .also { logger.info("Adding long haul prices.") }
-              .apply { writeMoves(moves[2]) }
+      LongHaulMovesSheet(workbook, header).also { logger.info("Adding long haul prices.") }.apply { writeMoves(moves[2]) }
 
-      LockoutMovesSheet(workbook, header)
-              .also { logger.info("Adding lockout prices.") }
-              .apply { writeMoves(moves[3]) }
+      LockoutMovesSheet(workbook, header).also { logger.info("Adding lockout prices.") }.apply { writeMoves(moves[3]) }
 
-      MultiTypeMovesSheet(workbook, header)
-              .also { logger.info("Adding multi-type prices.") }
-              .apply { writeMoves(moves[4]) }
+      MultiTypeMovesSheet(workbook, header).also { logger.info("Adding multi-type prices.") }.apply { writeMoves(moves[4]) }
 
-      CancelledMovesSheet(workbook, header)
-              .also { logger.info("Adding cancelled moves.") }
-              .apply { writeMoves(moves[5]) }
+      CancelledMovesSheet(workbook, header).also { logger.info("Adding cancelled moves.") }.apply { writeMoves(moves[5]) }
 
-      JourneysSheet(workbook, header)
-              .also { logger.info("Adding journeys.") }
-              .apply { writeJourneys(journeys) }
+      JourneysSheet(workbook, header).also { logger.info("Adding journeys.") }.apply { writeJourneys(journeys) }
 
-      SummarySheet(workbook, header)
-              .also { logger.info("Adding summaries.") }
-              .apply { writeSummaries(summaries) }
+      SummarySheet(workbook, header).also { logger.info("Adding summaries.") }.apply { writeSummaries(summaries) }
 
-      SupplierPricesSheet(workbook, header)
-              .also { logger.info("Adding prices used for supplier $supplier.") }
-              .apply { writePrices(supplierPrices.get(supplier)) }
+      SupplierPricesSheet(workbook, header).also { logger.info("Adding prices used for supplier $supplier.") }.apply { writePrices(supplierPrices.get(supplier)) }
 
       return createTempFile(suffix = "xlsx").apply {
         FileOutputStream(this).use {

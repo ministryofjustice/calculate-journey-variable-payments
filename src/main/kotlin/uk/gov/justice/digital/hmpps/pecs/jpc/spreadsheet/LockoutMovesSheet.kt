@@ -5,8 +5,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 class LockoutMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Lockouts")!!, header) {
 
-    override fun writeMove(move: Move) {
-        writeMoveRow(move, true)
-        writeJourneyRows(move.journeys)
-    }
+  override fun writeMove(move: Move) {
+    writeMoveRow(move, true)
+    writeJourneyRows(move.journeys)
+  }
 }

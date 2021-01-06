@@ -7,29 +7,32 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 
 @Component
-class LocationsImporter(private val locationRepo: LocationRepository, private val schedule34LocationsProvider: Schedule34LocationsProvider) {
+class LocationsImporter(
+  private val locationRepo: LocationRepository,
+  private val schedule34LocationsProvider: Schedule34LocationsProvider
+) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun import() {
-        locationRepo.deleteAll()
+  fun import() {
+    locationRepo.deleteAll()
 
-        schedule34LocationsProvider.get().use { locations ->
-            LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {
-                import(it)
-            }
-        }
+    schedule34LocationsProvider.get().use { locations ->
+      LocationsSpreadsheet(XSSFWorkbook(locations), locationRepo).use {
+        import(it)
+      }
     }
+  }
 
-    private fun import(spreadsheet: LocationsSpreadsheet) {
-        val count = locationRepo.count()
+  private fun import(spreadsheet: LocationsSpreadsheet) {
+    val count = locationRepo.count()
 
-        LocationsSpreadsheet.Tab.values().forEach { tab -> spreadsheet.forEachRowOn(tab) { locationRepo.save(it) } }
+    LocationsSpreadsheet.Tab.values().forEach { tab -> spreadsheet.forEachRowOn(tab) { locationRepo.save(it) } }
 
-        spreadsheet.errors.forEach { logger.info(it.toString()) }
+    spreadsheet.errors.forEach { logger.info(it.toString()) }
 
-        val inserted = locationRepo.count() - count
+    val inserted = locationRepo.count() - count
 
-        logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
-    }
+    logger.info("LOCATIONS INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
+  }
 }

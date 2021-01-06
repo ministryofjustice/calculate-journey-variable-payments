@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.LocalDate
@@ -51,12 +51,19 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     whenever(service.getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)).thenReturn(Pair("from", "to"))
 
-    mockMvc.get("/add-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
-            .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "0.00", "from", "to")) } }
-            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
-            .andExpect { view { name("add-price") } }
-            .andExpect { status { isOk } }
+    mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
+      .andExpect {
+        model {
+          attribute(
+            "form",
+            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")
+          )
+        }
+      }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("add-price") } }
+      .andExpect { status { isOk() } }
 
     verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)
   }
@@ -69,11 +76,11 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.post("/add-price") {
       session = mockSession
-      param("moveId", "${fromAgencyId}-${toAgencyId}")
+      param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "100.24")
     }
-            .andExpect { redirectedUrl("/journeys") }
-            .andExpect { status { is3xxRedirection } }
+      .andExpect { redirectedUrl("/journeys") }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24))
   }
@@ -87,14 +94,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.post("/add-price") {
       session = mockSession
-      param("moveId", "${fromAgencyId}-${toAgencyId}")
+      param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "1O.00")
     }
-            .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
-            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
-            .andExpect { view { name("add-price") } }
-            .andExpect { status { isOk } }
+      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("add-price") } }
+      .andExpect { status { isOk() } }
 
     verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
   }
@@ -108,14 +115,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.post("/add-price") {
       session = mockSession
-      param("moveId", "${fromAgencyId}-${toAgencyId}")
+      param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "-10.00")
     }
-            .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
-            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
-            .andExpect { view { name("add-price") } }
-            .andExpect { status { isOk } }
+      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("add-price") } }
+      .andExpect { status { isOk() } }
 
     verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
   }
@@ -127,14 +134,27 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
-    whenever(service.getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(Triple("from", "to", Money(1000)))
+    whenever(service.getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(
+      Triple(
+        "from",
+        "to",
+        Money(1000)
+      )
+    )
 
-    mockMvc.get("/update-price/${fromAgencyId}-${toAgencyId}") { session = mockSession}
-            .andExpect { model { attribute("form", MaintainSupplierPricingController.PriceForm("${fromAgencyId}-${toAgencyId}", "10.00", "from", "to")) } }
-            .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-            .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
-            .andExpect { view { name("update-price") } }
-            .andExpect { status { isOk } }
+    mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
+      .andExpect {
+        model {
+          attribute(
+            "form",
+            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")
+          )
+        }
+      }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("update-price") } }
+      .andExpect { status { isOk() } }
 
     verify(service).getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)
   }

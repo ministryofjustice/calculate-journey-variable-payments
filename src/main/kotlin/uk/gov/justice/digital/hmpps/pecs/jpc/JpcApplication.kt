@@ -17,24 +17,40 @@ fun main(args: Array<String>) {
   runApplication<JpcApplication>(*args).let { context ->
     // This is a temporary solution to run an import of locations and prices then terminate bypassing the need to go to an endpoint.
     context.environment.getProperty("import-locations")?.let {
-      (context.getBean(ManualLocationImporter::class) as ManualLocationImporter).let { SpringApplication.exit(context, it.import()) }
+      (context.getBean(ManualLocationImporter::class) as ManualLocationImporter).let {
+        SpringApplication.exit(
+          context,
+          it.import()
+        )
+      }
     }
 
     context.environment.getProperty("import-serco-prices")?.let {
-      (context.getBean(ManualPriceImporter::class) as ManualPriceImporter).let { SpringApplication.exit(context, it.import(Supplier.SERCO)) }
+      (context.getBean(ManualPriceImporter::class) as ManualPriceImporter).let {
+        SpringApplication.exit(
+          context,
+          it.import(Supplier.SERCO)
+        )
+      }
     }
 
     context.environment.getProperty("import-geoamey-prices")?.let {
-      (context.getBean(ManualPriceImporter::class) as ManualPriceImporter).let { SpringApplication.exit(context, it.import(Supplier.GEOAMEY)) }
+      (context.getBean(ManualPriceImporter::class) as ManualPriceImporter).let {
+        SpringApplication.exit(
+          context,
+          it.import(Supplier.GEOAMEY)
+        )
+      }
     }
 
     // This is a temporary solution to run an import of both supplier reports then terminate bypassing the need to go to an endpoint.
-    context.environment.getProperty("import-supplier-reports")?.let {dates ->
+    context.environment.getProperty("import-supplier-reports")?.let { dates ->
       val from = LocalDate.parse(dates.split(",")[0].trim())
       val to = LocalDate.parse(dates.split(",")[1].trim())
 
       (context.getBean(ReportsImporter::class) as ReportsImporter).let { reportImporter ->
-        SpringApplication.exit(context, reportImporter.import(from, to)) }
+        SpringApplication.exit(context, reportImporter.import(from, to))
+      }
     }
   }
 }

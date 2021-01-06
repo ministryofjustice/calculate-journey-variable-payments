@@ -14,9 +14,11 @@ import java.time.temporal.ChronoUnit
  * These commands are a temporary measure/solution to allow manually running the import of locations, prices and reporting data.
  */
 @ShellComponent
-class ImportCommands(@Autowired private val locationImporter: ManualLocationImporter,
-                     @Autowired private val manualPriceImporter: ManualPriceImporter,
-                     @Autowired private val reportsImporter: ReportsImporter) {
+class ImportCommands(
+  @Autowired private val locationImporter: ManualLocationImporter,
+  @Autowired private val manualPriceImporter: ManualPriceImporter,
+  @Autowired private val reportsImporter: ReportsImporter
+) {
 
   @ShellMethod("Imports schedule 34 locations from S3. This command deletes all existing prices.")
   fun importLocations() {

@@ -7,32 +7,27 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.Table
-import javax.validation.constraints.NotBlank
 
 @Entity
 @Table(name = "PROFILES")
 data class Profile(
+  @Json(name = "id")
+  @Id
+  @Column(name = "profile_id")
+  val profileId: String,
 
-        @Json(name = "id")
-        @Id
-        @Column(name = "profile_id")
-        val profileId: String,
+  @EventDateTime
+  @Json(name = "updated_at")
+  @Column(name = "updated_at", nullable = false)
+  val updatedAt: LocalDateTime,
 
-        @EventDateTime
-        @Json(name = "updated_at")
-        @Column(name = "updated_at", nullable = false)
-        val updatedAt: LocalDateTime,
-
-        @Json(name = "person_id")
-        @Column(name = "person_id", nullable = false)
-        val personId: String,
-
-        ) {
-    companion object {
-        fun fromJson(json: String): Profile? {
-            return Klaxon().
-            fieldConverter(EventDateTime::class, dateTimeConverter).
-            parse<Profile>(json)
-        }
+  @Json(name = "person_id")
+  @Column(name = "person_id", nullable = false)
+  val personId: String,
+) {
+  companion object {
+    fun fromJson(json: String): Profile? {
+      return Klaxon().fieldConverter(EventDateTime::class, dateTimeConverter).parse<Profile>(json)
     }
+  }
 }

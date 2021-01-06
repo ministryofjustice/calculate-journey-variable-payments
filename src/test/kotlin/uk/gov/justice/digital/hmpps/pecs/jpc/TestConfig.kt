@@ -27,60 +27,60 @@ import javax.sql.DataSource
 @TestConfiguration
 class TestConfig {
 
-    @Autowired
-    private lateinit var resourceLoader: ResourceLoader
+  @Autowired
+  private lateinit var resourceLoader: ResourceLoader
 
-    @Bean
-    fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository{
-        return MoveQueryRepository(JdbcTemplate(dataSource))
-    }
+  @Bean
+  fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository {
+    return MoveQueryRepository(JdbcTemplate(dataSource))
+  }
 
-    @Bean
-    fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource): JourneyQueryRepository{
-        return JourneyQueryRepository(JdbcTemplate(dataSource))
-    }
+  @Bean
+  fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource): JourneyQueryRepository {
+    return JourneyQueryRepository(JdbcTemplate(dataSource))
+  }
 
-    @Bean
-    fun timeSource(): TimeSource {
-        return TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
-    }
+  @Bean
+  fun timeSource(): TimeSource {
+    return TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
+  }
 
-    @Bean
-    fun jwtDecoder(): JwtDecoder {
-        // This is a temporary measure to prevent auth server startup/lookup errors during the tests.
-        return JwtDecoder { mock() }
-    }
+  @Bean
+  fun jwtDecoder(): JwtDecoder {
+    // This is a temporary measure to prevent auth server startup/lookup errors during the tests.
+    return JwtDecoder { mock() }
+  }
 
-    @Bean
-    fun dataSource(): DataSource {
-        return DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
-    }
+  @Bean
+  fun dataSource(): DataSource {
+    return DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
+  }
 
-    @Bean
-    fun locationsResourceProvider(): Schedule34LocationsProvider {
-        return Schedule34LocationsProvider { resourceLoader.getResource("classpath:/spreadsheets/locations.xlsx").inputStream }
-    }
+  @Bean
+  fun locationsResourceProvider(): Schedule34LocationsProvider {
+    return Schedule34LocationsProvider { resourceLoader.getResource("classpath:/spreadsheets/locations.xlsx").inputStream }
+  }
 
-    @Bean
-    fun sercoPricesResourceProvider(): SercoPricesProvider {
-        return SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
-    }
+  @Bean
+  fun sercoPricesResourceProvider(): SercoPricesProvider {
+    return SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
+  }
 
-    @Bean
-    fun geoameyPricesResourceProvider(): GeoameyPricesProvider {
-        return GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
-    }
+  @Bean
+  fun geoameyPricesResourceProvider(): GeoameyPricesProvider {
+    return GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
+  }
 
-    @Bean
-    fun reportingResourceProvider(): ReportingProvider {
-        return ReportingProvider { resourceLoader.getResource("classpath:/reporting/$it").file.readText() }
-    }
+  @Bean
+  fun reportingResourceProvider(): ReportingProvider {
+    return ReportingProvider { resourceLoader.getResource("classpath:/reporting/$it").file.readText() }
+  }
 
-    @Bean
-    fun reportImporter() = ReportImporter(reportingResourceProvider(), timeSource())
+  @Bean
+  fun reportImporter() = ReportImporter(reportingResourceProvider(), timeSource())
 
-    @Bean
-    fun jpcTemplateProvider(): JPCTemplateProvider {
-        return JPCTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JPC_template.xlsx").inputStream }
-    }
+  @Bean
+  fun jpcTemplateProvider(): JPCTemplateProvider {
+    return JPCTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JPC_template.xlsx").inputStream }
+  }
 }

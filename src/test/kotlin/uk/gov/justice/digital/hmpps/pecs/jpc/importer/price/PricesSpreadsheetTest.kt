@@ -16,109 +16,109 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class PricesSpreadsheetTest {
 
-    private val workbook: Workbook = XSSFWorkbook()
-    private val workbookSpy: Workbook = mock { spy(workbook) }
-    private val sheet: Sheet = workbook.createSheet()
+  private val workbook: Workbook = XSSFWorkbook()
+  private val workbookSpy: Workbook = mock { spy(workbook) }
+  private val sheet: Sheet = workbook.createSheet()
 
-    @Nested
-    inner class RecordingErrors {
+  @Nested
+  inner class RecordingErrors {
 
-        private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, emptyList())
+    private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, emptyList())
 
-        private val row: Row = sheet.createRow(0)
+    private val row: Row = sheet.createRow(0)
 
-        @Test
-        internal fun `no errors by default`() {
-            assertThat(spreadsheet.errors).isEmpty()
-        }
-
-        @Test
-        internal fun `errors are recorded`() {
-            val exception = RuntimeException("something went wrong")
-
-            spreadsheet.addError(row, exception)
-
-            assertThat(spreadsheet.errors).containsOnly(PricesSpreadsheetError(Supplier.GEOAMEY, row.rowNum + 1, exception))
-        }
+    @Test
+    internal fun `no errors by default`() {
+      assertThat(spreadsheet.errors).isEmpty()
     }
 
-    @Nested
-    inner class MappingRowToPrice {
+    @Test
+    internal fun `errors are recorded`() {
+      val exception = RuntimeException("something went wrong")
 
-        private val fromLocation: Location = Location(LocationType.CC, "from agency id", "from site")
-        private val toLocation: Location = Location(LocationType.CC, "to agency id", "to site")
+      spreadsheet.addError(row, exception)
 
-        private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation))
-
-        private val row: Row = sheet.createRow(1).apply {
-            this.createCell(0).setCellValue(1.0)
-            this.createCell(1).setCellValue("from site")
-            this.createCell(2).setCellValue("to site")
-            this.createCell(3).setCellValue(100.00)
-        }
-
-        @Test
-        internal fun `can map row to price`() {
-            val price = spreadsheet.mapToPrice(row)
-
-            assertThat(price.fromLocation).isEqualTo(fromLocation)
-            assertThat(price.toLocation).isEqualTo(toLocation)
-            assertThat(price.priceInPence).isEqualTo(10000)
-        }
-
-        @Test
-        internal fun `throws error if from location is blank`() {
-            row.getCell(1).setCellValue("")
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("From location name cannot be blank")
-        }
-
-        @Test
-        internal fun `throws error if price is zero`() {
-            row.getCell(3).setCellValue(0.0)
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("Price must be greater than zero")
-        }
-
-        @Test
-        internal fun `cannot map row to price when from site not found`() {
-            row.getCell(1).setCellValue("UNKNOWN from site")
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("From location 'UNKNOWN FROM SITE' for supplier 'GEOAMEY' not found")
-        }
-
-        @Test
-        internal fun `throws error if to location is blank`() {
-            row.getCell(2).setCellValue("")
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("To location name cannot be blank")
-        }
-
-        @Test
-        internal fun `throws error if problem reading price`() {
-            row.getCell(3).setCellValue("string instead of numeric")
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("Error retrieving price for supplier 'GEOAMEY'")
-        }
-
-
-        @Test
-        internal fun `cannot map row to price when to site not found`() {
-            row.getCell(2).setCellValue("UNKNOWN to site")
-
-            assertThatThrownBy { spreadsheet.mapToPrice(row) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("To location 'UNKNOWN TO SITE' for supplier 'GEOAMEY' not found")
-        }
+      assertThat(spreadsheet.errors).containsOnly(PricesSpreadsheetError(Supplier.GEOAMEY, row.rowNum + 1, exception))
     }
+  }
+
+  @Nested
+  inner class MappingRowToPrice {
+
+    private val fromLocation: Location = Location(LocationType.CC, "from agency id", "from site")
+    private val toLocation: Location = Location(LocationType.CC, "to agency id", "to site")
+
+    private val spreadsheet: PricesSpreadsheet =
+      PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation))
+
+    private val row: Row = sheet.createRow(1).apply {
+      this.createCell(0).setCellValue(1.0)
+      this.createCell(1).setCellValue("from site")
+      this.createCell(2).setCellValue("to site")
+      this.createCell(3).setCellValue(100.00)
+    }
+
+    @Test
+    internal fun `can map row to price`() {
+      val price = spreadsheet.mapToPrice(row)
+
+      assertThat(price.fromLocation).isEqualTo(fromLocation)
+      assertThat(price.toLocation).isEqualTo(toLocation)
+      assertThat(price.priceInPence).isEqualTo(10000)
+    }
+
+    @Test
+    internal fun `throws error if from location is blank`() {
+      row.getCell(1).setCellValue("")
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("From location name cannot be blank")
+    }
+
+    @Test
+    internal fun `throws error if price is zero`() {
+      row.getCell(3).setCellValue(0.0)
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("Price must be greater than zero")
+    }
+
+    @Test
+    internal fun `cannot map row to price when from site not found`() {
+      row.getCell(1).setCellValue("UNKNOWN from site")
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("From location 'UNKNOWN FROM SITE' for supplier 'GEOAMEY' not found")
+    }
+
+    @Test
+    internal fun `throws error if to location is blank`() {
+      row.getCell(2).setCellValue("")
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("To location name cannot be blank")
+    }
+
+    @Test
+    internal fun `throws error if problem reading price`() {
+      row.getCell(3).setCellValue("string instead of numeric")
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("Error retrieving price for supplier 'GEOAMEY'")
+    }
+
+    @Test
+    internal fun `cannot map row to price when to site not found`() {
+      row.getCell(2).setCellValue("UNKNOWN to site")
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("To location 'UNKNOWN TO SITE' for supplier 'GEOAMEY' not found")
+    }
+  }
 }

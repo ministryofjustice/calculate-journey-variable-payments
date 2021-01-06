@@ -22,22 +22,25 @@ import java.time.LocalDateTime
 @ContextConfiguration(classes = [TestConfig::class])
 class OutputSpreadsheetControllerTest(@Autowired val mockMvc: MockMvc) {
 
-    @MockBean
-    lateinit var timeSource: TimeSource
+  @MockBean
+  lateinit var timeSource: TimeSource
 
-    @Test
-    @WithMockUser(roles = ["PECS_JPC"])
-    fun `can generate spreadsheet with correct name for Serco`() {
-        whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
-        whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  fun `can generate spreadsheet with correct name for Serco`() {
+    whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
+    whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-        mockMvc.get("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01") { }
-                .andExpect {
-                    status { isOk }
-                    content { contentType("application/vnd.ms-excel") }
-                    header {
-                        string("Content-Disposition", "attachment;filename=Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx")
-                    }
-                }
-    }
+    mockMvc.get("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01") { }
+      .andExpect {
+        status { isOk() }
+        content { contentType("application/vnd.ms-excel") }
+        header {
+          string(
+            "Content-Disposition",
+            "attachment;filename=Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx"
+          )
+        }
+      }
+  }
 }

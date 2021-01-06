@@ -10,12 +10,12 @@ import java.time.LocalDate
 @Service
 class SpreadsheetService(private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun spreadsheet(supplierName: String, startDate: LocalDate): File? {
+  fun spreadsheet(supplierName: String, startDate: LocalDate): File? {
 
-        logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$startDate''")
+    logger.info("Generating spreadsheet for supplier '$supplierName', moves from '$startDate''")
 
-        return pricesSpreadsheetGenerator.generate(Supplier.valueOfCaseInsensitive(supplierName), startDate)
-    }
+    return pricesSpreadsheetGenerator.generate(Supplier.valueOfCaseInsensitive(supplierName), startDate)
+  }
 }

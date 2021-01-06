@@ -18,27 +18,33 @@ import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-class OutputSpreadsheetController(private val spreadsheetService: SpreadsheetService,
-                                  private val timeSource: TimeSource) {
+class OutputSpreadsheetController(
+  private val spreadsheetService: SpreadsheetService,
+  private val timeSource: TimeSource
+) {
 
-    @GetMapping("/generate-prices-spreadsheet/{supplier}")
-    @Throws(IOException::class)
-    fun generateSpreadsheet(
-            @PathVariable supplier: String,
-            @RequestParam(name = "moves_from", required = true) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
-            response: HttpServletResponse?): ResponseEntity<InputStreamResource?>? {
+  @GetMapping("/generate-prices-spreadsheet/{supplier}")
+  @Throws(IOException::class)
+  fun generateSpreadsheet(
+    @PathVariable supplier: String,
+    @RequestParam(
+      name = "moves_from",
+      required = true
+    ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
+    response: HttpServletResponse?
+  ): ResponseEntity<InputStreamResource?>? {
 
-        return spreadsheetService.spreadsheet(supplier, movesFrom)?.let { file ->
-            val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("YYYY-MM-dd_HH_mm"))
-            val filename = "Journey_Variable_Payment_Output_${supplier}_${uploadDateTime}.xlsx"
-            val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")
-            val resource = InputStreamResource(FileInputStream(file))
+    return spreadsheetService.spreadsheet(supplier, movesFrom)?.let { file ->
+      val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("YYYY-MM-dd_HH_mm"))
+      val filename = "Journey_Variable_Payment_Output_${supplier}_$uploadDateTime.xlsx"
+      val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")
+      val resource = InputStreamResource(FileInputStream(file))
 
-            ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=$filename")
-                    .contentType(mediaType)
-                    .contentLength(file.length())
-                    .body(resource)
-        } ?: ResponseEntity.noContent().build()
-    }
+      ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=$filename")
+        .contentType(mediaType)
+        .contentLength(file.length())
+        .body(resource)
+    } ?: ResponseEntity.noContent().build()
+  }
 }

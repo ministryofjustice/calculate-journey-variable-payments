@@ -13,8 +13,14 @@ import java.time.LocalDate
 @Component
 class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
-    fun prices(supplier: Supplier, fromSiteName: String?, toSiteName: String?, effectiveYear: Int): List<JourneyWithPrice>{
-        val selectPricesSQL = """
+  fun prices(
+    supplier: Supplier,
+    fromSiteName: String?,
+    toSiteName: String?,
+    effectiveYear: Int
+  ): List<JourneyWithPrice> {
+    val selectPricesSQL =
+      """
         select jfl.nomis_agency_id as journey_from_nomis_agency_id,
         jfl.site_name       as journey_from_site_name,
         jfl.location_type   as journey_from_location_type,
@@ -26,50 +32,58 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
          inner join LOCATIONS jfl on p.from_location_id = jfl.location_id
          inner join LOCATIONS jtl on p.to_location_id = jtl.location_id
             where p.supplier = ? 
-        """.trimIndent() +
-                (if(fromSiteName.isNullOrBlank()) "" else  " and jfl.site_name = ? ") +
-                (if(toSiteName.isNullOrBlank()) "" else  " and jtl.site_name = ? ") +
-                " and p.effective_year = ? "
+      """.trimIndent() +
+        (if (fromSiteName.isNullOrBlank()) "" else " and jfl.site_name = ? ") +
+        (if (toSiteName.isNullOrBlank()) "" else " and jtl.site_name = ? ") +
+        " and p.effective_year = ? "
 
-        val pricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
-            with(resultSet) {
-                JourneyWithPrice(
-                    fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
-                    fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
-                    fromSiteName = getString("journey_from_site_name"),
-                    toNomisAgencyId = getString("journey_to_nomis_agency_id"),
-                    toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
-                    toSiteName = getString("journey_to_site_name"),
-                    unitPriceInPence =  if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
-                    volume = null,
-                    totalPriceInPence = null
-                )
-            }
-        }
-
-        val placeholders = (listOf(supplier.name, fromSiteName, toSiteName).filter { !it.isNullOrBlank() } + effectiveYear).toTypedArray()
-        return jdbcTemplate.query(selectPricesSQL, placeholders, pricesRowMapper)
+    val pricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
+      with(resultSet) {
+        JourneyWithPrice(
+          fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
+          fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
+          fromSiteName = getString("journey_from_site_name"),
+          toNomisAgencyId = getString("journey_to_nomis_agency_id"),
+          toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
+          toSiteName = getString("journey_to_site_name"),
+          unitPriceInPence = if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
+          volume = null,
+          totalPriceInPence = null
+        )
+      }
     }
 
-    fun distinctJourneysAndPriceInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate, excludePriced: Boolean = true): List<JourneyWithPrice> {
-        val journeyWithPricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
-            with(resultSet) {
-                JourneyWithPrice(
-                    fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
-                    fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
-                    fromSiteName = getString("journey_from_site_name"),
-                    toNomisAgencyId = getString("journey_to_nomis_agency_id"),
-                    toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
-                    toSiteName = getString("journey_to_site_name"),
-                    volume = getInt("volume"),
-                    unitPriceInPence = if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
-                    totalPriceInPence = getInt("total_price_in_pence")
-                )
-            }
-        }
+    val placeholders =
+      (listOf(supplier.name, fromSiteName, toSiteName).filter { !it.isNullOrBlank() } + effectiveYear).toTypedArray()
+    return jdbcTemplate.query(selectPricesSQL, placeholders, pricesRowMapper)
+  }
 
-        val havingOnlyUnpriced = if(excludePriced) "HAVING max(case when p.price_in_pence is null then 1 else 0 end) > 0 " else ""
-        val uniqueJourneysSQL = """
+  fun distinctJourneysAndPriceInDateRange(
+    supplier: Supplier,
+    startDate: LocalDate,
+    endDateInclusive: LocalDate,
+    excludePriced: Boolean = true
+  ): List<JourneyWithPrice> {
+    val journeyWithPricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
+      with(resultSet) {
+        JourneyWithPrice(
+          fromNomisAgencyId = getString("journey_from_nomis_agency_id"),
+          fromLocationType = getString("journey_from_location_type")?.let { LocationType.valueOf(it) },
+          fromSiteName = getString("journey_from_site_name"),
+          toNomisAgencyId = getString("journey_to_nomis_agency_id"),
+          toLocationType = getString("journey_to_location_type")?.let { LocationType.valueOf(it) },
+          toSiteName = getString("journey_to_site_name"),
+          volume = getInt("volume"),
+          unitPriceInPence = if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
+          totalPriceInPence = getInt("total_price_in_pence")
+        )
+      }
+    }
+
+    val havingOnlyUnpriced =
+      if (excludePriced) "HAVING max(case when p.price_in_pence is null then 1 else 0 end) > 0 " else ""
+    val uniqueJourneysSQL =
+      """
             select j.from_nomis_agency_id                                     as journey_from_nomis_agency_id,
                    jfl.site_name                                              as journey_from_site_name,
                    jfl.location_type                                          as journey_from_location_type,
@@ -91,33 +105,38 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, p.price_in_pence
             $havingOnlyUnpriced
             ORDER BY null_locations_and_prices_sum desc, volume desc
-        """.trimIndent()
+      """.trimIndent()
 
-        return jdbcTemplate.query(uniqueJourneysSQL,
-                arrayOf(
-                    supplier.name,
-                    Timestamp.valueOf(startDate.atStartOfDay()),
-                    Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-                ),
-                journeyWithPricesRowMapper)
+    return jdbcTemplate.query(
+      uniqueJourneysSQL,
+      arrayOf(
+        supplier.name,
+        Timestamp.valueOf(startDate.atStartOfDay()),
+        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
+      ),
+      journeyWithPricesRowMapper
+    )
+  }
+
+  fun journeysSummaryInDateRange(
+    supplier: Supplier,
+    startDate: LocalDate,
+    endDateInclusive: LocalDate
+  ): JourneysSummary {
+    val journeysSummaryRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
+      with(resultSet) {
+        JourneysSummary(
+          supplier = supplier,
+          count = getInt("journey_count"),
+          totalPriceInPence = getInt("total_price_in_pence"),
+          countWithoutLocations = getInt("count_without_locations"),
+          countUnpriced = getInt("count_unpriced")
+        )
+      }
     }
 
-
-
-    fun journeysSummaryInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): JourneysSummary {
-        val journeysSummaryRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
-            with(resultSet) {
-                JourneysSummary(
-                    supplier = supplier,
-                    count = getInt("journey_count"),
-                    totalPriceInPence = getInt("total_price_in_pence"),
-                    countWithoutLocations = getInt("count_without_locations"),
-                    countUnpriced = getInt("count_unpriced")
-                )
-            }
-        }
-        
-        val journeysSummarySQL = """
+    val journeysSummarySQL =
+      """
            select count(js.journey) as journey_count, sum(js.price_in_pence) as total_price_in_pence, 
            sum (js.volume_unlocationed) as count_without_locations, sum(js.volume_unpriced) as count_unpriced from(
                 select distinct CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id) as journey, 
@@ -131,16 +150,17 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
              left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
              where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ?  
              and m.drop_off_or_cancelled < ?
-             GROUP BY journey) as js""".trimIndent()
+             GROUP BY journey) as js
+      """.trimIndent()
 
-
-        return jdbcTemplate.query(journeysSummarySQL,
-                arrayOf(
-                    supplier.name,
-                    Timestamp.valueOf(startDate.atStartOfDay()),
-                    Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-                ),
-                journeysSummaryRowMapper)[0]
-    }
+    return jdbcTemplate.query(
+      journeysSummarySQL,
+      arrayOf(
+        supplier.name,
+        Timestamp.valueOf(startDate.atStartOfDay()),
+        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
+      ),
+      journeysSummaryRowMapper
+    )[0]
+  }
 }
-

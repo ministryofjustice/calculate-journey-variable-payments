@@ -12,21 +12,21 @@ import java.time.LocalDate
 @Component
 class ReportsImporter(private val importService: ImportService) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val success = ExitCodeGenerator { 0 }
+  private val success = ExitCodeGenerator { 0 }
 
-    private val failure = ExitCodeGenerator { 1 }
+  private val failure = ExitCodeGenerator { 1 }
 
-    /**
-     * Calling this kicks off an import and returns '0' if successful or '1' if any exception is thrown (and caught).
-     *
-     * To import reports for a single day then the [from] and [to] dates should be the same.
-     */
-    fun import(from: LocalDate, to: LocalDate): ExitCodeGenerator {
-        return Result.runCatching {
-            importService.importReports(from, to)
-            return success
-        }.onFailure { logger.error(it.stackTraceToString()) }.getOrDefault(failure)
-    }
+  /**
+   * Calling this kicks off an import and returns '0' if successful or '1' if any exception is thrown (and caught).
+   *
+   * To import reports for a single day then the [from] and [to] dates should be the same.
+   */
+  fun import(from: LocalDate, to: LocalDate): ExitCodeGenerator {
+    return Result.runCatching {
+      importService.importReports(from, to)
+      return success
+    }.onFailure { logger.error(it.stackTraceToString()) }.getOrDefault(failure)
+  }
 }

@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.servlet.ResultMatcher
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -20,9 +19,8 @@ import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
-import java.util.*
+import java.util.Optional
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -37,30 +35,30 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   lateinit var moveService: MoveService
 
   @BeforeEach
-  fun beforeEach(){
+  fun beforeEach() {
     mockSession.setAttribute("supplier", defaultSupplierSerco)
   }
 
   @Test
-  internal fun `GET move with valid Move ID for supplier`(){
+  internal fun `GET move with valid Move ID for supplier`() {
     val move = moveM1()
     whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)).thenReturn(move)
 
-    mockMvc.get("/moves/${move.moveId}") { session = mockSession}
-            .andExpect { view { name("move") } }
-            .andExpect { status { isOk } }
+    mockMvc.get("/moves/${move.moveId}") { session = mockSession }
+      .andExpect { view { name("move") } }
+      .andExpect { status { isOk() } }
 
     verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)
   }
 
   @Test
-  fun `GET move with invalid Move ID for supplier`(){
+  fun `GET move with invalid Move ID for supplier`() {
     val move = moveM1()
     whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)).thenReturn(null)
 
-    mockMvc.get("/moves/${move.moveId}") { session = mockSession}
-        .andExpect { status { isNotFound } }
-        .andExpect { view { name("error/404") } }
+    mockMvc.get("/moves/${move.moveId}") { session = mockSession }
+      .andExpect { status { isNotFound() } }
+      .andExpect { view { name("error/404") } }
 
     verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)
   }
@@ -74,8 +72,8 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       session = mockSession
       param("reference", "ref1 ")
     }
-            .andExpect { redirectedUrl("/moves/M1") }
-            .andExpect { status { is3xxRedirection } }
+      .andExpect { redirectedUrl("/moves/M1") }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)
   }
@@ -89,8 +87,8 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       session = mockSession
       param("reference", "nonexistentref")
     }
-            .andExpect { redirectedUrl("/find-move/?no-results-for=nonexistentref") }
-            .andExpect { status { is3xxRedirection } }
+      .andExpect { redirectedUrl("/find-move/?no-results-for=nonexistentref") }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("NONEXISTENTREF", defaultSupplierSerco)
   }
@@ -104,8 +102,8 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       session = mockSession
       param("reference", "select * from moves")
     }
-            .andExpect { redirectedUrl("/find-move/?no-results-for=invalid-reference") }
-            .andExpect { status { is3xxRedirection } }
+      .andExpect { redirectedUrl("/find-move/?no-results-for=invalid-reference") }
+      .andExpect { status { is3xxRedirection() } }
 
     verifyNoMoreInteractions(moveService)
   }

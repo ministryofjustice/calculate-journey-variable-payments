@@ -11,56 +11,54 @@ import kotlin.streams.toList
 
 @Component
 class ReportImporter(
-        @Autowired val provider: ReportingProvider,
-        @Autowired val timeSource: TimeSource) {
+  @Autowired val provider: ReportingProvider,
+  @Autowired val timeSource: TimeSource
+) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Move>{
-        val movesContent = getContents("moves", from, to)
-        val journeysContent = getContents("journeys", from, to)
-        val eventsContent = getContents("events", from, to)
-        return ReportParser.parseMovesJourneysEvents(
-                moveFiles = movesContent,
-                journeyFiles = journeysContent,
-                eventFiles = eventsContent,
-        )
+  fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Move> {
+    val movesContent = getContents("moves", from, to)
+    val journeysContent = getContents("journeys", from, to)
+    val eventsContent = getContents("events", from, to)
+    return ReportParser.parseMovesJourneysEvents(
+      moveFiles = movesContent,
+      journeyFiles = journeysContent,
+      eventFiles = eventsContent,
+    )
+  }
+
+  fun importPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person> {
+    val peopleContent = getContents("people", from, to)
+    return ReportParser.parseAsPerson(peopleFiles = peopleContent)
+  }
+
+  fun importProfiles(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Profile> {
+    val profilesContent = getContents("profiles", from, to)
+    return ReportParser.parseAsProfile(profileFiles = profilesContent)
+  }
+
+  private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String> {
+    logger.info("Getting $entity between $from and $to")
+    val fileNames = fileNamesForDate(entity, from, to)
+    return fileNames.map {
+      try {
+        logger.info("Retrieving file $it")
+        provider.get(it)
+      } catch (e: Exception) {
+        logger.warn("Error attempting to get file $it, exception: $e")
+        null
+      }
+    }.filterNotNull()
+  }
+
+  companion object {
+    fun fileNamesForDate(entity: String, from: LocalDate, to: LocalDate): List<String> {
+      return from.datesUntil(to.plusDays(1)).map { d ->
+        "${d.year}/${padZero(d.monthValue)}/${padZero(d.dayOfMonth)}/${d.year}-${padZero(d.monthValue)}-${padZero(d.dayOfMonth)}-$entity.jsonl"
+      }.toList()
     }
 
-    fun importPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person>{
-        val peopleContent = getContents("people", from, to)
-        return ReportParser.parseAsPerson( peopleFiles = peopleContent)
-    }
-
-    fun importProfiles(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Profile>{
-        val profilesContent = getContents("profiles", from, to)
-        return ReportParser.parseAsProfile( profileFiles = profilesContent)
-    }
-
-    private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String>{
-        logger.info("Getting $entity between $from and $to")
-        val fileNames = fileNamesForDate(entity, from, to)
-        return fileNames.map {
-            try {
-                logger.info("Retrieving file $it")
-                provider.get(it)
-            }
-            catch (e: Exception){
-                logger.warn("Error attempting to get file $it, exception: ${e.toString()}")
-                null
-            }
-        }.filterNotNull()
-    }
-
-    companion object{
-        fun fileNamesForDate(entity: String, from: LocalDate, to: LocalDate): List<String> {
-            return from.datesUntil(to.plusDays(1)).map {d ->
-                "${d.year}/${padZero(d.monthValue)}/${padZero(d.dayOfMonth)}/${d.year}-${padZero(d.monthValue)}-${padZero(d.dayOfMonth)}-$entity.jsonl"
-            }.toList()
-
-        }
-
-        private fun padZero(value: Int) = if (value < 10) "0${value}" else value.toString()
-    }
-
+    private fun padZero(value: Int) = if (value < 10) "0$value" else value.toString()
+  }
 }
