@@ -6,6 +6,7 @@
 
 - [Docker and Docker compose](https://docs.docker.com/get-docker/)
 - [Intellij IDEA](https://www.jetbrains.com/idea/)
+  - [EnvFile](https://plugins.jetbrains.com/plugin/7861-envfile) plugin
 
 ## Building
 
@@ -29,9 +30,9 @@ The command will launch:
 - [Localstack](https://github.com/localstack/localstack) (which is used to mock Amazon S3)
 - Postgres
 
-Next, head over to Intellij and set the environment variables from .env into the Run Configuration `Run > Edit configurations`:
+Next, head over to Intellij, locate `src/main/kotlin/JpcApplication.kt`, right click it and in `More Run/Debug`, click `Modify Run Configuration...`.
 
-![Configure the Spring Profile in Intellij](assets/environment_variables.png)
+In the window that pops up, open the `EnvFile` tab, check the box next to `Enable EnvFile` and at the bottom of the box below, click the plus symbol and then .env file and add `.env` (on macOS, this file will be hidden, `cmd + shift + .` will make it appear) and then click `OK`.
 
 You can run the application from Intelli with `Run > Run`.
 
