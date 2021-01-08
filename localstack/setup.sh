@@ -11,32 +11,6 @@ aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/sche
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/geoamey_sample.xlsx s3://jpc/
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/serco_sample.xlsx s3://jpc/
 
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-events.jsonl s3://basm/2020/09/01/2020-09-01-events.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-journeys.jsonl s3://basm/2020/09/01/2020-09-01-journeys.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/01/2020-09-01-moves.jsonl s3://basm/2020/09/01/2020-09-01-moves.jsonl
-
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-events.jsonl s3://basm/2020/09/02/2020-09-02-events.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-journeys.jsonl s3://basm/2020/09/02/2020-09-02-journeys.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/02/2020-09-02-moves.jsonl s3://basm/2020/09/02/2020-09-02-moves.jsonl
-
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-events.jsonl s3://basm/2020/09/03/2020-09-03-events.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-journeys.jsonl s3://basm/2020/09/03/2020-09-03-journeys.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/03/2020-09-03-moves.jsonl s3://basm/2020/09/03/2020-09-03-moves.jsonl
-
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-events.jsonl s3://basm/2020/09/04/2020-09-04-events.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-journeys.jsonl s3://basm/2020/09/04/2020-09-04-journeys.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/04/2020-09-04-moves.jsonl s3://basm/2020/09/04/2020-09-04-moves.jsonl
-
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-events.jsonl s3://basm/2020/09/05/2020-09-05-events.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-journeys.jsonl s3://basm/2020/09/05/2020-09-05-journeys.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/05/2020-09-05-moves.jsonl s3://basm/2020/09/05/2020-09-05-moves.jsonl
-
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/06/2020-09-06-events.jsonl s3://basm/2020/09/06/2020-09-06-events.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/06/2020-09-06-journeys.jsonl s3://basm/2020/09/06/2020-09-06-journeys.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/06/2020-09-06-moves.jsonl s3://basm/2020/09/06/2020-09-06-moves.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/06/2020-09-06-people.jsonl s3://basm/2020/09/06/2020-09-06-people.jsonl
-aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/09/06/2020-09-06-profiles.jsonl s3://basm/2020/09/06/2020-09-06-profiles.jsonl
-
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/01/2020-12-01-events.jsonl s3://basm/2020/12/01/2020-12-01-events.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/01/2020-12-01-journeys.jsonl s3://basm/2020/12/01/2020-12-01-journeys.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/01/2020-12-01-moves.jsonl s3://basm/2020/12/01/2020-12-01-moves.jsonl
@@ -60,5 +34,17 @@ aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/04/2020-12-04-moves.jsonl s3://basm/2020/12/04/2020-12-04-moves.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/04/2020-12-04-people.jsonl s3://basm/2020/12/04/2020-12-04-people.jsonl
 aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/04/2020-12-04-profiles.jsonl s3://basm/2020/12/04/2020-12-04-profiles.jsonl
+
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/05/2020-12-05-events.jsonl s3://basm/2020/12/05/2020-12-05-events.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/05/2020-12-05-journeys.jsonl s3://basm/2020/12/05/2020-12-05-journeys.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/05/2020-12-05-moves.jsonl s3://basm/2020/12/05/2020-12-05-moves.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/05/2020-12-05-people.jsonl s3://basm/2020/12/05/2020-12-05-people.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/05/2020-12-05-profiles.jsonl s3://basm/2020/12/05/2020-12-05-profiles.jsonl
+
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/06/2020-12-06-events.jsonl s3://basm/2020/12/06/2020-12-06-events.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/06/2020-12-06-journeys.jsonl s3://basm/2020/12/06/2020-12-06-journeys.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/06/2020-12-06-moves.jsonl s3://basm/2020/12/06/2020-12-06-moves.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/06/2020-12-06-people.jsonl s3://basm/2020/12/06/2020-12-06-people.jsonl
+aws --endpoint-url=http://localhost:4572 s3 cp /docker-entrypoint-initaws.d/2020/12/06/2020-12-06-profiles.jsonl s3://basm/2020/12/06/2020-12-06-profiles.jsonl
 
 echo "Buckets and seed data configured for schedule 34 locations and suppliers."
