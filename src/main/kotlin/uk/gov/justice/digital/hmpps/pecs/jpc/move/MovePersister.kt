@@ -114,7 +114,7 @@ class MovePersister(
           events = listOf(),
           pickUpDateTime = pickUp,
           dropOffDateTime = dropOff,
-          effectiveYear = pickUp?.year ?: effectiveYearForDate(move.moveDate ?: timeSource.date())
+          effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(move.moveDate ?: timeSource.date())
         )
       }
   }
