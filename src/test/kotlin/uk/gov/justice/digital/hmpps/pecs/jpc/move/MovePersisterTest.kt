@@ -50,8 +50,8 @@ internal class MovePersisterTest {
   @Autowired
   lateinit var timeSource: TimeSource
 
-  final val from: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 1)
-  final val to: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 6)
+  private final val fromSeptember1st2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 1)
+  private final val toSeptember6th2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 6)
 
   lateinit var redirectMove: Move
 
@@ -84,12 +84,12 @@ internal class MovePersisterTest {
           journeyEventFactory(
             journeyEventId = "E4",
             type = EventType.JOURNEY_START.value,
-            occurredAt = from.atStartOfDay().plusHours(5)
+            occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
           ),
           journeyEventFactory(
             journeyEventId = "E5",
             type = EventType.JOURNEY_COMPLETE.value,
-            occurredAt = from.atStartOfDay().plusHours(10)
+            occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
           )
         )
     )
@@ -104,28 +104,28 @@ internal class MovePersisterTest {
           journeyEventFactory(
             journeyEventId = "E6",
             type = EventType.JOURNEY_START.value,
-            occurredAt = from.atStartOfDay().plusHours(5)
+            occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
           ),
           journeyEventFactory(
             journeyEventId = "E7",
             type = EventType.JOURNEY_COMPLETE.value,
-            occurredAt = from.atStartOfDay().plusHours(10)
+            occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
           )
         )
     )
 
     val moveStartEvent =
-      moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
+      moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5))
     val moveRedirectEvent = moveEventFactory(
       eventId = "E2",
       type = EventType.MOVE_REDIRECT.value,
       notes = "This was redirected.",
-      occurredAt = from.atStartOfDay().plusHours(7)
+      occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(7)
     )
     val moveCompleteEvent = moveEventFactory(
       eventId = "E3",
       type = EventType.MOVE_COMPLETE.value,
-      occurredAt = from.atStartOfDay().plusHours(10)
+      occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
     )
 
     redirectMove = reportMoveFactory(
@@ -175,18 +175,18 @@ internal class MovePersisterTest {
         moveEventFactory(
           eventId = "E8",
           type = EventType.MOVE_START.value,
-          occurredAt = from.atStartOfDay().plusHours(5)
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
         ),
         moveEventFactory(
           eventId = "E9",
           type = EventType.MOVE_REDIRECT.value,
           notes = "This was redirected.",
-          occurredAt = from.atStartOfDay().plusHours(7)
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(7)
         ),
         moveEventFactory(
           eventId = "E10",
           type = EventType.MOVE_COMPLETE.value,
-          occurredAt = from.atStartOfDay().plusHours(10)
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
         )
       ),
       journeys = listOf()
@@ -207,7 +207,7 @@ internal class MovePersisterTest {
         moveEventFactory(
           eventId = "E400",
           type = EventType.MOVE_LOCKOUT.value,
-          occurredAt = from.atStartOfDay().plusHours(10)
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
         )
       )
     )
@@ -222,6 +222,48 @@ internal class MovePersisterTest {
   }
 
   @Test
+  fun `Journey with move start event in Sept 2020 persisted with 2020 effective year`() {
+
+    val journey = reportJourneyFactory().copy(
+      events = listOf(
+        journeyEventFactory(
+          journeyEventId = "E4",
+          type = EventType.JOURNEY_START.value,
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
+        )
+      )
+    )
+    val moveToPersist = redirectMove.copy(journeys = listOf(journey))
+
+    movePersister.persist(listOf(moveToPersist))
+    entityManager.flush()
+
+    val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
+    assertThat(journeys(retrievedMove.moveId).find { it.journeyId == "J1" }?.effectiveYear).isEqualTo(2020)
+  }
+
+  @Test
+  fun `Journey with move start event in Aug 31st 2021 persisted with 2020 effective year`() {
+
+    val journey = reportJourneyFactory().copy(
+      events = listOf(
+        journeyEventFactory(
+          journeyEventId = "E4",
+          type = EventType.JOURNEY_START.value,
+          occurredAt = java.time.LocalDate.of(2021, 8, 31).atStartOfDay().plusHours(5)
+        )
+      )
+    )
+    val moveToPersist = redirectMove.copy(journeys = listOf(journey))
+
+    movePersister.persist(listOf(moveToPersist))
+    entityManager.flush()
+
+    val retrievedMove = moveRepository.findById(redirectMove.moveId).get()
+    assertThat(journeys(retrievedMove.moveId).find { it.journeyId == "J1" }?.effectiveYear).isEqualTo(2020)
+  }
+
+  @Test
   fun `Journey with move start event in Sept 2021 persisted with 2021 effective year`() {
 
     val journey = reportJourneyFactory().copy(
@@ -229,7 +271,7 @@ internal class MovePersisterTest {
         journeyEventFactory(
           journeyEventId = "E4",
           type = EventType.JOURNEY_START.value,
-          occurredAt = from.plusYears(1).atStartOfDay().plusHours(5)
+          occurredAt = fromSeptember1st2020.plusYears(1).atStartOfDay().plusHours(5)
         )
       )
     )
@@ -267,7 +309,7 @@ internal class MovePersisterTest {
         journeyEventFactory(
           journeyEventId = "JE400",
           type = EventType.JOURNEY_LODGING.value,
-          occurredAt = from.atStartOfDay().plusHours(10)
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
         )
       )
     )
@@ -296,13 +338,13 @@ internal class MovePersisterTest {
         journeyEventFactory(
           journeyEventId = "E4",
           type = EventType.JOURNEY_START.value,
-          occurredAt = from.atStartOfDay().plusHours(5)
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
         )
       )
     )
 
     val moveStartEvent =
-      moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = from.atStartOfDay().plusHours(5))
+      moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5))
 
     val inTransitMove = reportMoveFactory(
       status = MoveStatus.in_transit,
@@ -318,12 +360,12 @@ internal class MovePersisterTest {
     val journeyCompleteEvent = journeyEventFactory(
       journeyEventId = "J1",
       type = EventType.JOURNEY_COMPLETE.value,
-      occurredAt = from.atStartOfDay().plusHours(10)
+      occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
     )
     val moveCompleteEvent = moveEventFactory(
       eventId = "E3",
       type = EventType.MOVE_COMPLETE.value,
-      occurredAt = from.atStartOfDay().plusHours(10)
+      occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
     )
 
     val journeyWithMoveCompleteEvent = journey1.copy(events = journey1.events + journeyCompleteEvent)
@@ -350,19 +392,19 @@ internal class MovePersisterTest {
       toLocation = toCourtNomisAgencyId(),
       toLocationType = "prison",
       cancellationReason = "cancelled_by_pmu",
-      date = to,
+      date = toSeptember6th2020,
       events = listOf(
         moveEventFactory(
           eventId = "E1",
           type = EventType.MOVE_ACCEPT.value,
           moveId = "M9",
-          occurredAt = to.atStartOfDay().minusHours(24)
+          occurredAt = toSeptember6th2020.atStartOfDay().minusHours(24)
         ),
         moveEventFactory(
           eventId = "E2",
           type = EventType.MOVE_CANCEL.value,
           moveId = "M9",
-          occurredAt = to.atStartOfDay().minusHours(2)
+          occurredAt = toSeptember6th2020.atStartOfDay().minusHours(2)
         )
       ),
     )
