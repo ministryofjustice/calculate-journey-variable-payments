@@ -6,4 +6,4 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:/db/migration,classpath:/db/migration/localstack
+    locations: classpath:/db/migration,classpath:/db/migration
