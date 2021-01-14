@@ -141,28 +141,28 @@
                                 Pick up location
                             </dt>
                             <dd class="govuk-summary-list__value"
-                                th:text="${move.fromSiteName}?: ${move.fromNomisAgencyId}"></dd>
+                                th:text="${journey.fromSiteName}?: ${journey.fromNomisAgencyId}"></dd>
                         </div>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 Pick up location type
                             </dt>
                             <dd class="govuk-summary-list__value"
-                                th:text="${move.fromLocationType}?: 'Not mapped'"></dd>
+                                th:text="${journey.fromLocationType}?: 'Not mapped'"></dd>
                         </div>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 Drop off location
                             </dt>
                             <dd class="govuk-summary-list__value"
-                                th:text="${move.toSiteName}?: ${move.toNomisAgencyId}"></dd>
+                                th:text="${journey.toSiteName}?: ${journey.toNomisAgencyId}"></dd>
                         </div>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 Drop off location type
                             </dt>
                             <dd class="govuk-summary-list__value"
-                                th:text="${move.toLocationType}?: 'Not mapped'"></dd>
+                                th:text="${journey.toLocationType}?: 'Not mapped'"></dd>
                         </div>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
