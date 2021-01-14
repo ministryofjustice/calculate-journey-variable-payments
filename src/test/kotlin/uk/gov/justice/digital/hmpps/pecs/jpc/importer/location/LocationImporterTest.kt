@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -17,17 +18,19 @@ import java.io.InputStream
 internal class LocationImporterTest {
 
   private val locationRepo: LocationRepository = mock()
+  private val priceRepo: PriceRepository = mock()
 
   private val schedule34LocationsProvider: Schedule34LocationsProvider =
     mock { on { get() } doReturn locationSheetWithCrownCourt() }
 
-  private val importer: LocationsImporter = LocationsImporter(locationRepo, schedule34LocationsProvider)
+  private val importer: LocationsImporter = LocationsImporter(locationRepo, priceRepo, schedule34LocationsProvider)
 
   @Test
   internal fun `verify import interactions`() {
     importer.import()
 
     verify(schedule34LocationsProvider).get()
+    verify(priceRepo).deleteAll()
     verify(locationRepo).deleteAll()
     verify(locationRepo, times(2)).count()
     verify(locationRepo).save(any())

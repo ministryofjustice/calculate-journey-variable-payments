@@ -5,16 +5,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 
 @Component
 class LocationsImporter(
   private val locationRepo: LocationRepository,
+  private val priceRepo: PriceRepository,
   private val schedule34LocationsProvider: Schedule34LocationsProvider
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
   fun import() {
+    priceRepo.deleteAll()
     locationRepo.deleteAll()
 
     schedule34LocationsProvider.get().use { locations ->
