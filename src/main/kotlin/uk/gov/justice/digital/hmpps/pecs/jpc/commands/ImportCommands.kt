@@ -3,10 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.commands
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ManualLocationImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ManualPriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ReportsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -15,19 +13,16 @@ import java.time.temporal.ChronoUnit
  */
 @ShellComponent
 class ImportCommands(
-  @Autowired private val locationImporter: ManualLocationImporter,
-  @Autowired private val manualPriceImporter: ManualPriceImporter,
-  @Autowired private val reportsImporter: ReportsImporter
+  @Autowired private val importService: ImportService
 ) {
-
   @ShellMethod("Imports schedule 34 locations from S3. This command deletes all existing prices.")
   fun importLocations() {
-    locationImporter.import()
+    importService.importLocations()
   }
 
   @ShellMethod("Imports prices for the given supplier from S3. This command deletes all existing prices for the given supplier.")
   fun importPrices(supplier: Supplier) {
-    manualPriceImporter.import(supplier)
+    importService.importPrices(supplier)
   }
 
   /**
@@ -36,9 +31,8 @@ class ImportCommands(
   @ShellMethod("Imports reports for both suppliers for the given dates. Date params are the in ISO date format e.g. YYYY-MM-DD.")
   fun importReports(from: LocalDate, to: LocalDate) {
     if (to.isBefore(from)) throw RuntimeException("To date must be equal to or greater than from date.")
-
     for (i in 0..ChronoUnit.DAYS.between(from, to)) {
-      reportsImporter.import(from.plusDays(i), from.plusDays(i))
+      importService.importReports(from.plusDays(i), from.plusDays(i))
     }
   }
 }

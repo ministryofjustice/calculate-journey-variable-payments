@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.location.LocationsImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.Duration
 import java.time.LocalDate
 
+@Transactional
 @Service
 class ImportService(
   private val timeSource: TimeSource,

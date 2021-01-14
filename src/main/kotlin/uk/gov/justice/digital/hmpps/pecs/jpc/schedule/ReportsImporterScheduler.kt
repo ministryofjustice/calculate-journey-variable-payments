@@ -2,15 +2,19 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.schedule
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.ReportsImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 
 @ConditionalOnWebApplication
 @Component
-class ReportsImporterScheduler(private val reportsImporter: ReportsImporter, private val timeSource: TimeSource) {
+class ReportsImporterScheduler(
+  @Autowired private val importService: ImportService,
+  private val timeSource: TimeSource
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -21,6 +25,6 @@ class ReportsImporterScheduler(private val reportsImporter: ReportsImporter, pri
 
     logger.info("Importing previous days reporting data: $yesterday.")
 
-    reportsImporter.import(yesterday, yesterday)
+    importService.importReports(yesterday, yesterday)
   }
 }
