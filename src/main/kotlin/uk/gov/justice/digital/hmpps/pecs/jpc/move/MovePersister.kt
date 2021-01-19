@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -119,7 +118,7 @@ class MovePersister(
       }
   }
 
-  fun fakeCancelledJourney(move: Move): Journey {
+  internal fun fakeCancelledJourney(move: Move): Journey {
     return Journey(
       journeyId = UUID.randomUUID().toString(),
       updatedAt = LocalDateTime.now(),
@@ -132,7 +131,7 @@ class MovePersister(
       state = JourneyState.cancelled,
       vehicleRegistration = null,
       notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
-      effectiveYear = effectiveYearForDate(move.moveDate ?: LocalDate.now()),
+      effectiveYear = effectiveYearForDate(move.moveDate ?: timeSource.date()),
       events = listOf()
     )
   }

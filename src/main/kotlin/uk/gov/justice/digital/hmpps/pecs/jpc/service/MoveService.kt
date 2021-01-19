@@ -23,11 +23,11 @@ class MoveService(
     return maybeMove?.let {
       val moveEvents = eventRepository.findAllByEventableId(it.moveId)
       val journeyId2Events =
-        eventRepository.findByEventableIdIn(it.journeys.map { it.journeyId }).groupBy { it.eventableId }
+        eventRepository.findByEventableIdIn(it.journeys.map { j -> j.journeyId }).groupBy { e -> e.eventableId }
 
       val journeysWithEvents = it.journeys.map { journey ->
         journey.copy(events = journeyId2Events[journey.journeyId] ?: listOf())
-      }
+      }.sortedBy { journey -> journey.pickUpDateTime }
 
       it.copy(events = moveEvents, journeys = journeysWithEvents)
     }

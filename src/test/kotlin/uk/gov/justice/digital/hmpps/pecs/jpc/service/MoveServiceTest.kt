@@ -12,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.EventRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.eventE1
@@ -23,7 +24,7 @@ import java.util.Optional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class MoveServiceTest() {
+class MoveServiceTest {
 
   @MockBean
   lateinit var moveQueryRepository: MoveQueryRepository
@@ -34,8 +35,10 @@ class MoveServiceTest() {
   @MockBean
   lateinit var moveRepository: MoveRepository
 
+  lateinit var service: MoveService
+
   @Test
-  fun `move by move id`() {
+  fun `find move by move id`() {
     val service = MoveService(moveQueryRepository, moveRepository, eventRepository)
     val journey = journeyJ1()
     val move = moveM1(journeys = listOf(journey))
@@ -45,9 +48,31 @@ class MoveServiceTest() {
     whenever(moveQueryRepository.moveWithPersonAndJourneys(eq("M1"), eq(defaultSupplierSerco))).thenReturn(move)
     whenever(eventRepository.findAllByEventableId(eq("M1"))).thenReturn(listOf(moveEvent))
 
-    val retrievedMpve = service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)
-    assertThat(retrievedMpve).isEqualTo(move)
-    assertThat(retrievedMpve?.events).containsExactly(moveEvent)
+    val retrievedMove = service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)
+    assertThat(retrievedMove).isEqualTo(move)
+    assertThat(retrievedMove?.events).containsExactly(moveEvent)
+  }
+
+  @Test
+  fun `journeys on the move are ordered by pickup datetime`() {
+    val service = MoveService(moveQueryRepository, moveRepository, eventRepository)
+
+    val journey1 = journeyJ1().copy(state = JourneyState.cancelled, dropOffDateTime = null)
+
+    val journey2 = journey1.copy(
+      journeyId = "J2",
+      fromNomisAgencyId = "WYI",
+      toNomisAgencyId = "BOG",
+      state = JourneyState.completed,
+      pickUpDateTime = journey1.pickUpDateTime?.plusMinutes(1)
+    )
+
+    val moveWithJourneysOutOfOrder = moveM1(journeys = listOf(journey2, journey1))
+
+    whenever(moveQueryRepository.moveWithPersonAndJourneys(eq("M1"), eq(defaultSupplierSerco))).thenReturn(moveWithJourneysOutOfOrder)
+    whenever(eventRepository.findAllByEventableId(eq("M1"))).thenReturn(listOf(eventE1()))
+
+    assertThat(service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)?.journeys).containsExactly(journey1, journey2)
   }
 
   @Test
