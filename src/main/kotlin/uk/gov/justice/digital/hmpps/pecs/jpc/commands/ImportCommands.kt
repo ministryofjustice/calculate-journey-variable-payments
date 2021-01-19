@@ -29,7 +29,7 @@ class ImportCommands(
   }
 
   /**
-   * Due to the potential the large volumes of data, each day is imported as an individual import to reduce the memory footprint.
+   * Due to potentially large volumes of data, each day is imported as an individual import to reduce the memory footprint.
    */
   @ShellMethod("Imports reports for both suppliers for the given dates. Date params are the in ISO date format e.g. YYYY-MM-DD.")
   fun importReports(from: LocalDate, to: LocalDate) {
