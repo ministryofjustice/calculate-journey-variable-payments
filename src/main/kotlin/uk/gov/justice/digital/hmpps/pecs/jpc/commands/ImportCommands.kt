@@ -22,11 +22,14 @@ class ImportCommands(
 
   @ShellMethod("Imports prices for the given supplier from S3. This command deletes all existing prices for the given supplier.")
   fun importPrices(supplier: Supplier) {
-    importService.importPrices(supplier)
+    when (supplier) {
+      Supplier.UNKNOWN -> throw RuntimeException("UNKNOWN is not a valid supplier")
+      else -> importService.importPrices(supplier)
+    }
   }
 
   /**
-   * Due to potential the large volumes of data each day is imported as an individual import to reduce the memory footprint.
+   * Due to potentially large volumes of data, each day is imported as an individual import to reduce the memory footprint.
    */
   @ShellMethod("Imports reports for both suppliers for the given dates. Date params are the in ISO date format e.g. YYYY-MM-DD.")
   fun importReports(from: LocalDate, to: LocalDate) {

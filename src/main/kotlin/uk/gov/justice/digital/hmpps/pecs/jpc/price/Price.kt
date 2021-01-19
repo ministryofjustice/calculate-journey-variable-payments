@@ -63,10 +63,8 @@ enum class Supplier {
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { Supplier.valueOf(value!!.toUpperCase()) }.getOrDefault(Supplier.UNKNOWN)
+      kotlin.runCatching { valueOf(value!!.toUpperCase()) }.getOrDefault(UNKNOWN)
   }
 }
-
-fun <T : Enum<*>> T.equalsStringCaseInsensitive(value: String) = this.name == value.toUpperCase()
 
 fun effectiveYearForDate(date: LocalDate) = if (date.monthValue >= 9) date.year else date.year - 1

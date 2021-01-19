@@ -21,6 +21,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
+import java.time.LocalDateTime
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation as WYIPrisonLocation1
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.fromPrisonNomisAgencyId as fromPrisonNomisAgencyId1
 
@@ -47,8 +49,7 @@ internal class MovePersisterTest {
   @Autowired
   lateinit var entityManager: TestEntityManager
 
-  @Autowired
-  lateinit var timeSource: TimeSource
+  private val timeSource: TimeSource = TimeSource { LocalDateTime.now() }
 
   private final val fromSeptember1st2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 1)
   private final val toSeptember6th2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 6)
@@ -416,6 +417,21 @@ internal class MovePersisterTest {
 
     assertThat(retrievedMove.moveType).isEqualTo(MoveType.CANCELLED)
     assertThat(journeys.all { it.notes!!.contains("FAKE") }).isTrue
+  }
+
+  @Test
+  fun `fake journey effective year taken from time move date when present`() {
+    val move = moveM1()
+    val fake = movePersister.fakeCancelledJourney(move)
+
+    assertThat(fake.effectiveYear).isEqualTo(effectiveYearForDate(move.moveDate!!))
+  }
+
+  @Test
+  fun `fake journey effective year taken defaults when move date is not present`() {
+    val fake = movePersister.fakeCancelledJourney(moveM1().copy(moveDate = null))
+
+    assertThat(fake.effectiveYear).isEqualTo(effectiveYearForDate(timeSource.date()))
   }
 
   private fun moveEvents(moveId: String) = eventRepository.findAllByEventableId(moveId)
