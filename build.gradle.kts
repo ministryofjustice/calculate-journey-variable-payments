@@ -33,7 +33,7 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
 
-  runtimeOnly("org.flywaydb:flyway-core:7.5.0")
+  runtimeOnly("org.flywaydb:flyway-core:6.5.6")
   runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.2.18")
 }
