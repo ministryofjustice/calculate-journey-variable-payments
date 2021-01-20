@@ -10,12 +10,14 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.EventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.eventE1
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyEventJE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import java.util.Optional
@@ -73,6 +75,28 @@ class MoveServiceTest {
     whenever(eventRepository.findAllByEventableId(eq("M1"))).thenReturn(listOf(eventE1()))
 
     assertThat(service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)?.journeys).containsExactly(journey1, journey2)
+  }
+
+  @Test
+  fun `journey events on the journey are ordered correctly`() {
+    val service = MoveService(moveQueryRepository, moveRepository, eventRepository)
+
+    val journeyStartEvent = journeyEventJE1()
+    val journeyCompleteEvent = journeyEventJE1(eventType = EventType.JOURNEY_COMPLETE).copy(occurredAt = journeyEventJE1().occurredAt.plusHours(1))
+
+    val journey = journeyJ1().copy(
+      state = JourneyState.cancelled,
+      dropOffDateTime = null,
+      events = listOf(journeyCompleteEvent, journeyStartEvent)
+    )
+
+    val moveWithJourneyEventsOutOfOrder = moveM1(journeys = listOf(journey))
+
+    whenever(moveQueryRepository.moveWithPersonAndJourneys(eq("M1"), eq(defaultSupplierSerco))).thenReturn(moveWithJourneyEventsOutOfOrder)
+    whenever(eventRepository.findAllByEventableId(eq("M1"))).thenReturn(listOf(eventE1()))
+    whenever((eventRepository.findByEventableIdIn(listOf(journey.journeyId)))).thenReturn(listOf(journeyCompleteEvent, journeyStartEvent))
+
+    assertThat(service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)!!.journeys[0].events).containsExactly(journeyStartEvent, journeyCompleteEvent)
   }
 
   @Test

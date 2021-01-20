@@ -114,3 +114,20 @@ fun eventE1(
   details = null,
   supplier = Supplier.SERCO
 )
+
+fun journeyEventJE1(
+  eventId: String = "JE1",
+  eventType: EventType = EventType.JOURNEY_START,
+  eventableId: String = journeyJ1().journeyId
+) = Event(
+  details = null,
+  eventableType = "journey",
+  eventableId = eventableId,
+  eventId = eventId,
+  notes = null,
+  occurredAt = journeyJ1().pickUpDateTime!!,
+  recordedAt = journeyJ1().pickUpDateTime!!,
+  supplier = Supplier.SERCO,
+  type = eventType.value,
+  updatedAt = defaultDateTime,
+)
