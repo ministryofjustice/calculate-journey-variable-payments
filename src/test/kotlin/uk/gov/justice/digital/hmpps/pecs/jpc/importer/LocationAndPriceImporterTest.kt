@@ -52,7 +52,7 @@ internal class LocationAndPriceImporterTest(
     verify(importServiceSpy).importPrices(Supplier.GEOAMEY)
     verify(importServiceSpy).importPrices(Supplier.SERCO)
 
-    assertThat(locationRepository.count()).isEqualTo(2)
+    assertThat(locationRepository.count()).isEqualTo(6)
     assertThat(priceRepository.count()).isEqualTo(2)
   }
 

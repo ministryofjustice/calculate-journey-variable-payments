@@ -32,6 +32,7 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
     OTHER("Other"),
     POLICE("Police"),
     PRISON("Prisons"),
+    PROBATION("Probation"),
     STCSCH("STC&SCH");
   }
 

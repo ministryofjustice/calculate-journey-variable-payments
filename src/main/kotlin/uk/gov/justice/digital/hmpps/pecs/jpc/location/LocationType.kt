@@ -6,6 +6,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.location
 enum class LocationType(val label: String) {
 
   AP("Airport"),
+  APP("Approved Premises"),
   CC("Crown Court"),
   CM("Combined Court"),
   CO("County Court"),
@@ -13,6 +14,7 @@ enum class LocationType(val label: String) {
   IM("Immigration"),
   MC("Mag Court"),
   O("Other"),
+  PB("Probation"),
   PR("Prison"),
   PS("Police"),
   SCH("SCH"),

@@ -35,7 +35,7 @@ internal class LocationsSpreadsheetTest {
 
       assertThatThrownBy { LocationsSpreadsheet(workbookWithMissingSheets, locationRepository) }
         .isInstanceOf(RuntimeException::class.java)
-        .hasMessage("The following tabs are missing from the locations spreadsheet: Hospitals, Other, Police, Prisons, STC&SCH")
+        .hasMessage("The following tabs are missing from the locations spreadsheet: Hospitals, Other, Police, Prisons, Probation, STC&SCH")
     }
 
     @Test
