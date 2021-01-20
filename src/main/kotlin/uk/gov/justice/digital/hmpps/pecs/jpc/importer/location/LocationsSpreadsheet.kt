@@ -58,9 +58,13 @@ class LocationsSpreadsheet(private val spreadsheet: Workbook, private val locati
       ?: throw RuntimeException("Unsupported location type: " + row.getFormattedStringCell(TYPE))
     val agency = row.getFormattedStringCell(AGENCY) ?: throw RuntimeException("Agency id cannot be blank")
     val site = row.getFormattedStringCell(SITE) ?: throw RuntimeException("Site name cannot be blank")
+    if (site.length > 255) throw RuntimeException("Site name cannot be more than 255 characters long.")
 
     locationRepository.findByNomisAgencyId(agency)
       .let { if (it != null) throw RuntimeException("Agency id '$agency' already exists") }
+
+    locationRepository.findBySiteName(site)
+      .let { if (it != null) throw RuntimeException("Site name '$site' already exists") }
 
     return Location(
       locationType = locationType,

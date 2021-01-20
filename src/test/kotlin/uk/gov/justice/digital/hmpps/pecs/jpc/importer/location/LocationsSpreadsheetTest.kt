@@ -89,12 +89,30 @@ internal class LocationsSpreadsheetTest {
     }
 
     @Test
+    internal fun `throws error if site name is more than 255 chars long`() {
+      row.getCell(2).setCellValue("A".repeat(256))
+
+      assertThatThrownBy { spreadsheet.toLocation(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("Site name cannot be more than 255 characters long.")
+    }
+
+    @Test
     internal fun `throws error if duplicate agency id`() {
       whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(location)
 
       assertThatThrownBy { spreadsheet.toLocation(row) }
         .isInstanceOf(RuntimeException::class.java)
         .hasMessage("Agency id 'AGENCY_ID' already exists")
+    }
+
+    @Test
+    internal fun `throws error if duplicate site name`() {
+      whenever(locationRepository.findBySiteName("SITE")).thenReturn(location)
+
+      assertThatThrownBy { spreadsheet.toLocation(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("Site name 'SITE' already exists")
     }
   }
 
