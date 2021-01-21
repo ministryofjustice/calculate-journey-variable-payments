@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
 
-  protected val rowIndex: AtomicInteger = AtomicInteger(10)
+  protected val rowIndex: AtomicInteger = AtomicInteger(9)
   protected fun createRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.createRow(rIndex)
   protected fun getRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.getRow(rIndex)
 

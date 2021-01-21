@@ -29,19 +29,19 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
     val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
     sheet.writeMoves(moves)
 
-    assertCellEquals(sheet, 10, 0, "REF1")
+    assertCellEquals(sheet, 9, 0, "REF1")
 
-    assertCellEquals(sheet, 10, 1, "from") // pick up sitename
-    assertCellEquals(sheet, 10, 2, "PR") // pick up location type
-    assertCellEquals(sheet, 10, 3, "to") // drop off sitename
-    assertCellEquals(sheet, 10, 4, "PR") // drop off location type
+    assertCellEquals(sheet, 9, 1, "from") // pick up sitename
+    assertCellEquals(sheet, 9, 2, "PR") // pick up location type
+    assertCellEquals(sheet, 9, 3, "to") // drop off sitename
+    assertCellEquals(sheet, 9, 4, "PR") // drop off location type
 
-    assertCellEquals(sheet, 10, 5, "10/09/2020") // Move date
-    assertCellEquals(sheet, 10, 6, "10/09/2020") // Cancellation date
-    assertCellEquals(sheet, 10, 7, "10:00") // Cancellation time
+    assertCellEquals(sheet, 9, 5, "10/09/2020") // Move date
+    assertCellEquals(sheet, 9, 6, "10/09/2020") // Cancellation date
+    assertCellEquals(sheet, 9, 7, "10:00") // Cancellation time
 
-    assertCellEquals(sheet, 10, 8, "PR101") // prison number
-    assertCellEquals(sheet, 10, 9, 1.0) // price
-    assertCellEquals(sheet, 10, 10, "some notes") // should only show the redirect event notes
+    assertCellEquals(sheet, 9, 8, "PR101") // prison number
+    assertCellEquals(sheet, 9, 9, 1.0) // price
+    assertCellEquals(sheet, 9, 10, "some notes") // should only show the redirect event notes
   }
 }
