@@ -15,33 +15,46 @@ class PersonPersister(
 
   fun persistPeople(people: List<Person>) {
     logger.info("Persisting ${people.size} people")
-    var counter = 1
+    var counter = 0
     val peopleToSave = mutableListOf<Person>()
-    Result.runCatching {
-      people.forEach { person ->
-        peopleToSave += person
-        if (counter++ % 1000 == 0) {
-          logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).")
-          saveFlushAndClear(personRepository, peopleToSave)
-        }
+    people.forEach { person ->
+      peopleToSave += person
+      if (++counter % 500 == 0) {
+        savePeople(peopleToSave) { logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).") }
       }
-      saveFlushAndClear(personRepository, peopleToSave)
-    }.onFailure { logger.warn("Error inserting people ${peopleToSave.map { p -> p.personId }} - ${it.message}") }
+    }
+
+    if (peopleToSave.isNotEmpty()) savePeople(peopleToSave) { logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).") }
+  }
+
+  private fun savePeople(people: MutableList<Person>, success: () -> Unit) {
+    Result.runCatching {
+      saveFlushAndClear(personRepository, people)
+    }
+      .onSuccess { success() }
+      .onFailure { logger.warn("Error inserting people ${people.map { p -> p.personId }} - ${it.message}") }
   }
 
   fun persistProfiles(profiles: List<Profile>) {
     logger.info("Persisting ${profiles.size} profiles")
-    var counter = 1
+    var counter = 0
     val profilesToSave = mutableListOf<Profile>()
-    Result.runCatching {
-      profiles.forEach { profile ->
-        profilesToSave += profile
-        if (counter++ % 1000 == 0) {
-          logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).")
-          saveFlushAndClear(profileRepository, profilesToSave)
-        }
+    profiles.forEach { profile ->
+      profilesToSave += profile
+
+      if (++counter % 500 == 0) {
+        saveProfiles(profilesToSave) { logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).") }
       }
-      saveFlushAndClear(profileRepository, profilesToSave)
-    }.onFailure { logger.warn("Error inserting profiles ${profilesToSave.map { p -> p.profileId }} - ${it.message}") }
+    }
+
+    if (profilesToSave.isNotEmpty()) saveProfiles(profilesToSave) { logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).") }
+  }
+
+  private fun saveProfiles(profiles: MutableList<Profile>, success: () -> Unit) {
+    Result.runCatching {
+      saveFlushAndClear(profileRepository, profiles)
+    }
+      .onSuccess { success() }
+      .onFailure { logger.warn("Error inserting profiles ${profiles.map { p -> p.profileId }} - ${it.message}") }
   }
 }
