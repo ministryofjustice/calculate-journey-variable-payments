@@ -5,12 +5,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Cancelled")!!, header) {
 
-  override fun writeMove(move: Move) = writeMoveRow(move, rowIndex.get() % 2 == 0, false)
+  override fun writeMove(move: Move) = writeMoveRow(move, false)
 
-  override fun writeMoveRow(move: Move, isShaded: Boolean, showNotes: Boolean) {
-    val fill = if (isShaded) fillLemon else null
+  override fun writeMoveRow(move: Move, showNotes: Boolean) {
     val row = createRow()
-    fun <T> add(col: Int, value: T?) = row.addCell(col, value, fill)
+    fun <T> add(col: Int, value: T?) = row.addCell(col, value, fillShaded)
     with(move) {
       add(0, reference)
       add(1, fromSiteName())
@@ -21,7 +20,7 @@ class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workb
       add(6, dropOffOrCancelledDate())
       add(7, dropOffOrCancelledTime())
       add(8, person?.prisonNumber)
-      if (hasPrice()) row.addCell(9, totalInPounds(), if (isShaded) fillLemonPound else fillWhitePound) else add(9, "NOT PRESENT")
+      if (hasPrice()) row.addCell(9, totalInPounds(), fillShadedPound) else add(9, "NOT PRESENT")
       add(10, notes)
     }
   }

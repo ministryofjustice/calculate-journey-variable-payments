@@ -42,11 +42,12 @@ internal class JourneysSheetTest(@Autowired private val template: JPCTemplatePro
     )
     sheet.writeJourneys(listOf(journey))
 
-    assertCellEquals(sheet, 10, 0, "from") // from site name
-    assertCellEquals(sheet, 10, 1, "TO") // TO - NOMIS Agency ID because there is no site name
-    assertCellEquals(sheet, 10, 2, 22.0) // volume
-    assertCellEquals(sheet, 10, 3, 1.0) // unit price in pounds
-    assertCellEquals(sheet, 10, 4, 22.0) // total price in pounds
+    assertCellEquals(sheet, 9, 0, "from") // from site name
+    assertCellEquals(sheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name
+    assertCellEquals(sheet, 9, 2, 22) // volume
+    assertCellEquals(sheet, 9, 3, 22) // billable journey count
+    assertCellEquals(sheet, 9, 4, 1.0) // unit price in pounds
+    assertCellEquals(sheet, 9, 5, 22.0) // total price in pounds
   }
 
   @Test
@@ -74,10 +75,11 @@ internal class JourneysSheetTest(@Autowired private val template: JPCTemplatePro
     )
     sheet.writeJourneys(listOf(journey))
 
-    assertCellEquals(sheet, 10, 0, "from") // from site name
-    assertCellEquals(sheet, 10, 1, "TO") // TO - NOMIS Agency ID because there is no site name
-    assertCellEquals(sheet, 10, 2, 22.0) // volume
-    assertCellEquals(sheet, 10, 3, "NOT PRESENT") // no unit price in pounds
-    assertCellEquals(sheet, 10, 4, 0.00) // total price in pounds
+    assertCellEquals(sheet, 9, 0, "from") // from site name
+    assertCellEquals(sheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name
+    assertCellEquals(sheet, 9, 2, 22) // volume
+    assertCellEquals(sheet, 9, 3, 0) // billable journey count
+    assertCellEquals(sheet, 9, 4, "NOT PRESENT") // no unit price in pounds
+    assertCellEquals(sheet, 9, 5, 0.0) // total price in pounds
   }
 }

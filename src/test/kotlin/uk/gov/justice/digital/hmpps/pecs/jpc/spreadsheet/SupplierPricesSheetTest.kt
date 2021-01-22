@@ -54,8 +54,8 @@ internal class SupplierPricesSheetTest(@Autowired private val template: JPCTempl
       )
     )
 
-    assertOnPriceRow(supplierPricesSheet.sheet.getRow(10), PriceRow("FROM SITE A", "TO SITE A", 200.59))
-    assertOnPriceRow(supplierPricesSheet.sheet.getRow(11), PriceRow("FROM SITE B", "TO SITE B", 100.24))
+    assertOnPriceRow(supplierPricesSheet.sheet.getRow(9), PriceRow("FROM SITE A", "TO SITE A", 200.59))
+    assertOnPriceRow(supplierPricesSheet.sheet.getRow(10), PriceRow("FROM SITE B", "TO SITE B", 100.24))
   }
 
   private fun assertOnPriceRow(row: Row, priceRow: PriceRow) {
