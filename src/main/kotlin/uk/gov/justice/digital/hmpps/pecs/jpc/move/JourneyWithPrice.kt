@@ -15,6 +15,7 @@ data class JourneyWithPrice(
 ) {
   fun unitPriceInPounds() = unitPriceInPence?.let { it.toDouble() / 100 }
   fun totalPriceInPounds() = totalPriceInPence?.let { it.toDouble() / 100 }
+  fun billableJourneyCount() = unitPriceInPence?.let { totalPriceInPence!! / it } ?: 0
   fun fromSiteName() = fromSiteName ?: fromNomisAgencyId
   fun toSiteName() = toSiteName ?: toNomisAgencyId
 }
