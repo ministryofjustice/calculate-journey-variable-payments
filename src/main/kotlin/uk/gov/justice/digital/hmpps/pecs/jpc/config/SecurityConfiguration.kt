@@ -31,7 +31,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
   private lateinit var issuer: String
 
   @Value("\${HMPPS_AUTH_BASE_URI}")
-  private lateinit var authLogoutSuccesUri: String
+  private lateinit var authLogoutSuccessUri: String
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
@@ -41,16 +41,24 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         authorize("/info", permitAll)
         authorize(anyRequest, hasRole("PECS_JPC"))
       }
+      sessionManagement {
+        invalidSessionUrl = authLogoutSuccessUri
+        sessionAuthenticationErrorUrl = authLogoutSuccessUri
+        sessionConcurrency {
+          maximumSessions = 1
+          expiredUrl = authLogoutSuccessUri
+        }
+      }
       exceptionHandling {
         accessDeniedHandler = accessDeniedHandler()
-        // TODO consider redirecting to access denied page?
       }
       oauth2Login {
         userInfoEndpoint { userService = oAuth2UserService() }
         defaultSuccessUrl("/", true)
+        failureUrl = authLogoutSuccessUri
       }
       logout {
-        logoutSuccessUrl = authLogoutSuccesUri
+        logoutSuccessUrl = authLogoutSuccessUri
       }
     }
   }
@@ -64,19 +72,25 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
       val user = delegate.loadUser(userRequest)
       val jwt = JwtDecoders.fromIssuerLocation(issuer).decode(userRequest.accessToken.tokenValue)
 
-      DefaultOAuth2User(jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(), user.attributes, "name")
+      DefaultOAuth2User(
+        jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
+        user.attributes,
+        "name"
+      )
     }
   }
 
   private fun accessDeniedHandler(): AccessDeniedHandler {
-    return AccessDeniedHandler { request, _, accessDeniedException ->
+    return AccessDeniedHandler { request, response, accessDeniedException ->
       val auth: Authentication? = SecurityContextHolder.getContext().authentication
 
-      if (auth != null) {
-        logger.warn("User: ${auth.name} attempted to access the protected URL: ${request.requestURI}")
-      }
+      auth?.let { logger.warn("User: ${auth.name} attempted to access the protected URL: ${request.requestURI}") }
 
       logger.error(accessDeniedException.message)
+
+      request.session.invalidate()
+
+      response.sendRedirect(authLogoutSuccessUri)
     }
   }
 

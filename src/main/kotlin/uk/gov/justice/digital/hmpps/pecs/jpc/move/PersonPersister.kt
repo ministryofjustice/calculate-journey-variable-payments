@@ -32,7 +32,10 @@ class PersonPersister(
       saveFlushAndClear(personRepository, people)
     }
       .onSuccess { success() }
-      .onFailure { logger.warn("Error inserting people ${people.map { p -> p.personId }} - ${it.message}") }
+      .onFailure {
+        logger.warn("Error inserting people batch ${people.map { p -> p.personId }} - ${it.stackTraceToString()}")
+        people.clear()
+      }
   }
 
   fun persistProfiles(profiles: List<Profile>) {
@@ -55,6 +58,9 @@ class PersonPersister(
       saveFlushAndClear(profileRepository, profiles)
     }
       .onSuccess { success() }
-      .onFailure { logger.warn("Error inserting profiles ${profiles.map { p -> p.profileId }} - ${it.message}") }
+      .onFailure {
+        logger.warn("Error inserting profiles batch ${profiles.map { p -> p.profileId }} - ${it.message}")
+        profiles.clear()
+      }
   }
 }
