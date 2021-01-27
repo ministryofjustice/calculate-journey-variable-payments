@@ -1,0 +1,12 @@
+{
+  "role": {
+    "name": "application-name"
+  },
+  "customDimensions": {
+    "service.version": "\${BUILD_NUMBER}"
+  },
+  "selfDiagnostics": {
+    "destination": "console",
+    "level": "INFO"
+  }
+}

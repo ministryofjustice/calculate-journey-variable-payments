@@ -25,11 +25,16 @@ class PriceImporter(
 
     logger.info("Importing prices for $supplier")
 
-    priceRepo.deleteBySupplier(supplier)
-
     when (supplier) {
-      Supplier.SERCO -> sercoPrices.get().use { import(it, Supplier.SERCO) }
-      Supplier.GEOAMEY -> geoameyPrices.get().use { import(it, Supplier.GEOAMEY) }
+      Supplier.SERCO -> {
+        priceRepo.deleteBySupplier(Supplier.SERCO)
+        sercoPrices.get().use { import(it, Supplier.SERCO) }
+      }
+      Supplier.GEOAMEY -> {
+        priceRepo.deleteBySupplier(Supplier.GEOAMEY)
+        geoameyPrices.get().use { import(it, Supplier.GEOAMEY) }
+      }
+      else -> throw RuntimeException("Supplier '$supplier' not supported.")
     }
 
     logger.info("Supplier $supplier prices import finished in '${(System.currentTimeMillis() - start) / 1000}' seconds.")
