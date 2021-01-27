@@ -52,7 +52,7 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
         invalidSessionUrl = authLogoutSuccessUri
         sessionAuthenticationErrorUrl = authLogoutSuccessUri
         sessionConcurrency {
-          sessionRegistry = sessionRegistry()
+          sessionRegistry = clusteredConcurrentSessionRegistry()
           maximumSessions = 1
         }
       }
@@ -70,9 +70,9 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
     }
   }
 
-  // Required for session management in a clustered environment.
   @Bean
-  fun sessionRegistry(): SpringSessionBackedSessionRegistry<S> = SpringSessionBackedSessionRegistry(sessionRepository)
+  fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =
+    SpringSessionBackedSessionRegistry(sessionRepository)
 
   @Bean
   fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
