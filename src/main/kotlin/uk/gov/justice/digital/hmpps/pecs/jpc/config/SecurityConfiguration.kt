@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
@@ -18,12 +19,15 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.springframework.session.FindByIndexNameSessionRepository
+import org.springframework.session.Session
+import org.springframework.session.security.SpringSessionBackedSessionRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
 import kotlin.streams.toList
 
 @EnableWebSecurity
 @ConditionalOnWebApplication
-class SecurityConfiguration : WebSecurityConfigurerAdapter() {
+class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -32,6 +36,9 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
 
   @Value("\${HMPPS_AUTH_BASE_URI}")
   private lateinit var authLogoutSuccessUri: String
+
+  @Autowired
+  private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
@@ -45,8 +52,8 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         invalidSessionUrl = authLogoutSuccessUri
         sessionAuthenticationErrorUrl = authLogoutSuccessUri
         sessionConcurrency {
+          sessionRegistry = sessionRegistry()
           maximumSessions = 1
-          expiredUrl = authLogoutSuccessUri
         }
       }
       exceptionHandling {
@@ -63,9 +70,12 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     }
   }
 
+  // Required for session management in a clustered environment.
+  @Bean
+  fun sessionRegistry(): SpringSessionBackedSessionRegistry<S> = SpringSessionBackedSessionRegistry(sessionRepository)
+
   @Bean
   fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    // This is not an ideal solution and should be revisited.  Spring was not playing nicely with JWT.
     val delegate = DefaultOAuth2UserService()
 
     return OAuth2UserService { userRequest ->
