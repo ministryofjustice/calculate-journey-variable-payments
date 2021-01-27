@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
@@ -61,6 +62,11 @@ internal class PriceImportTest {
     verify(priceRepo).deleteBySupplier(Supplier.GEOAMEY)
     verify(priceRepo, times(2)).count()
     verify(priceRepo).save(any())
+  }
+
+  @Test
+  internal fun `import fails with runtime exception for unsupported supplier`() {
+    assertThatThrownBy { import.import(Supplier.UNKNOWN) }.isInstanceOf(RuntimeException::class.java)
   }
 
   private fun priceSheetWithRow(journeyId: Double, fromSite: String, toSite: String, price: Double): InputStream {
