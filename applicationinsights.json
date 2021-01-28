@@ -1,12 +1,16 @@
 {
   "role": {
-    "name": "application-name"
+    "name": "calculate-journey-variable-payments"
   },
   "customDimensions": {
-    "service.version": "\${BUILD_NUMBER}"
+    "service.version": "${BUILD_NUMBER}"
+  },
+  "instrumentation": {
+    "logging": {
+      "level": "DEBUG"
+    }
   },
   "selfDiagnostics": {
-    "destination": "console",
-    "level": "INFO"
+    "destination": "console"
   }
 }
