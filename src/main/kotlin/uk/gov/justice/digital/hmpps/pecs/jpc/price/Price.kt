@@ -68,3 +68,5 @@ enum class Supplier {
 }
 
 fun effectiveYearForDate(date: LocalDate) = if (date.monthValue >= 9) date.year else date.year - 1
+
+fun nextEffectiveYearForDate(date: LocalDate) = effectiveYearForDate(date) + 1
