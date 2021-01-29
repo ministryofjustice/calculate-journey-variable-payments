@@ -1,15 +1,20 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.commands
 
+import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.BulkPriceUpdatesService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.BulkPricesService
 
 @ShellComponent
-class BulkPriceUpdateCommands(private val bulkPriceUpdatesService: BulkPriceUpdatesService) {
+class BulkPriceUpdateCommands(private val bulkPricesService: BulkPricesService) {
 
-  @ShellMethod("Provides the ability to perform a bulk price update for the next effective year.")
-  fun bulkPriceUpdate(supplier: Supplier, multiplier: Double) {
-    bulkPriceUpdatesService.bulkPriceUpdate(supplier, multiplier)
+  private val logger = LoggerFactory.getLogger(javaClass)
+
+  @ShellMethod("Adds prices for the next effective year based on the current effective years prices and the supplied multiplier.")
+  fun addNextYearsPrices(supplier: Supplier, multiplier: Double) {
+    logger.info("Running bulk price update for supplier '$supplier' using multiplier '$multiplier'")
+
+    bulkPricesService.addNextYearsPrices(supplier, multiplier)
   }
 }
