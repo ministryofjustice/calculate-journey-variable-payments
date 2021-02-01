@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.jwt.JwtDecoders
@@ -23,6 +24,9 @@ import org.springframework.session.FindByIndexNameSessionRepository
 import org.springframework.session.Session
 import org.springframework.session.security.SpringSessionBackedSessionRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogInAuditFilter
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogOutAuditHandler
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import kotlin.streams.toList
 
 @EnableWebSecurity
@@ -39,6 +43,12 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
 
   @Autowired
   private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
+
+  @Autowired
+  private lateinit var timeSource: TimeSource
+
+  @Autowired
+  private lateinit var auditService: AuditService
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
@@ -66,7 +76,9 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
       }
       logout {
         logoutSuccessUrl = authLogoutSuccessUri
+        addLogoutHandler(LogOutAuditHandler(auditService))
       }
+      addFilterAfter<OAuth2LoginAuthenticationFilter>(LogInAuditFilter(timeSource, auditService))
     }
   }
 
