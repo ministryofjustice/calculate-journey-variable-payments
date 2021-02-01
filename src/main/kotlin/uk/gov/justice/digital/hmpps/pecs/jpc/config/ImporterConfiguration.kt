@@ -27,5 +27,6 @@ class ImporterConfiguration {
   fun timeSource() = TimeSource { LocalDateTime.now(Clock.systemDefaultZone()) }
 
   @Bean
-  fun supplierPrices() = SupplierPrices { supplier -> priceRepository.findBySupplier(supplier) }
+  fun supplierPrices() =
+    SupplierPrices { supplier, year -> priceRepository.findBySupplierAndEffectiveYear(supplier, year) }
 }
