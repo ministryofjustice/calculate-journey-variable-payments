@@ -13,8 +13,10 @@ class BulkPriceUpdateCommands(private val bulkPricesService: BulkPricesService) 
 
   @ShellMethod("Adds prices for the next effective year based on the current effective years prices and the supplied multiplier.")
   fun addNextYearsPrices(supplier: Supplier, multiplier: Double) {
-    logger.info("Running bulk price update for supplier '$supplier' using multiplier '$multiplier'")
+    logger.info("Starting bulk price update for $supplier with multiplier $multiplier")
 
     bulkPricesService.addNextYearsPrices(supplier, multiplier)
+
+    logger.info("Finished bulk price update for $supplier with multiplier $multiplier")
   }
 }

@@ -9,8 +9,6 @@ interface PriceRepository : JpaRepository<Price, UUID> {
 
   fun findBySupplierAndFromLocationAndToLocation(supplier: Supplier, from: Location, to: Location): Price?
 
-  fun findBySupplier(supplier: Supplier): List<Price>
-
   fun findBySupplierAndEffectiveYear(supplier: Supplier, effectiveYear: Int): List<Price>
 
   fun deleteBySupplierAndEffectiveYear(supplier: Supplier, effectiveYear: Int)

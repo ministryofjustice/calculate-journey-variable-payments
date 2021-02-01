@@ -20,8 +20,8 @@ internal class BulkPriceUpdateCommandsTest {
 
   @Test
   internal fun `service invoked for Geoamey with expected multiplier`() {
-    command.addNextYearsPrices(Supplier.SERCO, 2.0)
+    command.addNextYearsPrices(Supplier.GEOAMEY, 2.0)
 
-    verify(service).addNextYearsPrices(Supplier.SERCO, 2.0)
+    verify(service).addNextYearsPrices(Supplier.GEOAMEY, 2.0)
   }
 }
