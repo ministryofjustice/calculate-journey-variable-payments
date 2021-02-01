@@ -11,9 +11,9 @@ data class Money(val pence: Int) {
 
   fun pounds() = pence.toDouble() / 100
 
-  fun multiplyBy(multiplier: Double): Money = valueOf(pounds() * multiplier)
-
   override fun toString(): String = "%.2f".format(pounds())
+
+  operator fun times(multiplier: Double) = valueOf(pounds() * multiplier)
 
   companion object Factory {
     fun valueOf(pounds: Double) = Money((pounds * 100).toInt())

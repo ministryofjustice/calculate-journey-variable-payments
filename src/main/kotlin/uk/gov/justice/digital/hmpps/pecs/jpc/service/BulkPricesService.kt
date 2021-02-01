@@ -38,7 +38,7 @@ class BulkPricesService(
           id = UUID.randomUUID(),
           addedAt = timeSource.dateTime(),
           effectiveYear = nextEffectiveYearForDate(now),
-          priceInPence = it.price().multiplyBy(multiplier).pence
+          priceInPence = it.price().times(multiplier).pence
         )
       )
     }.count()
