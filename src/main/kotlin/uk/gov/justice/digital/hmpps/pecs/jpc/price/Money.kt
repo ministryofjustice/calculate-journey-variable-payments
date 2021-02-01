@@ -13,6 +13,8 @@ data class Money(val pence: Int) {
 
   override fun toString(): String = "%.2f".format(pounds())
 
+  operator fun times(multiplier: Double) = valueOf(pounds() * multiplier)
+
   companion object Factory {
     fun valueOf(pounds: Double) = Money((pounds * 100).toInt())
   }
