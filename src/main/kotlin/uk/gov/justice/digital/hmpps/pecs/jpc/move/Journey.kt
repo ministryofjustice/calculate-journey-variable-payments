@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.dateTimeConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.journeyStateConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.supplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -118,7 +119,7 @@ data class Journey(
 
   fun hasPrice() = priceInPence != null
   fun isBillable() = if (billable) "YES" else "NO"
-  fun priceInPounds() = priceInPence?.let { it.toDouble() / 100 }
+  fun priceInPounds() = priceInPence?.let { Money(it).pounds() }
   fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
   fun pickUpTime() = pickUpDateTime?.format(timeFormatter)
   fun dropOffDate() = dropOffDateTime?.format(dateFormatter)

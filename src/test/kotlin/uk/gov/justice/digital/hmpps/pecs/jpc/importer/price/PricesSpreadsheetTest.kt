@@ -55,7 +55,7 @@ internal class PricesSpreadsheetTest {
       this.createCell(0).setCellValue(1.0)
       this.createCell(1).setCellValue("from site")
       this.createCell(2).setCellValue("to site")
-      this.createCell(3).setCellValue(100.00)
+      this.createCell(3).setCellValue(100.005)
     }
 
     @Test
@@ -64,7 +64,7 @@ internal class PricesSpreadsheetTest {
 
       assertThat(price.fromLocation).isEqualTo(fromLocation)
       assertThat(price.toLocation).isEqualTo(toLocation)
-      assertThat(price.priceInPence).isEqualTo(10000)
+      assertThat(price.priceInPence).isEqualTo(10001)
     }
 
     @Test
