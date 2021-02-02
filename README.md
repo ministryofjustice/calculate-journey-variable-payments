@@ -79,15 +79,26 @@ export $(cat .env | xargs) # Only run this if you want to set or update the curr
 
 java -jar app.jar --spring.shell.interactive.enabled=true --spring.main.web-application-type=none
 ```
-Once in the Spring shell the following commands for importing data are available:
+Once in the Spring shell the following commands for importing and generating pricing data are available:
 ```
+# Import the schedule 34 location spreadsheet that has been uploaded to S3
+
 import-locations
 ```
 ```
+# Import the supplier price spreadsheet that has been uploaded to S3
+
 import-prices --supplier SERCO/GEOAMEY
 ```
 ```
+# Import the reporting data for the supplied dates from S3
+
 import-reports --from YYYY-MM-DD --to YYYY-MM-DD
+```
+```
+# Bulk price updates for the following effective year
+
+add-next-years-prices --supplier SERCO/GEOAMEY --multiplier 1.12
 ```
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 
