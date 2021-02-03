@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.price
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.whenever
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class PricesSpreadsheetTest {
@@ -19,11 +22,12 @@ internal class PricesSpreadsheetTest {
   private val workbook: Workbook = XSSFWorkbook()
   private val workbookSpy: Workbook = mock { spy(workbook) }
   private val sheet: Sheet = workbook.createSheet()
+  private val priceRepository: PriceRepository = mock()
 
   @Nested
   inner class RecordingErrors {
 
-    private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, emptyList())
+    private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, emptyList(), priceRepository)
 
     private val row: Row = sheet.createRow(0)
 
@@ -45,11 +49,12 @@ internal class PricesSpreadsheetTest {
   @Nested
   inner class MappingRowToPrice {
 
+    private val price: Price = mock()
     private val fromLocation: Location = Location(LocationType.CC, "from agency id", "from site")
     private val toLocation: Location = Location(LocationType.CC, "to agency id", "to site")
 
     private val spreadsheet: PricesSpreadsheet =
-      PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation))
+      PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation), priceRepository)
 
     private val row: Row = sheet.createRow(1).apply {
       this.createCell(0).setCellValue(1.0)
@@ -119,6 +124,15 @@ internal class PricesSpreadsheetTest {
       assertThatThrownBy { spreadsheet.mapToPrice(row) }
         .isInstanceOf(RuntimeException::class.java)
         .hasMessage("To location 'UNKNOWN TO SITE' for supplier 'GEOAMEY' not found")
+    }
+
+    @Test
+    internal fun `throws error if duplicate price`() {
+      whenever(priceRepository.findBySupplierAndFromLocationAndToLocation(Supplier.GEOAMEY, fromLocation, toLocation)).thenReturn(price)
+
+      assertThatThrownBy { spreadsheet.mapToPrice(row) }
+        .isInstanceOf(RuntimeException::class.java)
+        .hasMessage("Duplicate price: 'from site' to 'to site' for GEOAMEY")
     }
   }
 }
