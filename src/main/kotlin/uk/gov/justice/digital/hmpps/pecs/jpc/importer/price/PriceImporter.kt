@@ -41,7 +41,7 @@ class PriceImporter(
   }
 
   private fun import(prices: InputStream, supplier: Supplier) =
-    PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository.findAll().toList()).use { import(it) }
+    PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository.findAll().toList(), priceRepo).use { import(it) }
 
   private fun import(spreadsheet: PricesSpreadsheet) {
     val count = priceRepo.count()

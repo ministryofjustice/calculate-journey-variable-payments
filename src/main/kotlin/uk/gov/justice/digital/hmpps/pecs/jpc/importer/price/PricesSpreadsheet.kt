@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.InboundSpreadsheet
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 private const val FROM_LOCATION = 1
@@ -17,8 +18,12 @@ private const val ROW_OFFSET = 1
 /**
  * Simple wrapper class to encapsulate the logic around access to data in the supplier prices spreadsheet. When finished with the spreadsheet should be closed.
  */
-class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplier, supplierLocations: List<Location>) :
-  InboundSpreadsheet(spreadsheet) {
+class PricesSpreadsheet(
+  private val spreadsheet: Workbook,
+  val supplier: Supplier,
+  supplierLocations: List<Location>,
+  private val pricesRepository: PriceRepository
+) : InboundSpreadsheet(spreadsheet) {
 
   val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
 
@@ -52,6 +57,11 @@ class PricesSpreadsheet(private val spreadsheet: Workbook, val supplier: Supplie
 
     val toLocation = locations[toLocationName]
       ?: throw RuntimeException("To location '$toLocationName' for supplier '$supplier' not found")
+
+    // Note: we do not need to worry about the effective year as we always start on a clean slate on import.
+    pricesRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)?.let {
+      throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
+    }
 
     return Price(
       supplier = supplier,
