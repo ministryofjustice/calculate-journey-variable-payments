@@ -7,8 +7,6 @@ import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
 import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.validation.constraints.NotBlank
 
@@ -26,11 +24,10 @@ data class AuditEvent(
   @get: NotBlank(message = "User cannot be blank")
   val username: String,
 
+  @Column(name = "details", nullable = false)
+  val details: String,
+
   @Id
   @Column(name = "audit_event_id", nullable = false)
   val id: UUID = UUID.randomUUID()
-) {
-  @OneToMany(orphanRemoval = true)
-  @JoinColumn(name = "audit_event_id")
-  val extras = mutableListOf<AuditEventExtra>()
-}
+)

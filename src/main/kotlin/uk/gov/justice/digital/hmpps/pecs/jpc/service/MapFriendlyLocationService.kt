@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -14,6 +16,9 @@ class MapFriendlyLocationService(
   private val timeSource: TimeSource
 ) {
 
+  @Autowired
+  private lateinit var auditService: AuditService
+
   fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? =
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
       ?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }
@@ -24,11 +29,22 @@ class MapFriendlyLocationService(
   }
 
   fun mapFriendlyLocation(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
+    val authentication = SecurityContextHolder.getContext().authentication
+
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let {
+      val oldName = it.siteName
+      val oldType = it.locationType
       it.siteName = friendlyLocationName.trim().toUpperCase()
       it.locationType = locationType
 
       locationRepository.save(it)
+
+      authentication?.let { authentication ->
+        if (oldName != it.siteName)
+          auditService.createLocationNameChangeEvent(authentication.name, agencyId, oldName, it.siteName)
+        if (oldType != it.locationType)
+          auditService.createLocationTypeChangeEvent(authentication.name, agencyId, oldType, it.locationType)
+      }
 
       return
     }
@@ -41,5 +57,10 @@ class MapFriendlyLocationService(
         timeSource.dateTime()
       )
     )
+
+    authentication?.let {
+      auditService.createLocationNameSetEvent(it.name, agencyId, friendlyLocationName.toUpperCase().trim())
+      auditService.createLocationTypeSetEvent(it.name, agencyId, locationType)
+    }
   }
 }
