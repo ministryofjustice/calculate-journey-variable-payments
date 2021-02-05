@@ -176,9 +176,12 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     }
   }
 
+  /**
+   * Excludes moves without a move_type. This is an indication of bad reporting data in the JSON data feeds.
+   */
   fun moveWithPersonAndJourneys(moveId: String, supplier: Supplier): Move? {
     val movePersonJourney = jdbcTemplate.query(
-      "$moveJourneySelectSQL where m.move_id = ? and m.supplier = ? ",
+      "$moveJourneySelectSQL where m.move_id = ? and m.supplier = ? and m.move_type is not null",
       arrayOf(moveId, supplier.name),
       moveJourneyRowMapper
     ).groupBy { it.move.moveId }
