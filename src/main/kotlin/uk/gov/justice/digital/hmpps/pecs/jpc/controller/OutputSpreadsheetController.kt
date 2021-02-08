@@ -6,11 +6,11 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SpreadsheetService
@@ -23,12 +23,9 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 class OutputSpreadsheetController(
   private val spreadsheetService: SpreadsheetService,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
+  @Autowired private val auditService: AuditService
 ) {
-
-  @Autowired
-  private lateinit var auditService: AuditService
-
   @GetMapping("/generate-prices-spreadsheet/{supplier}")
   @Throws(IOException::class)
   fun generateSpreadsheet(
@@ -39,9 +36,9 @@ class OutputSpreadsheetController(
     ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
     response: HttpServletResponse?
   ): ResponseEntity<InputStreamResource?>? {
-    SecurityContextHolder.getContext().authentication?.let {
-      auditService.createDownloadSpreadsheetEvent(it.name, movesFrom.format(DateTimeFormatter.ofPattern("yyyy-MM")), supplier)
-    }
+    auditService.create(
+      AuditableEvent.createDownloadSpreadsheetEvent(movesFrom.format(DateTimeFormatter.ofPattern("yyyy-MM")), supplier)
+    )
 
     return spreadsheetService.spreadsheet(supplier, movesFrom)?.let { file ->
       val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))

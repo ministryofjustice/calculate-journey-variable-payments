@@ -25,6 +25,7 @@ import org.springframework.session.security.SpringSessionBackedSessionRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogInAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogOutAuditHandler
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import kotlin.streams.toList
 
 @EnableWebSecurity
@@ -43,11 +44,8 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   @Autowired
   private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
 
-  @Bean
-  fun logInHandler() = LogInAuditHandler()
-
-  @Bean
-  fun logOutHandler() = LogOutAuditHandler()
+  @Autowired
+  private lateinit var auditService: AuditService
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
@@ -79,6 +77,12 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
       }
     }
   }
+
+  @Bean
+  fun logInHandler() = LogInAuditHandler(auditService)
+
+  @Bean
+  fun logOutHandler() = LogOutAuditHandler(auditService)
 
   @Bean
   fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =

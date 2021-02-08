@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
@@ -13,11 +13,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 @Service
 @Transactional
-class SupplierPricingService(val locationRepository: LocationRepository, val priceRepository: PriceRepository) {
-
-  @Autowired
-  private lateinit var auditService: AuditService
-
+class SupplierPricingService(
+  val locationRepository: LocationRepository,
+  val priceRepository: PriceRepository,
+  @Autowired private val auditService: AuditService
+) {
   fun getSiteNamesForPricing(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Pair<String, String> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
@@ -53,9 +53,7 @@ class SupplierPricingService(val locationRepository: LocationRepository, val pri
       )
     )
 
-    SecurityContextHolder.getContext().authentication?.let {
-      auditService.createJourneyPriceSetEvent(it.name, supplier.name, fromAgencyId, toAgencyId, price)
-    }
+    auditService.create(AuditableEvent.createJourneyPriceSetEvent(supplier.name, fromAgencyId, toAgencyId, price))
   }
 
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
@@ -67,16 +65,15 @@ class SupplierPricingService(val locationRepository: LocationRepository, val pri
 
     priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
 
-    SecurityContextHolder.getContext().authentication?.let {
-      auditService.createJourneyPriceChangeEvent(
-        it.name,
+    auditService.create(
+      AuditableEvent.createJourneyPriceChangeEvent(
         supplier.name,
         fromAgencyId,
         toAgencyId,
         oldPrice,
         agreedNewPrice
       )
-    }
+    )
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =

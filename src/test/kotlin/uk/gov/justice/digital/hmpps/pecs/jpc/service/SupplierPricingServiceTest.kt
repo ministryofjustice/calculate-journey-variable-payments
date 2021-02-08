@@ -16,13 +16,18 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class SupplierPricingServiceTest {
 
+  private val auditService: AuditService = mock()
   private val priceInPence: Int = 10024
   private val locationRepository: LocationRepository = mock()
   private val fromLocation: Location = mock { on { siteName } doReturn "from site" }
   private val toLocation: Location = mock { on { siteName } doReturn "to site" }
   private val priceRepository: PriceRepository = mock()
-  private val price: Price = mock { on { priceInPence } doReturn priceInPence }
-  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository)
+  private val price: Price = mock {
+    on { priceInPence } doReturn priceInPence
+    on { price() } doReturn Money.Factory.valueOf(priceInPence / 100.0)
+  }
+  private val service: SupplierPricingService =
+    SupplierPricingService(locationRepository, priceRepository, auditService)
   private val priceCaptor = argumentCaptor<Price>()
 
   @Test

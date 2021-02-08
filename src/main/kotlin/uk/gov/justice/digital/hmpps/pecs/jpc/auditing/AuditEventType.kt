@@ -14,7 +14,7 @@ enum class AuditEventType(val label: String) {
 
   companion object {
     /**
-     * Attempts to map the supplied value to the supported locations types.  Returns null if no match found.
+     * Attempts to map the supplied value to the supported audit event types.  Returns null if no match found.
      */
     fun map(value: String): AuditEventType? =
       values().firstOrNull { it.label.toUpperCase() == value.toUpperCase().trim() }

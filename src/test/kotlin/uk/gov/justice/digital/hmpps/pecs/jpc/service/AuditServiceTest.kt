@@ -1,198 +1,257 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import com.beust.klaxon.Klaxon
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatcher
-import org.springframework.context.annotation.Bean
-import org.springframework.test.util.ReflectionTestUtils
+import org.springframework.security.core.Authentication
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import java.time.Clock
 import java.time.LocalDateTime
+import java.time.ZoneOffset
+
+internal class DatelessAuditableEventMatcher(var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
+  override fun matches(otherAuditableEvent: AuditableEvent): Boolean {
+    return auditableEvent.username == otherAuditableEvent.username &&
+      auditableEvent.extras == otherAuditableEvent.extras &&
+      auditableEvent.type == otherAuditableEvent.type
+  }
+}
 
 private class AuditEventMatcher(var auditEvent: AuditEvent) : ArgumentMatcher<AuditEvent> {
   override fun matches(otherAuditEvent: AuditEvent): Boolean {
     return auditEvent.username == otherAuditEvent.username &&
-      auditEvent.details == otherAuditEvent.details &&
+      auditEvent.createdAt == otherAuditEvent.createdAt &&
+      auditEvent.metadata == otherAuditEvent.metadata &&
       auditEvent.eventType == otherAuditEvent.eventType
   }
 }
 
 internal class AuditServiceTest {
   private val auditEventRepository: AuditEventRepository = mock()
+  private val service = AuditService(auditEventRepository)
+  private val dateTime = LocalDateTime.of(2021, 1, 1, 12, 34, 56)
+  private val clock = Clock.fixed(dateTime.toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
+  private val authentication: Authentication = mock()
 
-  @Bean
-  private fun timeSource() = TimeSource { LocalDateTime.now() }
+  private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any> = mapOf()) =
+    verify(auditEventRepository, times(1)).save(
+      argThat(AuditEventMatcher(AuditEvent(type, dateTime, username, Klaxon().toJsonString(metadata))))
+    )
+
+  @BeforeEach
+  private fun initMocks() {
+    whenever(authentication.name).thenReturn(" mOcK NAME      ")
+  }
 
   @Test
   internal fun `create log in audit event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+    service.create(AuditableEvent.createLogInEvent(clock = clock))
+    service.create(AuditableEvent.createLogInEvent(authentication, clock))
 
-    val expectedAuditEvent = AuditEvent(AuditEventType.LOG_IN, LocalDateTime.now(), "TEST USER", "{}")
-
-    service.createLogInEvent("   test user   ")
-    service.createLogInEvent("TEST USER")
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(AuditEventType.LOG_IN, "_TERMINAL_")
+    verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
   }
 
   @Test
   internal fun `create log out audit event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+    service.create(AuditableEvent.createLogOutEvent(clock = clock))
+    service.create(AuditableEvent.createLogOutEvent(authentication, clock))
 
-    val expectedAuditEvent = AuditEvent(AuditEventType.LOG_OUT, LocalDateTime.now(), "TEST USER", "{}")
-
-    service.createLogOutEvent("   test user   ")
-    service.createLogOutEvent("TEST USER")
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(AuditEventType.LOG_OUT, "_TERMINAL_")
+    verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
   }
 
   @Test
-  internal fun `create spreadsheet download audit event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+  internal fun `create download spreadsheet audit event`() {
+    service.create(AuditableEvent.createDownloadSpreadsheetEvent("2021-01", "geoamey", clock = clock))
+    service.create(AuditableEvent.createDownloadSpreadsheetEvent("2021-02", "serco", authentication, clock))
 
-    val expectedAuditEvent = AuditEvent(
-      AuditEventType.DOWNLOAD_SPREADSHEET,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"month\": \"2021-01\", \"supplier\": \"geoamey\"}"
+    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "_TERMINAL_", mapOf("month" to "2021-01", "supplier" to "geoamey"))
+    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "serco"))
+  }
+
+  @Test
+  internal fun `create location name set audit event`() {
+    service.create(AuditableEvent.createLocationNameSetEvent("TEST1", "TEST 1 NAME", clock = clock))
+    service.create(AuditableEvent.createLocationNameSetEvent("TEST2", "TEST 2 NAME", authentication, clock))
+
+    verifyEvent(AuditEventType.LOCATION_NAME_SET, "_TERMINAL_", mapOf("nomisId" to "TEST1", "name" to "TEST 1 NAME"))
+    verifyEvent(AuditEventType.LOCATION_NAME_SET, "MOCK NAME", mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME"))
+  }
+
+  @Test
+  internal fun `create location name change audit event`() {
+    service.create(AuditableEvent.createLocationNameChangeEvent("TEST1", "TEST 1 NAME", "TEST A NAME", clock = clock))
+    service.create(
+      AuditableEvent.createLocationNameChangeEvent(
+        "TEST2",
+        "TEST 2 NAME",
+        "TEST B NAME",
+        authentication,
+        clock
+      )
     )
 
-    service.createDownloadSpreadsheetEvent("   test user   ", "2021-01", "geoamey")
-    service.createDownloadSpreadsheetEvent("TEST USER", "2021-01", "geoamey")
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
-  }
-
-  @Test
-  internal fun `create location name set event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
-
-    val expectedAuditEvent = AuditEvent(
-      AuditEventType.LOCATION_NAME_SET,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"nomisId\": \"TEST1\", \"name\": \"TEST 1 NAME\"}"
-    )
-
-    service.createLocationNameSetEvent("   test user   ", "TEST1", "TEST 1 NAME")
-    service.createLocationNameSetEvent("TEST USER", "TEST1", "TEST 1 NAME")
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
-  }
-
-  @Test
-  internal fun `create location name change event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
-
-    val expectedAuditEvent = AuditEvent(
+    verifyEvent(
       AuditEventType.LOCATION_NAME_CHANGE,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"nomisId\": \"TEST1\", \"oldName\": \"TEST 1 NAME\", \"newName\": \"TEST 2 NAME\"}"
+      "_TERMINAL_",
+      mapOf("nomisId" to "TEST1", "oldName" to "TEST 1 NAME", "newName" to "TEST A NAME")
     )
-
-    service.createLocationNameChangeEvent("   test user   ", "TEST1", "TEST 1 NAME", "TEST 2 NAME")
-    service.createLocationNameChangeEvent("TEST USER", "TEST1", "TEST 1 NAME", "TEST 2 NAME")
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(
+      AuditEventType.LOCATION_NAME_CHANGE,
+      "MOCK NAME",
+      mapOf("nomisId" to "TEST2", "oldName" to "TEST 2 NAME", "newName" to "TEST B NAME")
+    )
   }
 
   @Test
-  internal fun `create location type set event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+  internal fun `create location type set audit event`() {
+    service.create(AuditableEvent.createLocationTypeSetEvent("TEST1", LocationType.AP, clock = clock))
+    service.create(AuditableEvent.createLocationTypeSetEvent("TEST2", LocationType.HP, authentication, clock))
 
-    val expectedAuditEvent = AuditEvent(
-      AuditEventType.LOCATION_TYPE_SET,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"nomisId\": \"TEST1\", \"type\": \"AP\"}"
-    )
-
-    service.createLocationTypeSetEvent("   test user   ", "TEST1", LocationType.AP)
-    service.createLocationTypeSetEvent("TEST USER", "TEST1", LocationType.AP)
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(AuditEventType.LOCATION_TYPE_SET, "_TERMINAL_", mapOf("nomisId" to "TEST1", "type" to "AP"))
+    verifyEvent(AuditEventType.LOCATION_TYPE_SET, "MOCK NAME", mapOf("nomisId" to "TEST2", "type" to "HP"))
   }
 
   @Test
-  internal fun `create location type change event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+  internal fun `create location type change audit event`() {
+    service.create(
+      AuditableEvent.createLocationTypeChangeEvent(
+        "TEST1",
+        LocationType.AP,
+        LocationType.CO,
+        clock = clock
+      )
+    )
+    service.create(
+      AuditableEvent.createLocationTypeChangeEvent(
+        "TEST2",
+        LocationType.HP,
+        LocationType.PR,
+        authentication,
+        clock
+      )
+    )
 
-    val expectedAuditEvent = AuditEvent(
+    verifyEvent(
       AuditEventType.LOCATION_TYPE_CHANGE,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"nomisId\": \"TEST1\", \"oldType\": \"AP\", \"newType\": \"CO\"}"
+      "_TERMINAL_",
+      mapOf("nomisId" to "TEST1", "oldType" to "AP", "newType" to "CO")
     )
-
-    service.createLocationTypeChangeEvent("   test user   ", "TEST1", LocationType.AP, LocationType.CO)
-    service.createLocationTypeChangeEvent("TEST USER", "TEST1", LocationType.AP, LocationType.CO)
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(
+      AuditEventType.LOCATION_TYPE_CHANGE,
+      "MOCK NAME",
+      mapOf("nomisId" to "TEST2", "oldType" to "HP", "newType" to "PR")
+    )
   }
 
   @Test
-  internal fun `create journey price set event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+  internal fun `create journey price set audit event`() {
+    service.create(
+      AuditableEvent.createJourneyPriceSetEvent(
+        "geoamey",
+        "TEST1",
+        "TEST11",
+        Money.valueOf(1.23),
+        clock = clock
+      )
+    )
+    service.create(
+      AuditableEvent.createJourneyPriceSetEvent(
+        "serco",
+        "TEST2",
+        "TEST21",
+        Money.valueOf(2.34),
+        authentication,
+        clock
+      )
+    )
 
-    val expectedAuditEvent = AuditEvent(
+    verifyEvent(
       AuditEventType.JOURNEY_PRICE_SET,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"supplier\": \"SUPPLIER\", \"fromNomisId\": \"TEST1\", \"toNomisId\": \"TEST2\", \"price\": 1.23}"
+      "_TERMINAL_",
+      mapOf("supplier" to "geoamey", "fromNomisId" to "TEST1", "toNomisId" to "TEST11", "price" to 1.23)
     )
-
-    service.createJourneyPriceSetEvent("   test user   ", "SUPPLIER", "TEST1", "TEST2", Money.valueOf(1.23))
-    service.createJourneyPriceSetEvent("TEST USER", "SUPPLIER", "TEST1", "TEST2", Money.valueOf(1.23))
-
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(
+      AuditEventType.JOURNEY_PRICE_SET,
+      "MOCK NAME",
+      mapOf("supplier" to "serco", "fromNomisId" to "TEST2", "toNomisId" to "TEST21", "price" to 2.34)
+    )
   }
 
   @Test
-  internal fun `create journey price change event`() {
-    val service = AuditService(auditEventRepository)
-    ReflectionTestUtils.setField(service, "timeSource", timeSource())
+  internal fun `create journey price change audit event`() {
+    service.create(
+      AuditableEvent.createJourneyPriceChangeEvent(
+        "geoamey",
+        "TEST1",
+        "TEST11",
+        Money.valueOf(1.23),
+        Money.valueOf(12.3),
+        clock = clock
+      )
+    )
+    service.create(
+      AuditableEvent.createJourneyPriceChangeEvent(
+        "serco",
+        "TEST2",
+        "TEST21",
+        Money.valueOf(2.34),
+        Money.valueOf(23.4),
+        authentication,
+        clock
+      )
+    )
 
-    val expectedAuditEvent = AuditEvent(
+    verifyEvent(
       AuditEventType.JOURNEY_PRICE_CHANGE,
-      LocalDateTime.now(),
-      "TEST USER",
-      "{\"supplier\": \"SUPPLIER\", \"fromNomisId\": \"TEST1\", \"toNomisId\": \"TEST2\", \"oldPrice\": 1.23, \"newPrice\": 2.34}"
+      "_TERMINAL_",
+      mapOf(
+        "supplier" to "geoamey",
+        "fromNomisId" to "TEST1",
+        "toNomisId" to "TEST11",
+        "oldPrice" to 1.23,
+        "newPrice" to 12.3
+      )
     )
+    verifyEvent(
+      AuditEventType.JOURNEY_PRICE_CHANGE,
+      "MOCK NAME",
+      mapOf(
+        "supplier" to "serco",
+        "fromNomisId" to "TEST2",
+        "toNomisId" to "TEST21",
+        "oldPrice" to 2.34,
+        "newPrice" to 23.4
+      )
+    )
+  }
 
-    service.createJourneyPriceChangeEvent(
-      "   test user   ",
-      "SUPPLIER",
-      "TEST1",
-      "TEST2",
-      Money.valueOf(1.23),
-      Money.valueOf(2.34)
-    )
-    service.createJourneyPriceChangeEvent(
-      "TEST USER",
-      "SUPPLIER",
-      "TEST1",
-      "TEST2",
-      Money.valueOf(1.23),
-      Money.valueOf(2.34)
-    )
+  @Test
+  internal fun `create journey price bulk update audit event`() {
+    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent("serco", 1.5, clock = clock))
+    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent("geoamey", 2.0, authentication, clock))
 
-    verify(auditEventRepository, times(2)).save(argThat(AuditEventMatcher(expectedAuditEvent)))
+    verifyEvent(
+      AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+      "_TERMINAL_",
+      mapOf("supplier" to "serco", "multiplier" to 1.5)
+    )
+    verifyEvent(
+      AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+      "MOCK NAME",
+      mapOf("supplier" to "geoamey", "multiplier" to 2.0)
+    )
   }
 }

@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
@@ -8,6 +9,8 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
@@ -32,7 +35,7 @@ internal class BulkPricesServiceTest {
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2020)).thenReturn(prices)
 
-    val service = BulkPricesService(priceRepository, timeSourceEffectiveYear2020)
+    val service = BulkPricesService(priceRepository, timeSourceEffectiveYear2020, auditService)
     ReflectionTestUtils.setField(service, "auditService", auditService)
 
     service.addNextYearsPrices(Supplier.SERCO, 1.5)
@@ -40,7 +43,18 @@ internal class BulkPricesServiceTest {
     verify(priceRepository).deleteBySupplierAndEffectiveYear(Supplier.SERCO, 2021)
     verify(priceRepository).findBySupplierAndEffectiveYear(Supplier.SERCO, 2020)
     verify(priceRepository, times(2)).save(priceCaptor.capture())
-    verify(auditService).createJourneyPriceBulkUpdateEvent("SERCO", 1.5)
+    verify(auditService).create(
+      argThat(
+        DatelessAuditableEventMatcher(
+          AuditableEvent(
+            AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+            "_TERMINAL_",
+            LocalDateTime.now(),
+            mapOf("supplier" to "SERCO", "multiplier" to 1.5)
+          )
+        )
+      )
+    )
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.firstValue, Supplier.SERCO, Money(1500), 2021)
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.secondValue, Supplier.SERCO, Money(3000), 2021)
   }
@@ -51,7 +65,7 @@ internal class BulkPricesServiceTest {
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2021)).thenReturn(prices)
 
-    val service = BulkPricesService(priceRepository, timeSourceEffectiveYear2021)
+    val service = BulkPricesService(priceRepository, timeSourceEffectiveYear2021, auditService)
     ReflectionTestUtils.setField(service, "auditService", auditService)
 
     service.addNextYearsPrices(Supplier.GEOAMEY, 2.0)
@@ -59,7 +73,18 @@ internal class BulkPricesServiceTest {
     verify(priceRepository).deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2022)
     verify(priceRepository).findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2021)
     verify(priceRepository, times(2)).save(priceCaptor.capture())
-    verify(auditService).createJourneyPriceBulkUpdateEvent("GEOAMEY", 2.0)
+    verify(auditService).create(
+      argThat(
+        DatelessAuditableEventMatcher(
+          AuditableEvent(
+            AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+            "_TERMINAL_",
+            LocalDateTime.now(),
+            mapOf("supplier" to "GEOAMEY", "multiplier" to 2.0)
+          )
+        )
+      )
+    )
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.firstValue, Supplier.GEOAMEY, Money(3000), 2022)
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.secondValue, Supplier.GEOAMEY, Money(4000), 2022)
   }

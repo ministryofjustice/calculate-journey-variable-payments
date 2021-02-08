@@ -24,8 +24,8 @@ data class AuditEvent(
   @get: NotBlank(message = "User cannot be blank")
   val username: String,
 
-  @Column(name = "details", nullable = false)
-  val details: String,
+  @Column(name = "metadata", nullable = false, length = 1024)
+  val metadata: String,
 
   @Id
   @Column(name = "audit_event_id", nullable = false)
