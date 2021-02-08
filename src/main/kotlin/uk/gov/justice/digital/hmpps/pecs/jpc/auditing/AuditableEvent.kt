@@ -19,7 +19,7 @@ data class AuditableEvent(
 
     private fun createEvent(
       type: AuditEventType,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
+      authentication: Authentication?,
       metadata: Map<String, Any> = mapOf(),
       clock: Clock
     ): AuditableEvent {
@@ -32,7 +32,7 @@ data class AuditableEvent(
     }
 
     fun createLogInEvent(
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -43,7 +43,7 @@ data class AuditableEvent(
     }
 
     fun createLogOutEvent(
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -56,7 +56,7 @@ data class AuditableEvent(
     fun createDownloadSpreadsheetEvent(
       date: String,
       supplier: String,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -70,7 +70,7 @@ data class AuditableEvent(
     fun createLocationNameSetEvent(
       nomisId: String,
       name: String,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -85,7 +85,7 @@ data class AuditableEvent(
       nomisId: String,
       oldName: String,
       newName: String,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -99,7 +99,7 @@ data class AuditableEvent(
     fun createLocationTypeSetEvent(
       nomisId: String,
       type: LocationType,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -114,7 +114,7 @@ data class AuditableEvent(
       nomisId: String,
       oldType: LocationType,
       newType: LocationType,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -130,7 +130,7 @@ data class AuditableEvent(
       fromNomisId: String,
       toNomisId: String,
       price: Money,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -147,7 +147,7 @@ data class AuditableEvent(
       toNomisId: String,
       oldPrice: Money,
       newPrice: Money,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(
@@ -167,7 +167,7 @@ data class AuditableEvent(
     fun createJourneyPriceBulkUpdateEvent(
       supplier: String,
       multiplier: Double,
-      authentication: Authentication? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
       clock: Clock = Clock.systemDefaultZone()
     ): AuditableEvent {
       return createEvent(

@@ -82,7 +82,7 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   fun logInHandler() = LogInAuditHandler(auditService)
 
   @Bean
-  fun logOutHandler() = LogOutAuditHandler(auditService)
+  fun logOutHandler() = LogOutAuditHandler(auditService, authLogoutSuccessUri)
 
   @Bean
   fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =
