@@ -39,6 +39,7 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   @Value("\${HMPPS_AUTH_BASE_URI}")
   private lateinit var authLogoutSuccessUri: String
 
+  @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
 

@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
+import kotlin.math.roundToInt
+
 /**
  * Simple value object to encapsulate a monetary amount in pence. Negative amounts are not allowed.
  */
@@ -16,6 +18,10 @@ data class Money(val pence: Int) {
   operator fun times(multiplier: Double) = valueOf(pounds() * multiplier)
 
   companion object Factory {
-    fun valueOf(pounds: Double) = Money((pounds * 100).toInt())
+    /**
+     * This rounds the amount towards positive infinity, e.g. 10.004 would be rounded to 1000 pence and 10.005 would be
+     * rounded to 1001 pence.
+     */
+    fun valueOf(pounds: Double) = Money((pounds * 100).roundToInt())
   }
 }

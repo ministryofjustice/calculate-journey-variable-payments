@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.dateTimeConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.moveStatusConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.supplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -145,7 +146,7 @@ data class Move(
     }
 
   fun hasPrice() = totalInPence() != null
-  fun totalInPounds() = totalInPence()?.let { it.toDouble() / 100 }
+  fun totalInPounds() = totalInPence()?.let { Money(it).pounds() }
   fun moveDate() = moveDate?.format(dateFormatter)
   fun pickUpDate() = pickUpDateTime?.format(dateFormatter)
   fun pickUpTime() = pickUpDateTime?.format(timeFormatter)

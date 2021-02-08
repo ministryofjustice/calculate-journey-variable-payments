@@ -28,37 +28,38 @@ import java.util.UUID
 internal class MoveQueryRepositoryTest {
 
   @Autowired
-  lateinit var locationRepository: LocationRepository
+  private lateinit var locationRepository: LocationRepository
 
   @Autowired
-  lateinit var priceRepository: PriceRepository
+  private lateinit var priceRepository: PriceRepository
 
   @Autowired
-  lateinit var moveRepository: MoveRepository
+  private lateinit var moveRepository: MoveRepository
 
   @Autowired
-  lateinit var moveQueryRepository: MoveQueryRepository
+  private lateinit var moveQueryRepository: MoveQueryRepository
 
   @Autowired
-  lateinit var journeyRepository: JourneyRepository
+  private lateinit var journeyRepository: JourneyRepository
 
   @Autowired
-  lateinit var personRepository: PersonRepository
+  private lateinit var personRepository: PersonRepository
 
   @Autowired
-  lateinit var profileRepository: ProfileRepository
+  private lateinit var profileRepository: ProfileRepository
 
   @Autowired
-  lateinit var entityManager: TestEntityManager
+  private lateinit var entityManager: TestEntityManager
 
-  val wyi = WYIPrisonLocation()
-  val gni = GNICourtLocation()
+  private val wyi = WYIPrisonLocation()
+  private val gni = GNICourtLocation()
 
-  val standardMove = moveM1(
+  private val standardMove = moveM1(
     dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5)
   ) // should appear before the one above
-  val journeyModel1 = journeyJ1()
-  val journeyModel2 = journeyJ1(journeyId = "J2")
+  private val journeyModel1 = journeyJ1()
+  private val journeyModel2 = journeyJ1(journeyId = "J2")
+  private val moveWithMissingType = standardMove.copy(moveId = "MWMT", moveType = null)
 
   @BeforeEach
   fun beforeEach() {
@@ -80,6 +81,8 @@ internal class MoveQueryRepositoryTest {
     journeyRepository.save(journeyModel1)
     journeyRepository.save(journeyModel2)
 
+    moveRepository.save(moveWithMissingType)
+
     entityManager.flush()
   }
 
@@ -87,6 +90,12 @@ internal class MoveQueryRepositoryTest {
   fun `moveWithPersonAndJourneys with invalid moveId for supplier`() {
     val move = moveQueryRepository.moveWithPersonAndJourneys(standardMove.moveId, Supplier.GEOAMEY)
     assertThat(move).isNull()
+  }
+
+  @Test
+  fun `moveWithPersonAndJourneys with missing move_type is null`() {
+    assertThat(moveRepository.findById(moveWithMissingType.moveId)).isPresent
+    assertThat(moveQueryRepository.moveWithPersonAndJourneys(moveWithMissingType.moveId, moveWithMissingType.supplier)).isNull()
   }
 
   @Test
