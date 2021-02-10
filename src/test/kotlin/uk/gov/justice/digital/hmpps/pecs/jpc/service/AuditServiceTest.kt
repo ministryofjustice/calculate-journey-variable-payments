@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -103,96 +104,68 @@ internal class AuditServiceTest {
   }
 
   @Test
-  internal fun `create location name set audit event`() {
-    service.create(AuditableEvent.createLocationNameEvent("TEST1", "TEST 1 NAME", timeSource = timeSource))
-    service.create(
-      AuditableEvent.createLocationNameEvent(
-        "TEST2",
-        "TEST 2 NAME",
-        timeSource = timeSource,
-        authentication = authentication
-      )
-    )
+  internal fun `create new location audit event`() {
+    AuditableEvent.createLocationEvent(timeSource, Location(LocationType.PR, "TEST1", "TEST 1 NAME"))
+      ?.let { service.create(it) }
+    AuditableEvent.createLocationEvent(
+      timeSource,
+      Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
+      authentication = authentication
+    )?.let { service.create(it) }
 
-    verifyEvent(AuditEventType.LOCATION_NAME, "_TERMINAL_", mapOf("nomisId" to "TEST1", "name" to "TEST 1 NAME"))
-    verifyEvent(AuditEventType.LOCATION_NAME, "MOCK NAME", mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME"))
+    verifyEvent(AuditEventType.LOCATION, "_TERMINAL_", mapOf("nomisId" to "TEST1", "name" to "TEST 1 NAME", "type" to "PR"))
+    verifyEvent(AuditEventType.LOCATION, "MOCK NAME", mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP"))
   }
 
   @Test
   internal fun `create location name change audit event`() {
-    service.create(
-      AuditableEvent.createLocationNameEvent(
-        "TEST1",
-        "TEST 1 NAME",
-        "TEST A NAME",
-        timeSource = timeSource
-      )
+    AuditableEvent.createLocationEvent(
+      timeSource,
+      Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
+      Location(LocationType.PR, "TEST1", "TEST A NAME")
     )
-    service.create(
-      AuditableEvent.createLocationNameEvent(
-        "TEST2",
-        "TEST 2 NAME",
-        "TEST B NAME",
-        timeSource = timeSource,
-        authentication = authentication
-      )
-    )
+      ?.let { service.create(it) }
+    AuditableEvent.createLocationEvent(
+      timeSource,
+      Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
+      Location(LocationType.AP, "TEST2", "TEST B NAME"),
+      authentication = authentication
+    )?.let { service.create(it) }
 
     verifyEvent(
-      AuditEventType.LOCATION_NAME,
+      AuditEventType.LOCATION,
       "_TERMINAL_",
       mapOf("nomisId" to "TEST1", "oldName" to "TEST 1 NAME", "newName" to "TEST A NAME")
     )
     verifyEvent(
-      AuditEventType.LOCATION_NAME,
+      AuditEventType.LOCATION,
       "MOCK NAME",
       mapOf("nomisId" to "TEST2", "oldName" to "TEST 2 NAME", "newName" to "TEST B NAME")
     )
   }
 
   @Test
-  internal fun `create location type set audit event`() {
-    service.create(AuditableEvent.createLocationTypeEvent("TEST1", LocationType.AP, timeSource = timeSource))
-    service.create(
-      AuditableEvent.createLocationTypeEvent(
-        "TEST2",
-        LocationType.HP,
-        timeSource = timeSource,
-        authentication = authentication
-      )
-    )
-
-    verifyEvent(AuditEventType.LOCATION_TYPE, "_TERMINAL_", mapOf("nomisId" to "TEST1", "type" to "AP"))
-    verifyEvent(AuditEventType.LOCATION_TYPE, "MOCK NAME", mapOf("nomisId" to "TEST2", "type" to "HP"))
-  }
-
-  @Test
   internal fun `create location type change audit event`() {
-    service.create(
-      AuditableEvent.createLocationTypeEvent(
-        "TEST1",
-        LocationType.AP,
-        LocationType.CO,
-        timeSource = timeSource
-      )
+    AuditableEvent.createLocationEvent(
+      timeSource,
+      Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
+      Location(LocationType.CO, "TEST1", "TEST 1 NAME")
     )
-    service.create(
-      AuditableEvent.createLocationTypeEvent(
-        "TEST2",
-        LocationType.HP,
-        LocationType.PR,
-        timeSource = timeSource,
-        authentication = authentication
-      )
-    )
+      ?.let { service.create(it) }
+    AuditableEvent.createLocationEvent(
+      timeSource,
+      Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
+      Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
+      authentication = authentication
+    )?.let { service.create(it) }
 
     verifyEvent(
-      AuditEventType.LOCATION_TYPE,
+      AuditEventType.LOCATION,
       "_TERMINAL_",
       mapOf("nomisId" to "TEST1", "oldType" to "AP", "newType" to "CO")
     )
     verifyEvent(
-      AuditEventType.LOCATION_TYPE,
+      AuditEventType.LOCATION,
       "MOCK NAME",
       mapOf("nomisId" to "TEST2", "oldType" to "HP", "newType" to "PR")
     )

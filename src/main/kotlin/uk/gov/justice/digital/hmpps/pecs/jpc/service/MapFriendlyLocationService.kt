@@ -26,51 +26,31 @@ class MapFriendlyLocationService(
 
   fun mapFriendlyLocation(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let {
-      val oldName = it.siteName
-      val oldType = it.locationType
+      val oldLocation = it.copy()
       it.siteName = friendlyLocationName.trim().toUpperCase()
       it.locationType = locationType
 
-      locationRepository.save(it)
-
-      if (oldName != it.siteName)
-        auditService.create(
-          AuditableEvent.createLocationNameEvent(
-            agencyId,
-            oldName,
-            it.siteName,
-            timeSource
-          )
-        )
-      if (oldType != it.locationType)
-        auditService.create(
-          AuditableEvent.createLocationTypeEvent(
-            agencyId,
-            oldType,
-            it.locationType,
-            timeSource
-          )
-        )
+      val event = AuditableEvent.createLocationEvent(
+        timeSource,
+        oldLocation,
+        locationRepository.save(it).copy(),
+      )
+      event?.let { e -> auditService.create(e) }
 
       return
     }
 
-    locationRepository.save(
-      Location(
-        locationType,
-        agencyId.toUpperCase().trim(),
-        friendlyLocationName.toUpperCase().trim(),
-        timeSource.dateTime()
+    val event = AuditableEvent.createLocationEvent(
+      timeSource,
+      locationRepository.save(
+        Location(
+          locationType,
+          agencyId.toUpperCase().trim(),
+          friendlyLocationName.toUpperCase().trim(),
+          timeSource.dateTime()
+        ).copy()
       )
     )
-
-    auditService.create(
-      AuditableEvent.createLocationNameEvent(
-        agencyId,
-        friendlyLocationName.toUpperCase().trim(),
-        timeSource = timeSource
-      )
-    )
-    auditService.create(AuditableEvent.createLocationTypeEvent(agencyId, locationType, timeSource = timeSource))
+    event?.let { e -> auditService.create(e) }
   }
 }

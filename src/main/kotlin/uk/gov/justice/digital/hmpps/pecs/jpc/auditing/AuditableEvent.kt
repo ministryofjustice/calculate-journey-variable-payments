@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
@@ -67,44 +67,6 @@ data class AuditableEvent(
       )
     }
 
-    fun createLocationNameEvent(
-      nomisId: String,
-      name: String,
-      newName: String? = null,
-      timeSource: TimeSource,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
-      return createEvent(
-        AuditEventType.LOCATION_NAME,
-        timeSource,
-        authentication,
-        if (newName == null) {
-          mapOf("nomisId" to nomisId, "name" to name)
-        } else {
-          mapOf("nomisId" to nomisId, "oldName" to name, "newName" to newName)
-        }
-      )
-    }
-
-    fun createLocationTypeEvent(
-      nomisId: String,
-      type: LocationType,
-      newType: LocationType? = null,
-      timeSource: TimeSource,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
-      return createEvent(
-        AuditEventType.LOCATION_TYPE,
-        timeSource,
-        authentication,
-        if (newType == null) {
-          mapOf("nomisId" to nomisId, "type" to type)
-        } else {
-          mapOf("nomisId" to nomisId, "oldType" to type, "newType" to newType)
-        }
-      )
-    }
-
     fun createJourneyPriceEvent(
       supplier: Supplier,
       fromNomisId: String,
@@ -148,6 +110,40 @@ data class AuditableEvent(
         timeSource,
         authentication,
         mapOf("supplier" to supplier, "multiplier" to multiplier)
+      )
+    }
+
+    fun createLocationEvent(
+      timeSource: TimeSource,
+      oldLocation: Location,
+      newLocation: Location? = null,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication
+    ): AuditableEvent? {
+      if (oldLocation.siteName == newLocation?.siteName && oldLocation.locationType == newLocation.locationType) {
+        return null
+      }
+
+      val metadata = mutableMapOf<String, Any>("nomisId" to oldLocation.nomisAgencyId)
+      if (newLocation != null) {
+        if (oldLocation.siteName != newLocation.siteName) {
+          metadata["oldName"] = oldLocation.siteName
+          metadata["newName"] = newLocation.siteName
+        }
+
+        if (oldLocation.locationType != newLocation.locationType) {
+          metadata["oldType"] = oldLocation.locationType
+          metadata["newType"] = newLocation.locationType
+        }
+      } else {
+        metadata["name"] = oldLocation.siteName
+        metadata["type"] = oldLocation.locationType
+      }
+
+      return createEvent(
+        AuditEventType.LOCATION,
+        timeSource,
+        authentication,
+        metadata
       )
     }
   }
