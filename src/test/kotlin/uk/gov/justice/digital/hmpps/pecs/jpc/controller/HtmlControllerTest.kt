@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
@@ -106,5 +107,20 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       .andExpect { status { is3xxRedirection() } }
 
     verifyNoMoreInteractions(moveService)
+  }
+
+  @Test
+  internal fun `find a move by move not found redirects to search form without calling the move service`() {
+
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.empty())
+
+    mockMvc.post("/find-move") {
+      session = mockSession
+      param("reference", "REF1")
+    }
+      .andExpect { redirectedUrl("/find-move/?no-results-for=REF1") }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(moveService).findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)
   }
 }
