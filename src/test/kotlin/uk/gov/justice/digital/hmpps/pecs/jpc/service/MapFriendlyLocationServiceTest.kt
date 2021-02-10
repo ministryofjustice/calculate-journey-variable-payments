@@ -11,10 +11,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import java.time.LocalDateTime
 
 internal class MapFriendlyLocationServiceTest {
-
+  private val auditService: AuditService = mock()
   private val locationRepository: LocationRepository = mock()
   private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 11, 30, 12, 0) }
-  private val service: MapFriendlyLocationService = MapFriendlyLocationService(locationRepository, timeSource)
+  private val service: MapFriendlyLocationService = MapFriendlyLocationService(locationRepository, timeSource, auditService)
 
   @Test
   internal fun `site name already exists when agency different`() {

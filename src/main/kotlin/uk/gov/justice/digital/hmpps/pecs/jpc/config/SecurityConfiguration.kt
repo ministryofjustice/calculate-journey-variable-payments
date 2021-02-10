@@ -23,6 +23,9 @@ import org.springframework.session.FindByIndexNameSessionRepository
 import org.springframework.session.Session
 import org.springframework.session.security.SpringSessionBackedSessionRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogInAuditHandler
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogOutAuditHandler
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import kotlin.streams.toList
 
 @EnableWebSecurity
@@ -40,6 +43,12 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   @Suppress("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
+
+  @Autowired
+  private lateinit var auditService: AuditService
+
+  @Autowired
+  private lateinit var timeSource: TimeSource
 
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
@@ -62,14 +71,21 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
       }
       oauth2Login {
         userInfoEndpoint { userService = oAuth2UserService() }
-        defaultSuccessUrl("/", true)
         failureUrl = authLogoutSuccessUri
+        authenticationSuccessHandler = logInHandler()
       }
       logout {
         logoutSuccessUrl = authLogoutSuccessUri
+        logoutSuccessHandler = logOutHandler()
       }
     }
   }
+
+  @Bean
+  fun logInHandler() = LogInAuditHandler(auditService, timeSource)
+
+  @Bean
+  fun logOutHandler() = LogOutAuditHandler(auditService, authLogoutSuccessUri, timeSource)
 
   @Bean
   fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =
