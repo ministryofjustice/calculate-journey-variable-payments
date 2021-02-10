@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import java.time.LocalDateTime
 
 internal class SupplierPricingServiceTest {
 
@@ -27,7 +28,12 @@ internal class SupplierPricingServiceTest {
     on { price() } doReturn Money.Factory.valueOf(priceInPence / 100.0)
   }
   private val service: SupplierPricingService =
-    SupplierPricingService(locationRepository, priceRepository, auditService)
+    SupplierPricingService(
+      locationRepository,
+      priceRepository,
+      { LocalDateTime.of(2021, 1, 1, 12, 0) },
+      auditService
+    )
   private val priceCaptor = argumentCaptor<Price>()
 
   @Test

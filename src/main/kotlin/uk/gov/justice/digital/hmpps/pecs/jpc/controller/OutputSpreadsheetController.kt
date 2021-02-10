@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.InputStreamResource
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpHeaders
@@ -24,7 +23,7 @@ import javax.servlet.http.HttpServletResponse
 class OutputSpreadsheetController(
   private val spreadsheetService: SpreadsheetService,
   private val timeSource: TimeSource,
-  @Autowired private val auditService: AuditService
+  private val auditService: AuditService
 ) {
   @GetMapping("/generate-prices-spreadsheet/{supplier}")
   @Throws(IOException::class)
@@ -37,7 +36,7 @@ class OutputSpreadsheetController(
     response: HttpServletResponse?
   ): ResponseEntity<InputStreamResource?>? {
     auditService.create(
-      AuditableEvent.createDownloadSpreadsheetEvent(movesFrom.format(DateTimeFormatter.ofPattern("yyyy-MM")), supplier)
+      AuditableEvent.createDownloadSpreadsheetEvent(movesFrom, supplier, timeSource)
     )
 
     return spreadsheetService.spreadsheet(supplier, movesFrom)?.let { file ->

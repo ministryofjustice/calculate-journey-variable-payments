@@ -16,7 +16,11 @@ class AuditService(private val auditEventRepository: AuditEventRepository) {
         event.type,
         event.timestamp,
         event.username.trim().toUpperCase(),
-        Klaxon().toJsonString(event.extras)
+        if (event.extras != null) {
+          Klaxon().toJsonString(event.extras)
+        } else {
+          null
+        }
       )
     )
   }

@@ -8,7 +8,6 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.test.util.ReflectionTestUtils
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -36,7 +35,6 @@ internal class BulkPricesServiceTest {
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2020)).thenReturn(prices)
 
     val service = BulkPricesService(priceRepository, timeSourceEffectiveYear2020, auditService)
-    ReflectionTestUtils.setField(service, "auditService", auditService)
 
     service.addNextYearsPrices(Supplier.SERCO, 1.5)
 
@@ -50,7 +48,7 @@ internal class BulkPricesServiceTest {
             AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
             "_TERMINAL_",
             LocalDateTime.now(),
-            mapOf("supplier" to "SERCO", "multiplier" to 1.5)
+            mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
           )
         )
       )
@@ -66,7 +64,6 @@ internal class BulkPricesServiceTest {
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2021)).thenReturn(prices)
 
     val service = BulkPricesService(priceRepository, timeSourceEffectiveYear2021, auditService)
-    ReflectionTestUtils.setField(service, "auditService", auditService)
 
     service.addNextYearsPrices(Supplier.GEOAMEY, 2.0)
 
@@ -80,7 +77,7 @@ internal class BulkPricesServiceTest {
             AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
             "_TERMINAL_",
             LocalDateTime.now(),
-            mapOf("supplier" to "GEOAMEY", "multiplier" to 2.0)
+            mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
           )
         )
       )

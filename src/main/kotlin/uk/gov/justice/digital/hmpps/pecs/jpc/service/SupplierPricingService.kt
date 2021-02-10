@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
@@ -16,7 +16,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 class SupplierPricingService(
   val locationRepository: LocationRepository,
   val priceRepository: PriceRepository,
-  @Autowired private val auditService: AuditService
+  private val timeSource: TimeSource,
+  private val auditService: AuditService
 ) {
   fun getSiteNamesForPricing(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Pair<String, String> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
@@ -53,7 +54,7 @@ class SupplierPricingService(
       )
     )
 
-    auditService.create(AuditableEvent.createJourneyPriceSetEvent(supplier.name, fromAgencyId, toAgencyId, price))
+    auditService.create(AuditableEvent.createJourneyPriceEvent(supplier, fromAgencyId, toAgencyId, price, timeSource = timeSource))
   }
 
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
@@ -66,12 +67,13 @@ class SupplierPricingService(
     priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
 
     auditService.create(
-      AuditableEvent.createJourneyPriceChangeEvent(
-        supplier.name,
+      AuditableEvent.createJourneyPriceEvent(
+        supplier,
         fromAgencyId,
         toAgencyId,
         oldPrice,
-        agreedNewPrice
+        agreedNewPrice,
+        timeSource
       )
     )
   }

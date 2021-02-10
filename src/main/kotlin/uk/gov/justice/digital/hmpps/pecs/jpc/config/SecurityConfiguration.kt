@@ -47,6 +47,9 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   @Autowired
   private lateinit var auditService: AuditService
 
+  @Autowired
+  private lateinit var timeSource: TimeSource
+
   @Throws(Exception::class)
   override fun configure(http: HttpSecurity) {
     http {
@@ -79,10 +82,10 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   }
 
   @Bean
-  fun logInHandler() = LogInAuditHandler(auditService)
+  fun logInHandler() = LogInAuditHandler(auditService, timeSource)
 
   @Bean
-  fun logOutHandler() = LogOutAuditHandler(auditService, authLogoutSuccessUri)
+  fun logOutHandler() = LogOutAuditHandler(auditService, authLogoutSuccessUri, timeSource)
 
   @Bean
   fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =

@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
@@ -14,7 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 class MapFriendlyLocationService(
   private val locationRepository: LocationRepository,
   private val timeSource: TimeSource,
-  @Autowired private val auditService: AuditService
+  private val auditService: AuditService
 ) {
   fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? =
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
@@ -36,18 +35,20 @@ class MapFriendlyLocationService(
 
       if (oldName != it.siteName)
         auditService.create(
-          AuditableEvent.createLocationNameChangeEvent(
+          AuditableEvent.createLocationNameEvent(
             agencyId,
             oldName,
-            it.siteName
+            it.siteName,
+            timeSource
           )
         )
       if (oldType != it.locationType)
         auditService.create(
-          AuditableEvent.createLocationTypeChangeEvent(
+          AuditableEvent.createLocationTypeEvent(
             agencyId,
             oldType,
-            it.locationType
+            it.locationType,
+            timeSource
           )
         )
 
@@ -64,11 +65,12 @@ class MapFriendlyLocationService(
     )
 
     auditService.create(
-      AuditableEvent.createLocationNameSetEvent(
+      AuditableEvent.createLocationNameEvent(
         agencyId,
-        friendlyLocationName.toUpperCase().trim()
+        friendlyLocationName.toUpperCase().trim(),
+        timeSource = timeSource
       )
     )
-    auditService.create(AuditableEvent.createLocationTypeSetEvent(agencyId, locationType))
+    auditService.create(AuditableEvent.createLocationTypeEvent(agencyId, locationType, timeSource = timeSource))
   }
 }

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
@@ -20,12 +19,11 @@ import java.util.UUID
 class BulkPricesService(
   private val priceRepository: PriceRepository,
   private val timeSource: TimeSource,
-  @Autowired private val auditService: AuditService
+  private val auditService: AuditService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  // TODO this needs to be audited when the work/code is available.
   fun addNextYearsPrices(supplier: Supplier, multiplier: Double) {
     val now = timeSource.date()
 
@@ -48,6 +46,6 @@ class BulkPricesService(
 
     logger.info("$total $supplier prices added for effective year ${nextEffectiveYearForDate(now)}")
 
-    auditService.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(supplier.name, multiplier))
+    auditService.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(supplier, multiplier, timeSource))
   }
 }
