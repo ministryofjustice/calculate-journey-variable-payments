@@ -17,7 +17,7 @@ class LogOutAuditHandler(
     response: HttpServletResponse?,
     authentication: Authentication?
   ) {
-    auditService.create(AuditableEvent.createLogOutEvent(timeSource, authentication))
+    AuditableEvent.createLogOutEvent(timeSource, authentication)?.let { auditService.create(it) }
     defaultTargetUrl = authLogoutSuccessUri
     super.onLogoutSuccess(request, response, authentication)
   }

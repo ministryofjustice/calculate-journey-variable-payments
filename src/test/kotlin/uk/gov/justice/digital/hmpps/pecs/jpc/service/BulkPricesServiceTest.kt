@@ -43,11 +43,11 @@ internal class BulkPricesServiceTest {
     verify(priceRepository, times(2)).save(priceCaptor.capture())
     verify(auditService).create(
       argThat(
-        DatelessAuditableEventMatcher(
+        AuditableEventMatcher(
           AuditableEvent(
             AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
             "_TERMINAL_",
-            LocalDateTime.now(),
+            timeSourceEffectiveYear2020.dateTime(),
             mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
           )
         )
@@ -72,11 +72,11 @@ internal class BulkPricesServiceTest {
     verify(priceRepository, times(2)).save(priceCaptor.capture())
     verify(auditService).create(
       argThat(
-        DatelessAuditableEventMatcher(
+        AuditableEventMatcher(
           AuditableEvent(
             AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
             "_TERMINAL_",
-            LocalDateTime.now(),
+            timeSourceEffectiveYear2021.dateTime(),
             mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
           )
         )

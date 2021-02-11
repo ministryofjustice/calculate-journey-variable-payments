@@ -35,9 +35,7 @@ class OutputSpreadsheetController(
     ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
     response: HttpServletResponse?
   ): ResponseEntity<InputStreamResource?>? {
-    auditService.create(
-      AuditableEvent.createDownloadSpreadsheetEvent(movesFrom, supplier, timeSource)
-    )
+    AuditableEvent.createDownloadSpreadsheetEvent(movesFrom, supplier, timeSource)?.let { auditService.create(it) }
 
     return spreadsheetService.spreadsheet(supplier, movesFrom)?.let { file ->
       val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))

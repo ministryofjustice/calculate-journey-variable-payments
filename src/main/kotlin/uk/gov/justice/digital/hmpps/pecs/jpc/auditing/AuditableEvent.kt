@@ -21,8 +21,12 @@ data class AuditableEvent(
       type: AuditEventType,
       timeSource: TimeSource,
       authentication: Authentication?,
-      metadata: Map<String, Any>? = null
-    ): AuditableEvent {
+      metadata: Map<String, Any>? = null,
+      allowNoUser: Boolean = false
+    ): AuditableEvent? {
+      if (authentication == null && !allowNoUser)
+        return null
+
       return AuditableEvent(
         type,
         authentication?.name ?: "_TERMINAL_",
@@ -34,7 +38,7 @@ data class AuditableEvent(
     fun createLogInEvent(
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    ): AuditableEvent? {
       return createEvent(
         AuditEventType.LOG_IN,
         timeSource,
@@ -45,7 +49,7 @@ data class AuditableEvent(
     fun createLogOutEvent(
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    ): AuditableEvent? {
       return createEvent(
         AuditEventType.LOG_OUT,
         timeSource,
@@ -58,7 +62,7 @@ data class AuditableEvent(
       supplier: String,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    ): AuditableEvent? {
       return createEvent(
         AuditEventType.DOWNLOAD_SPREADSHEET,
         timeSource,
@@ -75,7 +79,7 @@ data class AuditableEvent(
       newPrice: Money? = null,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    ): AuditableEvent? {
       return createEvent(
         AuditEventType.JOURNEY_PRICE,
         timeSource,
@@ -104,12 +108,13 @@ data class AuditableEvent(
       multiplier: Double,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    ): AuditableEvent? {
       return createEvent(
         AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
         timeSource,
         authentication,
-        mapOf("supplier" to supplier, "multiplier" to multiplier)
+        mapOf("supplier" to supplier, "multiplier" to multiplier),
+        true
       )
     }
 

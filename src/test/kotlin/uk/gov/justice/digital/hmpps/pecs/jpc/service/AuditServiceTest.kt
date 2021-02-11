@@ -22,9 +22,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class DatelessAuditableEventMatcher(var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
+internal class AuditableEventMatcher(var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
   override fun matches(otherAuditableEvent: AuditableEvent): Boolean {
     return auditableEvent.username == otherAuditableEvent.username &&
+      auditableEvent.timestamp == auditableEvent.timestamp &&
       auditableEvent.extras == otherAuditableEvent.extras &&
       auditableEvent.type == otherAuditableEvent.type
   }
@@ -71,72 +72,71 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create log in audit event`() {
-    service.create(AuditableEvent.createLogInEvent(timeSource))
-    service.create(AuditableEvent.createLogInEvent(timeSource, authentication))
+    assert(AuditableEvent.createLogInEvent(timeSource) == null)
+    service.create(AuditableEvent.createLogInEvent(timeSource, authentication)!!)
 
-    verifyEvent(AuditEventType.LOG_IN, "_TERMINAL_")
     verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
   }
 
   @Test
   internal fun `create log out audit event`() {
-    service.create(AuditableEvent.createLogOutEvent(timeSource))
-    service.create(AuditableEvent.createLogOutEvent(timeSource, authentication))
+    assert(AuditableEvent.createLogOutEvent(timeSource) == null)
+    service.create(AuditableEvent.createLogOutEvent(timeSource, authentication)!!)
 
-    verifyEvent(AuditEventType.LOG_OUT, "_TERMINAL_")
     verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
   }
 
   @Test
   internal fun `create download spreadsheet audit event`() {
-    service.create(AuditableEvent.createDownloadSpreadsheetEvent(LocalDate.of(2021, 1, 31), "geoamey", timeSource))
+    assert(AuditableEvent.createDownloadSpreadsheetEvent(LocalDate.of(2021, 1, 31), "geoamey", timeSource) == null)
     service.create(
       AuditableEvent.createDownloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 1),
         "serco",
         timeSource,
         authentication
-      )
+      )!!
     )
 
-    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "_TERMINAL_", mapOf("month" to "2021-01", "supplier" to "geoamey"))
     verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "serco"))
   }
 
   @Test
   internal fun `create new location audit event`() {
-    AuditableEvent.createLocationEvent(timeSource, Location(LocationType.PR, "TEST1", "TEST 1 NAME"))
-      ?.let { service.create(it) }
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
-      authentication = authentication
-    )?.let { service.create(it) }
+    assert(AuditableEvent.createLocationEvent(timeSource, Location(LocationType.PR, "TEST1", "TEST 1 NAME")) == null)
+    service.create(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
+        authentication = authentication
+      )!!
+    )
 
-    verifyEvent(AuditEventType.LOCATION, "_TERMINAL_", mapOf("nomisId" to "TEST1", "name" to "TEST 1 NAME", "type" to "PR"))
-    verifyEvent(AuditEventType.LOCATION, "MOCK NAME", mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP"))
+    verifyEvent(
+      AuditEventType.LOCATION,
+      "MOCK NAME",
+      mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP")
+    )
   }
 
   @Test
   internal fun `create location name change audit event`() {
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
-      Location(LocationType.PR, "TEST1", "TEST A NAME")
+    assert(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
+        Location(LocationType.PR, "TEST1", "TEST A NAME")
+      ) == null
     )
-      ?.let { service.create(it) }
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
-      Location(LocationType.AP, "TEST2", "TEST B NAME"),
-      authentication = authentication
-    )?.let { service.create(it) }
+    service.create(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
+        Location(LocationType.AP, "TEST2", "TEST B NAME"),
+        authentication = authentication
+      )!!
+    )
 
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "_TERMINAL_",
-      mapOf("nomisId" to "TEST1", "oldName" to "TEST 1 NAME", "newName" to "TEST A NAME")
-    )
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
@@ -146,24 +146,22 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create location type change audit event`() {
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
-      Location(LocationType.CO, "TEST1", "TEST 1 NAME")
+    assert(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
+        Location(LocationType.CO, "TEST1", "TEST 1 NAME")
+      ) == null
     )
-      ?.let { service.create(it) }
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
-      Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
-      authentication = authentication
-    )?.let { service.create(it) }
+    service.create(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
+        Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
+        authentication = authentication
+      )!!
+    )
 
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "_TERMINAL_",
-      mapOf("nomisId" to "TEST1", "oldType" to "AP", "newType" to "CO")
-    )
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
@@ -173,14 +171,14 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price set audit event`() {
-    service.create(
+    assert(
       AuditableEvent.createJourneyPriceEvent(
         Supplier.GEOAMEY,
         "TEST1",
         "TEST11",
         Money.valueOf(1.23),
         timeSource = timeSource
-      )
+      ) == null
     )
     service.create(
       AuditableEvent.createJourneyPriceEvent(
@@ -190,14 +188,9 @@ internal class AuditServiceTest {
         Money.valueOf(2.34),
         timeSource = timeSource,
         authentication = authentication
-      )
+      )!!
     )
 
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE,
-      "_TERMINAL_",
-      mapOf("supplier" to Supplier.GEOAMEY, "fromNomisId" to "TEST1", "toNomisId" to "TEST11", "price" to 1.23)
-    )
     verifyEvent(
       AuditEventType.JOURNEY_PRICE,
       "MOCK NAME",
@@ -207,7 +200,7 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price change audit event`() {
-    service.create(
+    assert(
       AuditableEvent.createJourneyPriceEvent(
         Supplier.GEOAMEY,
         "TEST1",
@@ -215,7 +208,7 @@ internal class AuditServiceTest {
         Money.valueOf(1.23),
         Money.valueOf(12.3),
         timeSource = timeSource,
-      )
+      ) == null
     )
     service.create(
       AuditableEvent.createJourneyPriceEvent(
@@ -226,20 +219,9 @@ internal class AuditServiceTest {
         Money.valueOf(23.4),
         timeSource = timeSource,
         authentication = authentication
-      )
+      )!!
     )
 
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE,
-      "_TERMINAL_",
-      mapOf(
-        "supplier" to Supplier.GEOAMEY,
-        "fromNomisId" to "TEST1",
-        "toNomisId" to "TEST11",
-        "oldPrice" to 1.23,
-        "newPrice" to 12.3
-      )
-    )
     verifyEvent(
       AuditEventType.JOURNEY_PRICE,
       "MOCK NAME",
@@ -255,14 +237,14 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price bulk update audit event`() {
-    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5, timeSource = timeSource))
+    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5, timeSource = timeSource)!!)
     service.create(
       AuditableEvent.createJourneyPriceBulkUpdateEvent(
         Supplier.GEOAMEY,
         2.0,
         timeSource = timeSource,
         authentication = authentication
-      )
+      )!!
     )
 
     verifyEvent(
