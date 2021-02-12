@@ -6,6 +6,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatcher
@@ -22,9 +23,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class DatelessAuditableEventMatcher(var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
+internal class AuditableEventMatcher(var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
   override fun matches(otherAuditableEvent: AuditableEvent): Boolean {
     return auditableEvent.username == otherAuditableEvent.username &&
+      auditableEvent.timestamp == auditableEvent.timestamp &&
       auditableEvent.extras == otherAuditableEvent.extras &&
       auditableEvent.type == otherAuditableEvent.type
   }
@@ -71,25 +73,37 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create log in audit event`() {
-    service.create(AuditableEvent.createLogInEvent(timeSource))
+    assertThatThrownBy { AuditableEvent.createLogInEvent(timeSource) }
+      .isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOG_IN without a user")
+
     service.create(AuditableEvent.createLogInEvent(timeSource, authentication))
 
-    verifyEvent(AuditEventType.LOG_IN, "_TERMINAL_")
     verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
   }
 
   @Test
   internal fun `create log out audit event`() {
-    service.create(AuditableEvent.createLogOutEvent(timeSource))
+    assertThatThrownBy { AuditableEvent.createLogOutEvent(timeSource) }
+      .isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOG_OUT without a user")
+
     service.create(AuditableEvent.createLogOutEvent(timeSource, authentication))
 
-    verifyEvent(AuditEventType.LOG_OUT, "_TERMINAL_")
     verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
   }
 
   @Test
   internal fun `create download spreadsheet audit event`() {
-    service.create(AuditableEvent.createDownloadSpreadsheetEvent(LocalDate.of(2021, 1, 31), "geoamey", timeSource))
+    assertThatThrownBy {
+      AuditableEvent.createDownloadSpreadsheetEvent(
+        LocalDate.of(2021, 1, 31),
+        "geoamey",
+        timeSource
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event DOWNLOAD_SPREADSHEET without a user")
+
     service.create(
       AuditableEvent.createDownloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 1),
@@ -99,44 +113,54 @@ internal class AuditServiceTest {
       )
     )
 
-    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "_TERMINAL_", mapOf("month" to "2021-01", "supplier" to "geoamey"))
     verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "serco"))
   }
 
   @Test
   internal fun `create new location audit event`() {
-    AuditableEvent.createLocationEvent(timeSource, Location(LocationType.PR, "TEST1", "TEST 1 NAME"))
-      ?.let { service.create(it) }
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
-      authentication = authentication
-    )?.let { service.create(it) }
+    assertThatThrownBy {
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.PR, "TEST1", "TEST 1 NAME")
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOCATION without a user")
 
-    verifyEvent(AuditEventType.LOCATION, "_TERMINAL_", mapOf("nomisId" to "TEST1", "name" to "TEST 1 NAME", "type" to "PR"))
-    verifyEvent(AuditEventType.LOCATION, "MOCK NAME", mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP"))
+    service.create(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
+        authentication = authentication
+      )!!
+    )
+
+    verifyEvent(
+      AuditEventType.LOCATION,
+      "MOCK NAME",
+      mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP")
+    )
   }
 
   @Test
   internal fun `create location name change audit event`() {
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
-      Location(LocationType.PR, "TEST1", "TEST A NAME")
-    )
-      ?.let { service.create(it) }
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
-      Location(LocationType.AP, "TEST2", "TEST B NAME"),
-      authentication = authentication
-    )?.let { service.create(it) }
+    assertThatThrownBy {
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
+        Location(LocationType.PR, "TEST1", "TEST A NAME")
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOCATION without a user")
 
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "_TERMINAL_",
-      mapOf("nomisId" to "TEST1", "oldName" to "TEST 1 NAME", "newName" to "TEST A NAME")
+    service.create(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
+        Location(LocationType.AP, "TEST2", "TEST B NAME"),
+        authentication = authentication
+      )!!
     )
+
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
@@ -146,24 +170,24 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create location type change audit event`() {
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
-      Location(LocationType.CO, "TEST1", "TEST 1 NAME")
-    )
-      ?.let { service.create(it) }
-    AuditableEvent.createLocationEvent(
-      timeSource,
-      Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
-      Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
-      authentication = authentication
-    )?.let { service.create(it) }
+    assertThatThrownBy {
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
+        Location(LocationType.CO, "TEST1", "TEST 1 NAME")
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOCATION without a user")
 
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "_TERMINAL_",
-      mapOf("nomisId" to "TEST1", "oldType" to "AP", "newType" to "CO")
+    service.create(
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
+        Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
+        authentication = authentication
+      )!!
     )
+
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
@@ -173,7 +197,7 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price set audit event`() {
-    service.create(
+    assertThatThrownBy {
       AuditableEvent.createJourneyPriceEvent(
         Supplier.GEOAMEY,
         "TEST1",
@@ -181,7 +205,9 @@ internal class AuditServiceTest {
         Money.valueOf(1.23),
         timeSource = timeSource
       )
-    )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
+
     service.create(
       AuditableEvent.createJourneyPriceEvent(
         Supplier.SERCO,
@@ -195,11 +221,6 @@ internal class AuditServiceTest {
 
     verifyEvent(
       AuditEventType.JOURNEY_PRICE,
-      "_TERMINAL_",
-      mapOf("supplier" to Supplier.GEOAMEY, "fromNomisId" to "TEST1", "toNomisId" to "TEST11", "price" to 1.23)
-    )
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE,
       "MOCK NAME",
       mapOf("supplier" to Supplier.SERCO, "fromNomisId" to "TEST2", "toNomisId" to "TEST21", "price" to 2.34)
     )
@@ -207,7 +228,7 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price change audit event`() {
-    service.create(
+    assertThatThrownBy {
       AuditableEvent.createJourneyPriceEvent(
         Supplier.GEOAMEY,
         "TEST1",
@@ -216,7 +237,9 @@ internal class AuditServiceTest {
         Money.valueOf(12.3),
         timeSource = timeSource,
       )
-    )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
+
     service.create(
       AuditableEvent.createJourneyPriceEvent(
         Supplier.SERCO,
@@ -229,17 +252,6 @@ internal class AuditServiceTest {
       )
     )
 
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE,
-      "_TERMINAL_",
-      mapOf(
-        "supplier" to Supplier.GEOAMEY,
-        "fromNomisId" to "TEST1",
-        "toNomisId" to "TEST11",
-        "oldPrice" to 1.23,
-        "newPrice" to 12.3
-      )
-    )
     verifyEvent(
       AuditEventType.JOURNEY_PRICE,
       "MOCK NAME",

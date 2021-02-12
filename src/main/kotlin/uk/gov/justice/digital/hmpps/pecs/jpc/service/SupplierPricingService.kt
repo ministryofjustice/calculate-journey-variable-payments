@@ -54,7 +54,15 @@ class SupplierPricingService(
       )
     )
 
-    auditService.create(AuditableEvent.createJourneyPriceEvent(supplier, fromAgencyId, toAgencyId, price, timeSource = timeSource))
+    auditService.create(
+      AuditableEvent.createJourneyPriceEvent(
+        supplier,
+        fromAgencyId,
+        toAgencyId,
+        price,
+        timeSource = timeSource
+      )
+    )
   }
 
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
@@ -65,7 +73,6 @@ class SupplierPricingService(
     val oldPrice = Money.valueOf(existingPrice.price().pounds())
 
     priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
-
     auditService.create(
       AuditableEvent.createJourneyPriceEvent(
         supplier,

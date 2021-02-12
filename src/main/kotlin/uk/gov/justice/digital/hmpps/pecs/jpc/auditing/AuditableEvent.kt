@@ -21,8 +21,12 @@ data class AuditableEvent(
       type: AuditEventType,
       timeSource: TimeSource,
       authentication: Authentication?,
-      metadata: Map<String, Any>? = null
+      metadata: Map<String, Any>? = null,
+      allowNoUser: Boolean = false
     ): AuditableEvent {
+      if (authentication == null && !allowNoUser)
+        throw RuntimeException("Attempted to create audit event $type without a user")
+
       return AuditableEvent(
         type,
         authentication?.name ?: "_TERMINAL_",
@@ -109,7 +113,8 @@ data class AuditableEvent(
         AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
         timeSource,
         authentication,
-        mapOf("supplier" to supplier, "multiplier" to multiplier)
+        mapOf("supplier" to supplier, "multiplier" to multiplier),
+        true
       )
     }
 

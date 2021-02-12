@@ -6,7 +6,12 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
@@ -35,6 +40,18 @@ internal class SupplierPricingServiceTest {
       auditService
     )
   private val priceCaptor = argumentCaptor<Price>()
+  private val authentication: Authentication = mock { on { name } doReturn " mOcK NAME      " }
+  private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }
+
+  @BeforeEach
+  private fun initMocks() {
+    SecurityContextHolder.setContext(securityContext)
+  }
+
+  @AfterEach
+  private fun deInitMocks() {
+    SecurityContextHolder.clearContext()
+  }
 
   @Test
   internal fun `site names returned for new pricing`() {
