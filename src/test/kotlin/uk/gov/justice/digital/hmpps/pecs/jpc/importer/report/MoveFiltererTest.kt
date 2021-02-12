@@ -146,6 +146,16 @@ internal class MoveFiltererTest {
     )
   )
 
+  private val multiTypeMoveWhenSingleBillableJourneyPickUpLocationDoesNotMatch = reportMoveFactory(
+    events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
+    journeys = listOf(reportJourneyFactory(journeyId = "J1M1", billable = true, fromLocation = "DOES_NOT_MATCH_MOVE"))
+  )
+
+  private val multiTypeMoveWhenSingleBillableJourneyDropOffLocationDoesNotMatch = reportMoveFactory(
+    events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
+    journeys = listOf(reportJourneyFactory(journeyId = "J1M1", billable = true, toLocation = "DOES_NOT_MATCH_MOVE"))
+  )
+
   private val completedLockoutJourneyLockoutEvent = reportMoveFactory(
     moveId = "M8",
     events = listOf(
@@ -205,40 +215,50 @@ internal class MoveFiltererTest {
   )
 
   @Test
-  fun `isStandardMove`() {
+  fun `is standard move`() {
     assertThat(MoveFilterer.isStandardMove(standard)).isTrue
     assertThat(MoveFilterer.isStandardMove(completedRedirection)).isFalse
   }
 
   @Test
-  fun `isCompletedRedirection`() {
+  fun `is completed redirection`() {
     assertThat(MoveFilterer.isRedirectionMove(completedRedirection)).isTrue
     assertThat(MoveFilterer.isRedirectionMove(standard)).isFalse
   }
 
   @Test
-  fun `isLongHaulMove`() {
+  fun `is long haul move`() {
     assertThat(MoveFilterer.isLongHaulMove(completedLongHaulMoveLodgingEvents)).isTrue
     assertThat(MoveFilterer.isLongHaulMove(completedLongHaulJourneyLodgingEvents)).isTrue
     assertThat(MoveFilterer.isLongHaulMove(completedRedirection)).isFalse
   }
 
   @Test
-  fun `isLockoutMove`() {
+  fun `is lockout move`() {
     assertThat(MoveFilterer.isLockoutMove(completedLockoutJourneyLockoutEvent)).isTrue
     assertThat(MoveFilterer.isLockoutMove(completedLockoutMoveLockoutEvent)).isTrue
     assertThat(MoveFilterer.isLockoutMove(standard)).isFalse
   }
 
   @Test
-  fun `isMultiTypeMove`() {
+  fun `is multi-type move`() {
     assertThat(MoveFilterer.isMultiTypeMove(multiTypeMove)).isTrue
     assertThat(MoveFilterer.isMultiTypeMove(completedUnbillable)).isTrue
     assertThat(MoveFilterer.isMultiTypeMove(completedLockoutMoveLockoutEvent)).isFalse
   }
 
   @Test
-  fun `isCancelledBillable`() {
+  fun `is multi-type move when single billable journey pick up location does not match`() {
+    assertThat(MoveFilterer.isMultiTypeMove(multiTypeMoveWhenSingleBillableJourneyPickUpLocationDoesNotMatch)).isTrue
+  }
+
+  @Test
+  fun `is multi-type move when single billable journey drop off location does not match`() {
+    assertThat(MoveFilterer.isMultiTypeMove(multiTypeMoveWhenSingleBillableJourneyDropOffLocationDoesNotMatch)).isTrue
+  }
+
+  @Test
+  fun `is cancelled billable`() {
     assertThat(MoveFilterer.isCancelledBillableMove(cancelledBillable)).isTrue
     assertThat(MoveFilterer.isCancelledBillableMove(multiTypeMove)).isFalse
   }
