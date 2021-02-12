@@ -6,6 +6,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatcher
@@ -72,30 +73,44 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create log in audit event`() {
-    assert(AuditableEvent.createLogInEvent(timeSource) == null)
-    service.create(AuditableEvent.createLogInEvent(timeSource, authentication)!!)
+    assertThatThrownBy { AuditableEvent.createLogInEvent(timeSource) }
+      .isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOG_IN without a user")
+
+    service.create(AuditableEvent.createLogInEvent(timeSource, authentication))
 
     verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
   }
 
   @Test
   internal fun `create log out audit event`() {
-    assert(AuditableEvent.createLogOutEvent(timeSource) == null)
-    service.create(AuditableEvent.createLogOutEvent(timeSource, authentication)!!)
+    assertThatThrownBy { AuditableEvent.createLogOutEvent(timeSource) }
+      .isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOG_OUT without a user")
+
+    service.create(AuditableEvent.createLogOutEvent(timeSource, authentication))
 
     verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
   }
 
   @Test
   internal fun `create download spreadsheet audit event`() {
-    assert(AuditableEvent.createDownloadSpreadsheetEvent(LocalDate.of(2021, 1, 31), "geoamey", timeSource) == null)
+    assertThatThrownBy {
+      AuditableEvent.createDownloadSpreadsheetEvent(
+        LocalDate.of(2021, 1, 31),
+        "geoamey",
+        timeSource
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event DOWNLOAD_SPREADSHEET without a user")
+
     service.create(
       AuditableEvent.createDownloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 1),
         "serco",
         timeSource,
         authentication
-      )!!
+      )
     )
 
     verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "serco"))
@@ -103,7 +118,14 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create new location audit event`() {
-    assert(AuditableEvent.createLocationEvent(timeSource, Location(LocationType.PR, "TEST1", "TEST 1 NAME")) == null)
+    assertThatThrownBy {
+      AuditableEvent.createLocationEvent(
+        timeSource,
+        Location(LocationType.PR, "TEST1", "TEST 1 NAME")
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOCATION without a user")
+
     service.create(
       AuditableEvent.createLocationEvent(
         timeSource,
@@ -121,13 +143,15 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create location name change audit event`() {
-    assert(
+    assertThatThrownBy {
       AuditableEvent.createLocationEvent(
         timeSource,
         Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
         Location(LocationType.PR, "TEST1", "TEST A NAME")
-      ) == null
-    )
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOCATION without a user")
+
     service.create(
       AuditableEvent.createLocationEvent(
         timeSource,
@@ -146,13 +170,15 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create location type change audit event`() {
-    assert(
+    assertThatThrownBy {
       AuditableEvent.createLocationEvent(
         timeSource,
         Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
         Location(LocationType.CO, "TEST1", "TEST 1 NAME")
-      ) == null
-    )
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event LOCATION without a user")
+
     service.create(
       AuditableEvent.createLocationEvent(
         timeSource,
@@ -171,15 +197,17 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price set audit event`() {
-    assert(
+    assertThatThrownBy {
       AuditableEvent.createJourneyPriceEvent(
         Supplier.GEOAMEY,
         "TEST1",
         "TEST11",
         Money.valueOf(1.23),
         timeSource = timeSource
-      ) == null
-    )
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
+
     service.create(
       AuditableEvent.createJourneyPriceEvent(
         Supplier.SERCO,
@@ -188,7 +216,7 @@ internal class AuditServiceTest {
         Money.valueOf(2.34),
         timeSource = timeSource,
         authentication = authentication
-      )!!
+      )
     )
 
     verifyEvent(
@@ -200,7 +228,7 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price change audit event`() {
-    assert(
+    assertThatThrownBy {
       AuditableEvent.createJourneyPriceEvent(
         Supplier.GEOAMEY,
         "TEST1",
@@ -208,8 +236,10 @@ internal class AuditServiceTest {
         Money.valueOf(1.23),
         Money.valueOf(12.3),
         timeSource = timeSource,
-      ) == null
-    )
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
+
     service.create(
       AuditableEvent.createJourneyPriceEvent(
         Supplier.SERCO,
@@ -219,7 +249,7 @@ internal class AuditServiceTest {
         Money.valueOf(23.4),
         timeSource = timeSource,
         authentication = authentication
-      )!!
+      )
     )
 
     verifyEvent(
@@ -237,14 +267,14 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price bulk update audit event`() {
-    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5, timeSource = timeSource)!!)
+    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5, timeSource = timeSource))
     service.create(
       AuditableEvent.createJourneyPriceBulkUpdateEvent(
         Supplier.GEOAMEY,
         2.0,
         timeSource = timeSource,
         authentication = authentication
-      )!!
+      )
     )
 
     verifyEvent(

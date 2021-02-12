@@ -54,8 +54,15 @@ class SupplierPricingService(
       )
     )
 
-    AuditableEvent.createJourneyPriceEvent(supplier, fromAgencyId, toAgencyId, price, timeSource = timeSource)
-      ?.let { auditService.create(it) }
+    auditService.create(
+      AuditableEvent.createJourneyPriceEvent(
+        supplier,
+        fromAgencyId,
+        toAgencyId,
+        price,
+        timeSource = timeSource
+      )
+    )
   }
 
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
@@ -66,14 +73,16 @@ class SupplierPricingService(
     val oldPrice = Money.valueOf(existingPrice.price().pounds())
 
     priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
-    AuditableEvent.createJourneyPriceEvent(
-      supplier,
-      fromAgencyId,
-      toAgencyId,
-      oldPrice,
-      agreedNewPrice,
-      timeSource
-    )?.let { auditService.create(it) }
+    auditService.create(
+      AuditableEvent.createJourneyPriceEvent(
+        supplier,
+        fromAgencyId,
+        toAgencyId,
+        oldPrice,
+        agreedNewPrice,
+        timeSource
+      )
+    )
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =

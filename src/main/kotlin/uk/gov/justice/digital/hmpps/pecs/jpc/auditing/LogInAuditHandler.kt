@@ -14,7 +14,7 @@ class LogInAuditHandler(private val auditService: AuditService, private val time
     response: HttpServletResponse?,
     authentication: Authentication?
   ) {
-    AuditableEvent.createLogInEvent(timeSource, authentication)?.let { auditService.create(it) }
+    auditService.create(AuditableEvent.createLogInEvent(timeSource, authentication))
     super.onAuthenticationSuccess(request, response, authentication)
   }
 }

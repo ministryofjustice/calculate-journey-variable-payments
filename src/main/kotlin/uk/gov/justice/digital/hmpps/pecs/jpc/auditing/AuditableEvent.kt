@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -23,9 +24,9 @@ data class AuditableEvent(
       authentication: Authentication?,
       metadata: Map<String, Any>? = null,
       allowNoUser: Boolean = false
-    ): AuditableEvent? {
+    ): AuditableEvent {
       if (authentication == null && !allowNoUser)
-        return null
+        throw RuntimeException("Attempted to create audit event $type without a user")
 
       return AuditableEvent(
         type,
@@ -38,7 +39,7 @@ data class AuditableEvent(
     fun createLogInEvent(
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent? {
+    ): AuditableEvent {
       return createEvent(
         AuditEventType.LOG_IN,
         timeSource,
@@ -49,7 +50,7 @@ data class AuditableEvent(
     fun createLogOutEvent(
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent? {
+    ): AuditableEvent {
       return createEvent(
         AuditEventType.LOG_OUT,
         timeSource,
@@ -62,7 +63,7 @@ data class AuditableEvent(
       supplier: String,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent? {
+    ): AuditableEvent {
       return createEvent(
         AuditEventType.DOWNLOAD_SPREADSHEET,
         timeSource,
@@ -79,7 +80,7 @@ data class AuditableEvent(
       newPrice: Money? = null,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent? {
+    ): AuditableEvent {
       return createEvent(
         AuditEventType.JOURNEY_PRICE,
         timeSource,
@@ -108,7 +109,7 @@ data class AuditableEvent(
       multiplier: Double,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent? {
+    ): AuditableEvent {
       return createEvent(
         AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
         timeSource,
