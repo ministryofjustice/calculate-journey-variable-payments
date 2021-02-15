@@ -7,6 +7,13 @@ import java.util.UUID
 interface PriceRepository : JpaRepository<Price, UUID> {
   fun deleteBySupplier(supplier: Supplier): Long
 
+  fun findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+    supplier: Supplier,
+    from: Location,
+    to: Location,
+    effectiveYear: Int
+  ): Price?
+
   fun findBySupplierAndFromLocationAndToLocation(supplier: Supplier, from: Location, to: Location): Price?
 
   fun findBySupplierAndEffectiveYear(supplier: Supplier, effectiveYear: Int): List<Price>

@@ -19,12 +19,23 @@ class SupplierPricingService(
   private val timeSource: TimeSource,
   private val auditService: AuditService
 ) {
-  fun getSiteNamesForPricing(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Pair<String, String> {
+  fun getSiteNamesForPricing(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int
+  ): Pair<String, String> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)?.let {
-      throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName}")
-    }
+    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
+      ?.let {
+        throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName} for $effectiveYear")
+      }
 
     return Pair(fromLocation.siteName, toLocation.siteName)
   }
@@ -32,7 +43,8 @@ class SupplierPricingService(
   fun getExistingSiteNamesAndPrice(
     supplier: Supplier,
     fromAgencyId: String,
-    toAgencyId: String
+    toAgencyId: String,
+    effectiveYear: Int
   ): Triple<String, String, Money> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val price = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
@@ -41,7 +53,13 @@ class SupplierPricingService(
     return Triple(fromLocation.siteName, toLocation.siteName, Money(price.priceInPence))
   }
 
-  fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Money) {
+  fun addPriceForSupplier(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    price: Money,
+    effectiveYear: Int
+  ) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
     priceRepository.save(
@@ -50,7 +68,7 @@ class SupplierPricingService(
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = price.pence,
-        effectiveYear = 2020
+        effectiveYear = effectiveYear
       )
     )
 
@@ -59,15 +77,27 @@ class SupplierPricingService(
         supplier,
         fromAgencyId,
         toAgencyId,
+        effectiveYear,
         price,
         timeSource = timeSource
       )
     )
   }
 
-  fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
+  fun updatePriceForSupplier(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    agreedNewPrice: Money,
+    effectiveYear: Int
+  ) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
+    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
       ?: throw RuntimeException("No matching price found for $supplier")
 
     val oldPrice = Money.valueOf(existingPrice.price().pounds())
@@ -78,6 +108,7 @@ class SupplierPricingService(
         supplier,
         fromAgencyId,
         toAgencyId,
+        effectiveYear,
         oldPrice,
         agreedNewPrice,
         timeSource

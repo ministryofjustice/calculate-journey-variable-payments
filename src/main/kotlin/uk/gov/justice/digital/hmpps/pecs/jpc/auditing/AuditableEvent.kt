@@ -75,31 +75,31 @@ data class AuditableEvent(
       supplier: Supplier,
       fromNomisId: String,
       toNomisId: String,
+      effectiveYear: Int,
       price: Money,
       newPrice: Money? = null,
       timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
     ): AuditableEvent {
+      val metadata = mutableMapOf<String, Any>(
+        "supplier" to supplier,
+        "fromNomisId" to fromNomisId,
+        "toNomisId" to toNomisId,
+        "effectiveYear" to effectiveYear
+      )
+
+      if (newPrice == null) {
+        metadata["price"] = price.pounds()
+      } else {
+        metadata["oldPrice"] = price.pounds()
+        metadata["newPrice"] = newPrice.pounds()
+      }
+
       return createEvent(
         AuditEventType.JOURNEY_PRICE,
         timeSource,
         authentication,
-        if (newPrice == null) {
-          mapOf(
-            "supplier" to supplier,
-            "fromNomisId" to fromNomisId,
-            "toNomisId" to toNomisId,
-            "price" to price.pounds()
-          )
-        } else {
-          mapOf(
-            "supplier" to supplier,
-            "fromNomisId" to fromNomisId,
-            "toNomisId" to toNomisId,
-            "oldPrice" to price.pounds(),
-            "newPrice" to newPrice.pounds()
-          )
-        }
+        metadata
       )
     }
 

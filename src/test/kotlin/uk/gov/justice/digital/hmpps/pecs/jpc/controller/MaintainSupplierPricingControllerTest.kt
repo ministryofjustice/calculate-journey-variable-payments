@@ -49,7 +49,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
-    whenever(service.getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)).thenReturn(Pair("from", "to"))
+    whenever(
+      service.getSiteNamesForPricing(
+        Supplier.SERCO,
+        fromAgencyId,
+        toAgencyId,
+        effectiveYearForDate(effectiveDate)
+      )
+    ).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
       .andExpect {
@@ -65,13 +72,19 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId)
+    verify(service).getSiteNamesForPricing(
+      Supplier.SERCO,
+      fromAgencyId,
+      toAgencyId,
+      effectiveYearForDate(effectiveDate)
+    )
   }
 
   @Test
   internal fun `can add price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", effectiveDate)
     }
 
     mockMvc.post("/add-price") {
@@ -82,7 +95,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/journeys") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24))
+    verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24), effectiveYearForDate(effectiveDate))
   }
 
   @Test
@@ -103,7 +116,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
+    verify(service, never()).addPriceForSupplier(any(), any(), any(), any(), any())
   }
 
   @Test
@@ -124,7 +137,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service, never()).addPriceForSupplier(any(), any(), any(), any())
+    verify(service, never()).addPriceForSupplier(any(), any(), any(), any(), any())
   }
 
   @Test
@@ -134,7 +147,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
-    whenever(service.getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(
+    whenever(
+      service.getExistingSiteNamesAndPrice(
+        Supplier.GEOAMEY,
+        fromAgencyId,
+        toAgencyId,
+        effectiveYearForDate(effectiveDate)
+      )
+    ).thenReturn(
       Triple(
         "from",
         "to",
@@ -156,6 +176,11 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getExistingSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId)
+    verify(service).getExistingSiteNamesAndPrice(
+      Supplier.GEOAMEY,
+      fromAgencyId,
+      toAgencyId,
+      effectiveYearForDate(effectiveDate)
+    )
   }
 }

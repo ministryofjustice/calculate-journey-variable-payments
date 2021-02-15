@@ -21,12 +21,10 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     return jdbcTemplate.query(
       "select count(move_id) as moves_count from moves " +
         "where move_type is not null and supplier = ? and drop_off_or_cancelled >= ? and drop_off_or_cancelled < ?",
-      arrayOf(
-        supplier.name,
-        Timestamp.valueOf(startDate.atStartOfDay()),
-        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-      ),
-      rowMapper
+      rowMapper,
+      supplier.name,
+      Timestamp.valueOf(startDate.atStartOfDay()),
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
     )[0]
   }
 
@@ -68,12 +66,10 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
     return jdbcTemplate.query(
       movesSummarySQL,
-      arrayOf(
-        supplier.name,
-        Timestamp.valueOf(startDate.atStartOfDay()),
-        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-      ),
-      movesSummaryRowMapper
+      movesSummaryRowMapper,
+      supplier.name,
+      Timestamp.valueOf(startDate.atStartOfDay()),
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
     )
   }
 
@@ -182,8 +178,9 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
   fun moveWithPersonAndJourneys(moveId: String, supplier: Supplier): Move? {
     val movePersonJourney = jdbcTemplate.query(
       "$moveJourneySelectSQL where m.move_id = ? and m.supplier = ? and m.move_type is not null",
-      arrayOf(moveId, supplier.name),
-      moveJourneyRowMapper
+      moveJourneyRowMapper,
+      moveId,
+      supplier.name
     ).groupBy { it.move.moveId }
 
     val moves = movePersonJourney.keys.map { k -> movePersonJourney.getValue(k).move() }
@@ -202,13 +199,11 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       moveJourneySelectSQL +
         "where m.supplier = ? and m.move_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
         "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
-      arrayOf(
-        supplier.name,
-        moveType.name,
-        Timestamp.valueOf(startDate.atStartOfDay()),
-        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-      ),
-      moveJourneyRowMapper
+      moveJourneyRowMapper,
+      supplier.name,
+      moveType.name,
+      Timestamp.valueOf(startDate.atStartOfDay()),
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
     ).groupBy { it.move.moveId }
 
     return movesWithPersonAndJourneys.keys.map { k ->
