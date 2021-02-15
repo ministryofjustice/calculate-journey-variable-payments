@@ -18,6 +18,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal class SupplierPricingServiceTest {
@@ -43,6 +45,8 @@ internal class SupplierPricingServiceTest {
   private val authentication: Authentication = mock { on { name } doReturn " mOcK NAME      " }
   private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }
 
+  private val effectiveDate = LocalDate.now()
+
   @BeforeEach
   private fun initMocks() {
     SecurityContextHolder.setContext(securityContext)
@@ -65,12 +69,17 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(null)
 
-    val result = service.getSiteNamesForPricing(Supplier.SERCO, "from", "to")
+    val result = service.getSiteNamesForPricing(Supplier.SERCO, "from", "to", effectiveYearForDate(effectiveDate))
 
     assertThat(result).isEqualTo(Pair("from site", "to site"))
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
-    verify(priceRepository).findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)
+    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      Supplier.SERCO,
+      fromLocation,
+      toLocation,
+      effectiveYearForDate(effectiveDate)
+    )
   }
 
   @Test
@@ -99,7 +108,7 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(price)
 
-    val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to")
+    val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYearForDate(effectiveDate))
 
     assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -112,10 +121,11 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
-      priceRepository.findBySupplierAndFromLocationAndToLocation(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
         Supplier.SERCO,
         fromLocation,
-        toLocation
+        toLocation,
+        effectiveYearForDate(effectiveDate)
       )
     ).thenReturn(price)
 
@@ -123,7 +133,12 @@ internal class SupplierPricingServiceTest {
 
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
-    verify(priceRepository).findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)
+    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      Supplier.SERCO,
+      fromLocation,
+      toLocation,
+      effectiveYearForDate(effectiveDate)
+    )
     verify(priceRepository).save(price)
     verify(price).priceInPence = 20035
   }

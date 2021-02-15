@@ -44,14 +44,15 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     model: ModelMap,
     @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): Any {
+    val effectiveYear = model.getEffectiveYear()
     val (fromSite, toSite) = agencyIds(moveId).let { (from, to) ->
       supplierPricingService.getSiteNamesForPricing(
         supplier,
         from,
-        to
+        to,
+        effectiveYear
       )
     }
-    val effectiveYear = model.getEffectiveYear()
 
     model.apply {
       addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
@@ -100,14 +101,15 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     model: ModelMap,
     @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): String {
+    val effectiveYear = model.getEffectiveYear()
     val (fromSite, toSite, price) = agencyIds(moveId).let { (from, to) ->
       supplierPricingService.getExistingSiteNamesAndPrice(
         supplier,
         from,
-        to
+        to,
+        effectiveYear
       )
     }
-    val effectiveYear = model.getEffectiveYear()
 
     model.apply {
       addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))

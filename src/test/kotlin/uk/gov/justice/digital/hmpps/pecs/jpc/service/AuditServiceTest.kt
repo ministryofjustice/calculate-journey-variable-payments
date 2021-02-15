@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -202,6 +203,7 @@ internal class AuditServiceTest {
         Supplier.GEOAMEY,
         "TEST1",
         "TEST11",
+        effectiveYearForDate(timeSource.date()),
         Money.valueOf(1.23),
         timeSource = timeSource
       )
@@ -213,6 +215,7 @@ internal class AuditServiceTest {
         Supplier.SERCO,
         "TEST2",
         "TEST21",
+        effectiveYearForDate(timeSource.date()),
         Money.valueOf(2.34),
         timeSource = timeSource,
         authentication = authentication
@@ -222,7 +225,13 @@ internal class AuditServiceTest {
     verifyEvent(
       AuditEventType.JOURNEY_PRICE,
       "MOCK NAME",
-      mapOf("supplier" to Supplier.SERCO, "fromNomisId" to "TEST2", "toNomisId" to "TEST21", "price" to 2.34)
+      mapOf(
+        "supplier" to Supplier.SERCO,
+        "fromNomisId" to "TEST2",
+        "toNomisId" to "TEST21",
+        "effectiveYear" to effectiveYearForDate(timeSource.date()),
+        "price" to 2.34
+      )
     )
   }
 
@@ -233,6 +242,7 @@ internal class AuditServiceTest {
         Supplier.GEOAMEY,
         "TEST1",
         "TEST11",
+        effectiveYearForDate(timeSource.date()),
         Money.valueOf(1.23),
         Money.valueOf(12.3),
         timeSource = timeSource,
@@ -245,6 +255,7 @@ internal class AuditServiceTest {
         Supplier.SERCO,
         "TEST2",
         "TEST21",
+        effectiveYearForDate(timeSource.date()),
         Money.valueOf(2.34),
         Money.valueOf(23.4),
         timeSource = timeSource,
@@ -259,6 +270,7 @@ internal class AuditServiceTest {
         "supplier" to Supplier.SERCO,
         "fromNomisId" to "TEST2",
         "toNomisId" to "TEST21",
+        "effectiveYear" to effectiveYearForDate(timeSource.date()),
         "oldPrice" to 2.34,
         "newPrice" to 23.4
       )

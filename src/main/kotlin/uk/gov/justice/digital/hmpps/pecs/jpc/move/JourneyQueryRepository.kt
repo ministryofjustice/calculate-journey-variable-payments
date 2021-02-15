@@ -55,7 +55,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
     val placeholders =
       (listOf(supplier.name, fromSiteName, toSiteName).filter { !it.isNullOrBlank() } + effectiveYear).toTypedArray()
-    return jdbcTemplate.query(selectPricesSQL, placeholders, pricesRowMapper)
+    return jdbcTemplate.query(selectPricesSQL, pricesRowMapper, *placeholders)
   }
 
   fun distinctJourneysAndPriceInDateRange(
@@ -109,12 +109,10 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
     return jdbcTemplate.query(
       uniqueJourneysSQL,
-      arrayOf(
-        supplier.name,
-        Timestamp.valueOf(startDate.atStartOfDay()),
-        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-      ),
-      journeyWithPricesRowMapper
+      journeyWithPricesRowMapper,
+      supplier.name,
+      Timestamp.valueOf(startDate.atStartOfDay()),
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
     )
   }
 
@@ -155,12 +153,10 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
     return jdbcTemplate.query(
       journeysSummarySQL,
-      arrayOf(
-        supplier.name,
-        Timestamp.valueOf(startDate.atStartOfDay()),
-        Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
-      ),
-      journeysSummaryRowMapper
+      journeysSummaryRowMapper,
+      supplier.name,
+      Timestamp.valueOf(startDate.atStartOfDay()),
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
     )[0]
   }
 }

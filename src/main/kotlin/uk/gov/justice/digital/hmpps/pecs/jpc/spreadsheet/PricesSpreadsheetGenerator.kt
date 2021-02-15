@@ -65,7 +65,7 @@ class PricesSpreadsheetGenerator(
         logger.info("Adding $supplier prices for effective year ${effectiveYearForDate(startDate)}.")
       }.apply { writePrices(supplierPrices.get(supplier, effectiveYearForDate(startDate))) }
 
-      return createTempFile(suffix = "xlsx").apply {
+      return File.createTempFile("tmp", "xlsx").apply {
         FileOutputStream(this).use {
           workbook.write(it)
         }

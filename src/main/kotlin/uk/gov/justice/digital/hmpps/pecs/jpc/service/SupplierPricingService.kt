@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 
 @Service
 @Transactional
@@ -19,12 +20,18 @@ class SupplierPricingService(
   private val timeSource: TimeSource,
   private val auditService: AuditService
 ) {
-  fun getSiteNamesForPricing(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Pair<String, String> {
+  fun getSiteNamesForPricing(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int
+  ): Pair<String, String> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)?.let {
-      throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName}")
-    }
+    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(supplier, fromLocation, toLocation, effectiveYear)
+      ?.let {
+        throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName}")
+      }
 
     return Pair(fromLocation.siteName, toLocation.siteName)
   }
@@ -32,7 +39,8 @@ class SupplierPricingService(
   fun getExistingSiteNamesAndPrice(
     supplier: Supplier,
     fromAgencyId: String,
-    toAgencyId: String
+    toAgencyId: String,
+    effectiveYear: Int
   ): Triple<String, String, Money> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val price = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
@@ -43,6 +51,7 @@ class SupplierPricingService(
 
   fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Money) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
+    val effectiveYear = effectiveYearForDate(timeSource.date())
 
     priceRepository.save(
       Price(
@@ -50,7 +59,7 @@ class SupplierPricingService(
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = price.pence,
-        effectiveYear = 2020
+        effectiveYear = effectiveYear
       )
     )
 
@@ -59,6 +68,7 @@ class SupplierPricingService(
         supplier,
         fromAgencyId,
         toAgencyId,
+        effectiveYear,
         price,
         timeSource = timeSource
       )
@@ -67,7 +77,13 @@ class SupplierPricingService(
 
   fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
+    val effectiveYear = effectiveYearForDate(timeSource.date())
+    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
       ?: throw RuntimeException("No matching price found for $supplier")
 
     val oldPrice = Money.valueOf(existingPrice.price().pounds())
@@ -78,6 +94,7 @@ class SupplierPricingService(
         supplier,
         fromAgencyId,
         toAgencyId,
+        effectiveYear,
         oldPrice,
         agreedNewPrice,
         timeSource
