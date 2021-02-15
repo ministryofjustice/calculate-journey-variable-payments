@@ -34,7 +34,7 @@ class SupplierPricingService(
       effectiveYear
     )
       ?.let {
-        throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName}")
+        throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName} for $effectiveYear")
       }
 
     return Pair(fromLocation.siteName, toLocation.siteName)
