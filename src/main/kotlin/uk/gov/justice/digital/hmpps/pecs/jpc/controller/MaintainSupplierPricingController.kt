@@ -74,16 +74,23 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
+    val effectiveYear = model.getEffectiveYear()
     if (result.hasErrors()) {
-      val effectiveYear = model.getEffectiveYear()
-
       model.addAttribute("contractualYearStart", "$effectiveYear")
       model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
 
       return "add-price"
     }
 
-    agencyIds(form.moveId).let { (from, to) -> supplierPricingService.addPriceForSupplier(supplier, from, to, price!!) }
+    agencyIds(form.moveId).let { (from, to) ->
+      supplierPricingService.addPriceForSupplier(
+        supplier,
+        from,
+        to,
+        price!!,
+        effectiveYear
+      )
+    }
 
     redirectAttributes.apply {
       addFlashAttribute("flashMessage", "price-created")
@@ -133,8 +140,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
+    val effectiveYear = model.getEffectiveYear()
     if (result.hasErrors()) {
-      val effectiveYear = model.getEffectiveYear()
       model.addAttribute("contractualYearStart", "$effectiveYear")
       model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
       model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
@@ -146,7 +153,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
         supplier,
         from,
         to,
-        price!!
+        price!!,
+        effectiveYear
       )
     }
 

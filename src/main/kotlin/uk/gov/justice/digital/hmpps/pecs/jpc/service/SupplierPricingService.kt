@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 
 @Service
 @Transactional
@@ -28,7 +27,12 @@ class SupplierPricingService(
   ): Pair<String, String> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
-    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(supplier, fromLocation, toLocation, effectiveYear)
+    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
       ?.let {
         throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName}")
       }
@@ -49,9 +53,14 @@ class SupplierPricingService(
     return Triple(fromLocation.siteName, toLocation.siteName, Money(price.priceInPence))
   }
 
-  fun addPriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, price: Money) {
+  fun addPriceForSupplier(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    price: Money,
+    effectiveYear: Int
+  ) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val effectiveYear = effectiveYearForDate(timeSource.date())
 
     priceRepository.save(
       Price(
@@ -75,9 +84,14 @@ class SupplierPricingService(
     )
   }
 
-  fun updatePriceForSupplier(supplier: Supplier, fromAgencyId: String, toAgencyId: String, agreedNewPrice: Money) {
+  fun updatePriceForSupplier(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    agreedNewPrice: Money,
+    effectiveYear: Int
+  ) {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val effectiveYear = effectiveYearForDate(timeSource.date())
     val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
       supplier,
       fromLocation,

@@ -87,7 +87,13 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
 
-    service.addPriceForSupplier(Supplier.SERCO, "from", "to", Money.valueOf(100.24))
+    service.addPriceForSupplier(
+      Supplier.SERCO,
+      "from",
+      "to",
+      Money.valueOf(100.24),
+      effectiveYearForDate(effectiveDate)
+    )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
@@ -129,7 +135,13 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(price)
 
-    service.updatePriceForSupplier(Supplier.SERCO, "from", "to", Money.Factory.valueOf(200.35))
+    service.updatePriceForSupplier(
+      Supplier.SERCO,
+      "from",
+      "to",
+      Money.Factory.valueOf(200.35),
+      effectiveYearForDate(effectiveDate)
+    )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
