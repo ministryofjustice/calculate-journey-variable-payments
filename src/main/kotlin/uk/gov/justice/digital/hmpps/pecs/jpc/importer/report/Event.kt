@@ -59,12 +59,9 @@ data class Event constructor(
   @Column(name = "recorded_at")
   val recordedAt: LocalDateTime,
 
-  var notes: String?,
+  @Column(nullable = true, length = 1024)
+  val notes: String?,
 ) : Comparable<Event> {
-
-  init {
-    notes = notes?.take(255)
-  }
 
   fun hasType(et: EventType) = type == et.value
   override fun equals(other: Any?): Boolean {

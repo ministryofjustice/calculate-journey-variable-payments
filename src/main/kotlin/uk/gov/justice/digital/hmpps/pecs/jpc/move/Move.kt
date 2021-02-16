@@ -113,10 +113,11 @@ data class Move(
   val cancellationReason: String? = null,
 
   @Json(name = "cancellation_reason_comment")
-  @Column(name = "cancellation_reason_comment")
+  @Column(name = "cancellation_reason_comment", nullable = true, length = 1024)
   var cancellationReasonComment: String? = null,
 
   @Json(ignored = true)
+  @Column(nullable = false, length = 1024)
   var notes: String = "",
 
   @Json(ignored = true)
@@ -135,11 +136,6 @@ data class Move(
   @Transient
   val person: Person? = null
 ) {
-  init {
-    notes = notes.take(255)
-    cancellationReasonComment = cancellationReasonComment?.take(255)
-  }
-
   fun totalInPence() =
     if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy {
       it.priceInPence ?: 0
