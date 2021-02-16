@@ -19,21 +19,7 @@ internal class MoveRepositoryTest {
 
   @Test
   fun `save report model`() {
-
-    val move = moveM1().copy(
-      notes = "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffs" +
-        "fasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfas" +
-        "adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaf" +
-        "fsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaff" +
-        "sfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasa" +
-        "dfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsa" +
-        "fafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasa" +
-        "dfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafaf" +
-        "affsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadf" +
-        "afafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaf" +
-        "fsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafa" +
-        "fsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffsfas"
-    )
+    val move = moveM1().copy(notes = "a".repeat(1024))
     val journeyModel =
       journeyJ1(moveId = move.moveId, events = listOf(eventE1(eventId = "E1", eventableId = journeyJ1().journeyId)))
     val moveModel = move.copy(
@@ -49,6 +35,6 @@ internal class MoveRepositoryTest {
     val retrievedMove = moveRepository.findById(persistedReport.moveId).get()
 
     assertThat(retrievedMove).isEqualTo(moveModel)
-    assertThat(retrievedMove.notes).contains("adfafafsafafaffsfasadfafafsafafaffsfasadfafafsafafaffs")
+    assertThat(retrievedMove.notes).contains("a".repeat(1024))
   }
 }

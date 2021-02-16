@@ -57,21 +57,21 @@ internal class PersonPersisterTest(
   }
 
   @Test
-  fun `save invoked once for 500 people`() {
+  fun `save invoked once for 50 people`() {
     PersonPersister(
       personRepositorySpy,
       profileRepositorySpy
-    ).persistPeople(entities(500) { id -> reportPersonFactory().copy(personId = id) })
+    ).persistPeople(entities(50) { id -> reportPersonFactory().copy(personId = id) })
 
     verify(personRepositorySpy).saveAll(personCaptor.capture())
   }
 
   @Test
-  fun `save invoked twice for 501 people`() {
+  fun `save invoked twice for 51 people`() {
     PersonPersister(
       personRepositorySpy,
       profileRepositorySpy
-    ).persistPeople(entities(501) { id -> reportPersonFactory().copy(personId = id) })
+    ).persistPeople(entities(51) { id -> reportPersonFactory().copy(personId = id) })
 
     verify(personRepositorySpy, times(2)).saveAll(personCaptor.capture())
   }
@@ -87,21 +87,21 @@ internal class PersonPersisterTest(
   }
 
   @Test
-  fun `save invoked once for 500 profiles`() {
+  fun `save invoked once for 50 profiles`() {
     PersonPersister(
       personRepositorySpy,
       profileRepositorySpy
-    ).persistProfiles(entities(500) { id -> profileFactory().copy(profileId = id, personId = id) })
+    ).persistProfiles(entities(50) { id -> profileFactory().copy(profileId = id, personId = id) })
 
     verify(profileRepositorySpy).saveAll(profileCaptor.capture())
   }
 
   @Test
-  fun `save invoked twice for 501 profiles`() {
+  fun `save invoked twice for 51 profiles`() {
     PersonPersister(
       personRepositorySpy,
       profileRepositorySpy
-    ).persistProfiles(entities(501) { id -> profileFactory().copy(profileId = id, personId = id) })
+    ).persistProfiles(entities(51) { id -> profileFactory().copy(profileId = id, personId = id) })
 
     verify(profileRepositorySpy, times(2)).saveAll(profileCaptor.capture())
   }

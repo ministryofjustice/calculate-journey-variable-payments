@@ -26,6 +26,8 @@ import java.time.LocalDateTime
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation as WYIPrisonLocation1
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.fromPrisonNomisAgencyId as fromPrisonNomisAgencyId1
 
+const val TOO_LONG: Int = 3000
+
 @ActiveProfiles("test")
 @DataJpaTest
 @Import(TestConfig::class)
@@ -116,7 +118,11 @@ internal class MovePersisterTest {
     )
 
     val moveStartEvent =
-      moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5))
+      moveEventFactory(
+        eventId = "E1",
+        type = EventType.MOVE_START.value,
+        occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
+      )
     val moveRedirectEvent = moveEventFactory(
       eventId = "E2",
       type = EventType.MOVE_REDIRECT.value,
@@ -197,6 +203,37 @@ internal class MovePersisterTest {
     entityManager.flush()
 
     assertThat(moveRepository.findAll().map { it.moveId }).containsExactlyInAnyOrder("M1", "NOJOURNEY")
+  }
+
+  @Test
+  fun `Persist one out of two moves due to field value too long`() {
+    val multiMove = reportMoveFactory(
+      moveId = "NOJOURNEY",
+      events = listOf(
+        moveEventFactory(
+          eventId = "E8",
+          type = EventType.MOVE_START.value,
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
+        ),
+        moveEventFactory(
+          eventId = "E9",
+          type = EventType.MOVE_REDIRECT.value,
+          notes = "This was redirected.",
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(7)
+        ),
+        moveEventFactory(
+          eventId = "E10",
+          type = EventType.MOVE_COMPLETE.value,
+          occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
+        )
+      ),
+      journeys = listOf()
+    )
+
+    movePersister.persist(listOf(redirectMove.copy(cancellationReasonComment = "a".repeat(TOO_LONG)), multiMove))
+    entityManager.flush()
+
+    assertThat(moveRepository.findAll().map { it.moveId }).containsOnly("NOJOURNEY")
   }
 
   @Test
@@ -345,7 +382,11 @@ internal class MovePersisterTest {
     )
 
     val moveStartEvent =
-      moveEventFactory(eventId = "E1", type = EventType.MOVE_START.value, occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5))
+      moveEventFactory(
+        eventId = "E1",
+        type = EventType.MOVE_START.value,
+        occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(5)
+      )
 
     val inTransitMove = reportMoveFactory(
       status = MoveStatus.in_transit,

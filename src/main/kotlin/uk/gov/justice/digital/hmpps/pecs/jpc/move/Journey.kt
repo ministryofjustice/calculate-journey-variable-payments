@@ -94,7 +94,8 @@ data class Journey(
   val billable: Boolean,
 
   @Json(ignored = true)
-  var notes: String? = null,
+  @Column(nullable = true, length = 1024)
+  val notes: String? = null,
 
   @Json(ignored = true)
   @Transient
@@ -108,11 +109,6 @@ data class Journey(
   @Column(name = "effective_year", nullable = false)
   val effectiveYear: Int? = null
 ) {
-
-  init {
-    notes = notes?.take(255)
-  }
-
   override fun toString(): String {
     return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
   }

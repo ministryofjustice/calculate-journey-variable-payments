@@ -19,7 +19,7 @@ class PersonPersister(
     val peopleToSave = mutableListOf<Person>()
     people.forEach { person ->
       peopleToSave += person
-      if (++counter % 500 == 0) {
+      if (++counter % 50 == 0) {
         savePeople(peopleToSave) { logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).") }
       }
     }
@@ -45,7 +45,7 @@ class PersonPersister(
     profiles.forEach { profile ->
       profilesToSave += profile
 
-      if (++counter % 500 == 0) {
+      if (++counter % 50 == 0) {
         saveProfiles(profilesToSave) { logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).") }
       }
     }

@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
@@ -21,12 +22,13 @@ class MovePersister(
 
   fun persist(moves: List<Move>) {
 
-    var counter = 1
+    var counter = 0
     val movesToSave = mutableListOf<Move>()
     val journeysToSave = mutableListOf<Journey>()
     val eventsToSave = mutableListOf<Event>()
     logger.info("Persisting ${moves.size} moves")
 
+    @Transactional
     fun save() {
       saveFlushAndClear(moveRepository, movesToSave)
       saveFlushAndClear(journeyRepository, journeysToSave)
@@ -90,14 +92,26 @@ class MovePersister(
 
           eventsToSave += moveEvents + journeyEvents
 
-          if (counter++ % 1000 == 0) {
-            logger.info("Persisted $counter moves out of ${moves.size} (flushing moves to the database).")
-            save()
+          Result.runCatching { save() }
+            .onSuccess { counter++ }
+            .onFailure {
+              logger.error("Error inserting move '${moveToSave.reference}': ${it.stackTraceToString()}")
+
+              movesToSave.clear()
+              journeysToSave.clear()
+              eventsToSave.clear()
+
+              if (counter > 0) counter--
+            }
+
+          if (counter % 500 == 0) {
+            logger.info("Persisted $counter moves ...")
           }
         }
-        save()
-      }.onFailure { logger.warn("Error inserting $hundredMoves" + it.message) }
+      }.onFailure { logger.warn("Error inserting moves: ${it.message}") }
     }
+
+    logger.info("Persisted $counter moves out of total ${moves.size}.")
   }
 
   fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {
@@ -113,7 +127,9 @@ class MovePersister(
           events = listOf(),
           pickUpDateTime = pickUp,
           dropOffDateTime = dropOff,
-          effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(move.moveDate ?: timeSource.date())
+          effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(
+            move.moveDate ?: timeSource.date()
+          )
         )
       }
   }
