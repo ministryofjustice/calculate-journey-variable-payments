@@ -20,7 +20,10 @@ class MovePersister(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun persist(moves: List<Move>) {
+  /**
+   * Returns the number of successfully persisted moves.
+   */
+  fun persist(moves: List<Move>): Int {
 
     var counter = 0
     val movesToSave = mutableListOf<Move>()
@@ -112,6 +115,8 @@ class MovePersister(
     }
 
     logger.info("Persisted $counter moves out of total ${moves.size}.")
+
+    return counter
   }
 
   fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {
