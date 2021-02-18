@@ -1,3 +1,3 @@
-insert into profiles (profile_id, person_id, updated_at) values ('PR1', 'PE1', '2020-06-16 10:20:30.000000');
-insert into profiles (profile_id, person_id, updated_at) values ('PR2', 'PE2', '2020-06-16 10:20:30.000000');
-insert into profiles (profile_id, person_id, updated_at) values ('PR3', 'PE3', '2020-06-16 10:20:30.000000');
+insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR1', 'PE1', to_timestamp('2020-06-16 10:20:30.000000', 'YYYY-MM-DD HH24-MI-SS.US')) as tmp where not exists (select profile_id from profiles where profile_id = 'PR1');
+insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR2', 'PE2', to_timestamp('2020-06-16 10:20:30.000000', 'YYYY-MM-DD HH24-MI-SS.US')) as tmp where not exists (select profile_id from profiles where profile_id = 'PR2');
+insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR3', 'PE3', to_timestamp('2020-06-16 10:20:30.000000', 'YYYY-MM-DD HH24-MI-SS.US')) as tmp where not exists (select profile_id from profiles where profile_id = 'PR3');
