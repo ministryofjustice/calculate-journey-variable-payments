@@ -19,15 +19,6 @@ class ImportCommands(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @ShellMethod("Imports schedule 34 locations from S3. This command deletes all existing prices.")
-  fun importLocations() {
-    logger.info("Starting import of schedule 34 locations.")
-
-    importService.importLocations()
-
-    logger.info("Finished import of schedule 34 locations.")
-  }
-
   @ShellMethod("Imports prices for the given supplier from S3. This command deletes all existing prices for the given supplier.")
   fun importPrices(supplier: Supplier) {
     logger.info("Starting import of prices for $supplier.")

@@ -62,15 +62,14 @@ The data itself falls into three distinct types:
    are pulled into the application via the daily early morning CRON job to be used for calculating journey prices. It is
    important to understand that the reports (are always) being pulled based on the previous day.
 
-### Manually importing locations, supplier prices and reporting data
+### Manually importing supplier prices and reporting data
 
 **IMPORTANT:**
 
-- EXTREME CARE SHOULD BE TAKEN WHEN RUNNING LOCATION AND PRICING IMPORTS IN PRODUCTION, EXISTING LOCATIONS AND PRICES 
-  WILL BE REMOVED!!
+- EXTREME CARE SHOULD BE TAKEN WHEN RUNNING PRICING IMPORTS IN PRODUCTION, ANY EXISTING PRICES WILL BE REMOVED!!
 - TO MANUALLY IMPORT DATA IN PRODUCTION YOU WILL NEED TO GO DIRECTLY ONTO ONE OF THE KUBE PODS.
 - MANUALLY IMPORTING REPORTING DATA IS MAINLY TO SUPPORT LOADING OF BACK-FILLED SUPPLIER REPORTING DATA. IT CAN BE SLOW, 
-  IF YOU HAVE TO IMPORT A LOT OF DATA THEN ALLOW PLENTY OF TIME AND ALSO CONSIDER TIME OF EXECUTION.
+  IF YOU HAVE TO IMPORT A LOT OF DATA. ALLOW PLENTY OF TIME AND ALSO CONSIDER TIME OF EXECUTION I.E OUT OF HOURS.
 
 Start by running the following from the command line to take you into the Spring shell.
 
@@ -80,11 +79,6 @@ export $(cat .env | xargs) # Only run this if you want to set or update the curr
 java -jar app.jar --spring.shell.interactive.enabled=true --spring.main.web-application-type=none
 ```
 Once in the Spring shell the following commands for importing and generating pricing data are available:
-```
-# Import the schedule 34 location spreadsheet that has been uploaded to S3
-
-import-locations
-```
 ```
 # Import the supplier price spreadsheet that has been uploaded to S3
 
