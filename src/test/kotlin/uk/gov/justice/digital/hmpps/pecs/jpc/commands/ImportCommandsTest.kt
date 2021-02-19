@@ -40,23 +40,23 @@ internal class ImportCommandsTest {
   internal fun `import one days reporting data`() {
     commands.importReports(date, date)
 
-    verify(importService).importReports(date, date)
-    verify(importService, times(1)).importReports(any(), any())
+    verify(importService).importReportsOn(date)
+    verify(importService, times(1)).importReportsOn(any())
   }
 
   @Test
   internal fun `import two days reporting data`() {
     commands.importReports(date, date.plusDays(1))
 
-    verify(importService).importReports(date, date)
-    verify(importService).importReports(LocalDate.of(2020, 10, 1), LocalDate.of(2020, 10, 1))
-    verify(importService, times(2)).importReports(any(), any())
+    verify(importService).importReportsOn(date)
+    verify(importService).importReportsOn(LocalDate.of(2020, 10, 1))
+    verify(importService, times(2)).importReportsOn(any())
   }
 
   @Test
   internal fun `import spanning entire leap year of reporting data`() {
     commands.importReports(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 12, 31))
 
-    verify(importService, times(366)).importReports(any(), any())
+    verify(importService, times(366)).importReportsOn(any())
   }
 }

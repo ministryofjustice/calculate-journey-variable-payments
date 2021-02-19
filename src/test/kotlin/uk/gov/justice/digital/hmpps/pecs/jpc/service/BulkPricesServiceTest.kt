@@ -47,7 +47,6 @@ internal class BulkPricesServiceTest {
           AuditableEvent(
             AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
             "_TERMINAL_",
-            timeSourceEffectiveYear2020.dateTime(),
             mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
           )
         )
@@ -76,7 +75,6 @@ internal class BulkPricesServiceTest {
           AuditableEvent(
             AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
             "_TERMINAL_",
-            timeSourceEffectiveYear2021.dateTime(),
             mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
           )
         )

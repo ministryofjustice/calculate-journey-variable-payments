@@ -21,7 +21,7 @@ class MovePersister(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
-   * Returns the number of successfully persisted moves.
+   * Returns the total number of successfully persisted moves.
    */
   fun persist(moves: List<Move>): Int {
 

@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import java.time.LocalDate
 import kotlin.streams.toList
@@ -12,12 +11,13 @@ import kotlin.streams.toList
 @Component
 class ReportImporter(
   @Autowired val provider: ReportingProvider,
-  @Autowired val timeSource: TimeSource
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun importMovesJourneysEvents(from: LocalDate, to: LocalDate = timeSource.date()): Collection<Move> {
+  fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)
+
+  private fun importMovesJourneysEvents(from: LocalDate, to: LocalDate): Collection<Move> {
     val movesContent = getContents("moves", from, to)
     val journeysContent = getContents("journeys", from, to)
     val eventsContent = getContents("events", from, to)
@@ -28,12 +28,16 @@ class ReportImporter(
     )
   }
 
-  fun importPeople(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Person> {
+  fun importPeopleOn(date: LocalDate) = importPeople(date, date)
+
+  private fun importPeople(from: LocalDate, to: LocalDate): Sequence<Person> {
     val peopleContent = getContents("people", from, to)
     return ReportParser.parseAsPerson(peopleFiles = peopleContent)
   }
 
-  fun importProfiles(from: LocalDate, to: LocalDate = timeSource.date()): Sequence<Profile> {
+  fun importProfilesOn(date: LocalDate) = importProfiles(date, date)
+
+  private fun importProfiles(from: LocalDate, to: LocalDate): Sequence<Profile> {
     val profilesContent = getContents("profiles", from, to)
     return ReportParser.parseAsProfile(profileFiles = profilesContent)
   }
@@ -41,7 +45,7 @@ class ReportImporter(
   private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String> {
     logger.info("Getting $entity between $from and $to")
     val fileNames = fileNamesForDate(entity, from, to)
-    return fileNames.map {
+    return fileNames.mapNotNull {
       try {
         logger.info("Retrieving file $it")
         provider.get(it)
@@ -49,7 +53,7 @@ class ReportImporter(
         logger.warn("Error attempting to get file $it, exception: $e")
         null
       }
-    }.filterNotNull()
+    }
   }
 
   companion object {

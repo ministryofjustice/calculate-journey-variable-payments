@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -20,7 +21,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 internal class SupplierPricingServiceTest {
 
@@ -33,12 +33,13 @@ internal class SupplierPricingServiceTest {
   private val price: Price = mock {
     on { priceInPence } doReturn priceInPence
     on { price() } doReturn Money.Factory.valueOf(priceInPence / 100.0)
+    on { fromLocation } doReturn fromLocation
+    on { toLocation } doReturn toLocation
   }
   private val service: SupplierPricingService =
     SupplierPricingService(
       locationRepository,
       priceRepository,
-      { LocalDateTime.of(2021, 1, 1, 12, 0) },
       auditService
     )
   private val priceCaptor = argumentCaptor<Price>()
@@ -86,6 +87,7 @@ internal class SupplierPricingServiceTest {
   internal fun `add new price for supplier`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
+    whenever(priceRepository.save(any())).thenReturn(price)
 
     service.addPriceForSupplier(
       Supplier.SERCO,
@@ -134,6 +136,7 @@ internal class SupplierPricingServiceTest {
         effectiveYearForDate(effectiveDate)
       )
     ).thenReturn(price)
+    whenever(priceRepository.save(any())).thenReturn(price)
 
     service.updatePriceForSupplier(
       Supplier.SERCO,

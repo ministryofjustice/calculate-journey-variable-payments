@@ -10,9 +10,9 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @ExtendWith(SpringExtension::class)
 @Import(TestConfig::class)
@@ -21,18 +21,20 @@ import java.time.LocalDate
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autowired timeSource: TimeSource) {
+internal class ReportImporterTest(@Autowired provider: ReportingProvider) {
 
-  val importer: ReportImporter = ReportImporter(provider, timeSource)
+  val importer: ReportImporter = ReportImporter(provider)
 
-  val from = LocalDate.of(2020, 9, 1)
-  val to = LocalDate.of(2020, 9, 6)
+  val from: LocalDate = LocalDate.of(2020, 9, 1)
+  val to: LocalDate = LocalDate.of(2020, 9, 6)
 
-  private lateinit var moves: Collection<Move>
+  private var moves: Collection<Move> = mutableListOf()
 
   @BeforeEach
   fun beforeEach() {
-    moves = importer.importMovesJourneysEvents(from, to)
+    for (i in 0..ChronoUnit.DAYS.between(from, to)) {
+      moves += importer.importMovesJourneysEventsOn(from.plusDays(i))
+    }
   }
 
   @Test
@@ -45,10 +47,9 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider, @Autow
 
   @Test
   fun `Get files for date should ignore missing days`() {
-    val content = importer.importMovesJourneysEvents(
-      LocalDate.of(2020, 9, 1),
-      LocalDate.of(2020, 9, 3)
-    )
+    var content = importer.importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
+    content += importer.importMovesJourneysEventsOn(LocalDate.of(2020, 9, 2))
+    content += importer.importMovesJourneysEventsOn(LocalDate.of(2020, 9, 3))
 
     // This should only pick up the completed and cancelled moves
     Assertions.assertEquals(setOf("M1", "M2", "M20", "M3", "M30"), content.map { it.moveId }.toSet())

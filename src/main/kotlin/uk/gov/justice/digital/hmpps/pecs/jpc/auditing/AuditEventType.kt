@@ -1,12 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 
 enum class AuditEventType(val label: String) {
+  DOWNLOAD_SPREADSHEET("Download spreadsheet"),
+  JOURNEY_PRICE("Journey price"),
+  JOURNEY_PRICE_BULK_UPDATE("Journey price bulk update"),
+  LOCATION("Location"),
   LOG_IN("Log in"),
   LOG_OUT("Log out"),
-  DOWNLOAD_SPREADSHEET("Download spreadsheet"),
-  LOCATION("Location"),
-  JOURNEY_PRICE("Journey price"),
-  JOURNEY_PRICE_BULK_UPDATE("Journey price bulk update");
+  REPORTING_DATA_IMPORT("Reporting data import");
 
   companion object {
     /**

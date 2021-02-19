@@ -77,7 +77,7 @@ class TestConfig {
   }
 
   @Bean
-  fun reportImporter() = ReportImporter(reportingResourceProvider(), timeSource())
+  fun reportImporter() = ReportImporter(reportingResourceProvider())
 
   @Bean
   fun jpcTemplateProvider(): JPCTemplateProvider {

@@ -40,7 +40,7 @@ class ImportCommands(
 
     if (to.isBefore(from)) throw RuntimeException("To date must be equal to or greater than from date.")
     for (i in 0..ChronoUnit.DAYS.between(from, to)) {
-      importService.importReports(from.plusDays(i), from.plusDays(i))
+      importService.importReportsOn(from.plusDays(i))
     }
 
     logger.info("Finished import of reports from $from to $to.")

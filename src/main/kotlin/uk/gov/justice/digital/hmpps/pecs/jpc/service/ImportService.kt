@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
@@ -19,37 +20,47 @@ class ImportService(
   private val priceImporter: PriceImporter,
   private val reportImporter: ReportImporter,
   private val movePersister: MovePersister,
-  private val personPersister: PersonPersister
+  private val personPersister: PersonPersister,
+  private val auditService: AuditService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
   fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier) }
 
-  fun importReports(reportsFrom: LocalDate, reportsTo: LocalDate) {
-    importMovesJourneysEvents(reportsFrom, reportsTo)
-    importPeopleProfiles(reportsFrom, reportsTo)
+  fun importReportsOn(date: LocalDate) {
+    importMovesJourneysEventsOn(date)
+    importPeopleProfilesOn(date)
   }
 
-  private fun importMovesJourneysEvents(reportsFrom: LocalDate, reportsTo: LocalDate) {
-    logger.info("Importing moves, journeys and events from '$reportsFrom' to '$reportsTo'.")
+  private fun importMovesJourneysEventsOn(date: LocalDate) {
+    logger.info("Importing moves, journeys and events for date: $date.")
 
-    import { reportImporter.importMovesJourneysEvents(reportsFrom, reportsTo) }?.let {
-      val total = movePersister.persist(it.toList())
+    import { reportImporter.importMovesJourneysEventsOn(date) }?.let {
+      val moves = it.toList()
+      movePersister.persist(moves).let { persisted ->
+        auditService.create(AuditableEvent.createImportEvent("moves", moves.size, persisted))
+      }
     }
   }
 
-  private fun importPeopleProfiles(reportsFrom: LocalDate, reportsTo: LocalDate) {
-    logger.info("Importing people from '$reportsFrom' to '$reportsTo'.")
+  private fun importPeopleProfilesOn(date: LocalDate) {
+    logger.info("Importing people for date: $date.")
 
-    import { reportImporter.importPeople(reportsFrom, reportsTo) }?.let {
-      val total = personPersister.persistPeople(it.toList())
+    import { reportImporter.importPeopleOn(date) }?.let {
+      val people = it.toList()
+      personPersister.persistPeople(people).let { persisted ->
+        auditService.create(AuditableEvent.createImportEvent("people", people.size, persisted))
+      }
     }
 
-    logger.info("Importing profiles from '$reportsFrom' to '$reportsTo'.")
+    logger.info("Importing profiles for date: $date.")
 
-    import { reportImporter.importProfiles(reportsFrom, reportsTo) }?.let {
-      val total = personPersister.persistProfiles(it.toList())
+    import { reportImporter.importProfilesOn(date) }?.let {
+      val profiles = it.toList()
+      personPersister.persistProfiles(profiles).let { persisted ->
+        auditService.create(AuditableEvent.createImportEvent("profiles", profiles.size, persisted))
+      }
     }
   }
 

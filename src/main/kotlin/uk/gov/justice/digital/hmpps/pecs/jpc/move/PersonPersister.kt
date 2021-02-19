@@ -14,7 +14,7 @@ class PersonPersister(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
-   * Returns the number of successfully persisted people.
+   * Returns the total number of successfully persisted people.
    */
   fun persistPeople(people: List<Person>): Int {
     logger.info("Persisting ${people.size} people")
@@ -44,7 +44,7 @@ class PersonPersister(
   }
 
   /**
-   * Returns the number of successfully persisted profiles.
+   * Returns the total number of successfully persisted profiles.
    */
   fun persistProfiles(profiles: List<Profile>): Int {
     logger.info("Persisting ${profiles.size} profiles")

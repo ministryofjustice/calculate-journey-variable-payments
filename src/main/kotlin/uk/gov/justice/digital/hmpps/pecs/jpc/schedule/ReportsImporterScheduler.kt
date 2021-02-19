@@ -25,6 +25,6 @@ class ReportsImporterScheduler(
 
     logger.info("Importing previous days reporting data: $yesterday.")
 
-    importService.importReports(yesterday, yesterday)
+    importService.importReportsOn(yesterday)
   }
 }

@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
@@ -16,7 +15,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 class SupplierPricingService(
   val locationRepository: LocationRepository,
   val priceRepository: PriceRepository,
-  private val timeSource: TimeSource,
   private val auditService: AuditService
 ) {
   fun getSiteNamesForPricing(
@@ -70,18 +68,7 @@ class SupplierPricingService(
         priceInPence = price.pence,
         effectiveYear = effectiveYear
       )
-    )
-
-    auditService.create(
-      AuditableEvent.createJourneyPriceEvent(
-        supplier,
-        fromAgencyId,
-        toAgencyId,
-        effectiveYear,
-        price,
-        timeSource = timeSource
-      )
-    )
+    ).let { auditService.create(AuditableEvent.createAddPriceEvent(it)) }
   }
 
   fun updatePriceForSupplier(
@@ -102,18 +89,11 @@ class SupplierPricingService(
 
     val oldPrice = Money.valueOf(existingPrice.price().pounds())
 
-    priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
-    auditService.create(
-      AuditableEvent.createJourneyPriceEvent(
-        supplier,
-        fromAgencyId,
-        toAgencyId,
-        effectiveYear,
-        oldPrice,
-        agreedNewPrice,
-        timeSource
-      )
-    )
+    priceRepository.save(
+      existingPrice.apply {
+        this.priceInPence = agreedNewPrice.pence
+      }
+    ).let { auditService.create(AuditableEvent.createUpdatePriceEvent(it, oldPrice)) }
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =

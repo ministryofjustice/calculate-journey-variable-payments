@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
@@ -33,9 +34,10 @@ class OutputSpreadsheetController(
       name = "moves_from",
       required = true
     ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) movesFrom: LocalDate,
-    response: HttpServletResponse?
+    response: HttpServletResponse?,
+    authentication: Authentication?
   ): ResponseEntity<InputStreamResource?>? {
-    auditService.create(AuditableEvent.createDownloadSpreadsheetEvent(movesFrom, supplier, timeSource))
+    auditService.create(AuditableEvent.createDownloadSpreadsheetEvent(movesFrom, supplier, authentication!!))
 
     return spreadsheetService.spreadsheet(supplier, movesFrom)?.let { file ->
       val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))
