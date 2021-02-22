@@ -30,7 +30,7 @@ class MapFriendlyLocationService(
       it.siteName = friendlyLocationName.trim().toUpperCase()
       it.locationType = locationType
 
-      val event = AuditableEvent.createLocationEvent(
+      val event = AuditableEvent.locationEvent(
         oldLocation,
         locationRepository.save(it).copy(),
       )
@@ -39,7 +39,7 @@ class MapFriendlyLocationService(
       return
     }
 
-    val event = AuditableEvent.createLocationEvent(
+    val event = AuditableEvent.locationEvent(
       locationRepository.save(
         Location(
           locationType,
