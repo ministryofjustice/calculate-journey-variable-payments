@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneysSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
@@ -11,20 +13,46 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun distinctJourneysExcludingPriced(supplier: Supplier, startDate: LocalDate) =
-    journeyQueryRepository.distinctJourneysAndPriceInDateRange(supplier, startDate, endOfMonth(startDate))
+  fun distinctJourneysExcludingPriced(supplier: Supplier, startDate: LocalDate): List<JourneyWithPrice> {
+    logger.info("Fetching distinct journeys (excluding priced).")
 
-  fun distinctJourneysIncludingPriced(supplier: Supplier, startDate: LocalDate) =
-    journeyQueryRepository.distinctJourneysAndPriceInDateRange(supplier, startDate, endOfMonth(startDate), false)
+    return journeyQueryRepository.distinctJourneysAndPriceInDateRange(supplier, startDate, endOfMonth(startDate)).also {
+      logger.info("Retrieved ${it.size} distinct journeys (excluding priced).")
+    }
+  }
 
-  fun journeysSummary(supplier: Supplier, startDate: LocalDate) =
-    journeyQueryRepository.journeysSummaryInDateRange(supplier, startDate, endOfMonth(startDate))
+  fun distinctJourneysIncludingPriced(supplier: Supplier, startDate: LocalDate): List<JourneyWithPrice> {
+    logger.info("Fetching distinct journeys (including priced).")
 
-  fun prices(supplier: Supplier, fromSiteName: String?, toSiteName: String?, effectiveYear: Int) =
-    journeyQueryRepository.prices(
+    return journeyQueryRepository.distinctJourneysAndPriceInDateRange(supplier, startDate, endOfMonth(startDate), false)
+      .also {
+        logger.info("Retrieved ${it.size} distinct journeys (including priced).")
+      }
+  }
+
+  fun journeysSummary(supplier: Supplier, startDate: LocalDate): JourneysSummary {
+    logger.info("Fetching journey summary for $supplier on start date $startDate")
+
+    return journeyQueryRepository.journeysSummaryInDateRange(supplier, startDate, endOfMonth(startDate)).also {
+      logger.info("Retrieved journey summary for $supplier on start date $startDate")
+    }
+  }
+
+  fun prices(
+    supplier: Supplier,
+    fromSiteName: String?,
+    toSiteName: String?,
+    effectiveYear: Int
+  ): List<JourneyWithPrice> {
+    logger.info("Fetching prices for $supplier, from site '${fromSiteName.orEmpty()}', to site name '${toSiteName.orEmpty()}' for effective year $effectiveYear")
+
+    return journeyQueryRepository.prices(
       supplier,
       fromSiteName?.trim()?.toUpperCase(),
       toSiteName?.trim()?.toUpperCase(),
       effectiveYear
-    )
+    ).also {
+      logger.info("Retrieved ${it.size} prices for $supplier, from site '${fromSiteName.orEmpty()}', to site name '${toSiteName.orEmpty()}' for effective year $effectiveYear")
+    }
+  }
 }
