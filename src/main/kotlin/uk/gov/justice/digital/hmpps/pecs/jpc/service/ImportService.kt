@@ -39,7 +39,7 @@ class ImportService(
     import { reportImporter.importMovesJourneysEventsOn(date) }?.let {
       val moves = it.toList()
       movePersister.persist(moves).let { persisted ->
-        auditService.create(AuditableEvent.createImportEvent("moves", moves.size, persisted))
+        auditService.create(AuditableEvent.importReportEvent("moves", date, moves.size, persisted))
       }
     }
   }
@@ -50,7 +50,7 @@ class ImportService(
     import { reportImporter.importPeopleOn(date) }?.let {
       val people = it.toList()
       personPersister.persistPeople(people).let { persisted ->
-        auditService.create(AuditableEvent.createImportEvent("people", people.size, persisted))
+        auditService.create(AuditableEvent.importReportEvent("people", date, people.size, persisted))
       }
     }
 
@@ -59,7 +59,7 @@ class ImportService(
     import { reportImporter.importProfilesOn(date) }?.let {
       val profiles = it.toList()
       personPersister.persistProfiles(profiles).let { persisted ->
-        auditService.create(AuditableEvent.createImportEvent("profiles", profiles.size, persisted))
+        auditService.create(AuditableEvent.importReportEvent("profiles", date, profiles.size, persisted))
       }
     }
   }

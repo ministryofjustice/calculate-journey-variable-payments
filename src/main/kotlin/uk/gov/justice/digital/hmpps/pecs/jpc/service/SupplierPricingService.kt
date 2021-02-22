@@ -68,7 +68,7 @@ class SupplierPricingService(
         priceInPence = price.pence,
         effectiveYear = effectiveYear
       )
-    ).let { auditService.create(AuditableEvent.createAddPriceEvent(it)) }
+    ).let { auditService.create(AuditableEvent.addPriceEvent(it)) }
   }
 
   fun updatePriceForSupplier(
@@ -93,7 +93,7 @@ class SupplierPricingService(
       existingPrice.apply {
         this.priceInPence = agreedNewPrice.pence
       }
-    ).let { auditService.create(AuditableEvent.createUpdatePriceEvent(it, oldPrice)) }
+    ).let { auditService.create(AuditableEvent.updatePriceEvent(it, oldPrice)) }
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =

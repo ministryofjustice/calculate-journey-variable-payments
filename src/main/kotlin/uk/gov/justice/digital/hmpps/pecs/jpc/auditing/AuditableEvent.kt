@@ -31,13 +31,13 @@ data class AuditableEvent(
       )
     }
 
-    fun createLogInEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_IN, authentication)
+    fun logInEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_IN, authentication)
 
-    fun createLogOutEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_OUT, authentication)
+    fun logOutEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_OUT, authentication)
 
-    fun createDownloadSpreadsheetEvent(
+    fun downloadSpreadsheetEvent(
       date: LocalDate,
-      supplier: String,
+      supplier: Supplier,
       authentication: Authentication
     ) =
       createEvent(
@@ -46,7 +46,7 @@ data class AuditableEvent(
         mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
       )
 
-    fun createAddPriceEvent(
+    fun addPriceEvent(
       newPrice: Price,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
     ): AuditableEvent {
@@ -61,7 +61,7 @@ data class AuditableEvent(
       return createEvent(AuditEventType.JOURNEY_PRICE, authentication, metadata)
     }
 
-    fun createUpdatePriceEvent(
+    fun updatePriceEvent(
       updatedPrice: Price,
       oldPrice: Money,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
@@ -78,7 +78,7 @@ data class AuditableEvent(
       return createEvent(AuditEventType.JOURNEY_PRICE, authentication, metadata)
     }
 
-    fun createJourneyPriceBulkUpdateEvent(
+    fun journeyPriceBulkUpdateEvent(
       supplier: Supplier,
       multiplier: Double,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
@@ -89,7 +89,7 @@ data class AuditableEvent(
       true
     )
 
-    fun createLocationEvent(
+    fun locationEvent(
       oldLocation: Location,
       newLocation: Location? = null,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication
@@ -121,11 +121,12 @@ data class AuditableEvent(
       )
     }
 
-    fun createImportEvent(type: String, processed: Int, saved: Int) =
+    fun importReportEvent(type: String, reportDate: LocalDate, processed: Int, saved: Int) =
       createEvent(
         type = AuditEventType.REPORTING_DATA_IMPORT,
         metadata = mapOf(
           "type" to type,
+          "report_date" to reportDate.toString(),
           "processed" to processed,
           "saved" to saved
 

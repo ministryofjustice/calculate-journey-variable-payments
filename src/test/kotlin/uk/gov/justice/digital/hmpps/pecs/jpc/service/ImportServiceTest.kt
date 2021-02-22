@@ -66,8 +66,8 @@ internal class ImportServiceTest {
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
 
-    verify(auditService).create(AuditableEvent.createImportEvent("moves", 1, 1))
-    verify(auditService).create(AuditableEvent.createImportEvent("people", 1, 1))
-    verify(auditService).create(AuditableEvent.createImportEvent("profiles", 1, 1))
+    verify(auditService).create(AuditableEvent.importReportEvent("moves", timeSourceWithFixedDate.date(), 1, 1))
+    verify(auditService).create(AuditableEvent.importReportEvent("people", timeSourceWithFixedDate.date(), 1, 1))
+    verify(auditService).create(AuditableEvent.importReportEvent("profiles", timeSourceWithFixedDate.date(), 1, 1))
   }
 }

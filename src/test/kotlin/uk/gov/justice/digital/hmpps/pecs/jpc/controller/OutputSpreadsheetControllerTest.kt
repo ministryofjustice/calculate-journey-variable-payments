@@ -31,7 +31,7 @@ class OutputSpreadsheetControllerTest(@Autowired val mockMvc: MockMvc) {
     whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
     whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-    mockMvc.get("/generate-prices-spreadsheet/SERCO?moves_from=2020-10-01") { }
+    mockMvc.get("/generate-prices-spreadsheet/serco?moves_from=2020-10-01") { }
       .andExpect {
         status { isOk() }
         content { contentType("application/vnd.ms-excel") }
@@ -39,6 +39,25 @@ class OutputSpreadsheetControllerTest(@Autowired val mockMvc: MockMvc) {
           string(
             "Content-Disposition",
             "attachment;filename=Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx"
+          )
+        }
+      }
+  }
+
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  fun `can generate spreadsheet with correct name for Geoamey`() {
+    whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
+    whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
+
+    mockMvc.get("/generate-prices-spreadsheet/geoamey?moves_from=2020-10-01") { }
+      .andExpect {
+        status { isOk() }
+        content { contentType("application/vnd.ms-excel") }
+        header {
+          string(
+            "Content-Disposition",
+            "attachment;filename=Journey_Variable_Payment_Output_GEOAMEY_2020-10-13_15_25.xlsx"
           )
         }
       }

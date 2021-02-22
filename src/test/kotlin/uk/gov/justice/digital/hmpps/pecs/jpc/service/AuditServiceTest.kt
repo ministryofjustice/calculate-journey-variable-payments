@@ -73,14 +73,14 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create log in audit event`() {
-    service.create(AuditableEvent.createLogInEvent(authentication))
+    service.create(AuditableEvent.logInEvent(authentication))
 
     verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
   }
 
   @Test
   internal fun `create log out audit event`() {
-    service.create(AuditableEvent.createLogOutEvent(authentication))
+    service.create(AuditableEvent.logOutEvent(authentication))
 
     verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
   }
@@ -88,27 +88,27 @@ internal class AuditServiceTest {
   @Test
   internal fun `create download spreadsheet audit event`() {
     service.create(
-      AuditableEvent.createDownloadSpreadsheetEvent(
+      AuditableEvent.downloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 1),
-        "serco",
+        Supplier.SERCO,
         authentication
       )
     )
 
-    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "serco"))
+    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "SERCO"))
   }
 
   @Test
   internal fun `create new location audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createLocationEvent(
+      AuditableEvent.locationEvent(
         Location(LocationType.PR, "TEST1", "TEST 1 NAME")
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Attempted to create audit event LOCATION without a user")
 
     service.create(
-      AuditableEvent.createLocationEvent(
+      AuditableEvent.locationEvent(
         Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
         authentication = authentication
       )!!
@@ -124,7 +124,7 @@ internal class AuditServiceTest {
   @Test
   internal fun `create location name change audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createLocationEvent(
+      AuditableEvent.locationEvent(
         Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
         Location(LocationType.PR, "TEST1", "TEST A NAME")
       )
@@ -132,7 +132,7 @@ internal class AuditServiceTest {
       .hasMessage("Attempted to create audit event LOCATION without a user")
 
     service.create(
-      AuditableEvent.createLocationEvent(
+      AuditableEvent.locationEvent(
         Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
         Location(LocationType.AP, "TEST2", "TEST B NAME"),
         authentication = authentication
@@ -149,7 +149,7 @@ internal class AuditServiceTest {
   @Test
   internal fun `create location type change audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createLocationEvent(
+      AuditableEvent.locationEvent(
         Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
         Location(LocationType.CO, "TEST1", "TEST 1 NAME")
       )
@@ -157,7 +157,7 @@ internal class AuditServiceTest {
       .hasMessage("Attempted to create audit event LOCATION without a user")
 
     service.create(
-      AuditableEvent.createLocationEvent(
+      AuditableEvent.locationEvent(
         Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
         Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
         authentication = authentication
@@ -174,7 +174,7 @@ internal class AuditServiceTest {
   @Test
   internal fun `create journey price set audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createAddPriceEvent(
+      AuditableEvent.addPriceEvent(
         Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -187,7 +187,7 @@ internal class AuditServiceTest {
       .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
 
     service.create(
-      AuditableEvent.createAddPriceEvent(
+      AuditableEvent.addPriceEvent(
         Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -215,7 +215,7 @@ internal class AuditServiceTest {
   @Test
   internal fun `create journey price change audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createUpdatePriceEvent(
+      AuditableEvent.updatePriceEvent(
         Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -229,7 +229,7 @@ internal class AuditServiceTest {
       .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
 
     service.create(
-      AuditableEvent.createUpdatePriceEvent(
+      AuditableEvent.updatePriceEvent(
         Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -257,9 +257,9 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price bulk update audit event`() {
-    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5))
+    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.SERCO, 1.5))
     service.create(
-      AuditableEvent.createJourneyPriceBulkUpdateEvent(
+      AuditableEvent.journeyPriceBulkUpdateEvent(
         Supplier.GEOAMEY,
         2.0,
         authentication = authentication
@@ -275,6 +275,17 @@ internal class AuditServiceTest {
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
       "MOCK NAME",
       mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
+    )
+  }
+
+  @Test
+  internal fun `create import reports audit event`() {
+    service.create(AuditableEvent.importReportEvent("moves", LocalDate.of(2021, 2, 22), 20, 10))
+
+    verifyEvent(
+      AuditEventType.REPORTING_DATA_IMPORT,
+      "_TERMINAL_",
+      mapOf("type" to "moves", "report_date" to "2021-02-22", "processed" to 20, "saved" to 10)
     )
   }
 }

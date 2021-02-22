@@ -13,7 +13,7 @@ class LogInAuditHandler(private val auditService: AuditService) :
     response: HttpServletResponse?,
     authentication: Authentication?
   ) {
-    auditService.create(AuditableEvent.createLogInEvent(authentication!!))
+    auditService.create(AuditableEvent.logInEvent(authentication!!))
     super.onAuthenticationSuccess(request, response, authentication)
   }
 }
