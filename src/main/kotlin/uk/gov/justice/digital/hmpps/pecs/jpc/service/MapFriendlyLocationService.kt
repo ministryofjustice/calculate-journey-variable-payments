@@ -31,7 +31,6 @@ class MapFriendlyLocationService(
       it.locationType = locationType
 
       val event = AuditableEvent.createLocationEvent(
-        timeSource,
         oldLocation,
         locationRepository.save(it).copy(),
       )
@@ -41,7 +40,6 @@ class MapFriendlyLocationService(
     }
 
     val event = AuditableEvent.createLocationEvent(
-      timeSource,
       locationRepository.save(
         Location(
           locationType,

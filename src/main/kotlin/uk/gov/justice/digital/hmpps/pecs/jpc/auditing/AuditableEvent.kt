@@ -2,25 +2,22 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class AuditableEvent(
   val type: AuditEventType,
   val username: String,
-  val timestamp: LocalDateTime,
   val extras: Map<String, Any>? = null
 ) {
   companion object {
     private fun createEvent(
       type: AuditEventType,
-      timeSource: TimeSource,
-      authentication: Authentication?,
+      authentication: Authentication? = null,
       metadata: Map<String, Any>? = null,
       allowNoUser: Boolean = false
     ): AuditableEvent {
@@ -30,96 +27,69 @@ data class AuditableEvent(
       return AuditableEvent(
         type,
         authentication?.name ?: "_TERMINAL_",
-        timeSource.dateTime(),
         metadata
       )
     }
 
-    fun createLogInEvent(
-      timeSource: TimeSource,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
-      return createEvent(
-        AuditEventType.LOG_IN,
-        timeSource,
-        authentication,
-      )
-    }
+    fun createLogInEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_IN, authentication)
 
-    fun createLogOutEvent(
-      timeSource: TimeSource,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
-      return createEvent(
-        AuditEventType.LOG_OUT,
-        timeSource,
-        authentication,
-      )
-    }
+    fun createLogOutEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_OUT, authentication)
 
     fun createDownloadSpreadsheetEvent(
       date: LocalDate,
       supplier: String,
-      timeSource: TimeSource,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
-      return createEvent(
+      authentication: Authentication
+    ) =
+      createEvent(
         AuditEventType.DOWNLOAD_SPREADSHEET,
-        timeSource,
         authentication,
         mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
       )
-    }
 
-    fun createJourneyPriceEvent(
-      supplier: Supplier,
-      fromNomisId: String,
-      toNomisId: String,
-      effectiveYear: Int,
-      price: Money,
-      newPrice: Money? = null,
-      timeSource: TimeSource,
+    fun createAddPriceEvent(
+      newPrice: Price,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
     ): AuditableEvent {
       val metadata = mutableMapOf<String, Any>(
-        "supplier" to supplier,
-        "fromNomisId" to fromNomisId,
-        "toNomisId" to toNomisId,
-        "effectiveYear" to effectiveYear
+        "supplier" to newPrice.supplier,
+        "from_nomis_id" to newPrice.fromLocation.nomisAgencyId,
+        "to_nomis_id" to newPrice.toLocation.nomisAgencyId,
+        "effective_year" to newPrice.effectiveYear,
+        "price" to newPrice.price().pounds()
       )
 
-      if (newPrice == null) {
-        metadata["price"] = price.pounds()
-      } else {
-        metadata["oldPrice"] = price.pounds()
-        metadata["newPrice"] = newPrice.pounds()
-      }
+      return createEvent(AuditEventType.JOURNEY_PRICE, authentication, metadata)
+    }
 
-      return createEvent(
-        AuditEventType.JOURNEY_PRICE,
-        timeSource,
-        authentication,
-        metadata
+    fun createUpdatePriceEvent(
+      updatedPrice: Price,
+      oldPrice: Money,
+      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
+    ): AuditableEvent {
+      val metadata = mutableMapOf<String, Any>(
+        "supplier" to updatedPrice.supplier,
+        "from_nomis_id" to updatedPrice.fromLocation.nomisAgencyId,
+        "to_nomis_id" to updatedPrice.toLocation.nomisAgencyId,
+        "effective_year" to updatedPrice.effectiveYear,
+        "old_price" to oldPrice.pounds(),
+        "new_price" to updatedPrice.price().pounds()
       )
+
+      return createEvent(AuditEventType.JOURNEY_PRICE, authentication, metadata)
     }
 
     fun createJourneyPriceBulkUpdateEvent(
       supplier: Supplier,
       multiplier: Double,
-      timeSource: TimeSource,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
-      return createEvent(
-        AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
-        timeSource,
-        authentication,
-        mapOf("supplier" to supplier, "multiplier" to multiplier),
-        true
-      )
-    }
+    ) = createEvent(
+      AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+      authentication,
+      mapOf("supplier" to supplier, "multiplier" to multiplier),
+      true
+    )
 
     fun createLocationEvent(
-      timeSource: TimeSource,
       oldLocation: Location,
       newLocation: Location? = null,
       authentication: Authentication? = SecurityContextHolder.getContext().authentication
@@ -128,16 +98,16 @@ data class AuditableEvent(
         return null
       }
 
-      val metadata = mutableMapOf<String, Any>("nomisId" to oldLocation.nomisAgencyId)
+      val metadata = mutableMapOf<String, Any>("nomis_id" to oldLocation.nomisAgencyId)
       if (newLocation != null) {
         if (oldLocation.siteName != newLocation.siteName) {
-          metadata["oldName"] = oldLocation.siteName
-          metadata["newName"] = newLocation.siteName
+          metadata["old_name"] = oldLocation.siteName
+          metadata["new_name"] = newLocation.siteName
         }
 
         if (oldLocation.locationType != newLocation.locationType) {
-          metadata["oldType"] = oldLocation.locationType
-          metadata["newType"] = newLocation.locationType
+          metadata["old_type"] = oldLocation.locationType
+          metadata["new_type"] = newLocation.locationType
         }
       } else {
         metadata["name"] = oldLocation.siteName
@@ -146,10 +116,21 @@ data class AuditableEvent(
 
       return createEvent(
         AuditEventType.LOCATION,
-        timeSource,
         authentication,
         metadata
       )
     }
+
+    fun createImportEvent(type: String, processed: Int, saved: Int) =
+      createEvent(
+        type = AuditEventType.REPORTING_DATA_IMPORT,
+        metadata = mapOf(
+          "type" to type,
+          "processed" to processed,
+          "saved" to saved
+
+        ),
+        allowNoUser = true
+      )
   }
 }

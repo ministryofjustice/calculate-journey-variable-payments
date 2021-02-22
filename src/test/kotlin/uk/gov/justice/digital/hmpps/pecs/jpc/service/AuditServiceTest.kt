@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import com.beust.klaxon.Klaxon
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -19,15 +18,15 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class AuditableEventMatcher(var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
+internal class AuditableEventMatcher(private var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
   override fun matches(otherAuditableEvent: AuditableEvent): Boolean {
     return auditableEvent.username == otherAuditableEvent.username &&
-      auditableEvent.timestamp == auditableEvent.timestamp &&
       auditableEvent.extras == otherAuditableEvent.extras &&
       auditableEvent.type == otherAuditableEvent.type
   }
@@ -44,13 +43,13 @@ private class AuditEventMatcher(var auditEvent: AuditEvent) : ArgumentMatcher<Au
 
 internal class AuditServiceTest {
   private val auditEventRepository: AuditEventRepository = mock()
-  private val service = AuditService(auditEventRepository)
   private val dateTime = LocalDateTime.of(2021, 1, 1, 12, 34, 56)
   private val timeSource = TimeSource { dateTime }
+  private val service = AuditService(auditEventRepository, timeSource)
   private val authentication: Authentication = mock()
 
   private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) =
-    verify(auditEventRepository, times(1)).save(
+    verify(auditEventRepository).save(
       argThat(
         AuditEventMatcher(
           AuditEvent(
@@ -74,42 +73,24 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create log in audit event`() {
-    assertThatThrownBy { AuditableEvent.createLogInEvent(timeSource) }
-      .isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event LOG_IN without a user")
-
-    service.create(AuditableEvent.createLogInEvent(timeSource, authentication))
+    service.create(AuditableEvent.createLogInEvent(authentication))
 
     verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
   }
 
   @Test
   internal fun `create log out audit event`() {
-    assertThatThrownBy { AuditableEvent.createLogOutEvent(timeSource) }
-      .isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event LOG_OUT without a user")
-
-    service.create(AuditableEvent.createLogOutEvent(timeSource, authentication))
+    service.create(AuditableEvent.createLogOutEvent(authentication))
 
     verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
   }
 
   @Test
   internal fun `create download spreadsheet audit event`() {
-    assertThatThrownBy {
-      AuditableEvent.createDownloadSpreadsheetEvent(
-        LocalDate.of(2021, 1, 31),
-        "geoamey",
-        timeSource
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event DOWNLOAD_SPREADSHEET without a user")
-
     service.create(
       AuditableEvent.createDownloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 1),
         "serco",
-        timeSource,
         authentication
       )
     )
@@ -121,7 +102,6 @@ internal class AuditServiceTest {
   internal fun `create new location audit event`() {
     assertThatThrownBy {
       AuditableEvent.createLocationEvent(
-        timeSource,
         Location(LocationType.PR, "TEST1", "TEST 1 NAME")
       )
     }.isInstanceOf(RuntimeException::class.java)
@@ -129,7 +109,6 @@ internal class AuditServiceTest {
 
     service.create(
       AuditableEvent.createLocationEvent(
-        timeSource,
         Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
         authentication = authentication
       )!!
@@ -138,7 +117,7 @@ internal class AuditServiceTest {
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
-      mapOf("nomisId" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP")
+      mapOf("nomis_id" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP")
     )
   }
 
@@ -146,7 +125,6 @@ internal class AuditServiceTest {
   internal fun `create location name change audit event`() {
     assertThatThrownBy {
       AuditableEvent.createLocationEvent(
-        timeSource,
         Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
         Location(LocationType.PR, "TEST1", "TEST A NAME")
       )
@@ -155,7 +133,6 @@ internal class AuditServiceTest {
 
     service.create(
       AuditableEvent.createLocationEvent(
-        timeSource,
         Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
         Location(LocationType.AP, "TEST2", "TEST B NAME"),
         authentication = authentication
@@ -165,7 +142,7 @@ internal class AuditServiceTest {
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
-      mapOf("nomisId" to "TEST2", "oldName" to "TEST 2 NAME", "newName" to "TEST B NAME")
+      mapOf("nomis_id" to "TEST2", "old_name" to "TEST 2 NAME", "new_name" to "TEST B NAME")
     )
   }
 
@@ -173,7 +150,6 @@ internal class AuditServiceTest {
   internal fun `create location type change audit event`() {
     assertThatThrownBy {
       AuditableEvent.createLocationEvent(
-        timeSource,
         Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
         Location(LocationType.CO, "TEST1", "TEST 1 NAME")
       )
@@ -182,7 +158,6 @@ internal class AuditServiceTest {
 
     service.create(
       AuditableEvent.createLocationEvent(
-        timeSource,
         Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
         Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
         authentication = authentication
@@ -192,33 +167,35 @@ internal class AuditServiceTest {
     verifyEvent(
       AuditEventType.LOCATION,
       "MOCK NAME",
-      mapOf("nomisId" to "TEST2", "oldType" to "HP", "newType" to "PR")
+      mapOf("nomis_id" to "TEST2", "old_type" to "HP", "new_type" to "PR")
     )
   }
 
   @Test
   internal fun `create journey price set audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createJourneyPriceEvent(
-        Supplier.GEOAMEY,
-        "TEST1",
-        "TEST11",
-        effectiveYearForDate(timeSource.date()),
-        Money.valueOf(1.23),
-        timeSource = timeSource
+      AuditableEvent.createAddPriceEvent(
+        Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 234,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        )
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
 
     service.create(
-      AuditableEvent.createJourneyPriceEvent(
-        Supplier.SERCO,
-        "TEST2",
-        "TEST21",
-        effectiveYearForDate(timeSource.date()),
-        Money.valueOf(2.34),
-        timeSource = timeSource,
-        authentication = authentication
+      AuditableEvent.createAddPriceEvent(
+        Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 234,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        authentication
       )
     )
 
@@ -227,9 +204,9 @@ internal class AuditServiceTest {
       "MOCK NAME",
       mapOf(
         "supplier" to Supplier.SERCO,
-        "fromNomisId" to "TEST2",
-        "toNomisId" to "TEST21",
-        "effectiveYear" to effectiveYearForDate(timeSource.date()),
+        "from_nomis_id" to "TEST2",
+        "to_nomis_id" to "TEST21",
+        "effective_year" to effectiveYearForDate(timeSource.date()),
         "price" to 2.34
       )
     )
@@ -238,53 +215,53 @@ internal class AuditServiceTest {
   @Test
   internal fun `create journey price change audit event`() {
     assertThatThrownBy {
-      AuditableEvent.createJourneyPriceEvent(
-        Supplier.GEOAMEY,
-        "TEST1",
-        "TEST11",
-        effectiveYearForDate(timeSource.date()),
-        Money.valueOf(1.23),
-        Money.valueOf(12.3),
-        timeSource = timeSource,
+      AuditableEvent.createUpdatePriceEvent(
+        Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 2340,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        Money(234)
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
 
     service.create(
-      AuditableEvent.createJourneyPriceEvent(
-        Supplier.SERCO,
-        "TEST2",
-        "TEST21",
-        effectiveYearForDate(timeSource.date()),
-        Money.valueOf(2.34),
-        Money.valueOf(23.4),
-        timeSource = timeSource,
-        authentication = authentication
+      AuditableEvent.createUpdatePriceEvent(
+        Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 2340,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        Money(234),
+        authentication
       )
     )
-
     verifyEvent(
       AuditEventType.JOURNEY_PRICE,
       "MOCK NAME",
       mapOf(
         "supplier" to Supplier.SERCO,
-        "fromNomisId" to "TEST2",
-        "toNomisId" to "TEST21",
-        "effectiveYear" to effectiveYearForDate(timeSource.date()),
-        "oldPrice" to 2.34,
-        "newPrice" to 23.4
+        "from_nomis_id" to "TEST2",
+        "to_nomis_id" to "TEST21",
+        "effective_year" to effectiveYearForDate(timeSource.date()),
+        "old_price" to 2.34,
+        "new_price" to 23.4
       )
     )
   }
 
   @Test
   internal fun `create journey price bulk update audit event`() {
-    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5, timeSource = timeSource))
+    service.create(AuditableEvent.createJourneyPriceBulkUpdateEvent(Supplier.SERCO, 1.5))
     service.create(
       AuditableEvent.createJourneyPriceBulkUpdateEvent(
         Supplier.GEOAMEY,
         2.0,
-        timeSource = timeSource,
         authentication = authentication
       )
     )

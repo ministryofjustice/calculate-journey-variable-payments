@@ -13,7 +13,10 @@ class PersonPersister(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun persistPeople(people: List<Person>) {
+  /**
+   * Returns the total number of successfully persisted people.
+   */
+  fun persistPeople(people: List<Person>): Int {
     logger.info("Persisting ${people.size} people")
     var counter = 0
     val peopleToSave = mutableListOf<Person>()
@@ -25,6 +28,8 @@ class PersonPersister(
     }
 
     if (peopleToSave.isNotEmpty()) savePeople(peopleToSave) { logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).") }
+
+    return counter
   }
 
   private fun savePeople(people: MutableList<Person>, success: () -> Unit) {
@@ -38,7 +43,10 @@ class PersonPersister(
       }
   }
 
-  fun persistProfiles(profiles: List<Profile>) {
+  /**
+   * Returns the total number of successfully persisted profiles.
+   */
+  fun persistProfiles(profiles: List<Profile>): Int {
     logger.info("Persisting ${profiles.size} profiles")
     var counter = 0
     val profilesToSave = mutableListOf<Profile>()
@@ -51,6 +59,8 @@ class PersonPersister(
     }
 
     if (profilesToSave.isNotEmpty()) saveProfiles(profilesToSave) { logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).") }
+
+    return counter
   }
 
   private fun saveProfiles(profiles: MutableList<Profile>, success: () -> Unit) {

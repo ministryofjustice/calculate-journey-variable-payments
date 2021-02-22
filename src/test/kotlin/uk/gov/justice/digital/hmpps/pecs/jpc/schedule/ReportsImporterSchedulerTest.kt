@@ -16,6 +16,6 @@ class ReportsImporterSchedulerTest {
   fun `previous days reports data import invoked with correct dates`() {
     ReportsImporterScheduler(importService, timeSource).importPreviousDaysReports()
 
-    verify(importService).importReports(timeSource.date().minusDays(1), timeSource.date().minusDays(1))
+    verify(importService).importReportsOn(timeSource.date().minusDays(1))
   }
 }
