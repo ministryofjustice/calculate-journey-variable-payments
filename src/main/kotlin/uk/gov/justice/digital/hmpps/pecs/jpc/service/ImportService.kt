@@ -26,7 +26,7 @@ class ImportService(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier, timeSource) }
+  fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier) }
 
   fun importReportsOn(date: LocalDate) {
     importMovesJourneysEventsOn(date)

@@ -14,6 +14,7 @@ import java.io.InputStream
 
 @Component
 class PriceImporter(
+  private val timeSource: TimeSource,
   private val priceRepo: PriceRepository,
   private val sercoPrices: SercoPricesProvider,
   private val geoameyPrices: GeoameyPricesProvider,
@@ -22,7 +23,7 @@ class PriceImporter(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun import(supplier: Supplier, timeSource: TimeSource) {
+  fun import(supplier: Supplier) {
     val start = System.currentTimeMillis()
 
     logger.info("Importing prices for $supplier")

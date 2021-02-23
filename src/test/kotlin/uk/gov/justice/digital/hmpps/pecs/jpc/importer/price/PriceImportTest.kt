@@ -32,9 +32,9 @@ internal class PriceImportTest {
 
   private val geoameyPricesProvider: GeoameyPricesProvider = mock()
 
-  private val import: PriceImporter = PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
-
   private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 8, 30, 12, 0) }
+
+  private val import: PriceImporter = PriceImporter(timeSource, priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
 
   @Test
   internal fun `verify import interactions for serco`() {
@@ -43,7 +43,7 @@ internal class PriceImportTest {
     val toLocation = Location(LocationType.CC, "ID2", "SERCO TO")
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
-    import.import(Supplier.SERCO, timeSource)
+    import.import(Supplier.SERCO)
 
     verify(locationRepo).findAll()
     verify(sercoPricesProvider).get()
@@ -59,7 +59,7 @@ internal class PriceImportTest {
     val toLocation = Location(LocationType.CC, "ID2", "GEO TO")
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
-    import.import(Supplier.GEOAMEY, timeSource)
+    import.import(Supplier.GEOAMEY)
 
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
@@ -70,7 +70,7 @@ internal class PriceImportTest {
 
   @Test
   internal fun `import fails with runtime exception for unsupported supplier`() {
-    assertThatThrownBy { import.import(Supplier.UNKNOWN, timeSource) }.isInstanceOf(RuntimeException::class.java)
+    assertThatThrownBy { import.import(Supplier.UNKNOWN) }.isInstanceOf(RuntimeException::class.java)
   }
 
   private fun priceSheetWithRow(journeyId: Double, fromSite: String, toSite: String, price: Double): InputStream {
