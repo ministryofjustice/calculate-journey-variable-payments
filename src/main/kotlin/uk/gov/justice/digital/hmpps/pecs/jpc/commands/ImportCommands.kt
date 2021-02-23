@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.commands
 
+import io.sentry.Sentry
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.shell.standard.ShellComponent
@@ -44,5 +45,10 @@ class ImportCommands(
     }
 
     logger.info("Finished import of reports from $from to $to.")
+  }
+
+  @ShellMethod("Simple command to test Sentry IO is enabled. Sends the supplied message to the JPC project issues if enabled.")
+  fun sentry(message: String) {
+    if (Sentry.isEnabled()) Sentry.captureMessage(message.take(255)) else throw RuntimeException("Sentry not enabled.")
   }
 }

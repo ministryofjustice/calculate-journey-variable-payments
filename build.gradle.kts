@@ -16,6 +16,7 @@ dependencies {
   implementation("com.github.kittinunf.result:result-coroutines:4.0.0")
   implementation("com.beust:klaxon:5.4")
   implementation("com.amazonaws:aws-java-sdk-s3:1.11.959")
+  implementation("io.sentry:sentry-spring-boot-starter:4.2.0")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.20.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.20.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.2")

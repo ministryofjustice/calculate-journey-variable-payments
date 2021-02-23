@@ -118,4 +118,10 @@ env:
   - name: CRON_IMPORT_REPORTS
     value: "{{ .Values.env.CRON_IMPORT_REPORTS }}"
 
+  - name: SENTRY_DSN
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.sentry.secret_name }}"
+        key: sentry_dsn
+
 {{- end -}}
