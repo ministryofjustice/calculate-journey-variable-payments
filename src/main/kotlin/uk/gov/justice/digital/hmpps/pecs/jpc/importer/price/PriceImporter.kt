@@ -5,13 +5,16 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.io.InputStream
 
 @Component
 class PriceImporter(
+  private val timeSource: TimeSource,
   private val priceRepo: PriceRepository,
   private val sercoPrices: SercoPricesProvider,
   private val geoameyPrices: GeoameyPricesProvider,
@@ -27,11 +30,11 @@ class PriceImporter(
 
     when (supplier) {
       Supplier.SERCO -> {
-        priceRepo.deleteBySupplier(Supplier.SERCO)
+        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.SERCO, effectiveYearForDate(timeSource.date()))
         sercoPrices.get().use { import(it, Supplier.SERCO) }
       }
       Supplier.GEOAMEY -> {
-        priceRepo.deleteBySupplier(Supplier.GEOAMEY)
+        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, effectiveYearForDate(timeSource.date()))
         geoameyPrices.get().use { import(it, Supplier.GEOAMEY) }
       }
       else -> throw RuntimeException("Supplier '$supplier' not supported.")

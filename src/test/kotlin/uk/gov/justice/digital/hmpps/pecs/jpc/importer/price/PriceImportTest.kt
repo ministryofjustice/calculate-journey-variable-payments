@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -19,6 +20,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.time.LocalDateTime
 
 internal class PriceImportTest {
 
@@ -30,7 +32,9 @@ internal class PriceImportTest {
 
   private val geoameyPricesProvider: GeoameyPricesProvider = mock()
 
-  private val import: PriceImporter = PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
+  private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 8, 30, 12, 0) }
+
+  private val import: PriceImporter = PriceImporter(timeSource, priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
 
   @Test
   internal fun `verify import interactions for serco`() {
@@ -43,7 +47,7 @@ internal class PriceImportTest {
 
     verify(locationRepo).findAll()
     verify(sercoPricesProvider).get()
-    verify(priceRepo).deleteBySupplier(Supplier.SERCO)
+    verify(priceRepo).deleteBySupplierAndEffectiveYear(Supplier.SERCO, 2019)
     verify(priceRepo, times(2)).count()
     verify(priceRepo).save(any())
   }
@@ -59,7 +63,7 @@ internal class PriceImportTest {
 
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
-    verify(priceRepo).deleteBySupplier(Supplier.GEOAMEY)
+    verify(priceRepo).deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2019)
     verify(priceRepo, times(2)).count()
     verify(priceRepo).save(any())
   }
