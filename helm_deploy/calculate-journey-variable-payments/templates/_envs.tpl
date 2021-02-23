@@ -124,4 +124,7 @@ env:
         name: "{{ .Values.sentry.secret_name }}"
         key: sentry_dsn
 
+  - name: SENTRY_ENVIRONMENT
+    value: "{{ .Values.env.SENTRY_ENVIRONMENT }}"
+
 {{- end -}}
