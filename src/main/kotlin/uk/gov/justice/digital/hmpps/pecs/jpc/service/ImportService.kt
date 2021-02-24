@@ -21,7 +21,8 @@ class ImportService(
   private val reportImporter: ReportImporter,
   private val movePersister: MovePersister,
   private val personPersister: PersonPersister,
-  private val auditService: AuditService
+  private val auditService: AuditService,
+  private val monitoringService: MonitoringService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -40,6 +41,7 @@ class ImportService(
       val moves = it.toList()
       movePersister.persist(moves).let { persisted ->
         auditService.create(AuditableEvent.importReportEvent("moves", date, moves.size, persisted))
+        captureMessageIf(moves.size > persisted, "moves: persisted $persisted out of ${moves.size} for reporting date $date.")
       }
     }
   }
@@ -51,6 +53,7 @@ class ImportService(
       val people = it.toList()
       personPersister.persistPeople(people).let { persisted ->
         auditService.create(AuditableEvent.importReportEvent("people", date, people.size, persisted))
+        captureMessageIf(people.size > persisted, "people: persisted $persisted out of ${people.size} for reporting date $date.")
       }
     }
 
@@ -60,8 +63,13 @@ class ImportService(
       val profiles = it.toList()
       personPersister.persistProfiles(profiles).let { persisted ->
         auditService.create(AuditableEvent.importReportEvent("profiles", date, profiles.size, persisted))
+        captureMessageIf(profiles.size > persisted, "profiles: persisted $persisted out of ${profiles.size} for reporting date $date.")
       }
     }
+  }
+
+  private fun captureMessageIf(isTrue: Boolean, message: String) {
+    if (isTrue) monitoringService.capture(message)
   }
 
   private fun <T> import(import: () -> T): T? {
