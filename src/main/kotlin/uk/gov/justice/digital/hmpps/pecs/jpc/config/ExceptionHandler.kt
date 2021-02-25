@@ -5,50 +5,33 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import javax.validation.ValidationException
 
 @RestControllerAdvice
-class ExceptionHandler {
+class ExceptionHandler(private val monitoringService: MonitoringService) {
   @ExceptionHandler(ValidationException::class)
   fun handleValidationException(e: Exception): ResponseEntity<ErrorResponse> {
     log.info("Validation exception: {}", e.message)
-    return ResponseEntity
-      .status(HttpStatus.BAD_REQUEST)
-      .body(
-        ErrorResponse(
-          status = HttpStatus.BAD_REQUEST,
-          userMessage = "Validation failure: ${e.message}",
-          developerMessage = e.message
-        )
-      )
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(status = HttpStatus.BAD_REQUEST))
   }
 
   @ExceptionHandler(IllegalArgumentException::class)
   fun handleIllegalArgumentException(e: Exception): ResponseEntity<ErrorResponse> {
     log.info("Illegal argument exception: {}", e.message)
-    return ResponseEntity
-      .status(HttpStatus.BAD_REQUEST)
-      .body(
-        ErrorResponse(
-          status = HttpStatus.BAD_REQUEST,
-          userMessage = "Illegal argument failure: ${e.message}",
-          developerMessage = e.message
-        )
-      )
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse(status = HttpStatus.BAD_REQUEST))
   }
 
   @ExceptionHandler(java.lang.Exception::class)
   fun handleException(e: java.lang.Exception): ResponseEntity<ErrorResponse?>? {
     log.error("Unexpected exception", e)
+
     return ResponseEntity
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .body(
-        ErrorResponse(
-          status = HttpStatus.INTERNAL_SERVER_ERROR,
-          userMessage = "Unexpected error: ${e.message}",
-          developerMessage = e.message
-        )
-      )
+      .body(ErrorResponse(status = HttpStatus.INTERNAL_SERVER_ERROR))
+      .also { monitoringService.capture("An unexpected error has occurred in the JPC application, see the logs for more details.") }
   }
 
   companion object {
@@ -58,16 +41,10 @@ class ExceptionHandler {
 
 data class ErrorResponse(
   val status: Int,
-  val errorCode: Int? = null,
-  val userMessage: String? = null,
-  val developerMessage: String? = null,
-  val moreInfo: String? = null
+  val userMessage: String,
 ) {
   constructor(
     status: HttpStatus,
-    errorCode: Int? = null,
-    userMessage: String? = null,
-    developerMessage: String? = null,
-    moreInfo: String? = null
-  ) : this(status.value(), errorCode, userMessage, developerMessage, moreInfo)
+    userMessage: String = "An unexpected error has occurred with the JPC application, please contact support.",
+  ) : this(status.value(), userMessage)
 }
