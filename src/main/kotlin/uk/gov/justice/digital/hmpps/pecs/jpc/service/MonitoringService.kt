@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service
 
 /**
  * Simple service for capturing free text messages in the underlying monitoring tool.
+ *
+ * Extra care must be taken when using this service not to include any PII data in any calls.
  */
 @Service
 class MonitoringService {
