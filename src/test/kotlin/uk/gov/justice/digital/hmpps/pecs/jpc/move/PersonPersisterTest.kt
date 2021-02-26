@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
-import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
@@ -44,8 +44,6 @@ internal class PersonPersisterTest(
 ) {
   private val personRepositorySpy: PersonRepository = mock { spy(personRepository) }
   private val profileRepositorySpy: ProfileRepository = mock { spy(profileRepository) }
-  private val personCaptor = argumentCaptor<Person>()
-  private val profileCaptor = argumentCaptor<Profile>()
 
   @Test
   fun `Persist PII data`() {
@@ -71,7 +69,7 @@ internal class PersonPersisterTest(
       profileRepositorySpy
     ).persistPeople(entities(1) { id -> reportPersonFactory().copy(personId = id) })
 
-    verify(personRepositorySpy, times(1)).saveAndFlush(personCaptor.capture())
+    verify(personRepositorySpy).saveAndFlush(any())
   }
 
   @Test
@@ -81,7 +79,7 @@ internal class PersonPersisterTest(
       profileRepositorySpy
     ).persistPeople(entities(50) { id -> reportPersonFactory().copy(personId = id) })
 
-    verify(personRepositorySpy, times(50)).saveAndFlush(personCaptor.capture())
+    verify(personRepositorySpy, times(50)).saveAndFlush(any())
   }
 
   @Test
@@ -91,7 +89,7 @@ internal class PersonPersisterTest(
       profileRepositorySpy
     ).persistPeople(entities(51) { id -> reportPersonFactory().copy(personId = id) })
 
-    verify(personRepositorySpy, times(51)).saveAndFlush(personCaptor.capture())
+    verify(personRepositorySpy, times(51)).saveAndFlush(any())
   }
 
   @Test
@@ -122,7 +120,7 @@ internal class PersonPersisterTest(
       )
     ).isEqualTo(4)
 
-    verify(personRepositorySpy, times(6)).saveAndFlush(personCaptor.capture())
+    verify(personRepositorySpy, times(6)).saveAndFlush(any())
   }
 
   @Test
@@ -132,7 +130,7 @@ internal class PersonPersisterTest(
       profileRepositorySpy
     ).persistProfiles(entities(1) { id -> profileFactory().copy(profileId = id, personId = id) })
 
-    verify(profileRepositorySpy, times(1)).saveAndFlush(profileCaptor.capture())
+    verify(profileRepositorySpy, times(1)).saveAndFlush(any())
   }
 
   @Test
@@ -142,7 +140,7 @@ internal class PersonPersisterTest(
       profileRepositorySpy
     ).persistProfiles(entities(50) { id -> profileFactory().copy(profileId = id, personId = id) })
 
-    verify(profileRepositorySpy, times(50)).saveAndFlush(profileCaptor.capture())
+    verify(profileRepositorySpy, times(50)).saveAndFlush(any())
   }
 
   @Test
@@ -152,7 +150,7 @@ internal class PersonPersisterTest(
       profileRepositorySpy
     ).persistProfiles(entities(51) { id -> profileFactory().copy(profileId = id, personId = id) })
 
-    verify(profileRepositorySpy, times(51)).saveAndFlush(profileCaptor.capture())
+    verify(profileRepositorySpy, times(51)).saveAndFlush(any())
   }
 
   @Test
@@ -183,7 +181,7 @@ internal class PersonPersisterTest(
       )
     ).isEqualTo(4)
 
-    verify(profileRepositorySpy, times(6)).saveAndFlush(profileCaptor.capture())
+    verify(profileRepositorySpy, times(6)).saveAndFlush(any())
   }
 
   fun <T> entities(numberOf: Int, f: (id: String) -> T): List<T> =
