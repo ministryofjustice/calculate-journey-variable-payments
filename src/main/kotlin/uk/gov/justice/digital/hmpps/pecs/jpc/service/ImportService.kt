@@ -14,7 +14,6 @@ import java.time.Duration
 import java.time.LocalDate
 
 @Service
-@Transactional
 class ImportService(
   private val timeSource: TimeSource,
   private val priceImporter: PriceImporter,
@@ -27,8 +26,10 @@ class ImportService(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @Transactional
   fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier) }
 
+  // The transaction boundary for this method is being set in the underlying persistence classes on purpose.
   fun importReportsOn(date: LocalDate) {
     importMovesJourneysEventsOn(date)
     importPeopleProfilesOn(date)

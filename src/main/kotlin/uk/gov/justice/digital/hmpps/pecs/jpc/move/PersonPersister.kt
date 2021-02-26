@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Profile
 
@@ -17,30 +18,26 @@ class PersonPersister(
    * Returns the total number of successfully persisted people.
    */
   fun persistPeople(people: List<Person>): Int {
+    var saveCounter = 0
+    var errorCounter = 0
+
+    @Transactional
+    fun persistPerson(person: Person) = personRepository.saveAndFlush(person)
+
     logger.info("Persisting ${people.size} people")
-    var counter = 0
-    val peopleToSave = mutableListOf<Person>()
     people.forEach { person ->
-      peopleToSave += person
-      if (++counter % 50 == 0) {
-        savePeople(peopleToSave) { logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).") }
+      Result.runCatching { persistPerson(person) }.onSuccess {
+        saveCounter++
+        if (saveCounter % 50 == 0) logger.info("Persisted $saveCounter people out of ${people.size}.")
+      }.onFailure {
+        errorCounter++
+        logger.warn("Error persisting person ${person.personId} - ${it.message}")
       }
     }
 
-    if (peopleToSave.isNotEmpty()) savePeople(peopleToSave) { logger.info("Persisted $counter people out of ${people.size} (flushing people to the database).") }
+    logger.info("Persisted $saveCounter people out of ${people.size}, $errorCounter errors occurred.")
 
-    return counter
-  }
-
-  private fun savePeople(people: MutableList<Person>, success: () -> Unit) {
-    Result.runCatching {
-      saveFlushAndClear(personRepository, people)
-    }
-      .onSuccess { success() }
-      .onFailure {
-        logger.warn("Error inserting people batch ${people.map { p -> p.personId }} - ${it.stackTraceToString()}")
-        people.clear()
-      }
+    return saveCounter
   }
 
   /**
@@ -48,29 +45,22 @@ class PersonPersister(
    */
   fun persistProfiles(profiles: List<Profile>): Int {
     logger.info("Persisting ${profiles.size} profiles")
-    var counter = 0
-    val profilesToSave = mutableListOf<Profile>()
+    var saveCounter = 0
+    var errorCounter = 0
     profiles.forEach { profile ->
-      profilesToSave += profile
-
-      if (++counter % 50 == 0) {
-        saveProfiles(profilesToSave) { logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).") }
+      Result.runCatching {
+        profileRepository.saveAndFlush(profile)
+      }.onSuccess {
+        saveCounter++
+        if (saveCounter % 50 == 0) logger.info("Persisted $saveCounter profiles out of ${profiles.size}.")
+      }.onFailure {
+        errorCounter++
+        logger.warn("Error persisting profile ${profile.profileId} - ${it.message}")
       }
     }
 
-    if (profilesToSave.isNotEmpty()) saveProfiles(profilesToSave) { logger.info("Persisted $counter profiles out of ${profiles.size} (flushing profiles to the database).") }
+    logger.info("Persisted $saveCounter profiles out of ${profiles.size}, $errorCounter errors occurred.")
 
-    return counter
-  }
-
-  private fun saveProfiles(profiles: MutableList<Profile>, success: () -> Unit) {
-    Result.runCatching {
-      saveFlushAndClear(profileRepository, profiles)
-    }
-      .onSuccess { success() }
-      .onFailure {
-        logger.warn("Error inserting profiles batch ${profiles.map { p -> p.profileId }} - ${it.message}")
-        profiles.clear()
-      }
+    return saveCounter
   }
 }
