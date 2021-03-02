@@ -4,8 +4,9 @@ version: '3.1'
 
 services:
 
+# Pinning to specific DB version to be inline with RDS instances.
   db:
-    image: postgres:latest
+    image: postgres:10.16
     container_name: jpc-database
     depends_on:
       - localstack
