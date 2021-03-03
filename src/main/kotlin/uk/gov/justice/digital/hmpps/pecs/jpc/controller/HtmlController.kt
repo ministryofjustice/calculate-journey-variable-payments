@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
@@ -35,9 +34,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import javax.validation.Valid
-
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-class MoveNotFoundException(msg: String) : RuntimeException(msg)
 
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
 

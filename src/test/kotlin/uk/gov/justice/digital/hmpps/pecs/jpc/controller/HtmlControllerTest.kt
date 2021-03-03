@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,6 +21,7 @@ import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import java.util.Optional
 
@@ -33,6 +36,9 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   @MockBean
   lateinit var moveService: MoveService
+
+  @MockBean
+  lateinit var monitoringService: MonitoringService
 
   @BeforeEach
   fun beforeEach() {
@@ -121,5 +127,20 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)
+    verifyZeroInteractions(monitoringService)
+  }
+
+  @Test
+  internal fun `standard error page is shown when an unexpected exception occurs`() {
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenThrow(RuntimeException("Something has gone wrong"))
+
+    mockMvc.post("/find-move") {
+      session = mockSession
+      param("reference", "REF1")
+    }
+      .andExpect { view { name("error") } }
+      .andExpect { status { is2xxSuccessful() } }
+
+    verify(monitoringService).capture(any())
   }
 }
