@@ -49,7 +49,7 @@ internal class ImportServiceTest {
   internal fun `price importer interactions for Serco`() {
     importService.importPrices(Supplier.SERCO)
 
-    verify(priceImporter).import(Supplier.SERCO)
+    verify(priceImporter).import(Supplier.SERCO, 2020)
     verifyZeroInteractions(monitoringService)
   }
 
@@ -57,7 +57,7 @@ internal class ImportServiceTest {
   internal fun `price importer interactions for GEOAmey`() {
     importService.importPrices(Supplier.GEOAMEY)
 
-    verify(priceImporter).import(Supplier.GEOAMEY)
+    verify(priceImporter).import(Supplier.GEOAMEY, 2020)
     verifyZeroInteractions(monitoringService)
   }
 

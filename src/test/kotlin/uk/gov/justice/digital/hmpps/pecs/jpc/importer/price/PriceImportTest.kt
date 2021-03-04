@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -20,7 +19,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.time.LocalDateTime
 
 internal class PriceImportTest {
 
@@ -32,9 +30,7 @@ internal class PriceImportTest {
 
   private val geoameyPricesProvider: GeoameyPricesProvider = mock()
 
-  private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 8, 30, 12, 0) }
-
-  private val import: PriceImporter = PriceImporter(timeSource, priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
+  private val import: PriceImporter = PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo)
 
   @Test
   internal fun `verify import interactions for serco`() {
@@ -43,7 +39,7 @@ internal class PriceImportTest {
     val toLocation = Location(LocationType.CC, "ID2", "SERCO TO")
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
-    import.import(Supplier.SERCO)
+    import.import(Supplier.SERCO, 2019)
 
     verify(locationRepo).findAll()
     verify(sercoPricesProvider).get()
@@ -59,7 +55,7 @@ internal class PriceImportTest {
     val toLocation = Location(LocationType.CC, "ID2", "GEO TO")
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
-    import.import(Supplier.GEOAMEY)
+    import.import(Supplier.GEOAMEY, 2019)
 
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
@@ -70,7 +66,7 @@ internal class PriceImportTest {
 
   @Test
   internal fun `import fails with runtime exception for unsupported supplier`() {
-    assertThatThrownBy { import.import(Supplier.UNKNOWN) }.isInstanceOf(RuntimeException::class.java)
+    assertThatThrownBy { import.import(Supplier.UNKNOWN, 2020) }.isInstanceOf(RuntimeException::class.java)
   }
 
   private fun priceSheetWithRow(journeyId: Double, fromSite: String, toSite: String, price: Double): InputStream {
