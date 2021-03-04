@@ -5,16 +5,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.io.InputStream
 
 @Component
 class PriceImporter(
-  private val timeSource: TimeSource,
   private val priceRepo: PriceRepository,
   private val sercoPrices: SercoPricesProvider,
   private val geoameyPrices: GeoameyPricesProvider,
@@ -23,19 +20,17 @@ class PriceImporter(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun import(supplier: Supplier) {
+  fun import(supplier: Supplier, effectiveYear: Int) {
     val start = System.currentTimeMillis()
-
-    logger.info("Importing prices for $supplier")
 
     when (supplier) {
       Supplier.SERCO -> {
-        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.SERCO, effectiveYearForDate(timeSource.date()))
-        sercoPrices.get().use { import(it, Supplier.SERCO) }
+        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.SERCO, effectiveYear)
+        sercoPrices.get().use { import(it, Supplier.SERCO, effectiveYear) }
       }
       Supplier.GEOAMEY -> {
-        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, effectiveYearForDate(timeSource.date()))
-        geoameyPrices.get().use { import(it, Supplier.GEOAMEY) }
+        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, effectiveYear)
+        geoameyPrices.get().use { import(it, Supplier.GEOAMEY, effectiveYear) }
       }
       else -> throw RuntimeException("Supplier '$supplier' not supported.")
     }
@@ -43,8 +38,11 @@ class PriceImporter(
     logger.info("Supplier $supplier prices import finished in '${(System.currentTimeMillis() - start) / 1000}' seconds.")
   }
 
-  private fun import(prices: InputStream, supplier: Supplier) =
-    PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository.findAll().toList(), priceRepo).use { import(it) }
+  private fun import(prices: InputStream, supplier: Supplier, effectiveYear: Int) {
+    logger.info("Importing prices for $supplier and effective year $effectiveYear")
+
+    PricesSpreadsheet(XSSFWorkbook(prices), supplier, locationRepository.findAll().toList(), priceRepo, effectiveYear).use { import(it) }
+  }
 
   private fun import(spreadsheet: PricesSpreadsheet) {
     val count = priceRepo.count()

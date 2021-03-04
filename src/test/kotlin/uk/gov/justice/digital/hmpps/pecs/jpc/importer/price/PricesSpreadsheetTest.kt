@@ -27,7 +27,7 @@ internal class PricesSpreadsheetTest {
   @Nested
   inner class RecordingErrors {
 
-    private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, emptyList(), priceRepository)
+    private val spreadsheet: PricesSpreadsheet = PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, emptyList(), priceRepository, 2020)
 
     private val row: Row = sheet.createRow(0)
 
@@ -54,7 +54,7 @@ internal class PricesSpreadsheetTest {
     private val toLocation: Location = Location(LocationType.CC, "to agency id", "to site")
 
     private val spreadsheet: PricesSpreadsheet =
-      PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation), priceRepository)
+      PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation), priceRepository, 2020)
 
     private val row: Row = sheet.createRow(1).apply {
       this.createCell(0).setCellValue(1.0)
@@ -128,7 +128,7 @@ internal class PricesSpreadsheetTest {
 
     @Test
     internal fun `throws error if duplicate price`() {
-      whenever(priceRepository.findBySupplierAndFromLocationAndToLocation(Supplier.GEOAMEY, fromLocation, toLocation)).thenReturn(price)
+      whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.GEOAMEY, fromLocation, toLocation, 2020)).thenReturn(price)
 
       assertThatThrownBy { spreadsheet.mapToPrice(row) }
         .isInstanceOf(RuntimeException::class.java)

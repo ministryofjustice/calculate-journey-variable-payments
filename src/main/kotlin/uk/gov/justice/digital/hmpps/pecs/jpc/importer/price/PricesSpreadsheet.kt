@@ -22,7 +22,8 @@ class PricesSpreadsheet(
   private val spreadsheet: Workbook,
   val supplier: Supplier,
   supplierLocations: List<Location>,
-  private val pricesRepository: PriceRepository
+  private val pricesRepository: PriceRepository,
+  private val effectiveYear: Int
 ) : InboundSpreadsheet(spreadsheet) {
 
   val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
@@ -58,18 +59,21 @@ class PricesSpreadsheet(
     val toLocation = locations[toLocationName]
       ?: throw RuntimeException("To location '$toLocationName' for supplier '$supplier' not found")
 
-    // Note: we do not need to worry about the effective year as we always start on a clean slate on import.
-    pricesRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)?.let {
-      throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
-    }
+    failIfPriceAlreadyExists(supplier, fromLocation, toLocation)
 
     return Price(
       supplier = supplier,
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = price,
-      effectiveYear = 2020 // TODO remove this once we're not importing from spreadsheet anymore
+      effectiveYear = effectiveYear
     )
+  }
+
+  private fun failIfPriceAlreadyExists(supplier: Supplier, fromLocation: Location, toLocation: Location) {
+    pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(supplier, fromLocation, toLocation, effectiveYear)?.let {
+      throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
+    }
   }
 
   fun addError(row: Row, error: Throwable) = errors.add(

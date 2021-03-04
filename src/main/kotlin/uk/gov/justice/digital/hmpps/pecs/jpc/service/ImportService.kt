@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.Duration
 import java.time.LocalDate
 
@@ -27,7 +28,7 @@ class ImportService(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   @Transactional
-  fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier) }
+  fun importPrices(supplier: Supplier) = import { priceImporter.import(supplier, effectiveYearForDate(timeSource.date())) }
 
   // The transaction boundary for this method is being set in the underlying persistence classes on purpose.
   fun importReportsOn(date: LocalDate) {
