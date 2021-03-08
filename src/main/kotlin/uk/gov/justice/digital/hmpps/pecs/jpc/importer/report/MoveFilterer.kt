@@ -103,7 +103,7 @@ object MoveFilterer {
       ) &&
       when (val moveStartDate = move.events.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
         null -> {
-          logger.warn("No move start date event found for move $move")
+          logger.warn("No move start date event found for move reference '${move.reference}'")
           false
         }
         else -> {

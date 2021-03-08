@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -48,8 +49,12 @@ data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, v
 )
 class HtmlController(@Autowired val moveService: MoveService, @Autowired val journeyService: JourneyService) {
 
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   @RequestMapping("/")
   fun homepage(model: ModelMap): RedirectView {
+    logger.info("redirecting to dashboard")
+
     return RedirectView(DASHBOARD_URL)
   }
 
@@ -60,23 +65,29 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
 
   @RequestMapping("/choose-supplier/serco")
   fun chooseSupplierSerco(model: ModelMap): RedirectView {
+    logger.info("chosen supplier Serco")
+
     model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.SERCO)
     return RedirectView(DASHBOARD_URL)
   }
 
   @RequestMapping("/choose-supplier/geoamey")
   fun chooseSupplierGeoAmey(model: ModelMap): RedirectView {
+    logger.info("chosen supplier GEOAmey")
+
     model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.GEOAMEY)
     return RedirectView(DASHBOARD_URL)
   }
 
   @RequestMapping("$MOVES_BY_TYPE_URL/{moveTypeString}")
-  fun movesById(
+  fun movesByType(
     @PathVariable moveTypeString: String,
     @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap
   ): String {
+    logger.info("moves by type $moveTypeString")
+
     val moveType = MoveType.valueOfCaseInsensitive(moveTypeString)
     val moves = moveService.movesForMoveType(supplier, moveType, startOfMonth)
     val moveTypeSummary = moveService.summaryForMoveType(supplier, moveType, startOfMonth)
@@ -101,6 +112,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap
   ): ModelAndView {
+    logger.info("$supplier move $moveId")
+
     val maybeMove = moveService.moveWithPersonJourneysAndEvents(moveId, supplier)
 
     return maybeMove?.let {
@@ -117,6 +130,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     @ModelAttribute(name = "flashAttrMappedAgencyId") agencyId: String?,
     model: ModelMap,
   ): String {
+    logger.info("journeys for review for $supplier")
 
     removeAttributesIf(locationName.isNullOrEmpty(), model, "flashAttrMappedLocationName", "flashAttrMappedAgencyId")
 
@@ -139,11 +153,12 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap
   ): Any {
-    requestParamStartOfMonth?.let {
-      model.addAttribute(DATE_ATTRIBUTE, requestParamStartOfMonth)
-    }
-    val startOfMonth = model.getAttribute(DATE_ATTRIBUTE) as LocalDate
-    val endOfMonth = endOfMonth(startOfMonth)
+    logger.info("dashboard for $supplier")
+
+    requestParamStartOfMonth?.let { model.addAttribute(DATE_ATTRIBUTE, requestParamStartOfMonth) }
+
+    val startOfMonth = model.getStartOfMonth()
+    val endOfMonth = model.getEndOfMonth()
     model.addAttribute(START_OF_MONTH_DATE_ATTRIBUTE, startOfMonth)
     model.addAttribute(END_OF_MONTH_DATE_ATTRIBUTE, endOfMonth)
 
@@ -166,6 +181,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
 
   @GetMapping(SELECT_MONTH_URL)
   fun selectMonth(@ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): Any {
+    logger.info("select month for $supplier")
+
     model.addAttribute("form", JumpToMonthForm(date = ""))
     return "select-month"
   }
@@ -177,6 +194,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     if (result.hasErrors()) {
       return "select-month"
     }
+
+    logger.info("selected month ${MonthYearParser.atStartOf(form.date)}")
 
     model.addAttribute(DATE_ATTRIBUTE, MonthYearParser.atStartOf(form.date))
 
@@ -199,6 +218,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     model: ModelMap,
     redirectAttributes: RedirectAttributes
   ): String {
+    logger.info("finding move")
 
     val moveRef = form.reference.toUpperCase().trim()
     if (!moveRef.matches("[A-Za-z0-9]+".toRegex())) return "redirect:$FIND_MOVE_URL/?no-results-for=invalid-reference"
@@ -211,8 +231,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
 
   @GetMapping(SEARCH_JOURNEYS_URL)
   fun searchJourneys(model: ModelMap): Any {
-    val startOfMonth = model.getAttribute(DATE_ATTRIBUTE) as LocalDate
-    val effectiveYear = effectiveYearForDate(startOfMonth)
+    val effectiveYear = model.getEffectiveYear()
 
     model.addAttribute("form", SearchJourneyForm())
     model.addAttribute("contractualYearStart", "$effectiveYear")
@@ -232,19 +251,15 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     redirectAttributes: RedirectAttributes,
   ): String {
 
-    if (result.hasErrors()) {
-      return "search-journeys"
-    }
-    val from = form.from?.trim() ?: ""
-    val to = form.to?.trim() ?: ""
+    if (result.hasErrors()) return "search-journeys"
+
+    val from = form.from?.trim().orEmpty()
+    val to = form.to?.trim().orEmpty()
 
     val url = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
-    if (from != "") {
-      url.queryParam(PICK_UP_ATTRIBUTE, from)
-    }
-    if (to != "") {
-      url.queryParam(DROP_OFF_ATTRIBUTE, to)
-    }
+
+    if (from.isNotEmpty()) url.queryParam(PICK_UP_ATTRIBUTE, from)
+    if (to.isNotEmpty()) url.queryParam(DROP_OFF_ATTRIBUTE, to)
 
     model.addAttribute(PICK_UP_ATTRIBUTE, from)
     model.addAttribute(DROP_OFF_ATTRIBUTE, to)
@@ -259,26 +274,32 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap
   ): Any {
-    if ((pickUpLocation == null || pickUpLocation == "") && (dropOffLocation == null || dropOffLocation == "")) {
+    if (pickUpLocation.isNullOrEmpty() && dropOffLocation.isNullOrEmpty()) {
       return RedirectView(SEARCH_JOURNEYS_URL)
     }
 
-    val startOfMonth = model.getAttribute(DATE_ATTRIBUTE) as LocalDate
-    val effectiveYear = effectiveYearForDate(startOfMonth)
+    val effectiveYear = model.getEffectiveYear()
     val journeys = journeyService.prices(supplier, pickUpLocation, dropOffLocation, effectiveYear)
 
     model.addAttribute("contractualYearStart", "$effectiveYear")
     model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
 
-    if (journeys.isEmpty()) {
+    return if (journeys.isEmpty()) {
       model.addAttribute("pickUpLocation", pickUpLocation ?: "")
       model.addAttribute("dropOffLocation", dropOffLocation ?: "")
-      return "no-search-journeys-results"
+      "no-search-journeys-results"
     } else {
       model.addAttribute("journeys", journeys)
-      return "search-journeys-results"
+      "search-journeys-results"
     }
   }
+
+  private fun ModelMap.getStartOfMonth() =
+    this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate } ?: throw RuntimeException("date attribute not present in model")
+
+  private fun ModelMap.getEndOfMonth() = endOfMonth(getStartOfMonth())
+
+  private fun ModelMap.getEffectiveYear() = effectiveYearForDate(getStartOfMonth())
 
   companion object {
     const val PICK_UP_ATTRIBUTE = "pick-up"

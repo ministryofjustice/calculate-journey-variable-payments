@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -29,6 +30,8 @@ import javax.validation.constraints.NotNull
 )
 class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
 
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   data class PriceForm(
     @get: NotNull(message = "Invalid message id")
     val moveId: String,
@@ -44,6 +47,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     model: ModelMap,
     @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): Any {
+    logger.info("getting add price for move $moveId")
+
     val effectiveYear = model.getEffectiveYear()
     val (fromSite, toSite) = agencyIds(moveId).let { (from, to) ->
       supplierPricingService.getSiteNamesForPricing(
@@ -71,6 +76,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes,
   ): Any {
+    logger.info("adding price for move $supplier")
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
@@ -108,6 +114,8 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     model: ModelMap,
     @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): String {
+    logger.info("getting update price for move $moveId")
+
     val effectiveYear = model.getEffectiveYear()
     val (fromSite, toSite, price) = agencyIds(moveId).let { (from, to) ->
       supplierPricingService.getExistingSiteNamesAndPrice(
@@ -137,6 +145,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes,
   ): Any {
+    logger.info("updating price for move $supplier")
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 

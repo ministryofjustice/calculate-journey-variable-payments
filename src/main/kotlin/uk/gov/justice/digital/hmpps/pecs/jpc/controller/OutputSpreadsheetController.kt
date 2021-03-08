@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.InputStreamResource
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpHeaders
@@ -26,6 +27,9 @@ class OutputSpreadsheetController(
   private val spreadsheetService: SpreadsheetService,
   private val timeSource: TimeSource
 ) {
+
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   @GetMapping("/generate-prices-spreadsheet/{supplier}")
   @Throws(IOException::class)
   fun generateSpreadsheet(
@@ -37,6 +41,8 @@ class OutputSpreadsheetController(
     response: HttpServletResponse?,
     authentication: Authentication?
   ): ResponseEntity<InputStreamResource?>? {
+    logger.info("getting spreadsheet for $supplier")
+
     return spreadsheetService.spreadsheet(authentication!!, Supplier.valueOfCaseInsensitive(supplier), movesFrom)?.let { file ->
       val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))
       val filename = "Journey_Variable_Payment_Output_${Supplier.valueOfCaseInsensitive(supplier)}_$uploadDateTime.xlsx"
