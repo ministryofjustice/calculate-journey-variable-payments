@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -22,8 +23,12 @@ import javax.validation.constraints.NotEmpty
 @SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
 
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   @GetMapping("/map-location/{agency-id}")
   fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
+    logger.info("getting map friendly location for $agencyId")
+
     val from = model.getAttribute(PICK_UP_ATTRIBUTE)
     val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
     val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
@@ -46,6 +51,8 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
 
   @PostMapping("/map-location")
   fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
+    logger.info("mapping friendly location for agency id ${form.agencyId}")
+
     val from = model.getAttribute(PICK_UP_ATTRIBUTE)
     val to = model.getAttribute(DROP_OFF_ATTRIBUTE)
     val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
