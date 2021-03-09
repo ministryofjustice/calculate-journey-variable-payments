@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
@@ -22,6 +23,7 @@ class PricesSpreadsheetGenerator(
   @Autowired private val timeSource: TimeSource,
   @Autowired private val moveService: MoveService,
   @Autowired private val journeyService: JourneyService,
+  @Autowired private val locationRepository: LocationRepository,
   @Autowired private val supplierPrices: SupplierPrices
 ) {
 
@@ -36,6 +38,7 @@ class PricesSpreadsheetGenerator(
       val moves = moveService.moves(supplier, startDate)
       val journeys = journeyService.distinctJourneysIncludingPriced(supplier, startDate)
       val summaries = moveService.moveTypeSummaries(supplier, startDate)
+      val locations = locationRepository.findAll()
 
       StandardMovesSheet(workbook, header).also { logger.info("Adding standard prices.") }
         .apply { writeMoves(moves[0]) }
@@ -64,6 +67,8 @@ class PricesSpreadsheetGenerator(
       ).also {
         logger.info("Adding $supplier prices for effective year ${effectiveYearForDate(startDate)}.")
       }.apply { writePrices(supplierPrices.get(supplier, effectiveYearForDate(startDate))) }
+
+      LocationsSheet(workbook, header).also { logger.info("Adding locations.") }.apply { writeLocations(locations) }
 
       return File.createTempFile("tmp", "xlsx").apply {
         FileOutputStream(this).use {
