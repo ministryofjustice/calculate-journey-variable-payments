@@ -55,6 +55,7 @@ internal class JourneyQueryRepositoryTest {
   fun beforeEach() {
     locationRepository.save(wyi)
     locationRepository.save(gni)
+
     priceRepository.save(
       Price(
         id = UUID.randomUUID(),
@@ -62,6 +63,17 @@ internal class JourneyQueryRepositoryTest {
         toLocation = gni,
         priceInPence = 999,
         supplier = Supplier.SERCO,
+        effectiveYear = 2020
+      )
+    )
+
+    priceRepository.save(
+      Price(
+        id = UUID.randomUUID(),
+        fromLocation = wyi,
+        toLocation = gni,
+        priceInPence = 666,
+        supplier = Supplier.GEOAMEY,
         effectiveYear = 2020
       )
     )
