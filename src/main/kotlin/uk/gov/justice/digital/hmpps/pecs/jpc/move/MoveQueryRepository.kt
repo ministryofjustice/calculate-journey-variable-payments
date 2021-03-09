@@ -59,14 +59,15 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       " left join JOURNEYS j on j.move_id = sm.move_id " +
       " left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
       " left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
-      " left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year " +
-      " where sm.move_type is not null and sm.supplier = ? and sm.drop_off_or_cancelled >= ? and sm.drop_off_or_cancelled < ? " +
+      " left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?" +
+      " where sm.move_type is not null and sm.supplier = ? and sm.drop_off_or_cancelled >= ? and sm.drop_off_or_cancelled < ?" +
       " group by sm.move_id) as s on m.move_id = s.move_id " +
       "GROUP BY m.move_type"
 
     return jdbcTemplate.query(
       movesSummarySQL,
       movesSummaryRowMapper,
+      supplier.name,
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
       Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
@@ -98,7 +99,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             left join JOURNEYS j on j.move_id = m.move_id  
             left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id  
             left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id  
-            left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year 
+            left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
     """.trimIndent()
 
   val moveJourneyRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
@@ -179,6 +180,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     val movePersonJourney = jdbcTemplate.query(
       "$moveJourneySelectSQL where m.move_id = ? and m.supplier = ? and m.move_type is not null",
       moveJourneyRowMapper,
+      supplier.name,
       moveId,
       supplier.name
     ).groupBy { it.move.moveId }
@@ -200,6 +202,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         "where m.supplier = ? and m.move_type = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
         "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
       moveJourneyRowMapper,
+      supplier.name,
       supplier.name,
       moveType.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
