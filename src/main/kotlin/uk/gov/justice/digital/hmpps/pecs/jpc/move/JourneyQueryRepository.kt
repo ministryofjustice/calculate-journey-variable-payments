@@ -99,7 +99,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                      inner join JOURNEYS j on j.move_id = m.move_id
                      left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
-                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
+                     left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
                      where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ? 
                         and m.drop_off_or_cancelled < ?
             GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, p.price_in_pence
@@ -110,6 +110,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     return jdbcTemplate.query(
       uniqueJourneysSQL,
       journeyWithPricesRowMapper,
+      supplier.name,
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
       Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
@@ -145,7 +146,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
              inner join JOURNEYS j on j.move_id = m.move_id  
              left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id 
              left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id 
-             left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year
+             left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
              where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ?  
              and m.drop_off_or_cancelled < ?
              GROUP BY journey) as js
@@ -154,6 +155,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     return jdbcTemplate.query(
       journeysSummarySQL,
       journeysSummaryRowMapper,
+      supplier.name,
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
       Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
