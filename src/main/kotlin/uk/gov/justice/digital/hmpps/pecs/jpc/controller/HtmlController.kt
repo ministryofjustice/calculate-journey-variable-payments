@@ -231,6 +231,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
 
   @GetMapping(SEARCH_JOURNEYS_URL)
   fun searchJourneys(model: ModelMap): Any {
+    logger.info("getting search journey")
+
     val effectiveYear = model.getEffectiveYear()
 
     model.addAttribute("form", SearchJourneyForm())
@@ -250,6 +252,7 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     model: ModelMap,
     redirectAttributes: RedirectAttributes,
   ): String {
+    logger.info("performing search journeys for $supplier")
 
     if (result.hasErrors()) return "search-journeys"
 
@@ -274,6 +277,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap
   ): Any {
+    logger.info("getting search journey results for $supplier")
+
     if (pickUpLocation.isNullOrEmpty() && dropOffLocation.isNullOrEmpty()) {
       return RedirectView(SEARCH_JOURNEYS_URL)
     }
