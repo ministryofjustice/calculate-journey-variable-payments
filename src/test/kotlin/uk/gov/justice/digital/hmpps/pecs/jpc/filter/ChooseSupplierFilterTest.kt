@@ -6,8 +6,6 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import java.time.LocalDateTime
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -23,9 +21,7 @@ internal class ChooseSupplierFilterTest {
 
   private val filterChain: FilterChain = mock()
 
-  private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 11, 18, 0, 0) }
-
-  private val filter: ChooseSupplierFilter = ChooseSupplierFilter(timeSource)
+  private val filter: ChooseSupplierFilter = ChooseSupplierFilter()
 
   @Test
   internal fun `filter redirects to choose supplier when no supplier selected`() {
@@ -35,7 +31,7 @@ internal class ChooseSupplierFilterTest {
     filter.doFilter(request, response, filterChain)
 
     verify(session).getAttribute("supplier")
-    verify(session).setAttribute("date", timeSource.date().withDayOfMonth(1))
+    verify(session, never()).setAttribute(any(), any())
     verify(response).sendRedirect("/choose-supplier")
   }
 

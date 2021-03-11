@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DATE_ATTRIBUTE
@@ -47,7 +48,11 @@ data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, v
   PICK_UP_ATTRIBUTE,
   DROP_OFF_ATTRIBUTE
 )
-class HtmlController(@Autowired val moveService: MoveService, @Autowired val journeyService: JourneyService) {
+class HtmlController(
+  @Autowired val moveService: MoveService,
+  @Autowired val journeyService: JourneyService,
+  @Autowired val timeSource: TimeSource
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -68,6 +73,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     logger.info("chosen supplier Serco")
 
     model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.SERCO)
+    model.addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
+
     return RedirectView(DASHBOARD_URL)
   }
 
@@ -76,8 +83,12 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     logger.info("chosen supplier GEOAmey")
 
     model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.GEOAMEY)
+    model.addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
+
     return RedirectView(DASHBOARD_URL)
   }
+
+  private fun TimeSource.startOfMonth() = this.date().withDayOfMonth(1)
 
   @RequestMapping("$MOVES_BY_TYPE_URL/{moveTypeString}")
   fun movesByType(
@@ -300,7 +311,8 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
   }
 
   private fun ModelMap.getStartOfMonth() =
-    this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate } ?: throw RuntimeException("date attribute not present in model")
+    this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate }
+      ?: throw RuntimeException("date attribute not present in model")
 
   private fun ModelMap.getEndOfMonth() = endOfMonth(getStartOfMonth())
 
@@ -323,5 +335,6 @@ class HtmlController(@Autowired val moveService: MoveService, @Autowired val jou
     const val SEARCH_JOURNEYS_URL = "/search-journeys"
     const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
     const val FIND_MOVE_URL = "/find-move"
+    const val CHOOSE_SUPPLIER_URL = "/choose-supplier"
   }
 }
