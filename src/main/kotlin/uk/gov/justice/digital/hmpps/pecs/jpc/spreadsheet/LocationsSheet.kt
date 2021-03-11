@@ -8,7 +8,7 @@ class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.g
   override fun writeMove(move: Move) {}
 
   fun writeLocations(locations: List<Location>) {
-    locations.forEach {
+    locations.sortedBy { it.siteName }.forEach {
       val row = createRow()
       row.addCell(0, it.nomisAgencyId)
       row.addCell(1, it.siteName)

@@ -18,11 +18,9 @@ internal class LocationsSheetTest(@Autowired private val template: JPCTemplatePr
   private val workbook: Workbook = XSSFWorkbook(template.get())
 
   @Test
-  internal fun `summary prices`() {
-
-    val location1 = Location(LocationType.PR, "LOCATION1", "Location 1")
-    val location2 = Location(LocationType.AP, "LOCATION2", "Location 2")
-    val locations = listOf(location1, location2)
+  internal fun `locations details`() {
+    val location1 = Location(LocationType.PR, "LOCATION1", "B Location 1")
+    val location2 = Location(LocationType.AP, "LOCATION2", "A Location 2")
 
     val sheet = LocationsSheet(
       workbook,
@@ -32,14 +30,14 @@ internal class LocationsSheetTest(@Autowired private val template: JPCTemplatePr
         Supplier.SERCO
       )
     )
-    sheet.writeLocations(locations)
+    sheet.writeLocations(listOf(location1, location2))
 
-    assertCellEquals(sheet, 9, 0, "LOCATION1")
-    assertCellEquals(sheet, 9, 1, "Location 1")
-    assertCellEquals(sheet, 9, 2, "PR")
+    assertCellEquals(sheet, 9, 0, "LOCATION2")
+    assertCellEquals(sheet, 9, 1, "A Location 2")
+    assertCellEquals(sheet, 9, 2, "AP")
 
-    assertCellEquals(sheet, 10, 0, "LOCATION2")
-    assertCellEquals(sheet, 10, 1, "Location 2")
-    assertCellEquals(sheet, 10, 2, "AP")
+    assertCellEquals(sheet, 10, 0, "LOCATION1")
+    assertCellEquals(sheet, 10, 1, "B Location 1")
+    assertCellEquals(sheet, 10, 2, "PR")
   }
 }
