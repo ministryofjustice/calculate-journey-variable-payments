@@ -14,12 +14,13 @@ allOpen {
 dependencies {
   implementation("com.github.kittinunf.result:result:4.0.0")
   implementation("com.github.kittinunf.result:result-coroutines:4.0.0")
-  implementation("com.beust:klaxon:5.4")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.11.959")
-  implementation("io.sentry:sentry-spring-boot-starter:4.2.0")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.20.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.20.0")
+  implementation("com.beust:klaxon:5.5")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.11.973")
+  implementation("io.sentry:sentry-spring-boot-starter:4.3.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.21.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.21.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.2")
+  implementation("org.apache.xmlgraphics:batik-all:1.14")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -30,7 +31,7 @@ dependencies {
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
 
-  testImplementation("org.mockito:mockito-inline:3.7.7")
+  testImplementation("org.mockito:mockito-inline:3.8.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
 
