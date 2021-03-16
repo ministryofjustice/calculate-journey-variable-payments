@@ -1,13 +1,13 @@
 {
   "data": [
     {
-      "id": "7bad3789-0d49-44dc-bb8f-4ff32414fa0b",
+      "id": "2bad3789-0d49-44dc-bb8f-4ff32414fa0b",
       "type": "locations",
       "attributes": {
         "key": "court2",
         "title": "Court Two",
         "location_type": "court",
-        "nomis_agency_id": "COURT1",
+        "nomis_agency_id": "COURT2",
         "can_upload_documents": false,
         "young_offender_institution": false,
         "premise": null,
