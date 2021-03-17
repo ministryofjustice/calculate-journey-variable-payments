@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -22,6 +23,7 @@ import javax.validation.constraints.NotEmpty
 
 @Controller
 @SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
+@ConditionalOnWebApplication
 class MapFriendlyLocationController(
   private val service: MapFriendlyLocationService,
   private val agencyDetailsService: AgencyDetailsService

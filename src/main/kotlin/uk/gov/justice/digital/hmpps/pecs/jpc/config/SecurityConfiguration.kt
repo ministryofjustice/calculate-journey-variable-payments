@@ -12,6 +12,8 @@ import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
@@ -45,6 +47,9 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
 
   @Autowired
+  lateinit var clientRegistrationRepo: ClientRegistrationRepository
+
+  @Autowired
   private lateinit var auditService: AuditService
 
   @Throws(Exception::class)
@@ -70,6 +75,7 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
         userInfoEndpoint { userService = oAuth2UserService() }
         failureUrl = authLogoutSuccessUri
         authenticationSuccessHandler = logInHandler()
+        clientRegistrationRepository = hmppsClientRegistrationOnly()
       }
       logout {
         logoutSuccessUrl = authLogoutSuccessUri
@@ -77,6 +83,14 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
       }
     }
   }
+
+  /**
+   * This is a workaround. The point at which this is used in the Spring code it does not check the grant_types which I
+   * think is a bug in the Spring code. I think it should only include grant_types of 'authorization_code'. See class
+   * [org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer] private method
+   * getLoginLinks() it does not check the grant types.
+   */
+  private fun hmppsClientRegistrationOnly() = InMemoryClientRegistrationRepository(clientRegistrationRepo.findByRegistrationId("hmpps")!!)
 
   @Bean
   fun logInHandler() = LogInAuditHandler(auditService)
