@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "id": "2bad3789-0d49-44dc-bb8f-4ff32414fa0c",
+      "type": "locations",
+      "attributes": {
+        "key": "prison1",
+        "title": "Prison One",
+        "location_type": "prison",
+        "nomis_agency_id": "PRISON1",
+        "can_upload_documents": false,
+        "young_offender_institution": false,
+        "premise": null,
+        "locality": null,
+        "city": null,
+        "country": null,
+        "postcode": "P111 ONE",
+        "latitude": null,
+        "longitude": null,
+        "disabled_at": null
+      },
+      "relationships": {
+        "suppliers": {
+          "data": []
+        }
+      }
+    }
+  ],
+  "included": [],
+  "meta": {
+    "pagination": {
+      "per_page": 20,
+      "total_pages": 1,
+      "total_objects": 1
+    }
+  },
+  "links": {
+    "self": "https://basmhost/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON1&filter%5Byoung_offender_institution%5D=false&include=suppliers&page=1&per_page=20",
+    "first": "https://basmhost/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON1&filter%5Byoung_offender_institution%5D=false&include=suppliers&page=1&per_page=20",
+    "prev": null,
+    "next": null,
+    "last": "https://basmhost/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON1&filter%5Byoung_offender_institution%5D=false&include=suppliers&page=1&per_page=20"
+  }
+}

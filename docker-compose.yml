@@ -46,6 +46,8 @@ services:
     networks:
       - hmpps
     container_name: hmpps-auth
+    depends_on:
+      - hmpps-book-secure-move-api
     ports:
       - "9090:8080"
     healthcheck:
@@ -53,6 +55,17 @@ services:
     environment:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
+
+  hmpps-book-secure-move-api:
+    image: rodolpheche/wiremock:latest
+    networks:
+      - hmpps
+    container_name: hmpps-book-secure-move-api
+    ports:
+      - "9999:8080"
+    volumes:
+      - $PWD/wiremock-docker:/home/wiremock
+    command: --verbose --global-response-templating
 
 networks:
   hmpps:

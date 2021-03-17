@@ -1,0 +1,16 @@
+{
+  "request" : {
+    "url" : "/api/reference/locations?filter%5Bnomis_agency_id%5D=COURT2",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName" : "basm-api/locations/COURT2.json",
+    "transformers": [
+      "response-template"
+    ]
+  }
+}
