@@ -29,6 +29,7 @@ class MapFriendlyLocationService(
       val oldLocation = it.copy()
       it.siteName = friendlyLocationName.trim().toUpperCase()
       it.locationType = locationType
+      it.updatedAt = timeSource.dateTime()
 
       val event = AuditableEvent.locationEvent(
         oldLocation,
@@ -45,6 +46,7 @@ class MapFriendlyLocationService(
           locationType,
           agencyId.toUpperCase().trim(),
           friendlyLocationName.toUpperCase().trim(),
+          timeSource.dateTime(),
           timeSource.dateTime()
         ).copy()
       )
