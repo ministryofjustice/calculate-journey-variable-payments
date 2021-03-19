@@ -28,6 +28,9 @@ data class Location(
   @Column(name = "added_at", nullable = false)
   val addedAt: LocalDateTime = LocalDateTime.now(),
 
+  @Column(name = "updated_at", nullable = true)
+  var updatedAt: LocalDateTime? = LocalDateTime.now(),
+
   @Id
   @Column(name = "location_id", nullable = false)
   val id: UUID = UUID.randomUUID()
