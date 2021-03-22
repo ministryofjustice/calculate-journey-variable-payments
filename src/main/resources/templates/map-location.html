@@ -42,10 +42,15 @@
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
             <ol class="list pl0">
                 <li class="mv3">
-                    <p class="govuk-label govuk-body govuk-!-font-weight-bold">Location</p>
-                    <p th:text="*{agencyId}" class="govuk-body ma0"></p>
-                    <input type="hidden" th:field="*{agencyId}" class="dn"/>
-                    <input type="hidden" th:field="*{operation}" class="dn"/>
+                  <p class="govuk-label govuk-body govuk-!-font-weight-bold">NOMIS Location Name</p>
+                  <p th:text="*{nomisLocationName}" class="govuk-body ma0"></p>
+                  <input type="hidden" th:field="*{nomisLocationName}" class="dn"/>
+                </li>
+                <li class="mv3">
+                  <p class="govuk-label govuk-body govuk-!-font-weight-bold">NOMIS Agency ID</p>
+                  <p th:text="*{agencyId}" class="govuk-body ma0"></p>
+                  <input type="hidden" th:field="*{agencyId}" class="dn"/>
+                  <input type="hidden" th:field="*{operation}" class="dn"/>
                 </li>
                 <li class="mv3">
                     <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-name">Maps to Schedule

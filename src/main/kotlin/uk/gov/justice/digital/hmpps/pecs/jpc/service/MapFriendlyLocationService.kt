@@ -31,16 +31,15 @@ class MapFriendlyLocationService(
       it.locationType = locationType
       it.updatedAt = timeSource.dateTime()
 
-      val event = AuditableEvent.locationEvent(
+      AuditableEvent.locationEvent(
         oldLocation,
         locationRepository.save(it).copy(),
-      )
-      event?.let { e -> auditService.create(e) }
+      )?.let { e -> auditService.create(e) }
 
       return
     }
 
-    val event = AuditableEvent.locationEvent(
+    AuditableEvent.locationEvent(
       locationRepository.save(
         Location(
           locationType,
@@ -50,7 +49,6 @@ class MapFriendlyLocationService(
           timeSource.dateTime()
         ).copy()
       )
-    )
-    event?.let { e -> auditService.create(e) }
+    )?.let { e -> auditService.create(e) }
   }
 }
