@@ -28,7 +28,7 @@ data class Location(
   @Column(name = "added_at", nullable = false)
   val addedAt: LocalDateTime = LocalDateTime.now(),
 
-  @Column(name = "updated_at", nullable = true)
+  @Column(name = "updated_at", nullable = false)
   var updatedAt: LocalDateTime? = LocalDateTime.now(),
 
   @Id

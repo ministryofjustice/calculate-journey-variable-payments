@@ -4,58 +4,126 @@
       layout:decorate="~{layout/base}">
 
 <head>
-    <title>Calculate Journey Variable Payments - GOV.UK</title>
+  <title>Calculate Journey Variable Payments - GOV.UK</title>
+  <link rel="stylesheet" href="accessible-autocomplete.min.css">
 </head>
 
 <body>
-
 <div class="govuk-width-container" layout:fragment="content">
+  <div class="mv4">
+    <h1 class="govuk-heading-xl mv2" th:inline="text">
+      Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]
+    </h1>
+  </div>
 
-    <div class="mv4">
-        <h1 class="govuk-heading-xl mv2" th:inline="text">Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]</h1>
+  <h2 class="govuk-heading-l mv2 pt3">Find Journeys</h2>
+  <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">
+    Enter 1 location to find all journeys or 2 locations for a specific journey in the journey price catalogue.
+  </p>
+
+  <form th:action="@{/search-journeys}" th:object="${form}" method="post">
+
+    <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
+      <p th:if="${#fields.hasErrors('*')}" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> Please enter either a pick up or drop off location
+      </p>
+      <ol class="pl0 list">
+        <li class="mv3">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--s" for="from-autocomplete">Pick up location</label>
+            <div id="from-container" class="govuk-label govuk-input--width-20"></div>
+            <input id="from" type="hidden" name="from" th:field="*{from}">
+          </div>
+        </li>
+        <li class="mv3">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--s" for="to-autocomplete">Drop off location</label>
+            <div id="to-container" class="govuk-label govuk-input--width-20"></div>
+            <input id="to" type="hidden" name="to" th:field="*{to}">
+          </div>
+        </li>
+      </ol>
     </div>
 
-    <h2 class="govuk-heading-l mv2 pt3">Find Journeys</h2>
-    <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Enter 1 location to find all journeys or 2
-        locations for a specific journey in the journey price catalogue.</p>
+    <div class="flex items-center">
+      <button class="govuk-button mv3 mr3" data-module="govuk-button">
+        Find Journeys
+      </button>
+      <a href="/dashboard" class="govuk-link">Cancel</a>
+    </div>
+  </form>
 
+  <script src="/accessible-autocomplete.min.js"></script>
+  <script>
+        let locationData = {}
+        if (localStorage.locationData)
+          locationData = JSON.parse(localStorage.locationData)
+        
+        const fromInputEl = document.querySelector('#from')
+        const toInputEl = document.querySelector('#to')
+        const fromContainerEl = document.querySelector('#from-container')
+        const toContainerEl = document.querySelector('#to-container')
 
-    <form th:action="@{/search-journeys}" th:object="${form}" method="post">
+        accessibleAutocomplete({
+          element: fromContainerEl,
+          id: 'from-autocomplete',
+          source: Object.values(locationData.locations || {})
+        })
+        accessibleAutocomplete({
+          element: toContainerEl,
+          id: 'to-autocomplete',
+          source: Object.values(locationData.locations || {})
+        })
 
-        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
-            <p th:if="${#fields.hasErrors('*')}" class="govuk-error-message">
-                <span class="govuk-visually-hidden">Error:</span> Please enter either a pick up or drop off location
-            </p>
-            <ol class="pl0 list">
-                <li class="mv3">
-                    <div class="govuk-form-group">
-                        <label class="govuk-label govuk-label--s" for="from">Pick up location</label>
-                        <input class="govuk-input govuk-input--width-20" id="from" name="from" type="text"
-                               aria-describedby="from-hint" th:field="*{from}"
-                               th:classappend="${#fields.hasErrors('from')} ? 'govuk-input--error'">
-                    </div>
-                </li>
-                <li class="mv3">
-                    <div class="govuk-form-group">
-                        <label class="govuk-label govuk-label--s" for="from">Drop off location</label>
-                        <input class="govuk-input govuk-input--width-20" id="to" name="to" type="text"
-                               aria-describedby="to-hint" th:field="*{to}"
-                               th:classappend="${#fields.hasErrors('to')} ? 'govuk-input--error'">
-                    </div>
-                </li>
-            </ol>
-        </div>
+        let fromAutocompleteEl = document.querySelector('#from-autocomplete')
+        let toAutocompleteEl = document.querySelector('#to-autocomplete')
 
-        <div class="flex items-center">
-            <button class="govuk-button mv3 mr3" data-module="govuk-button">
-                Find Journeys
-            </button>
-            <a href="/dashboard" class="govuk-link">Cancel</a>
-        </div>
-    </form>
+        const request = new XMLHttpRequest()
+        request.addEventListener('load', function() {
+          const data = JSON.parse(this.responseText)
+          console.log(data)
 
+          // server sent new location data because ours is outdated
+          if (data.locations) {
+            locationData = data
+            localStorage.locationData = JSON.stringify(data)
+
+            const fromValue = fromAutocompleteEl.value
+            fromContainerEl.innerHTML = ''
+            accessibleAutocomplete({
+              element: fromContainerEl,
+              id: 'from-autocomplete',
+              source: Object.values(locationData.locations),
+              defaultValue: fromValue
+            })
+
+            const toValue = toAutocompleteEl.value
+            toContainerEl.innerHTML = ''
+            accessibleAutocomplete({
+              element: toContainerEl,
+              id: 'to-autocomplete',
+              source: Object.values(locationData.locations),
+              defaultValue: toValue
+            })
+
+            fromAutocompleteEl = document.querySelector('#from-autocomplete')
+            toAutocompleteEl = document.querySelector('#to-autocomplete')
+          }
+        })
+        request.open('GET', 'locations.json?locationsVersion=' + (locationData.version || -1))
+        request.send()
+
+        document.querySelector('form[action="/search-journeys"]').onsubmit = function() {
+          const fromValue = fromAutocompleteEl.value
+          const fromKey = Object.keys(locationData.locations).find(key => locationData.locations[key] === fromValue)
+          fromInputEl.value = fromKey || fromValue
+
+          const toValue = toAutocompleteEl.value
+          const toKey = Object.keys(locationData.locations).find(key => locationData.locations[key] === toValue)
+          toInputEl.value = toKey || toValue
+        }
+
+  </script>
 </div>
-
 </body>
-
 </html>

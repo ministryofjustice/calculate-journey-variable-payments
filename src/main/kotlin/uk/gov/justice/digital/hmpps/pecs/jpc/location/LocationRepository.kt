@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 
 interface LocationRepository : JpaRepository<Location, UUID> {
+  fun findFirstByOrderByUpdatedAtDesc(): Location?
 
   fun findByNomisAgencyId(id: String): Location?
 

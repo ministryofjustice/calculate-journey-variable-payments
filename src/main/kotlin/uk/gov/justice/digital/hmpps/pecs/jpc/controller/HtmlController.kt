@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.beust.klaxon.Klaxon
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
@@ -31,6 +33,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
@@ -51,6 +54,7 @@ data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, v
 class HtmlController(
   @Autowired val moveService: MoveService,
   @Autowired val journeyService: JourneyService,
+  @Autowired val locationService: MapFriendlyLocationService,
   @Autowired val timeSource: TimeSource
 ) {
 
@@ -240,6 +244,23 @@ class HtmlController(
     return "redirect:$uri"
   }
 
+  @GetMapping(LOCATIONS_JSON_URL)
+  @ResponseBody
+  fun locationsJSON(@ModelAttribute(name = LOCATIONS_VERSION_ATTRIBUTE) userVersion: Long, model: ModelMap): Any {
+    logger.info("getting locations json")
+
+    val locationsVersion = locationService.getVersion()
+    val locationsData: HashMap<String, Any> = hashMapOf("version" to locationsVersion)
+
+    if (userVersion != locationsVersion) {
+      val locationMap = hashMapOf<String, String>()
+      locationService.findAll().forEach { locationMap[it.nomisAgencyId] = it.siteName }
+      locationsData["locations"] = locationMap
+    }
+
+    return Klaxon().toJsonString(locationsData)
+  }
+
   @GetMapping(SEARCH_JOURNEYS_URL)
   fun searchJourneys(model: ModelMap): Any {
     logger.info("getting search journey")
@@ -326,12 +347,14 @@ class HtmlController(
     const val START_OF_MONTH_DATE_ATTRIBUTE = "startOfMonthDate"
     const val END_OF_MONTH_DATE_ATTRIBUTE = "endOfMonthDate"
     const val MOVE_ATTRIBUTE = "move"
+    const val LOCATIONS_VERSION_ATTRIBUTE = "locationsVersion"
 
     const val DASHBOARD_URL = "/dashboard"
     const val SELECT_MONTH_URL = "/select-month"
     const val MOVES_BY_TYPE_URL = "/moves-by-type"
     const val MOVES_URL = "/moves"
     const val JOURNEYS_URL = "/journeys"
+    const val LOCATIONS_JSON_URL = "/locations.json"
     const val SEARCH_JOURNEYS_URL = "/search-journeys"
     const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
     const val FIND_MOVE_URL = "/find-move"
