@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AgencyDetailsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 
 @SpringBootTest
@@ -29,15 +30,34 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
   private val agencyId = "123456"
 
+  private val nomisLocationName = "NOMIS Location Name"
+
   @MockBean
   lateinit var service: MapFriendlyLocationService
+
+  @MockBean
+  lateinit var agencyDetailsService: AgencyDetailsService
 
   @Test
   internal fun `get mapping for new friendly location`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
+    whenever(agencyDetailsService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
     mockMvc.get("/map-location/$agencyId")
-      .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId)) } }
+      .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)) } }
+      .andExpect { view { name("map-location") } }
+      .andExpect { status { isOk() } }
+
+    verify(service).findAgencyLocationAndType(agencyId)
+  }
+
+  @Test
+  internal fun `get mapping for new friendly location with no NOMIS location name lookup match`() {
+    whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
+    whenever(agencyDetailsService.findAgencyLocationNameBy(agencyId)).thenReturn(null)
+
+    mockMvc.get("/map-location/$agencyId")
+      .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.")) } }
       .andExpect { view { name("map-location") } }
       .andExpect { status { isOk() } }
 
@@ -54,12 +74,14 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       )
     )
 
+    whenever(agencyDetailsService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
+
     mockMvc.get("/map-location/$agencyId")
       .andExpect {
         model {
           attribute(
             "form",
-            MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP.name, "update")
+            MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP.name, "update", nomisLocationName)
           )
         }
       }
@@ -73,11 +95,12 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   internal fun `map new location successful when mandatory criteria supplied`() {
     mockMvc.post("/map-location") {
       param("agencyId", "123456")
+      param("nomisLocationName", nomisLocationName)
       param("locationName", "Friendly Location Name")
       param("locationType", "CC")
     }
       .andExpect { status { is3xxRedirection() } }
-      .andExpect { flash { attribute("flashAttrMappedLocationName", "Friendly Location Name") } }
+      .andExpect { flash { attribute("flashAttrMappedLocationName", "FRIENDLY LOCATION NAME") } }
       .andExpect { flash { attribute("flashAttrMappedAgencyId", "123456") } }
       .andExpect { redirectedUrl("/journeys") }
 
@@ -89,6 +112,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   internal fun `map new location fails when mandatory criteria not supplied`() {
     mockMvc.post("/map-location") {
       param("agencyId", "123456")
+      param("nomisLocationName", nomisLocationName)
       param("locationName", "")
       param("locationType", "CC")
     }
@@ -106,6 +130,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
     mockMvc.post("/map-location") {
       param("agencyId", agencyId)
+      param("nomisLocationName", nomisLocationName)
       param("locationName", "Duplicate location")
       param("locationType", "CC")
     }

@@ -1,4 +1,7 @@
 AGY_LOC_ID,DESCRIPTION,LONG_DESCRIPTION,AGENCY_LOCATION_TYPE,ACTIVE_FLAG
+COURT1,NOMIS Court One,NOMIS Court One,CRT,Y
+POLICE1,NOMIS Police One,NOMIS Police One,COMM,Y
+PRISON1,NOMIS Prison One,NOMIS Prison One,INST,Y
 LDM011,Tulse Hill,Tulse Hill,COMM,Y
 LDM087,Havering Mags Court Probation Office,Havering Mags Court Probation Office,COMM,Y
 MUDSLY,The Maudsley Hospital,The Maudsley Hospital,HSHOSP,Y

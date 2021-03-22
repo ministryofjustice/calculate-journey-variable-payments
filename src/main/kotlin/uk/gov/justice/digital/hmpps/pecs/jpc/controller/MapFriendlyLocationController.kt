@@ -15,13 +15,17 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidDuplicateLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DROP_OFF_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AgencyDetailsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
 @Controller
 @SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
-class MapFriendlyLocationController(private val service: MapFriendlyLocationService) {
+class MapFriendlyLocationController(
+  private val service: MapFriendlyLocationService,
+  private val agencyDetailsService: AgencyDetailsService
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -38,13 +42,31 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
 
     model.addAttribute("cancelLink", url.build().toUriString())
 
+    val nomisLocationName = agencyDetailsService.findAgencyLocationNameBy(agencyId) ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
+
     service.findAgencyLocationAndType(agencyId)?.let {
-      model.addAttribute("form", MapLocationForm(agencyId = it.first, locationName = it.second, locationType = it.third.name, operation = "update"))
+      model.addAttribute(
+        "form",
+        MapLocationForm(
+          agencyId = it.first,
+          locationName = it.second,
+          locationType = it.third.name,
+          operation = "update",
+          nomisLocationName = nomisLocationName
+        )
+      )
 
       return "map-location"
     }
 
-    model.addAttribute("form", MapLocationForm(agencyId = agencyId, operation = "create"))
+    model.addAttribute(
+      "form",
+      MapLocationForm(
+        agencyId = agencyId,
+        operation = "create",
+        nomisLocationName = nomisLocationName
+      )
+    )
 
     return "map-location"
   }
@@ -68,7 +90,7 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
 
     service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
-    redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName)
+    redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName.toUpperCase())
     redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
 
     if (form.operation == "create") {
@@ -96,5 +118,7 @@ class MapFriendlyLocationController(private val service: MapFriendlyLocationServ
     val locationType: String = "",
 
     val operation: String = "create",
+
+    val nomisLocationName: String
   )
 }
