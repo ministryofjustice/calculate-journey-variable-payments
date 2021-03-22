@@ -30,16 +30,14 @@
       <ol class="pl0 list">
         <li class="mv3">
           <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--s" for="from-autocomplete">Pick up location</label>
+            <label class="govuk-label govuk-label--s" for="from">Pick up location</label>
             <div id="from-container" class="govuk-label govuk-input--width-20"></div>
-            <input id="from" type="hidden" name="from" th:field="*{from}">
           </div>
         </li>
         <li class="mv3">
           <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--s" for="to-autocomplete">Drop off location</label>
+            <label class="govuk-label govuk-label--s" for="to">Drop off location</label>
             <div id="to-container" class="govuk-label govuk-input--width-20"></div>
-            <input id="to" type="hidden" name="to" th:field="*{to}">
           </div>
         </li>
       </ol>
@@ -58,30 +56,29 @@
         let locationData = {}
         if (localStorage.locationData)
           locationData = JSON.parse(localStorage.locationData)
-        
-        const fromInputEl = document.querySelector('#from')
-        const toInputEl = document.querySelector('#to')
+
         const fromContainerEl = document.querySelector('#from-container')
         const toContainerEl = document.querySelector('#to-container')
 
         accessibleAutocomplete({
           element: fromContainerEl,
-          id: 'from-autocomplete',
+          id: 'from',
+          name: 'from',
           source: Object.values(locationData.locations || {})
         })
         accessibleAutocomplete({
           element: toContainerEl,
-          id: 'to-autocomplete',
+          id: 'to',
+          name: 'to',
           source: Object.values(locationData.locations || {})
         })
 
-        let fromAutocompleteEl = document.querySelector('#from-autocomplete')
-        let toAutocompleteEl = document.querySelector('#to-autocomplete')
+        let fromAutocompleteEl = document.querySelector('#from')
+        let toAutocompleteEl = document.querySelector('#to')
 
         const request = new XMLHttpRequest()
         request.addEventListener('load', function() {
           const data = JSON.parse(this.responseText)
-          console.log(data)
 
           // server sent new location data because ours is outdated
           if (data.locations) {
@@ -92,7 +89,8 @@
             fromContainerEl.innerHTML = ''
             accessibleAutocomplete({
               element: fromContainerEl,
-              id: 'from-autocomplete',
+              id: 'from',
+              name: 'from',
               source: Object.values(locationData.locations),
               defaultValue: fromValue
             })
@@ -101,27 +99,18 @@
             toContainerEl.innerHTML = ''
             accessibleAutocomplete({
               element: toContainerEl,
-              id: 'to-autocomplete',
+              id: 'to',
+              name: 'to',
               source: Object.values(locationData.locations),
               defaultValue: toValue
             })
 
-            fromAutocompleteEl = document.querySelector('#from-autocomplete')
-            toAutocompleteEl = document.querySelector('#to-autocomplete')
+            fromAutocompleteEl = document.querySelector('#from')
+            toAutocompleteEl = document.querySelector('#to')
           }
         })
         request.open('GET', 'locations.json?locationsVersion=' + (locationData.version || -1))
         request.send()
-
-        document.querySelector('form[action="/search-journeys"]').onsubmit = function() {
-          const fromValue = fromAutocompleteEl.value
-          const fromKey = Object.keys(locationData.locations).find(key => locationData.locations[key] === fromValue)
-          fromInputEl.value = fromKey || fromValue
-
-          const toValue = toAutocompleteEl.value
-          const toKey = Object.keys(locationData.locations).find(key => locationData.locations[key] === toValue)
-          toInputEl.value = toKey || toValue
-        }
 
   </script>
 </div>
