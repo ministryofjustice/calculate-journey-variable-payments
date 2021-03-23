@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import java.time.ZoneOffset
 
 @Service
 @Transactional
@@ -15,6 +16,10 @@ class MapFriendlyLocationService(
   private val timeSource: TimeSource,
   private val auditService: AuditService
 ) {
+  fun findAll(): List<Location> = locationRepository.findAll()
+
+  fun getVersion() = locationRepository.findFirstByOrderByUpdatedAtDesc()?.updatedAt?.toEpochSecond(ZoneOffset.UTC) ?: 0
+
   fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? =
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
       ?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }

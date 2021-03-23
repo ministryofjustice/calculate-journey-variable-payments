@@ -132,7 +132,12 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   @Test
   internal fun `standard error page is shown when an unexpected exception occurs`() {
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenThrow(RuntimeException("Something has gone wrong"))
+    whenever(
+      moveService.findMoveByReferenceAndSupplier(
+        "REF1",
+        defaultSupplierSerco
+      )
+    ).thenThrow(RuntimeException("Something has gone wrong"))
 
     mockMvc.post("/find-move") {
       session = mockSession
