@@ -64,13 +64,15 @@
           element: fromContainerEl,
           id: 'from',
           name: 'from',
-          source: Object.values(locationData.locations || {})
+          source: Object.values(locationData.locations || {}),
+          minLength: 3
         })
         accessibleAutocomplete({
           element: toContainerEl,
           id: 'to',
           name: 'to',
-          source: Object.values(locationData.locations || {})
+          source: Object.values(locationData.locations || {}),
+          minLength: 3
         })
 
         let fromAutocompleteEl = document.querySelector('#from')
@@ -92,7 +94,8 @@
               id: 'from',
               name: 'from',
               source: Object.values(locationData.locations),
-              defaultValue: fromValue
+              defaultValue: fromValue,
+              minLength: 3
             })
 
             const toValue = toAutocompleteEl.value
@@ -102,14 +105,15 @@
               id: 'to',
               name: 'to',
               source: Object.values(locationData.locations),
-              defaultValue: toValue
+              defaultValue: toValue,
+              minLength: 3
             })
 
             fromAutocompleteEl = document.querySelector('#from')
             toAutocompleteEl = document.querySelector('#to')
           }
         })
-        request.open('GET', 'locations.json?locationsVersion=' + (locationData.version || -1))
+        request.open('GET', 'locations?version=' + (locationData.version || -1))
         request.send()
 
   </script>
