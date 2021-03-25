@@ -46,7 +46,7 @@ spring:
           issuer-uri: ${HMPPS_AUTH_BASE_URI}/issuer
 
   flyway:
-    locations: classpath:/db/migration/ddl,classpath:/db/migration/data/all
+    locations: classpath:/db/migration/ddl
     baseline-on-migrate: true
 
 resources:
