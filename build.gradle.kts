@@ -15,15 +15,22 @@ dependencies {
   implementation("com.github.kittinunf.result:result:4.0.0")
   implementation("com.github.kittinunf.result:result-coroutines:4.0.0")
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.11.973")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.11.982")
   implementation("io.sentry:sentry-spring-boot-starter:4.3.0")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.21.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.21.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.22.1")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.22.1")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.2")
-  implementation("org.apache.xmlgraphics:batik-all:1.14") {
-    because("previous version 1.13 pulled from Apache POI 5.0.0 has CVE")
-  }
   implementation("org.apache.poi:poi-ooxml:5.0.0")
+
+  constraints {
+    implementation("org.apache.xmlgraphics:batik-all:1.14") {
+      because("previous transitive version 1.13 pulled from Apache POI 5.0.0 has CVE")
+    }
+    implementation("org.apache.pdfbox:pdfbox:2.0.23") {
+      because("previous transitive version 2.0.22 pulled from Apache POI 5.0.0 has CVE")
+    }
+  }
+
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
