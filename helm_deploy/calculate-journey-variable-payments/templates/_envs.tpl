@@ -127,4 +127,7 @@ env:
   - name: SENTRY_ENVIRONMENT
     value: "{{ .Values.env.SENTRY_ENVIRONMENT }}"
 
+  - name: BASM_API_BASE_URL
+    value: "{{ .Values.env.BASM_API_BASE_URL }}"
+
 {{- end -}}

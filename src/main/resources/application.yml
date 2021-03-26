@@ -33,8 +33,6 @@ spring:
             token-uri: ${HMPPS_AUTH_BASE_URI}/oauth/token
             user-info-uri: ${HMPPS_AUTH_BASE_URI}/api/user/me
             user-name-attribute: name
-          basm:
-            token-uri: ${BASM_API_BASE_URL}/oauth/token
         registration:
           hmpps:
             client-id: ${HMPPS_AUTH_CLIENT_ID}
@@ -43,13 +41,6 @@ spring:
             scope: read
             authorization-grant-type: authorization_code
             redirect-uri: ${HMPPS_AUTH_REDIRECT_BASE_URI}/login/oauth2/code/hmpps
-          basm:
-            client-id: ${BASM_AUTH_CLIENT_ID}
-            client-secret: ${BASM_AUTH_CLIENT_SECRET}
-            provider: basm
-            authorization-grant-type: client_credentials
-
-
 
       resourceserver:
         jwt:

@@ -16,7 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidDuplicateLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DROP_OFF_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.AgencyDetailsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
@@ -26,7 +26,7 @@ import javax.validation.constraints.NotEmpty
 @ConditionalOnWebApplication
 class MapFriendlyLocationController(
   private val service: MapFriendlyLocationService,
-  private val agencyDetailsService: AgencyDetailsService
+  private val basmClientApiService: BasmClientApiService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -44,7 +44,7 @@ class MapFriendlyLocationController(
 
     model.addAttribute("cancelLink", url.build().toUriString())
 
-    val nomisLocationName = agencyDetailsService.findAgencyLocationNameBy(agencyId) ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
+    val nomisLocationName = basmClientApiService.findAgencyLocationNameBy(agencyId) ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
 
     service.findAgencyLocationAndType(agencyId)?.let {
       model.addAttribute(

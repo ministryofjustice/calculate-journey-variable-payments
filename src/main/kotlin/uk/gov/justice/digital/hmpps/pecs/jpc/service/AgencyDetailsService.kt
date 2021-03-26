@@ -10,6 +10,7 @@ private const val NOMIS_AGENCY_ID = 0
 private const val NAME = 1
 
 @Service
+@Deprecated(message = "This has been superseded with calls the BaSM backend API", level = DeprecationLevel.WARNING)
 class AgencyDetailsService(
   private val referenceData: NomisReferenceDataProvider,
   private val monitoringService: MonitoringService
