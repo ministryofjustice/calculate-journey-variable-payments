@@ -29,7 +29,4 @@ class ImporterConfiguration {
   @Bean
   fun supplierPrices() =
     SupplierPrices { supplier, year -> priceRepository.findBySupplierAndEffectiveYear(supplier, year) }
-
-  @Bean
-  fun nomisReferenceData() = NomisReferenceDataProvider { resourceLoader.getResource("classpath:/spreadsheets/nomis-locations.csv").inputStream }
 }
