@@ -118,9 +118,8 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
     }
   }
 
-  // Needed for Thymeleaf security extras.
   @Bean
-  fun securityDialect(): SpringSecurityDialect? {
+  fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? {
     return SpringSecurityDialect()
   }
 }

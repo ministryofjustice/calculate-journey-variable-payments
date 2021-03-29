@@ -3,16 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
 
-@ExtendWith(SpringExtension::class)
-@Import(TestConfig::class)
-@ActiveProfiles("test")
 internal class ReportParserTest {
 
   private fun profileReports(): List<String> {

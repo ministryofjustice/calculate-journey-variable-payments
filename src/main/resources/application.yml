@@ -41,6 +41,7 @@ spring:
             scope: read
             authorization-grant-type: authorization_code
             redirect-uri: ${HMPPS_AUTH_REDIRECT_BASE_URI}/login/oauth2/code/hmpps
+
       resourceserver:
         jwt:
           issuer-uri: ${HMPPS_AUTH_BASE_URI}/issuer

@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.AgencyDetailsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
 
 @SpringBootTest
@@ -36,12 +36,12 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   lateinit var service: MapFriendlyLocationService
 
   @MockBean
-  lateinit var agencyDetailsService: AgencyDetailsService
+  lateinit var basmClientApiService: BasmClientApiService
 
   @Test
   internal fun `get mapping for new friendly location`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
-    whenever(agencyDetailsService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
+    whenever(basmClientApiService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)) } }
@@ -54,7 +54,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   @Test
   internal fun `get mapping for new friendly location with no NOMIS location name lookup match`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
-    whenever(agencyDetailsService.findAgencyLocationNameBy(agencyId)).thenReturn(null)
+    whenever(basmClientApiService.findAgencyLocationNameBy(agencyId)).thenReturn(null)
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.")) } }
@@ -74,7 +74,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       )
     )
 
-    whenever(agencyDetailsService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
+    whenever(basmClientApiService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect {
