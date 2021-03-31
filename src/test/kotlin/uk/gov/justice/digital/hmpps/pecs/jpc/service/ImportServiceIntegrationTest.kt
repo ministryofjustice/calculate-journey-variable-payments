@@ -43,8 +43,8 @@ internal class ImportServiceIntegrationTest(
   internal fun `import should complete even when there are reports files with errors in them`() {
     service.importReportsOn(LocalDate.of(2020, 12, 1))
 
-    verify(monitoringService).capture("moves: persisted 1 out of 2 for reporting date 2020-12-01.")
-    verify(monitoringService).capture("people: persisted 3 out of 4 for reporting date 2020-12-01.")
+    verify(monitoringService).capture("moves: persisted 1 out of 2 for reporting feed date 2020-12-01.")
+    verify(monitoringService).capture("people: persisted 3 out of 4 for reporting feed date 2020-12-01.")
     verifyNoMoreInteractions(monitoringService)
   }
 }

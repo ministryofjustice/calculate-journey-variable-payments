@@ -68,7 +68,6 @@ internal class ImportServiceTest {
     verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
     verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date())
     verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.date())
-    verifyZeroInteractions(monitoringService)
   }
 
   @Test
@@ -91,7 +90,7 @@ internal class ImportServiceTest {
     whenever(movePersister.persist(any())).thenReturn(0)
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("moves: persisted 0 out of 1 for reporting date ${timeSourceWithFixedDate.date()}.")
+    verify(monitoringService).capture("moves: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
   }
 
   @Test
@@ -100,7 +99,7 @@ internal class ImportServiceTest {
     whenever(personPersister.persistPeople(any())).thenReturn(0)
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("people: persisted 0 out of 1 for reporting date ${timeSourceWithFixedDate.date()}.")
+    verify(monitoringService).capture("people: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
   }
 
   @Test
@@ -109,6 +108,30 @@ internal class ImportServiceTest {
     whenever(personPersister.persistProfiles(any())).thenReturn(0)
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("profiles: persisted 0 out of 1 for reporting date ${timeSourceWithFixedDate.date()}.")
+    verify(monitoringService).capture("profiles: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
+  }
+
+  @Test
+  internal fun `monitoring interactions when no moves to persist`() {
+    whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf())
+
+    importService.importReportsOn(timeSourceWithFixedDate.date())
+    verify(monitoringService).capture("There were no moves to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
+  }
+
+  @Test
+  internal fun `monitoring interactions when no people to persist`() {
+    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf())
+
+    importService.importReportsOn(timeSourceWithFixedDate.date())
+    verify(monitoringService).capture("There were no people to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
+  }
+
+  @Test
+  internal fun `monitoring interactions when no profiles to persist`() {
+    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf())
+
+    importService.importReportsOn(timeSourceWithFixedDate.date())
+    verify(monitoringService).capture("There were no profiles to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
   }
 }

@@ -15,6 +15,9 @@ class MonitoringService {
   private val logger = LoggerFactory.getLogger(javaClass)
 
   internal fun capture(message: String) {
-    if (Sentry.isEnabled()) Sentry.captureMessage(message) else logger.warn("Monitoring is disabled, ignoring message $message.")
+    if (Sentry.isEnabled()) {
+      Sentry.captureMessage(message)
+      logger.warn(message)
+    } else logger.warn("Monitoring is disabled, ignoring message $message.")
   }
 }

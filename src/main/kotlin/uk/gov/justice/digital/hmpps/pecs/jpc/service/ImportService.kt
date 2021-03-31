@@ -43,7 +43,13 @@ class ImportService(
       val moves = it.toList()
       movePersister.persist(moves).let { persisted ->
         auditService.create(AuditableEvent.importReportEvent("moves", date, moves.size, persisted))
-        captureMessageIf(moves.size > persisted, "moves: persisted $persisted out of ${moves.size} for reporting date $date.")
+
+        raiseMonitoringAlertIf(
+          moves.isNotEmpty() && moves.size > persisted,
+          "moves: persisted $persisted out of ${moves.size} for reporting feed date $date."
+        )
+
+        raiseMonitoringAlertIf(moves.isEmpty(), "There were no moves to persist for reporting feed date $date.")
       }
     }
   }
@@ -55,7 +61,13 @@ class ImportService(
       val people = it.toList()
       personPersister.persistPeople(people).let { persisted ->
         auditService.create(AuditableEvent.importReportEvent("people", date, people.size, persisted))
-        captureMessageIf(people.size > persisted, "people: persisted $persisted out of ${people.size} for reporting date $date.")
+
+        raiseMonitoringAlertIf(
+          people.isNotEmpty() && people.size > persisted,
+          "people: persisted $persisted out of ${people.size} for reporting feed date $date."
+        )
+
+        raiseMonitoringAlertIf(people.isEmpty(), "There were no people to persist for reporting feed date $date.")
       }
     }
 
@@ -65,13 +77,19 @@ class ImportService(
       val profiles = it.toList()
       personPersister.persistProfiles(profiles).let { persisted ->
         auditService.create(AuditableEvent.importReportEvent("profiles", date, profiles.size, persisted))
-        captureMessageIf(profiles.size > persisted, "profiles: persisted $persisted out of ${profiles.size} for reporting date $date.")
+
+        raiseMonitoringAlertIf(
+          profiles.isNotEmpty() && profiles.size > persisted,
+          "profiles: persisted $persisted out of ${profiles.size} for reporting feed date $date."
+        )
+
+        raiseMonitoringAlertIf(profiles.isEmpty(), "There were no profiles to persist for reporting feed date $date.")
       }
     }
   }
 
-  private fun captureMessageIf(isTrue: Boolean, message: String) {
-    if (isTrue) monitoringService.capture(message)
+  private fun raiseMonitoringAlertIf(isTrue: Boolean, alertMessage: String) {
+    if (isTrue) monitoringService.capture(alertMessage)
   }
 
   private fun <T> import(import: () -> T): T? {
