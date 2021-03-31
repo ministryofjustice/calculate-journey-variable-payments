@@ -1,16 +1,22 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -21,17 +27,22 @@ import java.time.temporal.ChronoUnit
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-internal class ReportImporterTest(@Autowired provider: ReportingProvider) {
+internal class ReportImporterTest(@Autowired private val provider: ReportingProvider) {
 
-  val importer: ReportImporter = ReportImporter(provider)
+  @MockBean
+  private lateinit var monitoringService: MonitoringService
 
-  val from: LocalDate = LocalDate.of(2020, 9, 1)
-  val to: LocalDate = LocalDate.of(2020, 9, 6)
+  private lateinit var importer: ReportImporter
+
+  private val from: LocalDate = LocalDate.of(2020, 9, 1)
+  private val to: LocalDate = LocalDate.of(2020, 9, 6)
 
   private var moves: Collection<Move> = mutableListOf()
 
   @BeforeEach
   fun beforeEach() {
+    importer = ReportImporter(provider, monitoringService)
+
     for (i in 0..ChronoUnit.DAYS.between(from, to)) {
       moves += importer.importMovesJourneysEventsOn(from.plusDays(i))
     }
@@ -77,6 +88,41 @@ internal class ReportImporterTest(@Autowired provider: ReportingProvider) {
   fun `Cancelled, billable moves should only include moves cancelled before 3pm the day before the move`() {
     val cancelledBillableMoves = movesFilteredBy(MoveFilterer::isCancelledBillableMove)
     Assertions.assertEquals(setOf("M61"), cancelledBillableMoves.map { it.moveId }.toSet())
+  }
+
+  @Test
+  fun `Monitoring service captures file download errors for moves, journeys and events`() {
+    val failingProvider: ReportingProvider = mock()
+
+    whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
+
+    ReportImporter(failingProvider, monitoringService).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
+
+    verify(monitoringService).capture("Error attempting to get moves file 2020/09/01/2020-09-01-moves.jsonl, exception: error")
+    verify(monitoringService).capture("Error attempting to get journeys file 2020/09/01/2020-09-01-journeys.jsonl, exception: error")
+    verify(monitoringService).capture("Error attempting to get events file 2020/09/01/2020-09-01-events.jsonl, exception: error")
+  }
+
+  @Test
+  fun `Monitoring service captures file download errors for profiles`() {
+    val failingProvider: ReportingProvider = mock()
+
+    whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
+
+    ReportImporter(failingProvider, monitoringService).importProfilesOn(LocalDate.of(2020, 9, 2))
+
+    verify(monitoringService).capture("Error attempting to get profiles file 2020/09/02/2020-09-02-profiles.jsonl, exception: error")
+  }
+
+  @Test
+  fun `Monitoring service captures file download errors for people`() {
+    val failingProvider: ReportingProvider = mock()
+
+    whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
+
+    ReportImporter(failingProvider, monitoringService).importPeopleOn(LocalDate.of(2020, 9, 3))
+
+    verify(monitoringService).capture("Error attempting to get people file 2020/09/03/2020-09-03-people.jsonl, exception: error")
   }
 
   private fun movesFilteredBy(filterer: (m: Move) -> Boolean) = moves.filter(filterer)

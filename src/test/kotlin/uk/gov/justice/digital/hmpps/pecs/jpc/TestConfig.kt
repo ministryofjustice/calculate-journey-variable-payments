@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.security.oauth2.jwt.JwtDecoder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
@@ -18,6 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -46,12 +46,6 @@ class TestConfig {
   }
 
   @Bean
-  fun jwtDecoder(): JwtDecoder {
-    // This is a temporary measure to prevent auth server startup/lookup errors during the tests.
-    return JwtDecoder { mock() }
-  }
-
-  @Bean
   fun dataSource(): DataSource {
     return DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
   }
@@ -77,7 +71,7 @@ class TestConfig {
   }
 
   @Bean
-  fun reportImporter() = ReportImporter(reportingResourceProvider())
+  fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() })
 
   @Bean
   fun jpcTemplateProvider(): JPCTemplateProvider {
