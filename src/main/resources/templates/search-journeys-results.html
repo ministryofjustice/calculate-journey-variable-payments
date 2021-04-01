@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 
 <head>
@@ -47,12 +47,19 @@
                     </a>
                 </td>
                 <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.toLocationType}]]</td>
-                <td class="govuk-table__cell" scope="row">
-                    <a th:href="@{'/update-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
-                       class="ma0 govuk-link" th:inline="text">
-                        £[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]
-                    </a>
-                </td>
+                <div sec:authorize="!hasRole('ROLE_PECS_MAINTAIN_PRICE')">
+                    <td class="govuk-table__cell" scope="row">
+                        <span th:inline="text">£[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]</span>
+                    </td>
+                </div>
+                <div sec:authorize="hasRole('ROLE_PECS_MAINTAIN_PRICE')">
+                    <td class="govuk-table__cell" scope="row">
+                        <a th:href="@{'/update-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
+                           class="ma0 govuk-link" th:inline="text">
+                            £[[${#numbers.formatDecimal(journey.unitPriceInPounds(), 1, 'COMMA', 2, 'POINT')}]]
+                        </a>
+                    </td>
+                </div>
             </tr>
             </tbody>
         </table>

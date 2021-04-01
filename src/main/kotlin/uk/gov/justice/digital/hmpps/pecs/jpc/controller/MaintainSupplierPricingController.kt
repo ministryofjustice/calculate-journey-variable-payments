@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -28,6 +29,7 @@ import javax.validation.constraints.NotNull
   HtmlController.DROP_OFF_ATTRIBUTE,
   HtmlController.DATE_ATTRIBUTE
 )
+@PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
 
   private val logger = LoggerFactory.getLogger(javaClass)

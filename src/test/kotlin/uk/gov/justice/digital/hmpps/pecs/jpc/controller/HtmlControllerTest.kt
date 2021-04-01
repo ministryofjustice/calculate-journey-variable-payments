@@ -144,7 +144,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       param("reference", "REF1")
     }
       .andExpect { view { name("error") } }
-      .andExpect { status { is2xxSuccessful() } }
+      .andExpect { status { is4xxClientError() } }
 
     verify(monitoringService).capture(any())
   }

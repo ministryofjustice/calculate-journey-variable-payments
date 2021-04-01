@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 
 <head>
@@ -99,10 +99,15 @@
                     <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.volume}]]</td>
                     <td class="govuk-table__cell" scope="row" th:inline="text">
                         <span th:if="${journey.fromSiteName == null || journey.toSiteName == null}" th:inline="text">Awaiting location</span>
-                        <span th:unless="${journey.fromSiteName == null || journey.toSiteName == null}">
-                            <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
-                               class="ma0 govuk-link">Add price</a>
-                        </span>
+                        <div sec:authorize="!hasRole('ROLE_PECS_MAINTAIN_PRICE')">
+                            <span th:unless="${journey.fromSiteName == null || journey.toSiteName == null}" th:inline="text">Awaiting price</span>
+                        </div>
+                        <div sec:authorize="hasRole('ROLE_PECS_MAINTAIN_PRICE')">
+                            <span th:unless="${journey.fromSiteName == null || journey.toSiteName == null}">
+                                <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
+                                   class="ma0 govuk-link">Add price</a>
+                            </span>
+                        </div>
                     </td>
                 </tr>
             </tbody>

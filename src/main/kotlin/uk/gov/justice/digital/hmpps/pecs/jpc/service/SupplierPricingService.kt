@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 @Service
 @Transactional
+@PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class SupplierPricingService(
   val locationRepository: LocationRepository,
   val priceRepository: PriceRepository,
