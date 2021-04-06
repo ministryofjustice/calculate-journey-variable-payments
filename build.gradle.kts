@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.1.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.1.4"
   kotlin("plugin.spring") version "1.4.32"
   kotlin("plugin.jpa") version "1.4.32"
   kotlin("plugin.allopen") version "1.4.32"
@@ -15,7 +15,7 @@ dependencies {
   implementation("com.github.kittinunf.result:result:4.0.0")
   implementation("com.github.kittinunf.result:result-coroutines:4.0.0")
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.11.986")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.11.989")
   implementation("io.sentry:sentry-spring-boot-starter:4.3.0")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.22.1")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.22.1")
@@ -47,7 +47,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
 
-  runtimeOnly("org.flywaydb:flyway-core:7.7.1")
+  runtimeOnly("org.flywaydb:flyway-core:7.7.2")
   runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.2.19")
 }

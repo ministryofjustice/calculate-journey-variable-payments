@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mock.web.MockHttpSession
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.get
@@ -27,6 +28,7 @@ import java.time.LocalDate
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
+@WithMockUser(roles = ["PECS_MAINTAIN_PRICE"])
 class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
@@ -81,6 +83,17 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  internal fun `cannot initiate add price for Serco when insufficient privileges`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", effectiveDate)
+    }
+
+    mockMvc.get("/add-price/not-allowed") { session = mockSession }.andExpect { status { isForbidden() } }
+  }
+
+  @Test
   internal fun `can add price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
@@ -96,6 +109,21 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { status { is3xxRedirection() } }
 
     verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24), effectiveYearForDate(effectiveDate))
+  }
+
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  internal fun `cannot add price for Serco when insufficient privileges`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", effectiveDate)
+    }
+
+    mockMvc.post("/add-price") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("price", "100.24")
+    }.andExpect { status { isForbidden() } }
   }
 
   @Test
@@ -182,5 +210,16 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       toAgencyId,
       effectiveYearForDate(effectiveDate)
     )
+  }
+
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  internal fun `cannot initiate update price for Geoamey when insufficient privileges`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.GEOAMEY)
+      this.setAttribute("date", effectiveDate)
+    }
+
+    mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }.andExpect { status { isForbidden() } }
   }
 }
