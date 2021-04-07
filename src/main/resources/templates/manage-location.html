@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+
+    <form th:action="@{/manage-location}" th:object="${form}" method="post">
+        <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
+             data-module="govuk-error-summary" th:if="${#fields.hasErrors('*')}">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    <li>
+                        <a href="#location-name" th:errors="*">Error</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mv4">
+            <h1 class="govuk-heading-xl mv2" th:inline="text">Update location</h1>
+            <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update Schedule 34 location.</p>
+        </div>
+
+
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
+            <ol class="list pl0">
+                <li class="mv3">
+                  <p class="govuk-label govuk-body govuk-!-font-weight-bold">NOMIS Location Name</p>
+                  <p th:text="*{nomisLocationName}" class="govuk-body ma0"></p>
+                  <input type="hidden" th:field="*{nomisLocationName}" class="dn"/>
+                </li>
+                <li class="mv3">
+                  <p class="govuk-label govuk-body govuk-!-font-weight-bold">NOMIS Agency ID</p>
+                  <p th:text="*{agencyId}" class="govuk-body ma0"></p>
+                  <input type="hidden" th:field="*{agencyId}" class="dn"/>
+                </li>
+                <li class="mv3">
+                    <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-name">Maps to Schedule
+                        34 location</label>
+                    <p th:if="${#fields.hasErrors('*')}" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span> <span th:errors="*"></span>
+                    </p>
+                    <input class="govuk-input govuk-input--width-20" id="location-name" name="location-name" type="text"
+                           th:field="*{locationName}"
+                           th:classappend="${#fields.hasErrors('locationName')} ? 'govuk-input--error'">
+                </li>
+                <li class="mv3">
+                    <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-type-id">Add location
+                        type</label>
+                    <select name="location-type" id="location-type-id" th:field="*{locationType}" class="govuk-select">
+                        <option value="AP">Airport</option>
+                        <option value="APP">Approved Premises</option>
+                        <option value="CC">Crown Court</option>
+                        <option value="CM">Combined Court</option>
+                        <option value="CO">County Court</option>
+                        <option value="HP">Hospital</option>
+                        <option value="IM">Immigration</option>
+                        <option value="MC">Mag Court</option>
+                        <option value="O">Other</option>
+                        <option value="PS">Police</option>
+                        <option value="PR">Prison</option>
+                        <option value="PB">Probation</option>
+                        <option value="SCH">SCH</option>
+                        <option value="STC">STC</option>
+                    </select>
+                </li>
+            </ol>
+        </div>
+        <div class="govuk-warning-text mv3">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                <span th:inline="text">Mapping a Schedule 34 location name will not update location names in NOMIS.</span>
+            </strong>
+        </div>
+        <div class="flex items-center">
+            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+                Confirm and save
+            </button>
+            <a href="/search-locations" class="govuk-link">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+
+</html>

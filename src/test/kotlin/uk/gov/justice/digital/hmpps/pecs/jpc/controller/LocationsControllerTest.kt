@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -29,7 +29,7 @@ class LocationsControllerTest(@Autowired private val wac: WebApplicationContext)
   private val mockSession = MockHttpSession(wac.servletContext)
 
   @MockBean
-  lateinit var locationService: MapFriendlyLocationService
+  lateinit var locationService: LocationsService
 
   @BeforeEach
   fun beforeEach() {

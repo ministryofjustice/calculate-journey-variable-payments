@@ -15,6 +15,17 @@ class ExceptionHandler(private val monitoringService: MonitoringService) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ExceptionHandler(ResourceNotFoundException::class)
+  fun handleResourceNotFound(e: ResourceNotFoundException): ModelAndView {
+    logger.warn("Resource not found exception", e)
+
+    return ModelAndView()
+      .apply {
+        this.viewName = "error/404"
+        this.status = HttpStatus.NOT_FOUND
+      }
+  }
+
   @ExceptionHandler(AccessDeniedException::class)
   fun handleAccessDeniedException(e: AccessDeniedException, request: HttpServletRequest): ModelAndView {
     logger.warn("Access denied exception", e)
@@ -42,3 +53,5 @@ class ExceptionHandler(private val monitoringService: MonitoringService) {
       .also { monitoringService.capture("An unexpected error has occurred in the JPC application, see the logs for more details.") }
   }
 }
+
+class ResourceNotFoundException(msg: String) : RuntimeException(msg)

@@ -11,11 +11,14 @@ import java.time.ZoneOffset
 
 @Service
 @Transactional
-class MapFriendlyLocationService(
+class LocationsService(
   private val locationRepository: LocationRepository,
   private val timeSource: TimeSource,
   private val auditService: AuditService
 ) {
+
+  fun findLocationBySiteName(locationName: String): Location? = locationRepository.findBySiteName(locationName.trim().toUpperCase())
+
   fun findAll(): List<Location> = locationRepository.findAll()
 
   fun getVersion() = locationRepository.findFirstByOrderByUpdatedAtDesc()?.updatedAt?.toEpochSecond(ZoneOffset.UTC) ?: 0

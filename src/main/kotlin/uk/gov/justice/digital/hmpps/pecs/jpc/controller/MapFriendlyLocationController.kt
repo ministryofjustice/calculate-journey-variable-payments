@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
@@ -25,7 +25,7 @@ import javax.validation.constraints.NotEmpty
 @SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 @ConditionalOnWebApplication
 class MapFriendlyLocationController(
-  private val service: MapFriendlyLocationService,
+  private val service: LocationsService,
   private val basmClientApiService: BasmClientApiService
 ) {
 

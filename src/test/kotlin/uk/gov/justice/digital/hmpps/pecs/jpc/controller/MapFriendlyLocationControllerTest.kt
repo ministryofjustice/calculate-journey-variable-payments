@@ -18,7 +18,7 @@ import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,7 +33,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   private val nomisLocationName = "NOMIS Location Name"
 
   @MockBean
-  lateinit var service: MapFriendlyLocationService
+  lateinit var service: LocationsService
 
   @MockBean
   lateinit var basmClientApiService: BasmClientApiService
