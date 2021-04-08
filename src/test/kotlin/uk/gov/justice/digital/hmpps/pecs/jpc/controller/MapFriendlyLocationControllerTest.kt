@@ -81,7 +81,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
         model {
           attribute(
             "form",
-            MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP.name, "update", nomisLocationName)
+            MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP, "update", nomisLocationName)
           )
         }
       }

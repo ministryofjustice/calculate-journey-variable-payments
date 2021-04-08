@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 /**
  * Controller to support searching and maintenance of existing Schedule 34 locations.
@@ -72,7 +73,7 @@ class ManageSchedule34LocationsController(
         LocationForm(
           agencyId = it.first,
           locationName = it.second,
-          locationType = it.third.name,
+          locationType = it.third,
           nomisLocationName = basmClientApiService.findAgencyLocationNameBy(agencyId)
             ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
         )
@@ -93,10 +94,10 @@ class ManageSchedule34LocationsController(
 
     if (result.hasErrors()) return "manage-location"
 
-    return if (duplicate(location)) {
+    return if (isDuplicate(location)) {
       "manage-location".also { result.duplicateLocation() }
     } else {
-      service.setLocationDetails(location.agencyId, location.locationName, LocationType.valueOf(location.locationType))
+      service.setLocationDetails(location.agencyId, location.locationName, location.locationType!!)
 
       redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
       redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", location.locationName.toUpperCase())
@@ -106,7 +107,7 @@ class ManageSchedule34LocationsController(
     }
   }
 
-  private fun duplicate(form: LocationForm) = service.locationAlreadyExists(form.agencyId, form.locationName)
+  private fun isDuplicate(form: LocationForm) = service.locationAlreadyExists(form.agencyId, form.locationName)
 
   private fun BindingResult.duplicateLocation() {
     this.rejectValue("locationName", "duplicate", "There is a problem, Schedule 34 location entered already exists, please enter a new schedule 34 location")
@@ -124,8 +125,8 @@ class ManageSchedule34LocationsController(
     @get: NotBlank(message = "Please enter a schedule 34 location name")
     val locationName: String = "",
 
-    @get: NotBlank(message = "Please enter a schedule 34 location type")
-    val locationType: String = "",
+    @get: NotNull(message = "Please enter a schedule 34 location type")
+    val locationType: LocationType? = null,
 
     val nomisLocationName: String = ""
   )

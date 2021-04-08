@@ -63,23 +63,12 @@
                            th:classappend="${#fields.hasErrors('locationName')} ? 'govuk-input--error'">
                 </li>
                 <li class="mv3">
-                    <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-type-id">Add location
-                        type</label>
+                    <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-type-id">Add location type</label>
                     <select name="location-type" id="location-type-id" th:field="*{locationType}" class="govuk-select">
-                        <option value="AP">Airport</option>
-                        <option value="APP">Approved Premises</option>
-                        <option value="CC">Crown Court</option>
-                        <option value="CM">Combined Court</option>
-                        <option value="CO">County Court</option>
-                        <option value="HP">Hospital</option>
-                        <option value="IM">Immigration</option>
-                        <option value="MC">Mag Court</option>
-                        <option value="O">Other</option>
-                        <option value="PS">Police</option>
-                        <option value="PR">Prison</option>
-                        <option value="PB">Probation</option>
-                        <option value="SCH">SCH</option>
-                        <option value="STC">STC</option>
+                        <option th:each="type : ${T(uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType).values()}"
+                                th:value="${type}"
+                                th:text="${type.label}">type
+                        </option>
                     </select>
                 </li>
             </ol>

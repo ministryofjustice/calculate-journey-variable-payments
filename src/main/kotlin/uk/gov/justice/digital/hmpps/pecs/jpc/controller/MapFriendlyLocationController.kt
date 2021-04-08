@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 
 /**
  * Controller to help with mapping a user friendly location name to (missing) Schedule 34 locations names.
@@ -56,7 +57,7 @@ class MapFriendlyLocationController(
         MapLocationForm(
           agencyId = it.first,
           locationName = it.second,
-          locationType = it.third.name,
+          locationType = it.third,
           operation = "update",
           nomisLocationName = nomisLocationName
         )
@@ -94,7 +95,7 @@ class MapFriendlyLocationController(
       return "map-location"
     }
 
-    service.setLocationDetails(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
+    service.setLocationDetails(form.agencyId, form.locationName, form.locationType!!)
 
     redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName.toUpperCase())
     redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
@@ -120,8 +121,8 @@ class MapFriendlyLocationController(
     @get: NotEmpty(message = "Enter Schedule 34 location")
     val locationName: String = "",
 
-    @get: NotEmpty(message = "Enter Schedule 34 location type")
-    val locationType: String = "",
+    @get: NotNull(message = "Enter Schedule 34 location type")
+    val locationType: LocationType? = null,
 
     val operation: String = "create",
 
