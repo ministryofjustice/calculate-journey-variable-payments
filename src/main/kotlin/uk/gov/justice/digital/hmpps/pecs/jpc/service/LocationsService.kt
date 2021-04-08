@@ -32,7 +32,7 @@ class LocationsService(
       ?.takeUnless { it.nomisAgencyId == agencyId.trim().toUpperCase() } != null
   }
 
-  fun mapFriendlyLocation(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
+  fun setLocationDetails(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
     locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let {
       val oldLocation = it.copy()
       it.siteName = friendlyLocationName.trim().toUpperCase()

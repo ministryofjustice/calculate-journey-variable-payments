@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
@@ -23,7 +25,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class ManageLocationsControllerTest(@Autowired private val wac: WebApplicationContext) {
+class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
@@ -33,7 +35,7 @@ class ManageLocationsControllerTest(@Autowired private val wac: WebApplicationCo
   @Test
   internal fun `get and display search locations screen`() {
     mockMvc.get("/search-locations")
-      .andExpect { model { attribute("form", ManageLocationsController.SearchLocationForm()) } }
+      .andExpect { model { attribute("form", ManageSchedule34LocationsController.SearchLocationForm()) } }
       .andExpect { view { name("search-locations") } }
       .andExpect { status { isOk() } }
 
@@ -49,6 +51,37 @@ class ManageLocationsControllerTest(@Autowired private val wac: WebApplicationCo
     }
       .andExpect { status { is3xxRedirection() } }
       .andExpect { redirectedUrl("/manage-location/AGENCY_ID") }
+  }
+
+  @Test
+  internal fun `perform location change succeeds`() {
+    mockMvc.post("/manage-location") {
+      param("agencyId", "AGENCY_ID")
+      param("locationName", "LOCATION NAME")
+      param("locationType", "PR")
+    }
+      .andExpect { status { is3xxRedirection() } }
+      .andExpect { redirectedUrl("search-locations") }
+
+    verify(service).locationAlreadyExists("AGENCY_ID", "LOCATION NAME")
+    verify(service).setLocationDetails("AGENCY_ID", "LOCATION NAME", LocationType.PR)
+  }
+
+  @Test
+  internal fun `perform location change fails on duplicate name`() {
+    whenever(service.locationAlreadyExists("AGENCY_ID", "DUPLICATE LOCATION NAME")).thenReturn(true)
+
+    mockMvc.post("/manage-location") {
+      param("agencyId", "AGENCY_ID")
+      param("locationName", "DUPLICATE LOCATION NAME")
+      param("locationType", "PR")
+    }
+      .andExpect { status { is2xxSuccessful() } }
+      .andExpect { view { name("manage-location") } }
+      .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "duplicate") } }
+
+    verify(service).locationAlreadyExists("AGENCY_ID", "DUPLICATE LOCATION NAME")
+    verify(service, never()).setLocationDetails(any(), any(), any())
   }
 
   @Test

@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 
 @RestController
-@RequestMapping(name = "Locations", path = ["/locations"], produces = [MediaType.APPLICATION_JSON_VALUE])
-class
-LocationsController(@Autowired val locationService: LocationsService) {
+@RequestMapping(name = "Reference Data", path = ["/reference"], produces = [MediaType.APPLICATION_JSON_VALUE])
+class ReferenceDataController(@Autowired val locationService: LocationsService) {
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @GetMapping
-  fun all(@RequestParam(name = "version") userVersion: Long): LocationsDto {
+  @GetMapping(path = ["/locations"])
+  fun locations(@RequestParam(name = "version") userVersion: Long): LocationsDto {
     logger.info("getting locations")
 
     val locationsVersion = locationService.getVersion()

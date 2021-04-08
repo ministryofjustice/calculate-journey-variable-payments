@@ -105,7 +105,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       .andExpect { redirectedUrl("/journeys") }
 
     verify(service).locationAlreadyExists(agencyId, "Friendly Location Name")
-    verify(service).mapFriendlyLocation(agencyId, "Friendly Location Name", LocationType.CC)
+    verify(service).setLocationDetails(agencyId, "Friendly Location Name", LocationType.CC)
   }
 
   @Test
@@ -121,7 +121,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       .andExpect { status { isOk() } }
 
     verify(service, never()).locationAlreadyExists(any(), any())
-    verify(service, never()).mapFriendlyLocation(any(), any(), any())
+    verify(service, never()).setLocationDetails(any(), any(), any())
   }
 
   @Test
@@ -139,6 +139,6 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       .andExpect { status { isOk() } }
 
     verify(service).locationAlreadyExists(agencyId, "Duplicate location")
-    verify(service, never()).mapFriendlyLocation(any(), any(), any())
+    verify(service, never()).setLocationDetails(any(), any(), any())
   }
 }

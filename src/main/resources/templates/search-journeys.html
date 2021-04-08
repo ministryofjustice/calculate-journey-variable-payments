@@ -113,7 +113,7 @@
             toAutocompleteEl = document.querySelector('#to')
           }
         })
-        request.open('GET', 'locations?version=' + (locationData.version || -1))
+        request.open('GET', 'reference/locations?version=' + (locationData.version || -1))
         request.send()
 
   </script>

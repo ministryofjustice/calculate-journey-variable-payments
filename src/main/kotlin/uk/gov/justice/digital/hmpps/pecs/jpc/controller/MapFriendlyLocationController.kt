@@ -15,14 +15,18 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.constraint.ValidDuplicateLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DROP_OFF_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.SUPPLIER_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 
+/**
+ * Controller to help with mapping a user friendly location name to (missing) Schedule 34 locations names.
+ */
 @Controller
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
+@SessionAttributes(SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 @ConditionalOnWebApplication
 class MapFriendlyLocationController(
   private val service: LocationsService,
@@ -31,7 +35,7 @@ class MapFriendlyLocationController(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @GetMapping("/map-location/{agency-id}")
+  @GetMapping("$MAP_LOCATION/{agency-id}")
   fun mapFriendlyLocation(@PathVariable("agency-id") agencyId: String, model: ModelMap): String {
     logger.info("getting map friendly location for $agencyId")
 
@@ -73,7 +77,7 @@ class MapFriendlyLocationController(
     return "map-location"
   }
 
-  @PostMapping("/map-location")
+  @PostMapping(MAP_LOCATION)
   fun mapFriendlyLocation(@Valid @ModelAttribute("form") form: MapLocationForm, result: BindingResult, model: ModelMap, redirectAttributes: RedirectAttributes): String {
     logger.info("mapping friendly location for agency id ${form.agencyId}")
 
@@ -90,7 +94,7 @@ class MapFriendlyLocationController(
       return "map-location"
     }
 
-    service.mapFriendlyLocation(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
+    service.setLocationDetails(form.agencyId, form.locationName, LocationType.valueOf(form.locationType))
 
     redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName.toUpperCase())
     redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
@@ -123,4 +127,10 @@ class MapFriendlyLocationController(
 
     val nomisLocationName: String
   )
+
+  companion object Routes {
+    const val MAP_LOCATION = "/map-location"
+
+    fun routes(): Array<String> = arrayOf(MAP_LOCATION, "$MAP_LOCATION/*")
+  }
 }
