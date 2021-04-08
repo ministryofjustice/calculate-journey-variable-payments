@@ -17,19 +17,19 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MapFriendlyLocationService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class LocationsControllerTest(@Autowired private val wac: WebApplicationContext) {
+class ReferenceDataControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
   private val mockSession = MockHttpSession(wac.servletContext)
 
   @MockBean
-  lateinit var locationService: MapFriendlyLocationService
+  lateinit var locationService: LocationsService
 
   @BeforeEach
   fun beforeEach() {
@@ -41,7 +41,7 @@ class LocationsControllerTest(@Autowired private val wac: WebApplicationContext)
     whenever(locationService.getVersion()).thenReturn(12345)
     whenever(locationService.findAll()).thenReturn(listOf(Location(LocationType.PR, "TESTLOC1", "Test Loc 1")))
 
-    mockMvc.get("/locations") {
+    mockMvc.get("/reference/locations") {
       session = mockSession
       param("version", "-1")
     }
@@ -60,7 +60,7 @@ class LocationsControllerTest(@Autowired private val wac: WebApplicationContext)
       )
     )
 
-    mockMvc.get("/locations") {
+    mockMvc.get("/reference/locations") {
       session = mockSession
       param("version", "-1")
     }
@@ -72,7 +72,7 @@ class LocationsControllerTest(@Autowired private val wac: WebApplicationContext)
   internal fun `get with newest version number returns just version number`() {
     whenever(locationService.getVersion()).thenReturn(12345)
 
-    mockMvc.get("/locations") {
+    mockMvc.get("/reference/locations") {
       session = mockSession
       param("version", "12345")
     }

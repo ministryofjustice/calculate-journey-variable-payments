@@ -43,7 +43,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     val to: String?,
   )
 
-  @GetMapping("/add-price/{moveId}")
+  @GetMapping("$ADD_PRICE/{moveId}")
   fun addPrice(
     @PathVariable moveId: String,
     model: ModelMap,
@@ -70,7 +70,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     return "add-price"
   }
 
-  @PostMapping("/add-price")
+  @PostMapping(ADD_PRICE)
   fun addPrice(
     @Valid @ModelAttribute("form") form: PriceForm,
     result: BindingResult,
@@ -110,7 +110,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     return RedirectView(HtmlController.JOURNEYS_URL)
   }
 
-  @GetMapping("/update-price/{moveId}")
+  @GetMapping("$UPDATE_PRICE/{moveId}")
   fun updatePrice(
     @PathVariable moveId: String,
     model: ModelMap,
@@ -139,7 +139,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     return "update-price"
   }
 
-  @PostMapping("/update-price")
+  @PostMapping(UPDATE_PRICE)
   fun updatePrice(
     @Valid @ModelAttribute("form") form: PriceForm,
     result: BindingResult,
@@ -207,5 +207,13 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
   private fun UriComponentsBuilder.toQueryParam(to: Any) {
     this.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
+  }
+
+  companion object Routes {
+
+    const val ADD_PRICE = "/add-price"
+    const val UPDATE_PRICE = "/update-price"
+
+    fun routes(): Array<String> = arrayOf(ADD_PRICE, "$ADD_PRICE/*", UPDATE_PRICE, "$UPDATE_PRICE/*")
   }
 }

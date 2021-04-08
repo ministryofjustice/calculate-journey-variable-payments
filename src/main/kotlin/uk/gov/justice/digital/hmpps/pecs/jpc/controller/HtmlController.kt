@@ -336,5 +336,7 @@ class HtmlController(
     const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
     const val FIND_MOVE_URL = "/find-move"
     const val CHOOSE_SUPPLIER_URL = "/choose-supplier"
+
+    fun routes(): Array<String> = arrayOf(DASHBOARD_URL, JOURNEYS_URL, MOVES_BY_TYPE_URL, SEARCH_JOURNEYS_URL, SELECT_MONTH_URL)
   }
 }
