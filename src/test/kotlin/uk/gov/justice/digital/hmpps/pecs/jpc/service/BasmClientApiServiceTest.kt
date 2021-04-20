@@ -26,7 +26,7 @@ internal class BasmClientApiServiceTest {
   internal fun `location name is found for agency COURT1`() {
     basmApiServer.enqueue(locationResponse("Court One"))
 
-    val location = service.findAgencyLocationNameBy("court1")
+    val location = service.findNomisAgencyLocationNameBy("court1")
     val request = basmApiServer.takeRequest()
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=COURT1")
@@ -38,7 +38,7 @@ internal class BasmClientApiServiceTest {
   internal fun `location name is found for agency COURT2`() {
     basmApiServer.enqueue(locationResponse("Court Two"))
 
-    val location = service.findAgencyLocationNameBy("court2")
+    val location = service.findNomisAgencyLocationNameBy("court2")
     val request = basmApiServer.takeRequest()
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=COURT2")
@@ -50,7 +50,7 @@ internal class BasmClientApiServiceTest {
   internal fun `location name is found for agency PRISON1`() {
     basmApiServer.enqueue(locationResponse("Prison One"))
 
-    val location = service.findAgencyLocationNameBy("prison1")
+    val location = service.findNomisAgencyLocationNameBy("prison1")
     val request = basmApiServer.takeRequest()
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON1")
@@ -62,7 +62,7 @@ internal class BasmClientApiServiceTest {
   internal fun `location name is found for agency PRISON2`() {
     basmApiServer.enqueue(locationResponse("Prison Two"))
 
-    val location = service.findAgencyLocationNameBy("prison2")
+    val location = service.findNomisAgencyLocationNameBy("prison2")
     val request = basmApiServer.takeRequest()
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON2")
@@ -74,7 +74,7 @@ internal class BasmClientApiServiceTest {
   internal fun `monitoring service is called when location when name not found`() {
     basmApiServer.enqueue(locationResponse(body = "{ \"data\": [] }"))
 
-    assertThat(service.findAgencyLocationNameBy("NO MATCH")).isNull()
+    assertThat(service.findNomisAgencyLocationNameBy("NO MATCH")).isNull()
     verify(monitoringService).capture(any())
   }
 
@@ -82,7 +82,7 @@ internal class BasmClientApiServiceTest {
   internal fun `monitoring service is called on with call timeout`() {
     basmApiServer.enqueue(locationResponse("timed out").setBodyDelay(1, TimeUnit.SECONDS))
 
-    assertThat(service.findAgencyLocationNameBy("TIMEOUT")).isNull()
+    assertThat(service.findNomisAgencyLocationNameBy("TIMEOUT")).isNull()
     verify(monitoringService).capture(any())
   }
 

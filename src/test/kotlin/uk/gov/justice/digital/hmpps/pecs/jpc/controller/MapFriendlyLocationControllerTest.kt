@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.get
@@ -28,6 +29,8 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
+  private val mockSession = MockHttpSession(wac.servletContext)
+
   private val agencyId = "123456"
 
   private val nomisLocationName = "NOMIS Location Name"
@@ -41,7 +44,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   @Test
   internal fun `get mapping for new friendly location`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
-    whenever(basmClientApiService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
+    whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)) } }
@@ -54,7 +57,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   @Test
   internal fun `get mapping for new friendly location with no NOMIS location name lookup match`() {
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(null)
-    whenever(basmClientApiService.findAgencyLocationNameBy(agencyId)).thenReturn(null)
+    whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(null)
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.")) } }
@@ -74,9 +77,9 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       )
     )
 
-    whenever(basmClientApiService.findAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
+    whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
-    mockMvc.get("/map-location/$agencyId")
+    mockMvc.get("/map-location/$agencyId?origin=from")
       .andExpect {
         model {
           attribute(
@@ -86,9 +89,89 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
         }
       }
       .andExpect { view { name("map-location") } }
+      .andExpect { model { attribute("origin", "from") } }
       .andExpect { status { isOk() } }
 
     verify(service).findAgencyLocationAndType(agencyId)
+  }
+
+  @Test
+  internal fun `map existing location successful when originating search based on pick-up`() {
+    whenever(service.locationAlreadyExists(agencyId, "Updated Friendly Location Name")).thenReturn(false)
+
+    mockSession.apply {
+      this.setAttribute("origin", "from")
+      this.setAttribute("pick-up", "FRIENDLY LOCATION NAME")
+    }
+
+    mockMvc.post("/map-location") {
+      param("agencyId", "123456")
+      param("nomisLocationName", nomisLocationName)
+      param("locationName", "Updated Friendly Location Name")
+      param("locationType", "CC")
+      param("operation", "update")
+      session = mockSession
+    }
+      .andExpect { flash { attribute("flashAttrMappedLocationName", "UPDATED FRIENDLY LOCATION NAME") } }
+      .andExpect { flash { attribute("flashAttrMappedAgencyId", "123456") } }
+      .andExpect { status { is3xxRedirection() } }
+      .andExpect { redirectedUrl("/journeys-results?pick-up=UPDATED%20FRIENDLY%20LOCATION%20NAME") }
+
+    verify(service).locationAlreadyExists(agencyId, "Updated Friendly Location Name")
+    verify(service).setLocationDetails(agencyId, "Updated Friendly Location Name", LocationType.CC)
+  }
+
+  @Test
+  internal fun `map existing location successful when originating search based on drop-off`() {
+    whenever(service.locationAlreadyExists(agencyId, "Updated Friendly Location Name")).thenReturn(false)
+
+    mockSession.apply {
+      this.setAttribute("origin", "to")
+      this.setAttribute("drop-off", "FRIENDLY LOCATION NAME")
+    }
+
+    mockMvc.post("/map-location") {
+      param("agencyId", "123456")
+      param("nomisLocationName", nomisLocationName)
+      param("locationName", "Updated Friendly Location Name")
+      param("locationType", "CC")
+      param("operation", "update")
+      session = mockSession
+    }
+      .andExpect { flash { attribute("flashAttrMappedLocationName", "UPDATED FRIENDLY LOCATION NAME") } }
+      .andExpect { flash { attribute("flashAttrMappedAgencyId", "123456") } }
+      .andExpect { status { is3xxRedirection() } }
+      .andExpect { redirectedUrl("/journeys-results?drop-off=UPDATED%20FRIENDLY%20LOCATION%20NAME") }
+
+    verify(service).locationAlreadyExists(agencyId, "Updated Friendly Location Name")
+    verify(service).setLocationDetails(agencyId, "Updated Friendly Location Name", LocationType.CC)
+  }
+
+  @Test
+  internal fun `map existing location successful when originating search based on pick-up and drop-off`() {
+    whenever(service.locationAlreadyExists(agencyId, "Updated pick-up location")).thenReturn(false)
+
+    mockSession.apply {
+      this.setAttribute("origin", "from")
+      this.setAttribute("pick-up", "PICK-UP LOCATION")
+      this.setAttribute("drop-off", "DROP-OFF LOCATION")
+    }
+
+    mockMvc.post("/map-location") {
+      param("agencyId", "123456")
+      param("nomisLocationName", nomisLocationName)
+      param("locationName", "Updated pick-up location")
+      param("locationType", "CC")
+      param("operation", "update")
+      session = mockSession
+    }
+      .andExpect { flash { attribute("flashAttrMappedLocationName", "UPDATED PICK-UP LOCATION") } }
+      .andExpect { flash { attribute("flashAttrMappedAgencyId", "123456") } }
+      .andExpect { status { is3xxRedirection() } }
+      .andExpect { redirectedUrl("/journeys-results?pick-up=UPDATED%20PICK-UP%20LOCATION&drop-off=DROP-OFF%20LOCATION") }
+
+    verify(service).locationAlreadyExists(agencyId, "Updated pick-up location")
+    verify(service).setLocationDetails(agencyId, "Updated pick-up location", LocationType.CC)
   }
 
   @Test
@@ -134,7 +217,6 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       param("locationName", "Duplicate location")
       param("locationType", "CC")
     }
-      // .andExpect { model { attributeErrorCount("form", 1) } }
       .andExpect { view { name("map-location") } }
       .andExpect { status { isOk() } }
 

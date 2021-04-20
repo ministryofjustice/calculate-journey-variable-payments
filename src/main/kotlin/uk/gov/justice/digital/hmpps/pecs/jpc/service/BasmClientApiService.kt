@@ -16,7 +16,7 @@ class BasmClientApiService(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  fun findAgencyLocationNameBy(agencyId: String): String? {
+  fun findNomisAgencyLocationNameBy(agencyId: String): String? {
     logger.info("Looking up location name for agency ID '${agencyId.trim().toUpperCase()}'.")
 
     fun recordIfLocationNotFound(location: LocationResponse?) {

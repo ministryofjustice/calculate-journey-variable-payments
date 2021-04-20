@@ -35,13 +35,13 @@
             <tbody class="govuk-table__body">
             <tr class="govuk-table__row" th:each="journey: ${journeys}">
                 <td class="govuk-table__cell" scope="row" th:inline="text">
-                    <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId}}" class="ma0 govuk-link">
+                    <a th:href="@{'/map-location/' + ${journey.fromNomisAgencyId} + '?origin=from'}" class="ma0 govuk-link">
                         <span th:inline="text"> [[${journey.fromSiteName}]]</span>
                     </a>
                 </td>
                 <td class="govuk-table__cell" scope="row" th:inline="text">[[${journey.fromLocationType}]]</td>
                 <td class="govuk-table__cell" scope="row" th:inline="text">
-                    <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId}}" class="ma0 govuk-link"
+                    <a th:href="@{'/map-location/' + ${journey.toNomisAgencyId} + '?origin=to'}" class="ma0 govuk-link"
                        th:inline="text">
                         [[${journey.toSiteName}]]
                     </a>
