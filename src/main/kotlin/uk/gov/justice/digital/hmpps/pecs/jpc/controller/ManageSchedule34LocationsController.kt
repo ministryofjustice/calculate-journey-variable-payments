@@ -74,7 +74,7 @@ class ManageSchedule34LocationsController(
           agencyId = it.first,
           locationName = it.second,
           locationType = it.third,
-          nomisLocationName = basmClientApiService.findAgencyLocationNameBy(agencyId)
+          nomisLocationName = basmClientApiService.findNomisAgencyLocationNameBy(agencyId)
             ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
         )
       )

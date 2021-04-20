@@ -267,18 +267,29 @@ class HtmlController(
 
     if (result.hasErrors()) return "search-journeys"
 
+    model.removeAnyPreviousSearchHistory()
+
     val from = form.from?.trim().orEmpty()
     val to = form.to?.trim().orEmpty()
 
     val url = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
 
-    if (from.isNotEmpty()) url.queryParam(PICK_UP_ATTRIBUTE, from)
-    if (to.isNotEmpty()) url.queryParam(DROP_OFF_ATTRIBUTE, to)
+    if (from.isNotBlank()) {
+      url.queryParam(PICK_UP_ATTRIBUTE, from)
+      model.addAttribute(PICK_UP_ATTRIBUTE, from)
+    }
 
-    model.addAttribute(PICK_UP_ATTRIBUTE, from)
-    model.addAttribute(DROP_OFF_ATTRIBUTE, to)
+    if (to.isNotBlank()) {
+      url.queryParam(DROP_OFF_ATTRIBUTE, to)
+      model.addAttribute(DROP_OFF_ATTRIBUTE, to)
+    }
 
     return "redirect:${url.build().toUri()}"
+  }
+
+  private fun ModelMap.removeAnyPreviousSearchHistory() {
+    this.addAttribute(PICK_UP_ATTRIBUTE, "")
+    this.addAttribute(DROP_OFF_ATTRIBUTE, "")
   }
 
   @GetMapping(SEARCH_JOURNEYS_RESULTS_URL)
