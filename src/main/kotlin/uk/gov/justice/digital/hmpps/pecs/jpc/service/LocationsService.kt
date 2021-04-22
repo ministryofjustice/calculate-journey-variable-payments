@@ -39,15 +39,12 @@ class LocationsService(
       it.locationType = locationType
       it.updatedAt = timeSource.dateTime()
 
-      AuditableEvent.locationEvent(
-        oldLocation,
-        locationRepository.save(it).copy(),
-      )?.let { e -> auditService.create(e) }
+      AuditableEvent.remapLocation(oldLocation, locationRepository.save(it).copy()).let { e -> auditService.create(e) }
 
       return
     }
 
-    AuditableEvent.locationEvent(
+    AuditableEvent.mapLocation(
       locationRepository.save(
         Location(
           locationType,
@@ -57,6 +54,6 @@ class LocationsService(
           timeSource.dateTime()
         ).copy()
       )
-    )?.let { e -> auditService.create(e) }
+    ).let { e -> auditService.create(e) }
   }
 }

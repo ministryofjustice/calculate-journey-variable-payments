@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 
+import com.beust.klaxon.Klaxon
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
@@ -12,8 +13,10 @@ import java.time.format.DateTimeFormatter
 data class AuditableEvent(
   val type: AuditEventType,
   val username: String,
-  val extras: Map<String, Any>? = null
+  val metadata: Metadata? = null
 ) {
+  constructor(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) : this(type, username, metadata?.let { MetadataWrapper(it) })
+
   companion object {
     private fun createEvent(
       type: AuditEventType,
@@ -27,29 +30,26 @@ data class AuditableEvent(
       return AuditableEvent(
         type,
         authentication?.name ?: "_TERMINAL_",
-        metadata
+        metadata = metadata?.let { MetadataWrapper(it) }
       )
+    }
+
+    private data class MetadataWrapper(private val metadata: Map<String, Any>) : Metadata {
+      override fun toJsonString() = Klaxon().toJsonString(metadata)
     }
 
     fun logInEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_IN, authentication)
 
     fun logOutEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_OUT, authentication)
 
-    fun downloadSpreadsheetEvent(
-      date: LocalDate,
-      supplier: Supplier,
-      authentication: Authentication
-    ) =
+    fun downloadSpreadsheetEvent(date: LocalDate, supplier: Supplier, authentication: Authentication) =
       createEvent(
         AuditEventType.DOWNLOAD_SPREADSHEET,
         authentication,
         mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
       )
 
-    fun addPriceEvent(
-      newPrice: Price,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    fun addPriceEvent(newPrice: Price): AuditableEvent {
       val metadata = mutableMapOf<String, Any>(
         "supplier" to newPrice.supplier,
         "from_nomis_id" to newPrice.fromLocation.nomisAgencyId,
@@ -58,14 +58,10 @@ data class AuditableEvent(
         "price" to newPrice.price().pounds()
       )
 
-      return createEvent(AuditEventType.JOURNEY_PRICE, authentication, metadata)
+      return createEvent(AuditEventType.JOURNEY_PRICE, authentication(), metadata)
     }
 
-    fun updatePriceEvent(
-      updatedPrice: Price,
-      oldPrice: Money,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
-    ): AuditableEvent {
+    fun updatePriceEvent(updatedPrice: Price, oldPrice: Money): AuditableEvent {
       val metadata = mutableMapOf<String, Any>(
         "supplier" to updatedPrice.supplier,
         "from_nomis_id" to updatedPrice.fromLocation.nomisAgencyId,
@@ -75,51 +71,35 @@ data class AuditableEvent(
         "new_price" to updatedPrice.price().pounds()
       )
 
-      return createEvent(AuditEventType.JOURNEY_PRICE, authentication, metadata)
+      return createEvent(AuditEventType.JOURNEY_PRICE, authentication(), metadata)
     }
 
     fun journeyPriceBulkUpdateEvent(
       supplier: Supplier,
-      multiplier: Double,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication,
+      multiplier: Double
     ) = createEvent(
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
-      authentication,
+      null,
       mapOf("supplier" to supplier, "multiplier" to multiplier),
       true
     )
 
-    fun locationEvent(
-      oldLocation: Location,
-      newLocation: Location? = null,
-      authentication: Authentication? = SecurityContextHolder.getContext().authentication
-    ): AuditableEvent? {
-      if (oldLocation.siteName == newLocation?.siteName && oldLocation.locationType == newLocation.locationType) {
-        return null
-      }
-
-      val metadata = mutableMapOf<String, Any>("nomis_id" to oldLocation.nomisAgencyId)
-      if (newLocation != null) {
-        if (oldLocation.siteName != newLocation.siteName) {
-          metadata["old_name"] = oldLocation.siteName
-          metadata["new_name"] = newLocation.siteName
-        }
-
-        if (oldLocation.locationType != newLocation.locationType) {
-          metadata["old_type"] = oldLocation.locationType
-          metadata["new_type"] = newLocation.locationType
-        }
-      } else {
-        metadata["name"] = oldLocation.siteName
-        metadata["type"] = oldLocation.locationType
-      }
-
-      return createEvent(
-        AuditEventType.LOCATION,
-        authentication,
-        metadata
+    fun mapLocation(location: Location) =
+      AuditableEvent(
+        type = AuditEventType.LOCATION,
+        username = authentication().name,
+        metadata = MapLocationMetadata.map(location)
       )
-    }
+
+    fun remapLocation(old: Location, new: Location) =
+      AuditableEvent(
+        type = AuditEventType.LOCATION,
+        username = authentication().name,
+        metadata = MapLocationMetadata.remap(old, new)
+      )
+
+    private fun authentication() = SecurityContextHolder.getContext().authentication
+      ?: throw RuntimeException("Attempted to create audit event $AuditEventType.LOCATION without a user")
 
     fun importReportEvent(type: String, reportDate: LocalDate, processed: Int, saved: Int) =
       createEvent(

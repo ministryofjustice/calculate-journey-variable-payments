@@ -2,18 +2,24 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import com.beust.klaxon.Klaxon
 import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatcher
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -23,14 +29,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
-
-internal class AuditableEventMatcher(private var auditableEvent: AuditableEvent) : ArgumentMatcher<AuditableEvent> {
-  override fun matches(otherAuditableEvent: AuditableEvent): Boolean {
-    return auditableEvent.username == otherAuditableEvent.username &&
-      auditableEvent.extras == otherAuditableEvent.extras &&
-      auditableEvent.type == otherAuditableEvent.type
-  }
-}
 
 private class AuditEventMatcher(var auditEvent: AuditEvent) : ArgumentMatcher<AuditEvent> {
   override fun matches(otherAuditEvent: AuditEvent): Boolean {
@@ -46,7 +44,9 @@ internal class AuditServiceTest {
   private val dateTime = LocalDateTime.of(2021, 1, 1, 12, 34, 56)
   private val timeSource = TimeSource { dateTime }
   private val service = AuditService(auditEventRepository, timeSource)
-  private val authentication: Authentication = mock()
+  private val authentication: Authentication = mock { on { name } doReturn " mOcK NAME      " }
+  private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }
+  private val eventCaptor = argumentCaptor<AuditEvent>()
 
   private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) =
     verify(auditEventRepository).save(
@@ -56,11 +56,7 @@ internal class AuditServiceTest {
             type,
             dateTime,
             username,
-            if (metadata != null) {
-              Klaxon().toJsonString(metadata)
-            } else {
-              null
-            }
+            if (metadata != null) Klaxon().toJsonString(metadata) else null
           )
         )
       )
@@ -69,6 +65,12 @@ internal class AuditServiceTest {
   @BeforeEach
   private fun initMocks() {
     whenever(authentication.name).thenReturn(" mOcK NAME      ")
+    SecurityContextHolder.setContext(securityContext)
+  }
+
+  @AfterEach
+  private fun deInitMocks() {
+    SecurityContextHolder.clearContext()
   }
 
   @Test
@@ -100,80 +102,74 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create new location audit event`() {
-    assertThatThrownBy {
-      AuditableEvent.locationEvent(
-        Location(LocationType.PR, "TEST1", "TEST 1 NAME")
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event LOCATION without a user")
+    service.create(AuditableEvent.mapLocation(Location(LocationType.AP, "TEST2", "TEST 2 NAME")))
 
-    service.create(
-      AuditableEvent.locationEvent(
-        Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
-        authentication = authentication
-      )!!
-    )
-
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "MOCK NAME",
-      mapOf("nomis_id" to "TEST2", "name" to "TEST 2 NAME", "type" to "AP")
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
+    assertThat(eventCaptor.firstValue.username).isEqualTo("MOCK NAME")
+    assertThatMappedLocationsAreTheSame(
+      eventCaptor.firstValue,
+      MapLocationMetadata(nomisId = "TEST2", newName = "TEST 2 NAME", newType = LocationType.AP)
     )
   }
 
   @Test
   internal fun `create location name change audit event`() {
-    assertThatThrownBy {
-      AuditableEvent.locationEvent(
-        Location(LocationType.PR, "TEST1", "TEST 1 NAME"),
-        Location(LocationType.PR, "TEST1", "TEST A NAME")
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event LOCATION without a user")
+    val location = Location(LocationType.AP, "TEST2", "TEST 2 NAME")
 
     service.create(
-      AuditableEvent.locationEvent(
-        Location(LocationType.AP, "TEST2", "TEST 2 NAME"),
-        Location(LocationType.AP, "TEST2", "TEST B NAME"),
-        authentication = authentication
-      )!!
+      AuditableEvent.remapLocation(
+        location,
+        location.copy(siteName = "TEST B NAME")
+      )
     )
 
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "MOCK NAME",
-      mapOf("nomis_id" to "TEST2", "old_name" to "TEST 2 NAME", "new_name" to "TEST B NAME")
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
+    assertThat(eventCaptor.firstValue.username).isEqualTo("MOCK NAME")
+    assertThatMappedLocationsAreTheSame(
+      eventCaptor.firstValue,
+      MapLocationMetadata(
+        nomisId = "TEST2",
+        newName = "TEST B NAME",
+        oldName = "TEST 2 NAME"
+      )
     )
   }
 
   @Test
   internal fun `create location type change audit event`() {
-    assertThatThrownBy {
-      AuditableEvent.locationEvent(
-        Location(LocationType.AP, "TEST1", "TEST 1 NAME"),
-        Location(LocationType.CO, "TEST1", "TEST 1 NAME")
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event LOCATION without a user")
+    val location = Location(LocationType.HP, "TEST2", "TEST 2 NAME")
 
     service.create(
-      AuditableEvent.locationEvent(
-        Location(LocationType.HP, "TEST2", "TEST 2 NAME"),
-        Location(LocationType.PR, "TEST2", "TEST 2 NAME"),
-        authentication = authentication
-      )!!
+      AuditableEvent.remapLocation(
+        location,
+        location.copy(locationType = LocationType.PR)
+      )
     )
 
-    verifyEvent(
-      AuditEventType.LOCATION,
-      "MOCK NAME",
-      mapOf("nomis_id" to "TEST2", "old_type" to "HP", "new_type" to "PR")
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
+    assertThat(eventCaptor.firstValue.username).isEqualTo("MOCK NAME")
+    assertThatMappedLocationsAreTheSame(
+      eventCaptor.firstValue,
+      MapLocationMetadata(
+        nomisId = "TEST2",
+        oldType = LocationType.HP,
+        newType = LocationType.PR
+      )
     )
   }
 
+  private fun assertThatMappedLocationsAreTheSame(auditEvent: AuditEvent, mapLocationMetadata: MapLocationMetadata) {
+    assertThat(jsonToMapLocation(auditEvent.metadata!!)!!).isEqualTo(mapLocationMetadata)
+  }
+
+  private fun jsonToMapLocation(json: String) = Klaxon().parse<MapLocationMetadata>(json)
+
   @Test
   internal fun `create journey price set audit event`() {
-    assertThatThrownBy {
+    service.create(
       AuditableEvent.addPriceEvent(
         Price(
           supplier = Supplier.SERCO,
@@ -182,20 +178,6 @@ internal class AuditServiceTest {
           priceInPence = 234,
           effectiveYear = effectiveYearForDate(timeSource.date())
         )
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
-
-    service.create(
-      AuditableEvent.addPriceEvent(
-        Price(
-          supplier = Supplier.SERCO,
-          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
-          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
-          priceInPence = 234,
-          effectiveYear = effectiveYearForDate(timeSource.date())
-        ),
-        authentication
       )
     )
 
@@ -214,20 +196,6 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price change audit event`() {
-    assertThatThrownBy {
-      AuditableEvent.updatePriceEvent(
-        Price(
-          supplier = Supplier.SERCO,
-          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
-          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
-          priceInPence = 2340,
-          effectiveYear = effectiveYearForDate(timeSource.date())
-        ),
-        Money(234)
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Attempted to create audit event JOURNEY_PRICE without a user")
-
     service.create(
       AuditableEvent.updatePriceEvent(
         Price(
@@ -237,8 +205,7 @@ internal class AuditServiceTest {
           priceInPence = 2340,
           effectiveYear = effectiveYearForDate(timeSource.date())
         ),
-        Money(234),
-        authentication
+        Money(234)
       )
     )
     verifyEvent(
@@ -258,22 +225,17 @@ internal class AuditServiceTest {
   @Test
   internal fun `create journey price bulk update audit event`() {
     service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.SERCO, 1.5))
-    service.create(
-      AuditableEvent.journeyPriceBulkUpdateEvent(
-        Supplier.GEOAMEY,
-        2.0,
-        authentication = authentication
-      )
-    )
+    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.GEOAMEY, 2.0))
 
     verifyEvent(
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
       "_TERMINAL_",
       mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
     )
+
     verifyEvent(
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
-      "MOCK NAME",
+      "_TERMINAL_",
       mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
     )
   }

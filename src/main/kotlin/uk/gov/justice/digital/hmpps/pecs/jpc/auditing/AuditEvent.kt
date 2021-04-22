@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank
 data class AuditEvent(
   @Enumerated(EnumType.STRING)
   @Column(name = "event_type", nullable = false)
-  var eventType: AuditEventType,
+  val eventType: AuditEventType,
 
   @Column(name = "created_at", nullable = false)
   val createdAt: LocalDateTime,
@@ -30,4 +30,15 @@ data class AuditEvent(
   @Id
   @Column(name = "audit_event_id", nullable = false)
   val id: UUID = UUID.randomUUID()
-)
+) {
+  constructor(eventType: AuditEventType, createdAt: LocalDateTime, username: String, metadata: Metadata?) : this(
+    eventType = eventType,
+    createdAt = createdAt,
+    username = username,
+    metadata = metadata?.toJsonString()
+  )
+}
+
+fun interface Metadata {
+  fun toJsonString(): String
+}

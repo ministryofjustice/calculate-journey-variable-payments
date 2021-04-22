@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
@@ -42,14 +41,10 @@ internal class BulkPricesServiceTest {
     verify(priceRepository).findBySupplierAndEffectiveYear(Supplier.SERCO, 2020)
     verify(priceRepository, times(2)).save(priceCaptor.capture())
     verify(auditService).create(
-      argThat(
-        AuditableEventMatcher(
-          AuditableEvent(
-            AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
-            "_TERMINAL_",
-            mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
-          )
-        )
+      AuditableEvent(
+        AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+        "_TERMINAL_",
+        mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
       )
     )
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.firstValue, Supplier.SERCO, Money(1500), 2021)
@@ -70,14 +65,10 @@ internal class BulkPricesServiceTest {
     verify(priceRepository).findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2021)
     verify(priceRepository, times(2)).save(priceCaptor.capture())
     verify(auditService).create(
-      argThat(
-        AuditableEventMatcher(
-          AuditableEvent(
-            AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
-            "_TERMINAL_",
-            mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
-          )
-        )
+      AuditableEvent(
+        AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+        "_TERMINAL_",
+        mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
       )
     )
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.firstValue, Supplier.GEOAMEY, Money(3000), 2022)
