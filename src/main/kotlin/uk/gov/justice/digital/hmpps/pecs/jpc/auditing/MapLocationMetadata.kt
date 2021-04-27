@@ -48,6 +48,13 @@ data class MapLocationMetadata(
 
       return MapLocationMetadata(old, new)
     }
+
+    fun map(event: AuditEvent): MapLocationMetadata {
+      return if (event.eventType == AuditEventType.LOCATION)
+        Klaxon().parse<MapLocationMetadata>(event.metadata!!)!!
+      else
+        throw IllegalArgumentException("Audit event type is not a location event.")
+    }
   }
 
   fun isRemapping() = oldName != null || oldType != null

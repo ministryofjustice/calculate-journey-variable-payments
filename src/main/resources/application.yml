@@ -13,6 +13,7 @@ spring:
       hibernate.order_updates: true
       hibernate.jdbc.batch_versioned_data: true
       hibernate.generate_statistics: false
+    open-in-view: false
   datasource:
     platform: postgres
     url: ${APP_DB_URL}
@@ -47,8 +48,7 @@ spring:
           issuer-uri: ${HMPPS_AUTH_BASE_URI}/issuer
 
   flyway:
-    locations: classpath:/db/migration/ddl
-    baseline-on-migrate: true
+    locations: classpath:/db/migration/ddl,classpath:/db/migration/dml
 
 resources:
   provider: s3
