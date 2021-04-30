@@ -17,29 +17,33 @@ class LocationsService(
   private val auditService: AuditService
 ) {
 
-  fun findLocationBySiteName(locationName: String): Location? = locationRepository.findBySiteName(locationName.trim().toUpperCase())
+  fun findLocationBySiteName(locationName: String): Location? = locationRepository.findBySiteName(sanitised(locationName))
 
   fun findAll(): List<Location> = locationRepository.findAll()
 
   fun getVersion() = locationRepository.findFirstByOrderByUpdatedAtDesc()?.updatedAt?.toEpochSecond(ZoneOffset.UTC) ?: 0
 
   fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? =
-    locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
-      ?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }
+    locationRepository.findByNomisAgencyId(sanitised(agencyId))?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }
 
-  fun locationAlreadyExists(agencyId: String, siteName: String): Boolean {
-    return locationRepository.findBySiteName(siteName.trim().toUpperCase())
-      ?.takeUnless { it.nomisAgencyId == agencyId.trim().toUpperCase() } != null
-  }
+  fun locationAlreadyExists(agencyId: String, siteName: String) =
+    locationRepository.findBySiteName(sanitised(siteName))?.takeUnless { it.nomisAgencyId == sanitised(agencyId) } != null
 
   fun setLocationDetails(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
-    locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())?.let {
-      val oldLocation = it.copy()
-      it.siteName = friendlyLocationName.trim().toUpperCase()
-      it.locationType = locationType
-      it.updatedAt = timeSource.dateTime()
+    val sanitizedAgencyId = sanitised(agencyId)
+    val sanitisedLocationName = sanitised(friendlyLocationName)
 
-      AuditableEvent.remapLocation(oldLocation, locationRepository.save(it).copy()).let { e -> auditService.create(e) }
+    fun Location.eitherHasChanged(siteName: String, type: LocationType) = this.siteName != siteName || this.locationType != type
+
+    locationRepository.findByNomisAgencyId(sanitizedAgencyId)?.let {
+      if (it.eitherHasChanged(sanitisedLocationName, locationType)) {
+        val oldLocation = it.copy()
+        it.siteName = sanitisedLocationName
+        it.locationType = locationType
+        it.updatedAt = timeSource.dateTime()
+
+        AuditableEvent.remapLocation(oldLocation, locationRepository.save(it).copy()).let { e -> auditService.create(e) }
+      }
 
       return
     }
@@ -48,12 +52,14 @@ class LocationsService(
       locationRepository.save(
         Location(
           locationType,
-          agencyId.toUpperCase().trim(),
-          friendlyLocationName.toUpperCase().trim(),
+          sanitizedAgencyId,
+          sanitisedLocationName,
           timeSource.dateTime(),
           timeSource.dateTime()
         ).copy()
       )
     ).let { e -> auditService.create(e) }
   }
+
+  private fun sanitised(value: String) = value.trim().toUpperCase()
 }

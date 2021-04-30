@@ -13,9 +13,15 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     datasource:
       url: "spring.jpa.database: HSQL"
-
   flyway:
     enabled: false
+  main:
+    allow-bean-definition-overriding: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri:
 
 server:
   port: 8080

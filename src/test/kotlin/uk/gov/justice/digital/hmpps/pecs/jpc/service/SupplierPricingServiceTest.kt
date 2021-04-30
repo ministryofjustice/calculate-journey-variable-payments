@@ -2,19 +2,16 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContext
-import org.springframework.security.core.context.SecurityContextHolder
+import org.junit.jupiter.api.extension.ExtendWith
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
@@ -22,41 +19,18 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 
+@ExtendWith(FakeAuthentication::class)
 internal class SupplierPricingServiceTest {
 
   private val auditService: AuditService = mock()
-  private val priceInPence: Int = 10024
+  private val effectiveYear = effectiveYearForDate(LocalDate.now())
   private val locationRepository: LocationRepository = mock()
-  private val fromLocation: Location = mock { on { siteName } doReturn "from site" }
-  private val toLocation: Location = mock { on { siteName } doReturn "to site" }
+  private val fromLocation: Location = Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
+  private val toLocation: Location = Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
   private val priceRepository: PriceRepository = mock()
-  private val price: Price = mock {
-    on { priceInPence } doReturn priceInPence
-    on { price() } doReturn Money.Factory.valueOf(priceInPence / 100.0)
-    on { fromLocation } doReturn fromLocation
-    on { toLocation } doReturn toLocation
-  }
-  private val service: SupplierPricingService =
-    SupplierPricingService(
-      locationRepository,
-      priceRepository,
-      auditService
-    )
+  private val price: Price = Price(supplier = Supplier.SERCO, priceInPence = 10024, fromLocation = fromLocation, toLocation = toLocation, effectiveYear = effectiveYear)
   private val priceCaptor = argumentCaptor<Price>()
-  private val authentication: Authentication = mock { on { name } doReturn " mOcK NAME      " }
-  private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }
-
-  private val effectiveDate = LocalDate.now()
-
-  @BeforeEach
-  private fun initMocks() {
-    SecurityContextHolder.setContext(securityContext)
-  }
-
-  @AfterEach
-  private fun deInitMocks() {
-    SecurityContextHolder.clearContext()
-  }
+  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository, auditService)
 
   @Test
   internal fun `site names returned for new pricing`() {
@@ -70,7 +44,7 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(null)
 
-    val result = service.getSiteNamesForPricing(Supplier.SERCO, "from", "to", effectiveYearForDate(effectiveDate))
+    val result = service.getSiteNamesForPricing(Supplier.SERCO, "from", "to", effectiveYear)
 
     assertThat(result).isEqualTo(Pair("from site", "to site"))
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -79,7 +53,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       fromLocation,
       toLocation,
-      effectiveYearForDate(effectiveDate)
+      effectiveYear
     )
   }
 
@@ -94,7 +68,7 @@ internal class SupplierPricingServiceTest {
       "from",
       "to",
       Money.valueOf(100.24),
-      effectiveYearForDate(effectiveDate)
+      effectiveYear
     )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -116,7 +90,7 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(price)
 
-    val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYearForDate(effectiveDate))
+    val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYear)
 
     assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -125,15 +99,43 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
+  internal fun `attempt to update existing price to same price has no effect`() {
+    whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
+    whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear
+      (
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        2020
+      )
+    ).thenReturn(price)
+    whenever(priceRepository.save(any())).thenReturn(price)
+
+    service.updatePriceForSupplier(
+      Supplier.SERCO,
+      "from",
+      "to",
+      price.price(),
+      effectiveYear
+    )
+
+    verify(priceRepository, never()).save(any())
+    verify(auditService, never()).create(any())
+  }
+
+  @Test
   internal fun `update existing price for supplier`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
-      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear
+      (
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYearForDate(effectiveDate)
+        2020
       )
     ).thenReturn(price)
     whenever(priceRepository.save(any())).thenReturn(price)
@@ -143,7 +145,7 @@ internal class SupplierPricingServiceTest {
       "from",
       "to",
       Money.Factory.valueOf(200.35),
-      effectiveYearForDate(effectiveDate)
+      effectiveYear
     )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -152,9 +154,9 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       fromLocation,
       toLocation,
-      effectiveYearForDate(effectiveDate)
+      effectiveYear
     )
     verify(priceRepository).save(price)
-    verify(price).priceInPence = 20035
+    assertThat(price.priceInPence).isEqualTo(20035)
   }
 }

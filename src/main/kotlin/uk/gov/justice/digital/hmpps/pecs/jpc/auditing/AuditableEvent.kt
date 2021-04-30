@@ -49,29 +49,20 @@ data class AuditableEvent(
         mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
       )
 
-    fun addPriceEvent(newPrice: Price): AuditableEvent {
-      val metadata = mutableMapOf<String, Any>(
-        "supplier" to newPrice.supplier,
-        "from_nomis_id" to newPrice.fromLocation.nomisAgencyId,
-        "to_nomis_id" to newPrice.toLocation.nomisAgencyId,
-        "effective_year" to newPrice.effectiveYear,
-        "price" to newPrice.price().pounds()
+    fun addPrice(newPrice: Price): AuditableEvent {
+      return AuditableEvent(
+        type = AuditEventType.JOURNEY_PRICE,
+        username = authentication().name,
+        metadata = PriceMetadata.new(newPrice)
       )
-
-      return createEvent(AuditEventType.JOURNEY_PRICE, authentication(), metadata)
     }
 
-    fun updatePriceEvent(updatedPrice: Price, oldPrice: Money): AuditableEvent {
-      val metadata = mutableMapOf<String, Any>(
-        "supplier" to updatedPrice.supplier,
-        "from_nomis_id" to updatedPrice.fromLocation.nomisAgencyId,
-        "to_nomis_id" to updatedPrice.toLocation.nomisAgencyId,
-        "effective_year" to updatedPrice.effectiveYear,
-        "old_price" to oldPrice.pounds(),
-        "new_price" to updatedPrice.price().pounds()
+    fun updatePrice(updatedPrice: Price, oldPrice: Money): AuditableEvent {
+      return AuditableEvent(
+        type = AuditEventType.JOURNEY_PRICE,
+        username = authentication().name,
+        metadata = PriceMetadata.update(oldPrice, updatedPrice)
       )
-
-      return createEvent(AuditEventType.JOURNEY_PRICE, authentication(), metadata)
     }
 
     fun journeyPriceBulkUpdateEvent(
