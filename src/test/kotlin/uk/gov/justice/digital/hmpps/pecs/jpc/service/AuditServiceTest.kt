@@ -3,23 +3,21 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import com.beust.klaxon.Klaxon
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatcher
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -39,13 +37,13 @@ private class AuditEventMatcher(var auditEvent: AuditEvent) : ArgumentMatcher<Au
   }
 }
 
+@ExtendWith(FakeAuthentication::class)
 internal class AuditServiceTest {
   private val auditEventRepository: AuditEventRepository = mock()
   private val dateTime = LocalDateTime.of(2021, 1, 1, 12, 34, 56)
   private val timeSource = TimeSource { dateTime }
   private val service = AuditService(auditEventRepository, timeSource)
-  private val authentication: Authentication = mock { on { name } doReturn " mOcK NAME      " }
-  private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }
+  private lateinit var authentication: Authentication
   private val eventCaptor = argumentCaptor<AuditEvent>()
 
   private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) =
@@ -55,7 +53,7 @@ internal class AuditServiceTest {
           AuditEvent(
             type,
             dateTime,
-            username,
+            username.trim().toUpperCase(),
             if (metadata != null) Klaxon().toJsonString(metadata) else null
           )
         )
@@ -63,28 +61,22 @@ internal class AuditServiceTest {
     )
 
   @BeforeEach
-  private fun initMocks() {
-    whenever(authentication.name).thenReturn(" mOcK NAME      ")
-    SecurityContextHolder.setContext(securityContext)
-  }
-
-  @AfterEach
-  private fun deInitMocks() {
-    SecurityContextHolder.clearContext()
+  fun before() {
+    authentication = SecurityContextHolder.getContext().authentication
   }
 
   @Test
   internal fun `create log in audit event`() {
     service.create(AuditableEvent.logInEvent(authentication))
 
-    verifyEvent(AuditEventType.LOG_IN, "MOCK NAME")
+    verifyEvent(AuditEventType.LOG_IN, authentication.name)
   }
 
   @Test
   internal fun `create log out audit event`() {
     service.create(AuditableEvent.logOutEvent(authentication))
 
-    verifyEvent(AuditEventType.LOG_OUT, "MOCK NAME")
+    verifyEvent(AuditEventType.LOG_OUT, authentication.name)
   }
 
   @Test
@@ -97,7 +89,7 @@ internal class AuditServiceTest {
       )
     )
 
-    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, "MOCK NAME", mapOf("month" to "2021-02", "supplier" to "SERCO"))
+    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, authentication.name, mapOf("month" to "2021-02", "supplier" to "SERCO"))
   }
 
   @Test
@@ -106,7 +98,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
-    assertThat(eventCaptor.firstValue.username).isEqualTo("MOCK NAME")
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
       MapLocationMetadata(nomisId = "TEST2", newName = "TEST 2 NAME", newType = LocationType.AP)
@@ -126,7 +118,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
-    assertThat(eventCaptor.firstValue.username).isEqualTo("MOCK NAME")
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
       MapLocationMetadata(
@@ -150,7 +142,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
-    assertThat(eventCaptor.firstValue.username).isEqualTo("MOCK NAME")
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
       MapLocationMetadata(
@@ -162,15 +154,13 @@ internal class AuditServiceTest {
   }
 
   private fun assertThatMappedLocationsAreTheSame(auditEvent: AuditEvent, mapLocationMetadata: MapLocationMetadata) {
-    assertThat(jsonToMapLocation(auditEvent.metadata!!)!!).isEqualTo(mapLocationMetadata)
+    assertThat(jsonTo<MapLocationMetadata>(auditEvent.metadata!!)).isEqualTo(mapLocationMetadata)
   }
-
-  private fun jsonToMapLocation(json: String) = Klaxon().parse<MapLocationMetadata>(json)
 
   @Test
   internal fun `create journey price set audit event`() {
     service.create(
-      AuditableEvent.addPriceEvent(
+      AuditableEvent.addPrice(
         Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -181,15 +171,18 @@ internal class AuditServiceTest {
       )
     )
 
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE,
-      "MOCK NAME",
-      mapOf(
-        "supplier" to Supplier.SERCO,
-        "from_nomis_id" to "TEST2",
-        "to_nomis_id" to "TEST21",
-        "effective_year" to effectiveYearForDate(timeSource.date()),
-        "price" to 2.34
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        Supplier.SERCO,
+        "TEST2",
+        "TEST21",
+        effectiveYearForDate(timeSource.date()),
+        2.34,
       )
     )
   }
@@ -197,7 +190,7 @@ internal class AuditServiceTest {
   @Test
   internal fun `create journey price change audit event`() {
     service.create(
-      AuditableEvent.updatePriceEvent(
+      AuditableEvent.updatePrice(
         Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -208,19 +201,28 @@ internal class AuditServiceTest {
         Money(234)
       )
     )
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE,
-      "MOCK NAME",
-      mapOf(
-        "supplier" to Supplier.SERCO,
-        "from_nomis_id" to "TEST2",
-        "to_nomis_id" to "TEST21",
-        "effective_year" to effectiveYearForDate(timeSource.date()),
-        "old_price" to 2.34,
-        "new_price" to 23.4
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        Supplier.SERCO,
+        "TEST2",
+        "TEST21",
+        effectiveYearForDate(timeSource.date()),
+        23.4,
+        2.34
       )
     )
   }
+
+  private fun assertThatPricesMetadataIsTheSame(auditEvent: AuditEvent, priceMetadata: PriceMetadata) {
+    assertThat(jsonTo<PriceMetadata>(auditEvent.metadata!!)).isEqualTo(priceMetadata)
+  }
+
+  private inline fun <reified T> jsonTo(json: String): T = Klaxon().parse<T>(json)!!
 
   @Test
   internal fun `create journey price bulk update audit event`() {

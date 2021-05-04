@@ -70,7 +70,7 @@ class SupplierPricingService(
         priceInPence = price.pence,
         effectiveYear = effectiveYear
       )
-    ).let { auditService.create(AuditableEvent.addPriceEvent(it)) }
+    ).let { auditService.create(AuditableEvent.addPrice(it)) }
   }
 
   fun updatePriceForSupplier(
@@ -89,13 +89,11 @@ class SupplierPricingService(
     )
       ?: throw RuntimeException("No matching price found for $supplier")
 
-    val oldPrice = Money.valueOf(existingPrice.price().pounds())
+    if (existingPrice.price() != agreedNewPrice) {
+      val oldPrice = existingPrice.price().copy()
 
-    priceRepository.save(
-      existingPrice.apply {
-        this.priceInPence = agreedNewPrice.pence
-      }
-    ).let { auditService.create(AuditableEvent.updatePriceEvent(it, oldPrice)) }
+      priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence }).let { auditService.create(AuditableEvent.updatePrice(it, oldPrice)) }
+    }
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =

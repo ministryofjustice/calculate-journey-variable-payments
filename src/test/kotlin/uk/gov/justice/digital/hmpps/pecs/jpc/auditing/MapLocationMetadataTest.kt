@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 
-class MapLocationMetadataTest {
+internal class MapLocationMetadataTest {
   @Test
   fun `mapping a new location`() {
     val metadata = MapLocationMetadata.map(Location(LocationType.PR, "AGENCY_ID", "SITE NAME"))
