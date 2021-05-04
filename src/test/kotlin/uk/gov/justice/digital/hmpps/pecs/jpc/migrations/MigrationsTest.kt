@@ -14,7 +14,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.util.UUID
 
 @SpringBootTest
@@ -41,5 +43,13 @@ class MigrationsTest(@Autowired val auditEventRepository: AuditEventRepository) 
     val metadata = MapLocationMetadata.map(auditEventRepository.findById(UUID.fromString("74a1fa0b-d164-49eb-9e7a-4a5b620373a9")).get())
 
     assertThat(metadata).isEqualTo(MapLocationMetadata("GNI", "GREAT NINE ITERATE", LocationType.MC))
+  }
+
+  @FlywayTest(locationsForMigrate = ["/db/migration/testdata"])
+  @Test
+  fun `price audit event metadata can be deserialized after update to metadata structure`() {
+    val metadata = PriceMetadata.map(auditEventRepository.findById(UUID.fromString("28aca3e6-acc5-11eb-8529-0242ac130003")).get())
+
+    assertThat(metadata).isEqualTo(PriceMetadata(Supplier.SERCO, "PRISON1", "PRISON2", 2020, 10.50))
   }
 }
