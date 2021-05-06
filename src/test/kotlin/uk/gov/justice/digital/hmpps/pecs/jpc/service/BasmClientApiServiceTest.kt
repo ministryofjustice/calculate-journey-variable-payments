@@ -8,8 +8,13 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.web.reactive.function.client.WebClient
+import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import java.time.Duration
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 internal class BasmClientApiServiceTest {
@@ -86,7 +91,79 @@ internal class BasmClientApiServiceTest {
     verify(monitoringService).capture(any())
   }
 
-  private fun locationResponse(locationName: String? = null, body: String = "{ \"data\": [ { \"attributes\": { \"title\": \"$locationName\" } } ] }") =
+  @ParameterizedTest
+  @MethodSource("locationMappingTestData")
+  fun `locations types are mapped to the correct type`(input: NomisLocationTestData, expected: BasmNomisLocation) {
+    basmApiServer.enqueue(locationResponse(input.title, input.nomisAgencyId, input.locationType, input.createdAt))
+
+    val mappedLocation = service.findNomisAgenciesCreatedOn(input.createdAt)
+
+    assertThat(mappedLocation).containsExactly(expected)
+  }
+
+  private companion object {
+    @JvmStatic
+    fun locationMappingTestData(): List<Arguments> = listOf(
+      Arguments.of(
+        NomisLocationTestData(" Approved ", " Approved_agency_ID ", "approved_premises", LocalDate.of(2021, 5, 1)),
+        BasmNomisLocation("APPROVED", "APPROVED_AGENCY_ID", LocationType.APP, LocalDate.of(2021, 5, 1))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" Hospital ", " hospital_agency_ID ", "hospital", LocalDate.of(2021, 5, 2)),
+        BasmNomisLocation("HOSPITAL", "HOSPITAL_AGENCY_ID", LocationType.HP, LocalDate.of(2021, 5, 2))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" Police ", " police_agency_ID ", "police", LocalDate.of(2021, 5, 3)),
+        BasmNomisLocation("POLICE", "POLICE_AGENCY_ID", LocationType.PS, LocalDate.of(2021, 5, 3))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" Prison ", " prison_agency_ID ", "prison", LocalDate.of(2021, 5, 4)),
+        BasmNomisLocation("PRISON", "PRISON_AGENCY_ID", LocationType.PR, LocalDate.of(2021, 5, 4))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" Probation ", " probation_agency_ID ", "probation_office", LocalDate.of(2021, 5, 5)),
+        BasmNomisLocation("PROBATION", "PROBATION_AGENCY_ID", LocationType.PB, LocalDate.of(2021, 5, 5))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" Immigration ", " immigration_agency_ID ", "immigration_detention_centre", LocalDate.of(2021, 5, 6)),
+        BasmNomisLocation("IMMIGRATION", "IMMIGRATION_AGENCY_ID", LocationType.IM, LocalDate.of(2021, 5, 6))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" High Security Hospital ", " high_security_hospital_agency_ID ", "high_security_hospital", LocalDate.of(2021, 5, 7)),
+        BasmNomisLocation("HIGH SECURITY HOSPITAL", "HIGH_SECURITY_HOSPITAL_AGENCY_ID", LocationType.HP, LocalDate.of(2021, 5, 7))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" sch ", " sch_agency_ID ", "secure_childrens_home", LocalDate.of(2021, 5, 8)),
+        BasmNomisLocation("SCH", "SCH_AGENCY_ID", LocationType.SCH, LocalDate.of(2021, 5, 8))
+      ),
+      Arguments.of(
+        NomisLocationTestData(" stc ", " stc_agency_ID ", "secure_training_centre", LocalDate.of(2021, 5, 9)),
+        BasmNomisLocation("STC", "STC_AGENCY_ID", LocationType.STC, LocalDate.of(2021, 5, 9))
+      )
+      // TODO need to map the various court types
+    )
+  }
+
+  data class NomisLocationTestData(val title: String, val nomisAgencyId: String, val locationType: String, val createdAt: LocalDate)
+
+  private fun locationResponse(
+    title: String = "",
+    nomisAgencyId: String = "",
+    locationType: String = "police",
+    createdAt: LocalDate = LocalDate.now(),
+    body: String = """
+      { "data": [ 
+          { 
+            "attributes": {
+               "title": "$title",
+               "nomis_agency_id": "$nomisAgencyId",
+               "location_type": "$locationType",
+               "created_at": "$createdAt"
+            }
+          } 
+        ]
+      }"""
+  ) =
     MockResponse()
       .addHeader("Content-Type", "application/json; charset=utf-8")
       .setBody(body)

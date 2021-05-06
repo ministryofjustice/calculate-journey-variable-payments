@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+
+  hmpps-book-secure-move-api:
+    image: rodolpheche/wiremock:latest
+    networks:
+      - hmpps
+    container_name: wiremock-basm-api
+    ports:
+      - "9999:8080"
+    volumes:
+      - $PWD:/home/wiremock
+    command: --verbose --global-response-templating
+
+networks:
+  hmpps:
