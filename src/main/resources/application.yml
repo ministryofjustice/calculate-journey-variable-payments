@@ -13,7 +13,6 @@ spring:
       hibernate.order_updates: true
       hibernate.jdbc.batch_versioned_data: true
       hibernate.generate_statistics: false
-    open-in-view: false
   datasource:
     platform: postgres
     url: ${APP_DB_URL}
