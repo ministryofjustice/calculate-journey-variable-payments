@@ -51,9 +51,13 @@ class BasmClientApiService(
       .onSuccess { recordIfLocationNotFound(it) }.getOrNull()?.locations?.elementAtOrNull(0)?.name?.toUpperCase()
   }
 
-  fun findNomisAgenciesCreatedOn(date: LocalDate): List<BasmNomisLocation?> =
-    // TODO need to record any lookup failures in the onFailure { ... }
-    Result.runCatching {
+  fun findNomisAgenciesCreatedOn(date: LocalDate): List<BasmNomisLocation> {
+    fun recordFailure(error: Throwable) {
+      logger.error("An error occurred trying to find location by date '$date' on calling BaSM API: ${error.message}")
+      monitoringService.capture("An error occurred trying to find location by date '$date' on calling BaSM API: ${error.message}")
+    }
+
+    return Result.runCatching {
       basmApiWebClient
         .get()
         .uri("api/reference/locations?filter[created_at]=$date")
@@ -61,7 +65,10 @@ class BasmClientApiService(
         .bodyToMono(LocationResponse::class.java)
         .map { it.locations }
         .block(basmApiTimeout)
-    }.getOrDefault(listOf())
+    }
+      .onFailure { recordFailure(it) }
+      .getOrDefault(listOf()).filterNotNull()
+  }
 }
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -79,6 +86,19 @@ data class BasmNomisLocation(
 )
 
 object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
+
+  private val mayBe: Map<String, LocationType> = mapOf(
+    "approved_premises" to LocationType.APP,
+    "hospital" to LocationType.HP,
+    "immigration_detention_centre" to LocationType.IM,
+    "high_security_hospital" to LocationType.HP,
+    "police" to LocationType.PS,
+    "prison" to LocationType.PR,
+    "probation_office" to LocationType.PB,
+    "secure_childrens_home" to LocationType.SCH,
+    "secure_training_centre" to LocationType.STC
+  )
+
   override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): BasmNomisLocation? =
     (p?.readValueAsTree() as JsonNode)["attributes"]?.let { attributes ->
       val title = attributes["title"].asText().trim().toUpperCase()
@@ -86,22 +106,20 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
       val locationType = attributes["location_type"].asText()
       val createdAt = LocalDate.parse(attributes["created_at"].asText())
 
-      return LocationTypeParser.parse(locationType)?.let { BasmNomisLocation(title, agencyId, it, createdAt) }
+      return (mayBe[locationType] ?: mayBeCourt(locationType, title))?.let { BasmNomisLocation(title, agencyId, it, createdAt) }
     }
-}
 
-object LocationTypeParser {
-  fun parse(value: String): LocationType? =
-    when (value) {
-      "approved_premises" -> LocationType.APP
-      "hospital" -> LocationType.HP
-      "immigration_detention_centre" -> LocationType.IM
-      "high_security_hospital" -> LocationType.HP
-      "police" -> LocationType.PS
-      "prison" -> LocationType.PR
-      "probation_office" -> LocationType.PB
-      "secure_childrens_home" -> LocationType.SCH
-      "secure_training_centre" -> LocationType.STC
-      else -> null
-    }
+  private fun mayBeCourt(type: String, title: String): LocationType? {
+    return if (type == "court") {
+      val sanitisedTitle = title.toUpperCase()
+
+      when {
+        sanitisedTitle.contains("COMBINED COURT") -> LocationType.CM
+        sanitisedTitle.contains("COUNTY COURT") -> LocationType.CO
+        sanitisedTitle.contains("CROWN COURT") -> LocationType.CC
+        sanitisedTitle.contains("MAGISTRATES COURT") -> LocationType.MC
+        else -> LocationType.CRT
+      }
+    } else null
+  }
 }
