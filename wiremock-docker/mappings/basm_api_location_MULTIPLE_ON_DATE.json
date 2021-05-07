@@ -1,0 +1,16 @@
+{
+  "request" : {
+    "url" : "/api/reference/locations?filter%5Bcreated_at%5D=2021-05-05&per_page=100",
+    "method" : "GET"
+  },
+  "response" : {
+    "status" : 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName" : "basm-api/locations/MULTIPLE.json",
+    "transformers": [
+      "response-template"
+    ]
+  }
+}
