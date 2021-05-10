@@ -14,7 +14,7 @@ import javax.sql.DataSource
 @ConditionalOnWebApplication
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtLeastFor = "PT1M", defaultLockAtMostFor = "PT30M")
-class SchedulerConfiguration {
+class TaskSchedulerConfiguration {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 

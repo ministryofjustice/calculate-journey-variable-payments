@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import java.time.LocalDateTime
 
-internal class BasmAutomaticLocationMappingServiceTest {
+internal class AutomaticLocationMappingServiceTest {
 
   private val fixedTime = LocalDateTime.of(2021, 5, 7, 0, 0)
   private val basmClientApiService: BasmClientApiService = mock()
@@ -25,7 +25,7 @@ internal class BasmAutomaticLocationMappingServiceTest {
   private val timeSource: TimeSource = TimeSource { fixedTime }
   private val auditService: AuditService = mock()
   private val newLocationCaptor = argumentCaptor<Location>()
-  private val service: BasmAutomaticLocationMappingService = BasmAutomaticLocationMappingService(basmClientApiService, locationRepository, timeSource, auditService)
+  private val service: AutomaticLocationMappingService = AutomaticLocationMappingService(basmClientApiService, locationRepository, timeSource, auditService)
 
   @Test
   fun `when there are no locations to map there should be basm interactions but no repository or audit interactions`() {

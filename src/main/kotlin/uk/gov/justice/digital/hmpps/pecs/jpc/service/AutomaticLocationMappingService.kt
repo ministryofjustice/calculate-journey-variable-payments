@@ -10,7 +10,7 @@ import java.time.LocalDate
 
 @Service
 @Transactional
-internal class BasmAutomaticLocationMappingService(
+class AutomaticLocationMappingService(
   private val basmClientApi: BasmClientApiService,
   private val locationRepository: LocationRepository,
   private val timeSource: TimeSource,
