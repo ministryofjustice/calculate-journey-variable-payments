@@ -10,6 +10,7 @@ import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
@@ -42,6 +43,7 @@ internal class BasmAutomaticLocationMappingServiceTest {
     val basmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT, fixedTime.toLocalDate())
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocation))
+    whenever(locationRepository.save(any())).thenReturn(Location(LocationType.CRT, "agency_id", "name"))
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
@@ -55,7 +57,7 @@ internal class BasmAutomaticLocationMappingServiceTest {
     assertThat(newLocation.locationType).isEqualTo(LocationType.CRT)
     assertThat(newLocation.addedAt).isEqualTo(fixedTime)
 
-    // TODO need to check audit interactions when changes to that have been made
+    verify(auditService).create(AuditableEvent.autoMapLocation(newLocation))
   }
 
   @Test
@@ -64,6 +66,10 @@ internal class BasmAutomaticLocationMappingServiceTest {
     val basmLocationTwo = BasmNomisLocation("two", "agency_two_id", LocationType.PB, fixedTime.toLocalDate())
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocationOne, basmLocationTwo))
+    whenever(locationRepository.save(any())).thenReturn(
+      Location(LocationType.CRT, "agency_one_id", "one"),
+      Location(LocationType.PB, "agency_two_id", "two")
+    )
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
@@ -84,7 +90,8 @@ internal class BasmAutomaticLocationMappingServiceTest {
     assertThat(newLocationTwo.locationType).isEqualTo(LocationType.PB)
     assertThat(newLocationTwo.addedAt).isEqualTo(fixedTime)
 
-    // TODO need to check audit interactions when changes to that have been made
+    verify(auditService).create(AuditableEvent.autoMapLocation(newLocationOne))
+    verify(auditService).create(AuditableEvent.autoMapLocation(newLocationTwo))
   }
 
   @Test
