@@ -1,6 +1,11 @@
 {
   "request" : {
-    "url" : "/api/reference/locations?filter%5Bcreated_at%5D=2021-05-05&per_page=100",
+    "urlPathPattern": "/api/reference/locations",
+    "queryParameters" : {
+      "filter%5Bcreated_at%5D" : {
+        "matches" : "^\\d{4}-\\d{2}-\\d{2}$"
+      }
+    },
     "method" : "GET"
   },
   "response" : {

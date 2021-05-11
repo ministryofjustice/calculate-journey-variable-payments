@@ -17,7 +17,8 @@
         "postcode": "C111 ONE",
         "latitude": null,
         "longitude": null,
-        "disabled_at": null
+        "disabled_at": null,
+        "created_at": "{{now format='yyyy-MM-dd'}}"
       },
       "relationships": {
         "suppliers": {
@@ -42,7 +43,8 @@
         "postcode": "C2 TWO",
         "latitude": null,
         "longitude": null,
-        "disabled_at": null
+        "disabled_at": null,
+        "created_at": "{{now format='yyyy-MM-dd'}}"
       },
       "relationships": {
         "suppliers": {
@@ -54,20 +56,21 @@
       "id": "2bad3789-0d49-44dc-bb8f-4ff32414fa0c",
       "type": "locations",
       "attributes": {
-        "key": "prison1",
-        "title": "Prison One",
+        "key": "prison5",
+        "title": "Prison Five",
         "location_type": "prison",
-        "nomis_agency_id": "PRISON1",
+        "nomis_agency_id": "PRISON5",
         "can_upload_documents": false,
         "young_offender_institution": false,
         "premise": null,
         "locality": null,
         "city": null,
         "country": null,
-        "postcode": "P111 ONE",
+        "postcode": "P111 FIVE",
         "latitude": null,
         "longitude": null,
-        "disabled_at": null
+        "disabled_at": null,
+        "created_at": "{{now format='yyyy-MM-dd'}}"
       },
       "relationships": {
         "suppliers": {
