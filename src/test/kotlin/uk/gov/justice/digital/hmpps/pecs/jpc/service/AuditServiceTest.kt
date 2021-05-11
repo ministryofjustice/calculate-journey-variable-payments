@@ -158,6 +158,23 @@ internal class AuditServiceTest {
   }
 
   @Test
+  internal fun `create automatic map location type change audit event`() {
+    val location = Location(LocationType.PR, "PRISON_ONE", "PRISON ONE")
+
+    service.create(
+      AuditableEvent.autoMapLocation(location)
+    )
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
+    assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
+    assertThatMappedLocationsAreTheSame(
+      eventCaptor.firstValue,
+      MapLocationMetadata(nomisId = "PRISON_ONE", newType = LocationType.PR, newName = "PRISON ONE")
+    )
+  }
+
+  @Test
   internal fun `create journey price set audit event`() {
     service.create(
       AuditableEvent.addPrice(

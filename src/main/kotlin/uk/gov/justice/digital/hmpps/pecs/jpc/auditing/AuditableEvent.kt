@@ -18,6 +18,8 @@ data class AuditableEvent(
   constructor(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) : this(type, username, metadata?.let { MetadataWrapper(it) })
 
   companion object {
+    private val terminal = "_TERMINAL_"
+
     private fun createEvent(
       type: AuditEventType,
       authentication: Authentication? = null,
@@ -29,7 +31,7 @@ data class AuditableEvent(
 
       return AuditableEvent(
         type,
-        authentication?.name ?: "_TERMINAL_",
+        authentication?.name ?: terminal,
         metadata = metadata?.let { MetadataWrapper(it) }
       )
     }
@@ -87,6 +89,13 @@ data class AuditableEvent(
         type = AuditEventType.LOCATION,
         username = authentication().name,
         metadata = MapLocationMetadata.remap(old, new)
+      )
+
+    fun autoMapLocation(location: Location) =
+      AuditableEvent(
+        type = AuditEventType.LOCATION,
+        username = terminal,
+        metadata = MapLocationMetadata.map(location)
       )
 
     private fun authentication() = SecurityContextHolder.getContext().authentication

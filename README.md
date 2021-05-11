@@ -98,6 +98,15 @@ Typing help in the shell will also list the available commands.  TAB autocomplet
 
 To exit from the shell simply type: exit
 
+### Automatic mapping of Schedule 34 locations (from BaSM)
+
+Periodically new locations are added to BaSM. In an effort to keep in sync with BaSM and reduce the amount of work
+the users have to do with mapping new locations, a CRON job runs daily to retrieve the previous days locations added to
+BaSM and automatically add them to CJVP (if there are any).  If a location already exists in CJVP it will simply be
+ignored, nothing is overwritten, only new locations will be added.
+
+The CRON job is configured in the helm config of this project via the **CRON_AUTOMATIC_LOCATION_MAPPING** environment variable.
+
 ### Common gradle tasks 
 To list project dependencies, run:
 ```
