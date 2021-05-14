@@ -123,59 +123,59 @@ internal class BasmClientApiServiceTest {
     fun locationMappingTestData(): List<Arguments> = listOf(
       Arguments.of(
         FakeNomisLocation(" Approved ", " Approved_agency_ID ", "approved_premises", LocalDate.of(2021, 5, 1)),
-        BasmNomisLocation("APPROVED", "APPROVED_AGENCY_ID", LocationType.APP, LocalDate.of(2021, 5, 1))
+        BasmNomisLocation("APPROVED", "APPROVED_AGENCY_ID", LocationType.APP)
       ),
       Arguments.of(
         FakeNomisLocation(" Hospital ", " hospital_agency_ID ", "hospital", LocalDate.of(2021, 5, 2)),
-        BasmNomisLocation("HOSPITAL", "HOSPITAL_AGENCY_ID", LocationType.HP, LocalDate.of(2021, 5, 2))
+        BasmNomisLocation("HOSPITAL", "HOSPITAL_AGENCY_ID", LocationType.HP)
       ),
       Arguments.of(
         FakeNomisLocation(" Police ", " police_agency_ID ", "police", LocalDate.of(2021, 5, 3)),
-        BasmNomisLocation("POLICE", "POLICE_AGENCY_ID", LocationType.PS, LocalDate.of(2021, 5, 3))
+        BasmNomisLocation("POLICE", "POLICE_AGENCY_ID", LocationType.PS)
       ),
       Arguments.of(
         FakeNomisLocation(" Prison ", " prison_agency_ID ", "prison", LocalDate.of(2021, 5, 4)),
-        BasmNomisLocation("PRISON", "PRISON_AGENCY_ID", LocationType.PR, LocalDate.of(2021, 5, 4))
+        BasmNomisLocation("PRISON", "PRISON_AGENCY_ID", LocationType.PR)
       ),
       Arguments.of(
         FakeNomisLocation(" Probation ", " probation_agency_ID ", "probation_office", LocalDate.of(2021, 5, 5)),
-        BasmNomisLocation("PROBATION", "PROBATION_AGENCY_ID", LocationType.PB, LocalDate.of(2021, 5, 5))
+        BasmNomisLocation("PROBATION", "PROBATION_AGENCY_ID", LocationType.PB)
       ),
       Arguments.of(
         FakeNomisLocation(" Immigration ", " immigration_agency_ID ", "immigration_detention_centre", LocalDate.of(2021, 5, 6)),
-        BasmNomisLocation("IMMIGRATION", "IMMIGRATION_AGENCY_ID", LocationType.IM, LocalDate.of(2021, 5, 6))
+        BasmNomisLocation("IMMIGRATION", "IMMIGRATION_AGENCY_ID", LocationType.IM)
       ),
       Arguments.of(
         FakeNomisLocation(" High Security Hospital ", " high_security_hospital_agency_ID ", "high_security_hospital", LocalDate.of(2021, 5, 7)),
-        BasmNomisLocation("HIGH SECURITY HOSPITAL", "HIGH_SECURITY_HOSPITAL_AGENCY_ID", LocationType.HP, LocalDate.of(2021, 5, 7))
+        BasmNomisLocation("HIGH SECURITY HOSPITAL", "HIGH_SECURITY_HOSPITAL_AGENCY_ID", LocationType.HP)
       ),
       Arguments.of(
         FakeNomisLocation(" sch ", " sch_agency_ID ", "secure_childrens_home", LocalDate.of(2021, 5, 8)),
-        BasmNomisLocation("SCH", "SCH_AGENCY_ID", LocationType.SCH, LocalDate.of(2021, 5, 8))
+        BasmNomisLocation("SCH", "SCH_AGENCY_ID", LocationType.SCH)
       ),
       Arguments.of(
         FakeNomisLocation(" stc ", " stc_agency_ID ", "secure_training_centre", LocalDate.of(2021, 5, 9)),
-        BasmNomisLocation("STC", "STC_AGENCY_ID", LocationType.STC, LocalDate.of(2021, 5, 9))
+        BasmNomisLocation("STC", "STC_AGENCY_ID", LocationType.STC)
       ),
       Arguments.of(
         FakeNomisLocation(" County courT ", " court_agency_ID ", "court", LocalDate.of(2021, 5, 10)),
-        BasmNomisLocation("COUNTY COURT", "COURT_AGENCY_ID", LocationType.CO, LocalDate.of(2021, 5, 10))
+        BasmNomisLocation("COUNTY COURT", "COURT_AGENCY_ID", LocationType.CO)
       ),
       Arguments.of(
         FakeNomisLocation(" combineD courT ", " court_agency_ID ", "court", LocalDate.of(2021, 5, 11)),
-        BasmNomisLocation("COMBINED COURT", "COURT_AGENCY_ID", LocationType.CM, LocalDate.of(2021, 5, 11))
+        BasmNomisLocation("COMBINED COURT", "COURT_AGENCY_ID", LocationType.CM)
       ),
       Arguments.of(
         FakeNomisLocation(" cRown courT ", " court_agency_ID ", "court", LocalDate.of(2021, 5, 12)),
-        BasmNomisLocation("CROWN COURT", "COURT_AGENCY_ID", LocationType.CC, LocalDate.of(2021, 5, 12))
+        BasmNomisLocation("CROWN COURT", "COURT_AGENCY_ID", LocationType.CC)
       ),
       Arguments.of(
         FakeNomisLocation(" magistrates courT ", " court_agency_ID ", "court", LocalDate.of(2021, 5, 13)),
-        BasmNomisLocation("MAGISTRATES COURT", "COURT_AGENCY_ID", LocationType.MC, LocalDate.of(2021, 5, 13))
+        BasmNomisLocation("MAGISTRATES COURT", "COURT_AGENCY_ID", LocationType.MC)
       ),
       Arguments.of(
         FakeNomisLocation(" ranDom courT ", " court_agency_ID ", "court", LocalDate.of(2021, 5, 14)),
-        BasmNomisLocation("RANDOM COURT", "COURT_AGENCY_ID", LocationType.CRT, LocalDate.of(2021, 5, 14))
+        BasmNomisLocation("RANDOM COURT", "COURT_AGENCY_ID", LocationType.CRT)
       )
     )
   }
