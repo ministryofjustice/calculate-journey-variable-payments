@@ -82,7 +82,6 @@ data class BasmNomisLocation(
   val name: String,
   val agencyId: String,
   val locationType: LocationType,
-  val createdAt: LocalDate
 )
 
 object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
@@ -104,9 +103,8 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
       val title = attributes["title"].asText().trim().toUpperCase()
       val agencyId = attributes["nomis_agency_id"].asText().trim().toUpperCase()
       val locationType = attributes["location_type"].asText()
-      val createdAt = LocalDate.parse(attributes["created_at"].asText())
 
-      return (mayBe[locationType] ?: mayBeCourt(locationType, title))?.let { BasmNomisLocation(title, agencyId, it, createdAt) }
+      return (mayBe[locationType] ?: mayBeCourt(locationType, title))?.let { BasmNomisLocation(title, agencyId, it) }
     }
 
   private fun mayBeCourt(type: String, title: String): LocationType? {

@@ -40,7 +40,7 @@ internal class AutomaticLocationMappingServiceTest {
 
   @Test
   fun `when there is a location to map there should be basm, repository and audit interactions`() {
-    val basmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT, fixedTime.toLocalDate())
+    val basmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocation))
     whenever(locationRepository.save(any())).thenReturn(Location(LocationType.CRT, "agency_id", "name"))
@@ -62,8 +62,8 @@ internal class AutomaticLocationMappingServiceTest {
 
   @Test
   fun `when there multiple locations to map there should be basm, repository and audit interactions`() {
-    val basmLocationOne = BasmNomisLocation("one", "agency_one_id", LocationType.CRT, fixedTime.toLocalDate())
-    val basmLocationTwo = BasmNomisLocation("two", "agency_two_id", LocationType.PB, fixedTime.toLocalDate())
+    val basmLocationOne = BasmNomisLocation("one", "agency_one_id", LocationType.CRT)
+    val basmLocationTwo = BasmNomisLocation("two", "agency_two_id", LocationType.PB)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocationOne, basmLocationTwo))
     whenever(locationRepository.save(any())).thenReturn(
@@ -96,7 +96,7 @@ internal class AutomaticLocationMappingServiceTest {
 
   @Test
   fun `when there is a duplicate location it should be ignored and there should be basm and repository interactions only`() {
-    val duplicateBasmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT, fixedTime.toLocalDate())
+    val duplicateBasmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT)
     val duplicateLocation = Location(duplicateBasmLocation.locationType, duplicateBasmLocation.agencyId, duplicateBasmLocation.name)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(duplicateBasmLocation))

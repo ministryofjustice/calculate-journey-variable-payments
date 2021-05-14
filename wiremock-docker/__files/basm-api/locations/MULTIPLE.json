@@ -18,7 +18,7 @@
         "latitude": null,
         "longitude": null,
         "disabled_at": null,
-        "created_at": "{{now format='yyyy-MM-dd'}}"
+        "created_at": "{{now}}"
       },
       "relationships": {
         "suppliers": {
@@ -44,7 +44,7 @@
         "latitude": null,
         "longitude": null,
         "disabled_at": null,
-        "created_at": "{{now format='yyyy-MM-dd'}}"
+        "created_at": "{{now}}"
       },
       "relationships": {
         "suppliers": {
@@ -70,7 +70,7 @@
         "latitude": null,
         "longitude": null,
         "disabled_at": null,
-        "created_at": "{{now format='yyyy-MM-dd'}}"
+        "created_at": "{{now}}"
       },
       "relationships": {
         "suppliers": {
