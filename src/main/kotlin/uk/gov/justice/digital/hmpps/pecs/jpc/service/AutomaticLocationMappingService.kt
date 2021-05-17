@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
@@ -17,12 +18,16 @@ class AutomaticLocationMappingService(
   private val auditService: AuditService
 ) {
 
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   fun mapIfNotPresentLocationsCreatedOn(date: LocalDate) {
     basmClientApi.findNomisAgenciesCreatedOn(date).forEach {
       locationRepository.findByNomisAgencyId(it.agencyId).let { location ->
         if (location == null) {
           locationRepository.save(Location(it.locationType, it.agencyId, it.name, timeSource.dateTime())).also { newLocation ->
             auditService.create(AuditableEvent.autoMapLocation(newLocation))
+
+            logger.info("Automatically mapped new location: agency ID '${it.agencyId}', name '${it.name}' and type '${it.locationType.label}'")
           }
         }
       }
