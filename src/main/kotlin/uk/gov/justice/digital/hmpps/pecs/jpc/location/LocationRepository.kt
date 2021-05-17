@@ -9,4 +9,6 @@ interface LocationRepository : JpaRepository<Location, UUID> {
   fun findByNomisAgencyId(id: String): Location?
 
   fun findBySiteName(name: String): Location?
+
+  fun findByNomisAgencyIdOrSiteName(id: String, name: String): Location?
 }

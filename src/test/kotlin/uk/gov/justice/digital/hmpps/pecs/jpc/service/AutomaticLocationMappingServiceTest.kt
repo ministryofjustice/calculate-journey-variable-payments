@@ -40,10 +40,10 @@ internal class AutomaticLocationMappingServiceTest {
 
   @Test
   fun `when there is a location to map there should be basm, repository and audit interactions`() {
-    val basmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT)
+    val basmLocation = BasmNomisLocation(" Name", "agency_iD ", LocationType.CRT)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocation))
-    whenever(locationRepository.save(any())).thenReturn(Location(LocationType.CRT, "agency_id", "name"))
+    whenever(locationRepository.save(any())).thenReturn(Location(LocationType.CRT, "AGENCY_ID", "NAME"))
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
@@ -52,8 +52,8 @@ internal class AutomaticLocationMappingServiceTest {
 
     val newLocation = newLocationCaptor.firstValue
 
-    assertThat(newLocation.siteName).isEqualTo("name")
-    assertThat(newLocation.nomisAgencyId).isEqualTo("agency_id")
+    assertThat(newLocation.siteName).isEqualTo("NAME")
+    assertThat(newLocation.nomisAgencyId).isEqualTo("AGENCY_ID")
     assertThat(newLocation.locationType).isEqualTo(LocationType.CRT)
     assertThat(newLocation.addedAt).isEqualTo(fixedTime)
 
@@ -62,13 +62,13 @@ internal class AutomaticLocationMappingServiceTest {
 
   @Test
   fun `when there multiple locations to map there should be basm, repository and audit interactions`() {
-    val basmLocationOne = BasmNomisLocation("one", "agency_one_id", LocationType.CRT)
-    val basmLocationTwo = BasmNomisLocation("two", "agency_two_id", LocationType.PB)
+    val basmLocationOne = BasmNomisLocation("onE ", " Agency_one_id", LocationType.CRT)
+    val basmLocationTwo = BasmNomisLocation(" tWo", "agency_Two_id ", LocationType.PB)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocationOne, basmLocationTwo))
     whenever(locationRepository.save(any())).thenReturn(
-      Location(LocationType.CRT, "agency_one_id", "one"),
-      Location(LocationType.PB, "agency_two_id", "two")
+      Location(LocationType.CRT, "AGENCY_ONE_ID", "ONE"),
+      Location(LocationType.PB, "AGENCY_TWO_ID", "TWO")
     )
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
@@ -78,15 +78,15 @@ internal class AutomaticLocationMappingServiceTest {
 
     val newLocationOne = newLocationCaptor.firstValue
 
-    assertThat(newLocationOne.siteName).isEqualTo("one")
-    assertThat(newLocationOne.nomisAgencyId).isEqualTo("agency_one_id")
+    assertThat(newLocationOne.siteName).isEqualTo("ONE")
+    assertThat(newLocationOne.nomisAgencyId).isEqualTo("AGENCY_ONE_ID")
     assertThat(newLocationOne.locationType).isEqualTo(LocationType.CRT)
     assertThat(newLocationOne.addedAt).isEqualTo(fixedTime)
 
     val newLocationTwo = newLocationCaptor.secondValue
 
-    assertThat(newLocationTwo.siteName).isEqualTo("two")
-    assertThat(newLocationTwo.nomisAgencyId).isEqualTo("agency_two_id")
+    assertThat(newLocationTwo.siteName).isEqualTo("TWO")
+    assertThat(newLocationTwo.nomisAgencyId).isEqualTo("AGENCY_TWO_ID")
     assertThat(newLocationTwo.locationType).isEqualTo(LocationType.PB)
     assertThat(newLocationTwo.addedAt).isEqualTo(fixedTime)
 
@@ -96,16 +96,16 @@ internal class AutomaticLocationMappingServiceTest {
 
   @Test
   fun `when there is a duplicate location it should be ignored and there should be basm and repository interactions only`() {
-    val duplicateBasmLocation = BasmNomisLocation("name", "agency_id", LocationType.CRT)
+    val duplicateBasmLocation = BasmNomisLocation(" nAme ", " agency_Id", LocationType.CRT)
     val duplicateLocation = Location(duplicateBasmLocation.locationType, duplicateBasmLocation.agencyId, duplicateBasmLocation.name)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(duplicateBasmLocation))
-    whenever(locationRepository.findByNomisAgencyId(duplicateBasmLocation.agencyId)).thenReturn(duplicateLocation)
+    whenever(locationRepository.findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")).thenReturn(duplicateLocation)
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
     verify(basmClientApiService).findNomisAgenciesCreatedOn(fixedTime.toLocalDate())
-    verify(locationRepository).findByNomisAgencyId(duplicateBasmLocation.agencyId)
+    verify(locationRepository).findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")
     verify(locationRepository, never()).save(any())
     verifyZeroInteractions(auditService)
   }

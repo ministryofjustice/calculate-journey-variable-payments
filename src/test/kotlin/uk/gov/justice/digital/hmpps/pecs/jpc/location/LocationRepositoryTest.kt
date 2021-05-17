@@ -35,4 +35,14 @@ internal class LocationRepositoryTest {
       entityManager.flush()
     }.isInstanceOf(ConstraintViolationException::class.java)
   }
+
+  @Test
+  fun `can find location by agency id or site name`() {
+    val location = repository.save(Location(LocationType.PR, "agency id", "site name"))
+
+    entityManager.flush()
+
+    assertThat(repository.findByNomisAgencyIdOrSiteName("agency id", "different site name")).isEqualTo(location)
+    assertThat(repository.findByNomisAgencyIdOrSiteName("different agency id", "site name")).isEqualTo(location)
+  }
 }
