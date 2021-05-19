@@ -24,8 +24,9 @@ internal class AutomaticLocationMappingServiceTest {
   private val locationRepository: LocationRepository = mock()
   private val timeSource: TimeSource = TimeSource { fixedTime }
   private val auditService: AuditService = mock()
+  private val monitoringService: MonitoringService = mock()
   private val newLocationCaptor = argumentCaptor<Location>()
-  private val service: AutomaticLocationMappingService = AutomaticLocationMappingService(basmClientApiService, locationRepository, timeSource, auditService)
+  private val service: AutomaticLocationMappingService = AutomaticLocationMappingService(basmClientApiService, locationRepository, timeSource, auditService, monitoringService)
 
   @Test
   fun `when there are no locations to map there should be basm interactions but no repository or audit interactions`() {
@@ -36,6 +37,7 @@ internal class AutomaticLocationMappingServiceTest {
     verify(basmClientApiService).findNomisAgenciesCreatedOn(fixedTime.toLocalDate())
     verifyZeroInteractions(locationRepository)
     verifyZeroInteractions(auditService)
+    verifyZeroInteractions(monitoringService)
   }
 
   @Test
@@ -58,10 +60,11 @@ internal class AutomaticLocationMappingServiceTest {
     assertThat(newLocation.addedAt).isEqualTo(fixedTime)
 
     verify(auditService).create(AuditableEvent.autoMapLocation(newLocation))
+    verifyZeroInteractions(monitoringService)
   }
 
   @Test
-  fun `when there multiple locations to map there should be basm, repository and audit interactions`() {
+  fun `when there are multiple unique locations to map there should be basm, repository and audit interactions`() {
     val basmLocationOne = BasmNomisLocation("onE ", " Agency_one_id", LocationType.CRT)
     val basmLocationTwo = BasmNomisLocation(" tWo", "agency_Two_id ", LocationType.PB)
 
@@ -92,6 +95,7 @@ internal class AutomaticLocationMappingServiceTest {
 
     verify(auditService).create(AuditableEvent.autoMapLocation(newLocationOne))
     verify(auditService).create(AuditableEvent.autoMapLocation(newLocationTwo))
+    verifyZeroInteractions(monitoringService)
   }
 
   @Test
@@ -100,7 +104,7 @@ internal class AutomaticLocationMappingServiceTest {
     val duplicateLocation = Location(duplicateBasmLocation.locationType, duplicateBasmLocation.agencyId, duplicateBasmLocation.name)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(duplicateBasmLocation))
-    whenever(locationRepository.findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")).thenReturn(duplicateLocation)
+    whenever(locationRepository.findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")).thenReturn(listOf(duplicateLocation))
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
@@ -108,5 +112,24 @@ internal class AutomaticLocationMappingServiceTest {
     verify(locationRepository).findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")
     verify(locationRepository, never()).save(any())
     verifyZeroInteractions(auditService)
+    verifyZeroInteractions(monitoringService)
+  }
+
+  @Test
+  fun `when there are multiple location matches in JPC for one BaSM location a Sentry alert should be raised to inform the end users, we cannot resolve this at the application level`() {
+    val basmLocation = BasmNomisLocation(" nAme ", " agency_Id", LocationType.CRT)
+    val location1 = Location(basmLocation.locationType, basmLocation.agencyId, basmLocation.name)
+    val location2 = Location(basmLocation.locationType, basmLocation.agencyId, basmLocation.name)
+
+    whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocation))
+    whenever(locationRepository.findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")).thenReturn(listOf(location1, location2))
+
+    service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
+
+    verify(basmClientApiService).findNomisAgenciesCreatedOn(fixedTime.toLocalDate())
+    verify(locationRepository).findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")
+    verify(locationRepository, never()).save(any())
+    verifyZeroInteractions(auditService)
+    verify(monitoringService).capture(any())
   }
 }

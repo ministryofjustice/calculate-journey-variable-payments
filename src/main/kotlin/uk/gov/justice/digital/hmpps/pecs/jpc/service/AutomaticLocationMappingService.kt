@@ -15,7 +15,8 @@ class AutomaticLocationMappingService(
   private val basmClientApi: BasmClientApiService,
   private val locationRepository: LocationRepository,
   private val timeSource: TimeSource,
-  private val auditService: AuditService
+  private val auditService: AuditService,
+  private val monitoringService: MonitoringService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -23,11 +24,18 @@ class AutomaticLocationMappingService(
   fun mapIfNotPresentLocationsCreatedOn(date: LocalDate) {
     basmClientApi.findNomisAgenciesCreatedOn(date).forEach {
       locationRepository.findByNomisAgencyIdOrSiteName(it.agencyId.toUpperCase().trim(), it.name.toUpperCase().trim()).let { location ->
-        if (location == null) {
-          locationRepository.save(Location(it.locationType, it.agencyId.toUpperCase().trim(), it.name.toUpperCase().trim(), timeSource.dateTime())).also { newLocation ->
-            auditService.create(AuditableEvent.autoMapLocation(newLocation))
+        when (location.size) {
+          0 -> {
+            locationRepository.save(Location(it.locationType, it.agencyId.toUpperCase().trim(), it.name.toUpperCase().trim(), timeSource.dateTime())).also { newLocation ->
+              auditService.create(AuditableEvent.autoMapLocation(newLocation))
 
-            logger.info("Automatically mapped new location: agency ID '${it.agencyId}', name '${it.name}' and type '${it.locationType.label}'")
+              logger.info("Automatically mapped new location: agency ID '${it.agencyId}', name '${it.name}' and type '${it.locationType.label}'")
+            }
+          }
+          1 -> logger.info("Location with agency id '${it.agencyId}' and name '${it.name}' already exists, no mapping required.")
+          else -> {
+            logger.warn("Multiple locations for agency id '${it.agencyId}' and location name '${it.name}', raise with end users.")
+            monitoringService.capture("Multiple locations for agency id '${it.agencyId}' and location name '${it.name}', raise with end users.")
           }
         }
       }
