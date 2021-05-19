@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
@@ -60,6 +62,11 @@ class LocationsService(
       )
     ).let { e -> auditService.create(e) }
   }
+
+  fun locationHistoryForAgencyId(agencyId: String) =
+    auditService.auditEventsByType(AuditEventType.LOCATION)
+      .associateWith { MapLocationMetadata.map(it) }
+      .filterValues { sanitised(it.nomisId) == sanitised(agencyId) }
 
   private fun sanitised(value: String) = value.trim().toUpperCase()
 }

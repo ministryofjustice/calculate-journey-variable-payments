@@ -17,9 +17,14 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import java.time.LocalDateTime
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,6 +36,9 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
   @MockBean
   lateinit var service: LocationsService
+
+  @MockBean
+  lateinit var basmClientApiService: BasmClientApiService
 
   @Test
   internal fun `get and display search locations screen`() {
@@ -51,6 +59,29 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
     }
       .andExpect { status { is3xxRedirection() } }
       .andExpect { redirectedUrl("/manage-location/AGENCY_ID") }
+
+    verify(service).findLocationBySiteName("LOCATION NAME")
+  }
+
+  @Test
+  internal fun `get manage location screen and location audit history`() {
+    val (agencyId, agencyName, agencyType) = Triple("ABCDEF", "AGENCY NAME", LocationType.CC)
+    val auditEventDatetime = LocalDateTime.now()
+    val auditEventMetadata = MapLocationMetadata(agencyId, newName = agencyName, newType = agencyType)
+
+    whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
+    whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn("DIFFERENT AGENCY NAME")
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
+      mapOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata) to auditEventMetadata)
+    )
+
+    mockMvc.get("/manage-location/ABCDEF")
+      .andExpect { model { attribute("form", ManageSchedule34LocationsController.LocationForm(agencyId, agencyName, LocationType.CC, "DIFFERENT AGENCY NAME")) } }
+      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name AGENCY NAME and type Crown Court", "Jane"))) } }
+      .andExpect { view { name("manage-location") } }
+      .andExpect { status { isOk() } }
+
+    verify(service).locationHistoryForAgencyId(agencyId)
   }
 
   @Test
