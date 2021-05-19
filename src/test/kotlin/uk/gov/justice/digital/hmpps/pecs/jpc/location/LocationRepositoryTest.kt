@@ -42,7 +42,17 @@ internal class LocationRepositoryTest {
 
     entityManager.flush()
 
-    assertThat(repository.findByNomisAgencyIdOrSiteName("agency id", "different site name")).isEqualTo(location)
-    assertThat(repository.findByNomisAgencyIdOrSiteName("different agency id", "site name")).isEqualTo(location)
+    assertThat(repository.findByNomisAgencyIdOrSiteName("agency id", "different site name")).containsExactly(location)
+    assertThat(repository.findByNomisAgencyIdOrSiteName("different agency id", "site name")).containsExactly(location)
+  }
+
+  @Test
+  fun `can find multiple location by agency id or site name`() {
+    val location1 = repository.save(Location(LocationType.PR, "agency id", "site name"))
+    val location2 = repository.save(Location(LocationType.PR, "other agency id", "other site name"))
+
+    entityManager.flush()
+
+    assertThat(repository.findByNomisAgencyIdOrSiteName("agency id", "other site name")).containsExactly(location1, location2)
   }
 }
