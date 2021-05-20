@@ -17,9 +17,13 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import java.time.LocalDateTime
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,7 +52,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)) } }
-      .andExpect { view { name("map-location") } }
+      .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 
     verify(service).findAgencyLocationAndType(agencyId)
@@ -61,20 +65,22 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
     mockMvc.get("/map-location/$agencyId")
       .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.")) } }
-      .andExpect { view { name("map-location") } }
+      .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 
     verify(service).findAgencyLocationAndType(agencyId)
   }
 
   @Test
-  internal fun `get mapping for existing friendly location`() {
-    whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(
-      Triple(
-        agencyId,
-        "existing location",
-        LocationType.AP
-      )
+  internal fun `get mapping for existing friendly location and location audit history`() {
+    val (agencyId, agencyName, agencyType) = Triple("ABCDEF", "EXISTING LOCATION", LocationType.CC)
+    val auditEventDatetime = LocalDateTime.now()
+    val auditEventMetadata = MapLocationMetadata(agencyId, newName = agencyName, newType = agencyType)
+
+    whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
+
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
+      mapOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata) to auditEventMetadata)
     )
 
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
@@ -84,11 +90,12 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
         model {
           attribute(
             "form",
-            MapFriendlyLocationController.MapLocationForm(agencyId, "existing location", LocationType.AP, "update", nomisLocationName)
+            MapFriendlyLocationController.MapLocationForm("ABCDEF", "EXISTING LOCATION", LocationType.CC, "update", nomisLocationName)
           )
         }
       }
-      .andExpect { view { name("map-location") } }
+      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name EXISTING LOCATION and type Crown Court", "Jane"))) } }
+      .andExpect { view { name("update-location") } }
       .andExpect { model { attribute("origin", "from") } }
       .andExpect { status { isOk() } }
 
@@ -200,7 +207,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       param("locationType", "CC")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "NotEmpty") } }
-      .andExpect { view { name("map-location") } }
+      .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 
     verify(service, never()).locationAlreadyExists(any(), any())
@@ -217,7 +224,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       param("locationName", "Duplicate location")
       param("locationType", "CC")
     }
-      .andExpect { view { name("map-location") } }
+      .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 
     verify(service).locationAlreadyExists(agencyId, "Duplicate location")

@@ -27,17 +27,10 @@
         </div>
 
         <div class="mv4">
-            <div th:if="${form.operation == 'create'}">
                 <h1 class="govuk-heading-xl mv2" th:inline="text">Map location</h1>
                 <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Please add a Schedule 34 location name
                     for this NOMIS agency ID.</p>
-            </div>
-            <div th:if="${form.operation == 'update'}">
-                <h1 class="govuk-heading-xl mv2" th:inline="text">Update location</h1>
-                <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update Schedule 34 location.</p>
-            </div>
         </div>
-
 
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
             <ol class="list pl0">
@@ -84,8 +77,7 @@
             <button class="govuk-button mv3 mr3" data-module="govuk-button">
                 Confirm and save
             </button>
-            <a href="/journeys" class="govuk-link" th:if="${form.operation == 'create'}">Cancel</a>
-            <a th:href="${cancelLink}" class="govuk-link" th:if="${form.operation == 'update'}">Cancel</a>
+            <a href="/journeys" class="govuk-link">Cancel</a>
         </div>
     </form>
 </div>
