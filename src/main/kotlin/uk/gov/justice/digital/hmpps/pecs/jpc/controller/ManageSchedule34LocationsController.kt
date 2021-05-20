@@ -78,6 +78,13 @@ class ManageSchedule34LocationsController(
             ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
         )
       )
+
+      model.addAttribute(
+        "history",
+        service.locationHistoryForAgencyId(agencyId)
+          .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+          .sortedByDescending { lh -> lh.datetime }
+      )
     }
 
     return "manage-location"
@@ -92,7 +99,16 @@ class ManageSchedule34LocationsController(
   ): String {
     logger.info("performing manage location")
 
-    if (result.hasErrors()) return "manage-location"
+    if (result.hasErrors()) {
+      model.addAttribute(
+        "history",
+        service.locationHistoryForAgencyId(location.agencyId)
+          .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+          .sortedByDescending { lh -> lh.datetime }
+      )
+
+      return "manage-location"
+    }
 
     return if (isDuplicate(location)) {
       "manage-location".also { result.duplicateLocation() }

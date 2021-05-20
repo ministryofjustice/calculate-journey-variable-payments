@@ -62,10 +62,17 @@ class MapFriendlyLocationController(
         )
       )
 
+      model.addAttribute(
+        "history",
+        service.locationHistoryForAgencyId(agencyId)
+          .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+          .sortedByDescending { lh -> lh.datetime }
+      )
+
       model.addCancelLinkFor(UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL))
       model.rememberLocationChangeTypePriorToUpdate(origin!!)
 
-      return "map-location"
+      return "update-location"
     }
 
     model.addAttribute(
@@ -77,7 +84,7 @@ class MapFriendlyLocationController(
       )
     )
 
-    return "map-location"
+    return "add-location"
   }
 
   private fun ModelMap.rememberLocationChangeTypePriorToUpdate(type: String) {
@@ -96,9 +103,20 @@ class MapFriendlyLocationController(
     val searchResultsUrl = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
 
     if (result.hasErrors()) {
-      if (form.operation == "update") model.addCancelLinkFor(searchResultsUrl)
+      if (form.operation == "update") {
+        model.addCancelLinkFor(searchResultsUrl)
 
-      return "map-location"
+        model.addAttribute(
+          "history",
+          service.locationHistoryForAgencyId(form.agencyId)
+            .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+            .sortedByDescending { lh -> lh.datetime }
+        )
+
+        return "update-location"
+      }
+
+      return "add-location"
     }
 
     service.setLocationDetails(form.agencyId, form.locationName, form.locationType!!)

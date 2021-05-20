@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 
@@ -20,4 +21,6 @@ class AuditService(private val auditEventRepository: AuditEventRepository, priva
       )
     )
   }
+
+  internal fun auditEventsByType(type: AuditEventType) = auditEventRepository.findByEventType(type)
 }

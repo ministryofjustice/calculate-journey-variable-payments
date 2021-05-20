@@ -6,12 +6,12 @@
 <head>
     <title>Calculate Journey Variable Payments - GOV.UK</title>
 </head>
-
+govuk-table__caption
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
 
-  <a href="/search-locations" class="govuk-back-link">Back</a>
+  <a th:href="${cancelLink}" class="govuk-back-link">Back</a>
 
   <div class="govuk-tabs" data-module="govuk-tabs">
     <h2 class="govuk-tabs__title">
@@ -30,7 +30,7 @@
       </li>
     </ul>
     <div class="govuk-tabs__panel" id="update-location">
-      <form th:action="@{/manage-location}" th:object="${form}" method="post">
+      <form th:action="@{/map-location}" th:object="${form}" method="post">
         <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
              data-module="govuk-error-summary" th:if="${#fields.hasErrors('*')}">
           <h2 class="govuk-error-summary__title" id="error-summary-title">
@@ -61,6 +61,7 @@
               <p class="govuk-label govuk-body govuk-!-font-weight-bold">NOMIS Agency ID</p>
               <p th:text="*{agencyId}" class="govuk-body ma0"></p>
               <input type="hidden" th:field="*{agencyId}" class="dn"/>
+              <input type="hidden" th:field="*{operation}" class="dn"/>
             </li>
             <li class="mv3">
               <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-name">Maps to Schedule
@@ -94,7 +95,7 @@
           <button class="govuk-button mv3 mr3" data-module="govuk-button">
             Confirm and save
           </button>
-          <a href="/search-locations" class="govuk-link">Cancel</a>
+          <a th:href="${cancelLink}" class="govuk-link">Cancel</a>
         </div>
       </form>
     </div>

@@ -20,6 +20,8 @@ data class AuditableEvent(
   companion object {
     private val terminal = "_TERMINAL_"
 
+    fun isSystemGenerated(event: AuditEvent) = event.username.toUpperCase().trim() == terminal
+
     private fun createEvent(
       type: AuditEventType,
       authentication: Authentication? = null,
