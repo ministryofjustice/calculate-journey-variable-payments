@@ -15,6 +15,7 @@ spring:
       url: "spring.jpa.database: HSQL"
   flyway:
     enabled: false
+    locations: classpath:/db/migration/ddl,classpath:/db/migration/dml
   main:
     allow-bean-definition-overriding: true
   security:

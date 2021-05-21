@@ -50,9 +50,21 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
-  testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0")
+  testImplementation("org.testcontainers:postgresql:1.15.3")
 
   runtimeOnly("org.flywaydb:flyway-core:7.8.1")
   runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.2.19")
+}
+
+tasks {
+  test {
+    useJUnitPlatform()
+    exclude("**/integration/*")
+  }
+
+  val testIntegration by registering(Test::class) {
+    useJUnitPlatform()
+    include("uk/gov/justice/digital/hmpps/pecs/jpc/integration/*")
+  }
 }
