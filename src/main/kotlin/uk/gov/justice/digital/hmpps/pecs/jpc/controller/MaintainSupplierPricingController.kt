@@ -119,19 +119,21 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     logger.info("getting update price for move $moveId")
 
     val effectiveYear = model.getEffectiveYear()
-    val (fromSite, toSite, price) = agencyIds(moveId).let { (from, to) ->
-      supplierPricingService.getExistingSiteNamesAndPrice(
-        supplier,
-        from,
-        to,
-        effectiveYear
-      )
-    }
+
+    val (fromAgencyId, toAgencyId) = agencyIds(moveId)
+
+    val (fromSite, toSite, price) = supplierPricingService.getExistingSiteNamesAndPrice(
+      supplier,
+      fromAgencyId,
+      toAgencyId,
+      effectiveYear
+    )
 
     model.apply {
       addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
       addAttribute("contractualYearStart", "$effectiveYear")
       addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+      addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
     }
 
     model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
@@ -152,10 +154,14 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
     val effectiveYear = model.getEffectiveYear()
+
     if (result.hasErrors()) {
       model.addAttribute("contractualYearStart", "$effectiveYear")
       model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
       model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
+
+      agencyIds(form.moveId).let { (from, to) -> model.addAttribute("history", priceHistoryForMove(supplier, from, to)) }
+
       return "update-price"
     }
 
@@ -178,6 +184,11 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     return RedirectView(model.getJourneySearchResultsUrl())
   }
+
+  private fun priceHistoryForMove(supplier: Supplier, from: String, to: String) =
+    supplierPricingService.priceHistoryForJourney(supplier, from, to)
+      .map { history -> PriceHistoryDto.valueOf(history) }
+      .sortedByDescending { lh -> lh.datetime }
 
   private fun ModelMap.getJourneySearchResultsUrl(): String {
     val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)

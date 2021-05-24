@@ -72,7 +72,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   }
 
   @Test
-  internal fun `get mapping for existing friendly location and location audit history`() {
+  internal fun `get mapping for existing friendly location with location history`() {
     val (agencyId, agencyName, agencyType) = Triple("ABCDEF", "EXISTING LOCATION", LocationType.CC)
     val auditEventDatetime = LocalDateTime.now()
     val auditEventMetadata = MapLocationMetadata(agencyId, newName = agencyName, newType = agencyType)
