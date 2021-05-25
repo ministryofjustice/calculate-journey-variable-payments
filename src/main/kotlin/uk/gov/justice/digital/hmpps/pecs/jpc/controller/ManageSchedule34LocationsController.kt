@@ -82,7 +82,7 @@ class ManageSchedule34LocationsController(
       model.addAttribute(
         "history",
         service.locationHistoryForAgencyId(agencyId)
-          .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+          .map { history -> LocationHistoryDto.valueOf(history) }
           .sortedByDescending { lh -> lh.datetime }
       )
     }
@@ -103,7 +103,7 @@ class ManageSchedule34LocationsController(
       model.addAttribute(
         "history",
         service.locationHistoryForAgencyId(location.agencyId)
-          .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+          .map { history -> LocationHistoryDto.valueOf(history) }
           .sortedByDescending { lh -> lh.datetime }
       )
 

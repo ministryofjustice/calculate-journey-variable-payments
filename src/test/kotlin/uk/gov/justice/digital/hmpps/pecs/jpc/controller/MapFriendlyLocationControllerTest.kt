@@ -72,16 +72,14 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
   }
 
   @Test
-  internal fun `get mapping for existing friendly location and location audit history`() {
+  internal fun `get mapping for existing friendly location with location history`() {
     val (agencyId, agencyName, agencyType) = Triple("ABCDEF", "EXISTING LOCATION", LocationType.CC)
     val auditEventDatetime = LocalDateTime.now()
     val auditEventMetadata = MapLocationMetadata(agencyId, newName = agencyName, newType = agencyType)
 
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
 
-    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
-      mapOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata) to auditEventMetadata)
-    )
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(setOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata)))
 
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
@@ -94,7 +92,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
           )
         }
       }
-      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name EXISTING LOCATION and type Crown Court", "Jane"))) } }
+      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name 'EXISTING LOCATION' and type 'Crown Court'", "Jane"))) } }
       .andExpect { view { name("update-location") } }
       .andExpect { model { attribute("origin", "from") } }
       .andExpect { status { isOk() } }

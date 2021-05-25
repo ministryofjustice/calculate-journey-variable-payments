@@ -4,79 +4,122 @@
       layout:decorate="~{layout/base}">
 
 <head>
-    <title>Calculate Journey Variable Payments - GOV.UK</title>
+  <title>Calculate Journey Variable Payments - GOV.UK</title>
 </head>
 
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
 
-    <form th:action="@{/update-price}" th:object="${form}" method="post">
+  <a th:href="${cancelLink}" class="govuk-back-link">Back</a>
+
+  <div class="govuk-tabs" data-module="govuk-tabs">
+    <h2 class="govuk-tabs__title">
+      Contents
+    </h2>
+    <ul class="govuk-tabs__list">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+        <a class="govuk-tabs__tab" href="#update-price">
+          Update price
+        </a>
+      </li>
+      <li class="govuk-tabs__list-item">
+        <a class="govuk-tabs__tab" href="#price-history">
+          Price history
+        </a>
+      </li>
+    </ul>
+    <div class="govuk-tabs__panel" id="update-price">
+      <form th:action="@{/update-price}" th:object="${form}" method="post">
         <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
              data-module="govuk-error-summary" th:if="${#fields.hasErrors('price')}">
-            <h2 class="govuk-error-summary__title" id="error-summary-title">
-                There is a problem
-            </h2>
-            <div class="govuk-error-summary__body">
-                <ul class="govuk-list govuk-error-summary__list">
-                    <li>
-                        <a href="#price">Enter a valid price in the correct
-                            format</a>
-                    </li>
-                </ul>
-            </div>
+          <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+          </h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+              <li>
+                <a href="#price">Enter a valid price in the correct
+                  format</a>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div class="mv4">
-            <h1 class="govuk-heading-xl mv2" th:inline="text">Update price</h1>
-            <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update price agreed with supplier for this
-                journey.</p>
+        <div>
+          <h2 class="govuk-heading-l" th:inline="text">Update price</h2>
+          <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Update price agreed with supplier for this
+            journey.</p>
         </div>
 
         <input type="hidden" th:field="*{moveId}" class="dn"/>
         <input type="hidden" th:field="*{from}" class="dn"/>
         <input type="hidden" th:field="*{to}" class="dn"/>
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('price')} ? 'govuk-form-group--error'">
-            <ol class="list pl0">
-                <li class="mv1">
-                    <p class="govuk-label govuk-body govuk-!-font-weight-bold">Journey</p>
-                    <p th:inline="text" class="govuk-body">[[*{from}]] to [[*{to}]]</p>
-                </li>
-                <li class="mv1">
-                    <label class="govuk-label govuk-body govuk-!-font-weight-bold"
-                           for="price">
-                        Add price
-                    </label>
-                    <div id="price-hint" class="govuk-hint">
-                        Example £100.00
-                    </div>
-                    <p th:if="${#fields.hasErrors('price')}" class="govuk-error-message">
-                        <span class="govuk-visually-hidden">Error:</span> Enter a valid price in the correct
-                        format
-                    </p>
-                    <div class="govuk-input__wrapper">
-                        <div class="govuk-input__prefix" aria-hidden="true">£</div>
-                        <input class="govuk-input govuk-input--width-5" id="price" name="price" type="text"
-                               aria-describedby="price-hint" th:field="*{price}"
-                               th:classappend="${#fields.hasErrors('price')} ? 'govuk-input--error'">
-                    </div>
-                </li>
-            </ol>
+          <ol class="list pl0">
+            <li class="mv1">
+              <p class="govuk-label govuk-body govuk-!-font-weight-bold">Journey</p>
+              <p th:inline="text" class="govuk-body">[[*{from}]] to [[*{to}]]</p>
+            </li>
+            <li class="mv1">
+              <label class="govuk-label govuk-body govuk-!-font-weight-bold"
+                     for="price">
+                Add price
+              </label>
+              <div id="price-hint" class="govuk-hint">
+                Example £100.00
+              </div>
+              <p th:if="${#fields.hasErrors('price')}" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span> Enter a valid price in the correct
+                format
+              </p>
+              <div class="govuk-input__wrapper">
+                <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                <input class="govuk-input govuk-input--width-5" id="price" name="price" type="text"
+                       aria-describedby="price-hint" th:field="*{price}"
+                       th:classappend="${#fields.hasErrors('price')} ? 'govuk-input--error'">
+              </div>
+            </li>
+          </ol>
         </div>
         <div class="govuk-warning-text mv3">
-            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-            <strong class="govuk-warning-text__text">
-                <span class="govuk-warning-text__assistive">Warning</span>
-                <span th:inline="text">Please note the added price will be effective for all instances of this journey undertaken by [[${supplier}]] in the current contractual year [[${contractualYearStart}]] to [[${contractualYearEnd}]].</span>
-            </strong>
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            <span th:inline="text">Please note the added price will be effective for all instances of this journey undertaken by [[${supplier}]] in the current contractual year [[${contractualYearStart}]] to [[${contractualYearEnd}]].</span>
+          </strong>
         </div>
         <div class="flex items-center">
-            <button class="govuk-button mv3 mr3" data-module="govuk-button">
-                Confirm and save
-            </button>
-            <a th:href="${cancelLink}" class="govuk-link">Cancel</a>
+          <button class="govuk-button mv3 mr3" data-module="govuk-button">
+            Confirm and save
+          </button>
+          <a th:href="${cancelLink}" class="govuk-link">Cancel</a>
         </div>
-    </form>
+      </form>
+    </div>
+
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-history">
+      <h2 class="govuk-heading-l">Price history</h2>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Date</th>
+          <th scope="col" class="govuk-table__header">Time</th>
+          <th scope="col" class="govuk-table__header">Action</th>
+          <th scope="col" class="govuk-table__header">By</th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <tr class="govuk-table__row" th:each="event: ${history}">
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'dd MMMM yyyy')}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'HH:mm a')}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.action}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.by}]]</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 </body>
 

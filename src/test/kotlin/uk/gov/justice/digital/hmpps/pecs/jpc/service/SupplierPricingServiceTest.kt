@@ -9,6 +9,9 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
@@ -18,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @ExtendWith(FakeAuthentication::class)
 internal class SupplierPricingServiceTest {
@@ -158,5 +162,49 @@ internal class SupplierPricingServiceTest {
     )
     verify(priceRepository).save(price)
     assertThat(price.priceInPence).isEqualTo(20035)
+  }
+
+  @Test
+  internal fun `finds single price history entry for Serco`() {
+    val sercoOriginalPrice = PriceMetadata(Supplier.SERCO, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+    val sercoOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", sercoOriginalPrice)
+
+    val geoameyPriceEvent = AuditEvent(
+      AuditEventType.JOURNEY_PRICE,
+      LocalDateTime.now(),
+      "Jane",
+      PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+    )
+
+    whenever(auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)).thenReturn(listOf(sercoOriginalPriceEvent, geoameyPriceEvent))
+
+    val sercoPriceHistory = service.priceHistoryForJourney(Supplier.SERCO, "from_agency_id", "to_agency_id")
+
+    assertThat(sercoPriceHistory).containsExactly(sercoOriginalPriceEvent)
+    verify(auditService).auditEventsByType(AuditEventType.JOURNEY_PRICE)
+  }
+
+  @Test
+  internal fun `finds multiple price history entries for GEOAmey`() {
+    val geoameyOriginalPrice = PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+    val geoameyOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", geoameyOriginalPrice)
+
+    val geoameyPriceChange = geoameyOriginalPrice.copy(newPrice = Money(2000).pounds(), oldPrice = Money(1000).pounds())
+    val geoameyPriceChangeEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now().plusDays(1), "Jane", geoameyPriceChange)
+
+    val sercoPriceEvent = AuditEvent(
+      AuditEventType.JOURNEY_PRICE,
+      LocalDateTime.now(),
+      "Jane",
+      PriceMetadata(Supplier.SERCO, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+    )
+
+    whenever(auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent, sercoPriceEvent))
+
+    val geoameyPriceHistory = service.priceHistoryForJourney(Supplier.GEOAMEY, "from_agency_id", "to_agency_id")
+
+    assertThat(geoameyPriceHistory).containsExactly(geoameyOriginalPriceEvent, geoameyPriceChangeEvent)
+
+    verify(auditService).auditEventsByType(AuditEventType.JOURNEY_PRICE)
   }
 }

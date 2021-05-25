@@ -7,15 +7,17 @@ import java.time.LocalDateTime
 
 data class LocationHistoryDto(val datetime: LocalDateTime, val action: String, val by: String) {
   companion object {
-    fun valueOf(event: AuditEvent, data: MapLocationMetadata): LocationHistoryDto {
+    fun valueOf(event: AuditEvent): LocationHistoryDto {
+
+      val data = MapLocationMetadata.map(event)
 
       val action = buildString {
         if (data.isRemapping()) {
-          if (data.newName != null) append("Location name changed from '${data.oldName}' to '${data.newName}'")
-          if (data.newName != null && data.newType != null) append(" and location type changed from '${data.oldType?.label}' to '${data.newType.label}'")
-          if (data.newType != null && data.newName == null) append("Location type changed from '${data.oldType?.label}' to '${data.newType.label}'")
+          if (data.oldName != null) append("Location name changed from '${data.oldName}' to '${data.newName}'")
+          if (data.oldType != null && data.oldName == null) append("Location type changed from '${data.oldType.label}' to '${data.newType!!.label}'")
+          if (data.oldName != null && data.oldType != null) append(" and location type changed from '${data.oldType.label}' to '${data.newType!!.label}'")
         } else {
-          append("Assigned to location name ${data.newName} and type ${data.newType?.label}")
+          append("Assigned to location name '${data.newName}' and type '${data.newType!!.label}'")
         }
       }
 

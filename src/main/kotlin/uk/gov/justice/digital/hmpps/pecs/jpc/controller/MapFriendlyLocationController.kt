@@ -65,7 +65,7 @@ class MapFriendlyLocationController(
       model.addAttribute(
         "history",
         service.locationHistoryForAgencyId(agencyId)
-          .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+          .map { history -> LocationHistoryDto.valueOf(history) }
           .sortedByDescending { lh -> lh.datetime }
       )
 
@@ -109,7 +109,7 @@ class MapFriendlyLocationController(
         model.addAttribute(
           "history",
           service.locationHistoryForAgencyId(form.agencyId)
-            .map { history -> LocationHistoryDto.valueOf(history.key, history.value) }
+            .map { history -> LocationHistoryDto.valueOf(history) }
             .sortedByDescending { lh -> lh.datetime }
         )
 

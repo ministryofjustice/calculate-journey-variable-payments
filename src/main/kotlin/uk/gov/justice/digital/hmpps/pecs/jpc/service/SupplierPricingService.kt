@@ -3,7 +3,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
@@ -102,6 +104,13 @@ class SupplierPricingService(
       getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found.")
     )
 
-  private fun getLocationBy(agencyId: String): Location? =
-    locationRepository.findByNomisAgencyId(agencyId.trim().toUpperCase())
+  private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
+
+  fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String) =
+    auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)
+      .associateWith { PriceMetadata.map(it) }
+      .filterValues { it.supplier == supplier && sanitised(it.fromNomisId) == sanitised(fromAgencyId) && sanitised(it.toNomisId) == sanitised(toAgencyId) }
+      .keys
+
+  private fun sanitised(value: String) = value.trim().toUpperCase()
 }
