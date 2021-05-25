@@ -17,7 +17,7 @@ data class LocationHistoryDto(val datetime: LocalDateTime, val action: String, v
           if (data.oldType != null && data.oldName == null) append("Location type changed from '${data.oldType.label}' to '${data.newType!!.label}'")
           if (data.oldName != null && data.oldType != null) append(" and location type changed from '${data.oldType.label}' to '${data.newType!!.label}'")
         } else {
-          append("Assigned to location name '${data.newName}' and type '${data.newType?.label}'")
+          append("Assigned to location name '${data.newName}' and type '${data.newType!!.label}'")
         }
       }
 

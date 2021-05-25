@@ -20,9 +20,9 @@ data class PriceHistoryDto(val datetime: LocalDateTime, val action: String, val 
 
       val action = buildString {
         if (data.isUpdate()) {
-          append("Price changed from £${Money.valueOf(data.oldPrice!!)} to £${Money.valueOf(data.newPrice)} for journey from '${data.fromNomisId}' to '${data.toNomisId}'. Effective from ${data.effectiveYear - 1} to ${data.effectiveYear}.")
+          append("Price changed from £${Money.valueOf(data.oldPrice!!)} to £${Money.valueOf(data.newPrice)}. Effective from ${data.effectiveYear} to ${data.effectiveYear + 1}.")
         } else {
-          append("Journey from '${data.fromNomisId}' to '${data.toNomisId}' priced at £${Money.valueOf(data.newPrice)}. Effective from ${data.effectiveYear - 1} to ${data.effectiveYear}.")
+          append("Journey priced at £${Money.valueOf(data.newPrice)}. Effective from ${data.effectiveYear} to ${data.effectiveYear + 1}.")
         }
       }
 

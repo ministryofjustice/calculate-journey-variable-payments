@@ -216,7 +216,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           attribute(
             "history",
             listOf(
-              PriceHistoryDto(priceHistoryDateTime, "Journey from '$fromAgencyId' to '$toAgencyId' priced at £10.00. Effective from ${effectiveYearForDate(effectiveDate) - 1} to ${effectiveYearForDate(effectiveDate)}.", "SYSTEM")
+              PriceHistoryDto(priceHistoryDateTime, "Journey priced at £10.00. Effective from ${effectiveYearForDate(effectiveDate)} to ${effectiveYearForDate(effectiveDate) + 1}.", "SYSTEM")
             )
           )
         }
