@@ -71,13 +71,11 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn("DIFFERENT AGENCY NAME")
-    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
-      mapOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata) to auditEventMetadata)
-    )
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(setOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata)))
 
     mockMvc.get("/manage-location/ABCDEF")
       .andExpect { model { attribute("form", ManageSchedule34LocationsController.LocationForm(agencyId, agencyName, LocationType.CC, "DIFFERENT AGENCY NAME")) } }
-      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name AGENCY NAME and type Crown Court", "Jane"))) } }
+      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name 'AGENCY NAME' and type 'Crown Court'", "Jane"))) } }
       .andExpect { view { name("manage-location") } }
       .andExpect { status { isOk() } }
 

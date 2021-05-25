@@ -79,9 +79,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
 
-    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
-      mapOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata) to auditEventMetadata)
-    )
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(setOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata)))
 
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
@@ -94,7 +92,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
           )
         }
       }
-      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name EXISTING LOCATION and type Crown Court", "Jane"))) } }
+      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name 'EXISTING LOCATION' and type 'Crown Court'", "Jane"))) } }
       .andExpect { view { name("update-location") } }
       .andExpect { model { attribute("origin", "from") } }
       .andExpect { status { isOk() } }

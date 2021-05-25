@@ -67,6 +67,7 @@ class LocationsService(
     auditService.auditEventsByType(AuditEventType.LOCATION)
       .associateWith { MapLocationMetadata.map(it) }
       .filterValues { sanitised(it.nomisId) == sanitised(agencyId) }
+      .keys
 
   private fun sanitised(value: String) = value.trim().toUpperCase()
 }

@@ -187,7 +187,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
   private fun priceHistoryForMove(supplier: Supplier, from: String, to: String) =
     supplierPricingService.priceHistoryForJourney(supplier, from, to)
-      .map { history -> PriceHistoryDto.valueOf(history) }
+      .map { history -> PriceHistoryDto.valueOf(supplier, history) }
       .sortedByDescending { lh -> lh.datetime }
 
   private fun ModelMap.getJourneySearchResultsUrl(): String {

@@ -17,14 +17,14 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `initial journey pricing via the system`() {
     val datetime = LocalDateTime.now()
-    val priceMetadata = PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2021, Money(1100).pounds())
+    val priceMetadata = PriceMetadata(Supplier.GEOAMEY, "from_geo_agency_id", "to_geo_agency_id", 2021, Money(1100).pounds())
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "_TERMINAL_", priceMetadata)
-    val history = PriceHistoryDto.valueOf(priceEvent)
+    val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
 
     assertThat(history).isEqualTo(
       PriceHistoryDto(
         datetime,
-        "Journey from 'from_agency_id' to 'to_agency_id' priced at £11.00. Effective from 2020 to 2021.",
+        "Journey from 'from_geo_agency_id' to 'to_geo_agency_id' priced at £11.00. Effective from 2020 to 2021.",
         "SYSTEM"
       )
     )
@@ -33,14 +33,14 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `initial journey pricing via a user`() {
     val datetime = LocalDateTime.now()
-    val priceMetadata = PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2022, Money(1450).pounds())
+    val priceMetadata = PriceMetadata(Supplier.SERCO, "from_serco_agency_id", "to_serco_agency_id", 2022, Money(1450).pounds())
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
-    val history = PriceHistoryDto.valueOf(priceEvent)
+    val history = PriceHistoryDto.valueOf(Supplier.SERCO, priceEvent)
 
     assertThat(history).isEqualTo(
       PriceHistoryDto(
         datetime,
-        "Journey from 'from_agency_id' to 'to_agency_id' priced at £14.50. Effective from 2021 to 2022.",
+        "Journey from 'from_serco_agency_id' to 'to_serco_agency_id' priced at £14.50. Effective from 2021 to 2022.",
         "Jane"
       )
     )
@@ -51,7 +51,7 @@ internal class PriceHistoryDtoTest {
     val datetime = LocalDateTime.now()
     val priceMetadata = PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2022, Money(1450).pounds(), Money(1650).pounds())
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
-    val history = PriceHistoryDto.valueOf(priceEvent)
+    val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
 
     assertThat(history).isEqualTo(
       PriceHistoryDto(
@@ -65,7 +65,16 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `throws a runtime exception if not correct event type`() {
     assertThatThrownBy {
-      PriceHistoryDto.valueOf(AuditEvent(AuditEventType.LOCATION, LocalDateTime.now(), "Jane", MapLocationMetadata("agency_id", "site name", LocationType.CC)))
+      PriceHistoryDto.valueOf(Supplier.GEOAMEY, AuditEvent(AuditEventType.LOCATION, LocalDateTime.now(), "Jane", MapLocationMetadata("agency_id", "site name", LocationType.CC)))
     }.isInstanceOf(RuntimeException::class.java)
+  }
+
+  @Test
+  fun `throws a runtime exception if incorrect supplier for history event`() {
+    val datetime = LocalDateTime.now()
+    val priceMetadata = PriceMetadata(Supplier.SERCO, "from_serco_agency_id", "to_serco_agency_id", 2022, Money(1450).pounds())
+    val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
+
+    assertThatThrownBy { PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent) }.isInstanceOf(RuntimeException::class.java)
   }
 }
