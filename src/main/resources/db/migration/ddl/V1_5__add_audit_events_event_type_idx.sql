@@ -1,0 +1,1 @@
+create index if not exists audit_events_event_type_idx on audit_events (event_type);
