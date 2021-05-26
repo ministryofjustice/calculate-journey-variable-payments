@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
@@ -106,11 +107,15 @@ class SupplierPricingService(
 
   private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
 
-  fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String) =
-    auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)
+  fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
+    val sanitisedFrom = sanitised(fromAgencyId)
+    val sanitisedTo = sanitised(toAgencyId)
+
+    return auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)
       .associateWith { PriceMetadata.map(it) }
-      .filterValues { it.supplier == supplier && sanitised(it.fromNomisId) == sanitised(fromAgencyId) && sanitised(it.toNomisId) == sanitised(toAgencyId) }
+      .filterValues { it.supplier == supplier && it.fromNomisId == sanitisedFrom && it.toNomisId == sanitisedTo }
       .keys
+  }
 
   private fun sanitised(value: String) = value.trim().toUpperCase()
 }

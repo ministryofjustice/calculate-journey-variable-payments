@@ -166,14 +166,14 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `finds single price history entry for Serco`() {
-    val sercoOriginalPrice = PriceMetadata(Supplier.SERCO, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+    val sercoOriginalPrice = PriceMetadata(Supplier.SERCO, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
     val sercoOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", sercoOriginalPrice)
 
     val geoameyPriceEvent = AuditEvent(
       AuditEventType.JOURNEY_PRICE,
       LocalDateTime.now(),
       "Jane",
-      PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+      PriceMetadata(Supplier.GEOAMEY, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
     )
 
     whenever(auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)).thenReturn(listOf(sercoOriginalPriceEvent, geoameyPriceEvent))
@@ -186,7 +186,7 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `finds multiple price history entries for GEOAmey`() {
-    val geoameyOriginalPrice = PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+    val geoameyOriginalPrice = PriceMetadata(Supplier.GEOAMEY, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
     val geoameyOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", geoameyOriginalPrice)
 
     val geoameyPriceChange = geoameyOriginalPrice.copy(newPrice = Money(2000).pounds(), oldPrice = Money(1000).pounds())
@@ -196,7 +196,7 @@ internal class SupplierPricingServiceTest {
       AuditEventType.JOURNEY_PRICE,
       LocalDateTime.now(),
       "Jane",
-      PriceMetadata(Supplier.SERCO, "from_agency_id", "to_agency_id", 2021, Money(1000).pounds())
+      PriceMetadata(Supplier.SERCO, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
     )
 
     whenever(auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent, sercoPriceEvent))
