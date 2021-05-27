@@ -22,5 +22,5 @@ class AuditService(private val auditEventRepository: AuditEventRepository, priva
     )
   }
 
-  internal fun auditEventsByType(type: AuditEventType) = auditEventRepository.findByEventType(type)
+  internal fun auditEventsByTypeAndMetaKey(type: AuditEventType, metaKey: String) = auditEventRepository.findByEventTypeAndMetadataKey(type, metaKey.trim().toUpperCase())
 }

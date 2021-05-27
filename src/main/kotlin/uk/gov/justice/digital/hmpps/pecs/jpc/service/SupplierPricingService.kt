@@ -108,12 +108,8 @@ class SupplierPricingService(
   private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
 
   fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
-    val sanitisedFrom = sanitised(fromAgencyId)
-    val sanitisedTo = sanitised(toAgencyId)
-
-    return auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)
+    return auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, PriceMetadata.key(supplier, fromAgencyId, toAgencyId))
       .associateWith { PriceMetadata.map(it) }
-      .filterValues { it.supplier == supplier && it.fromNomisId == sanitisedFrom && it.toNomisId == sanitisedTo }
       .keys
   }
 

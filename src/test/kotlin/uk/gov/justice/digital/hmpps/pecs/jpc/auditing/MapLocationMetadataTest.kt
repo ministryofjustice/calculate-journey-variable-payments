@@ -9,26 +9,28 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 internal class MapLocationMetadataTest {
   @Test
   fun `mapping a new location`() {
-    val metadata = MapLocationMetadata.map(Location(LocationType.PR, "AGENCY_ID", "SITE NAME"))
+    val metadata = MapLocationMetadata.map(Location(LocationType.PR, "NEW_AGENCY_ID", "NEW SITE NAME"))
 
-    assertThat(metadata.nomisId).isEqualTo("AGENCY_ID")
-    assertThat(metadata.newName).isEqualTo("SITE NAME")
+    assertThat(metadata.nomisId).isEqualTo("NEW_AGENCY_ID")
+    assertThat(metadata.newName).isEqualTo("NEW SITE NAME")
     assertThat(metadata.newType).isEqualTo(LocationType.PR)
     assertThat(metadata.oldName).isNull()
     assertThat(metadata.oldType).isNull()
     assertThat(metadata.isRemapping()).isFalse
+    assertThat(metadata.key()).isEqualTo("NEW_AGENCY_ID")
   }
 
   @Test
   fun `remapping of existing location name`() {
-    val existingLocation = Location(LocationType.PR, "AGENCY_ID", "OLD SITE NAME")
+    val existingLocation = Location(LocationType.PR, "EXISTING_AGENCY_ID", "OLD SITE NAME")
     val metadata = MapLocationMetadata.remap(existingLocation, existingLocation.copy(siteName = "NEW SITE NAME"))
 
-    assertThat(metadata.nomisId).isEqualTo("AGENCY_ID")
+    assertThat(metadata.nomisId).isEqualTo("EXISTING_AGENCY_ID")
     assertThat(metadata.newName).isEqualTo("NEW SITE NAME")
     assertThat(metadata.newType).isNull()
     assertThat(metadata.oldName).isEqualTo("OLD SITE NAME")
     assertThat(metadata.oldType).isNull()
+    assertThat(metadata.key()).isEqualTo("EXISTING_AGENCY_ID")
   }
 
   @Test

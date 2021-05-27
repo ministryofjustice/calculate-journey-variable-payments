@@ -4,5 +4,5 @@ import org.springframework.data.repository.CrudRepository
 import java.util.UUID
 
 interface AuditEventRepository : CrudRepository<AuditEvent, UUID> {
-  fun findByEventType(eventType: AuditEventType): List<AuditEvent>
+  fun findByEventTypeAndMetadataKey(eventType: AuditEventType, metadataKey: String): List<AuditEvent>
 }

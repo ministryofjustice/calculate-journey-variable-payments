@@ -25,19 +25,21 @@ internal class PriceMetadataTest {
     assertThat(metadata.newPrice).isEqualTo(1.0)
     assertThat(metadata.oldPrice).isNull()
     assertThat(metadata.isUpdate()).isFalse
+    assertThat(metadata.key()).isEqualTo("SERCO-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
   @Test
   fun `update price`() {
-    val metadata = PriceMetadata.update(Money.valueOf(2.0), Price(supplier = Supplier.SERCO, fromLocation = fromLocation, toLocation = toLocation, effectiveYear = 2020, priceInPence = 100))
+    val metadata = PriceMetadata.update(Money.valueOf(2.0), Price(supplier = Supplier.GEOAMEY, fromLocation = fromLocation, toLocation = toLocation, effectiveYear = 2020, priceInPence = 100))
 
-    assertThat(metadata.supplier).isEqualTo(Supplier.SERCO)
+    assertThat(metadata.supplier).isEqualTo(Supplier.GEOAMEY)
     assertThat(metadata.fromNomisId).isEqualTo("FROM_AGENCY_ID")
     assertThat(metadata.toNomisId).isEqualTo("TO_AGENCY_ID")
     assertThat(metadata.effectiveYear).isEqualTo(2020)
     assertThat(metadata.newPrice).isEqualTo(1.0)
     assertThat(metadata.oldPrice).isEqualTo(2.0)
     assertThat(metadata.isUpdate()).isTrue
+    assertThat(metadata.key()).isEqualTo("GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
   @Test
