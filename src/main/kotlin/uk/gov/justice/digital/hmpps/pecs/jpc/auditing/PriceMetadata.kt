@@ -60,9 +60,13 @@ data class PriceMetadata(
       else
         throw IllegalArgumentException("Audit event type is not a price event.")
     }
+
+    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) = "$supplier-${fromNomisId.trim().toUpperCase()}-${toNomisId.trim().toUpperCase()}"
   }
 
   fun isUpdate() = oldPrice != null
 
   override fun toJsonString(): String = Klaxon().toJsonString(this)
+
+  override fun key(): String = key(supplier, fromNomisId, toNomisId)
 }

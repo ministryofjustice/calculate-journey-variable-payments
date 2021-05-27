@@ -169,19 +169,12 @@ internal class SupplierPricingServiceTest {
     val sercoOriginalPrice = PriceMetadata(Supplier.SERCO, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
     val sercoOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", sercoOriginalPrice)
 
-    val geoameyPriceEvent = AuditEvent(
-      AuditEventType.JOURNEY_PRICE,
-      LocalDateTime.now(),
-      "Jane",
-      PriceMetadata(Supplier.GEOAMEY, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
-    )
-
-    whenever(auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)).thenReturn(listOf(sercoOriginalPriceEvent, geoameyPriceEvent))
+    whenever(auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "SERCO-FROM_AGENCY_ID-TO_AGENCY_ID")).thenReturn(listOf(sercoOriginalPriceEvent))
 
     val sercoPriceHistory = service.priceHistoryForJourney(Supplier.SERCO, "from_agency_id", "to_agency_id")
 
     assertThat(sercoPriceHistory).containsExactly(sercoOriginalPriceEvent)
-    verify(auditService).auditEventsByType(AuditEventType.JOURNEY_PRICE)
+    verify(auditService).auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "SERCO-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
   @Test
@@ -192,19 +185,12 @@ internal class SupplierPricingServiceTest {
     val geoameyPriceChange = geoameyOriginalPrice.copy(newPrice = Money(2000).pounds(), oldPrice = Money(1000).pounds())
     val geoameyPriceChangeEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now().plusDays(1), "Jane", geoameyPriceChange)
 
-    val sercoPriceEvent = AuditEvent(
-      AuditEventType.JOURNEY_PRICE,
-      LocalDateTime.now(),
-      "Jane",
-      PriceMetadata(Supplier.SERCO, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
-    )
-
-    whenever(auditService.auditEventsByType(AuditEventType.JOURNEY_PRICE)).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent, sercoPriceEvent))
+    whenever(auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent))
 
     val geoameyPriceHistory = service.priceHistoryForJourney(Supplier.GEOAMEY, "from_agency_id", "to_agency_id")
 
     assertThat(geoameyPriceHistory).containsExactly(geoameyOriginalPriceEvent, geoameyPriceChangeEvent)
 
-    verify(auditService).auditEventsByType(AuditEventType.JOURNEY_PRICE)
+    verify(auditService).auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 }
