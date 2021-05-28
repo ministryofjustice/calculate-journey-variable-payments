@@ -10,6 +10,7 @@ enum class LocationType(val label: String) {
   CC("Crown Court"),
   CM("Combined Court"),
   CO("County Court"),
+  CRN("Coroners Court"),
   CRT("Court"),
   HP("Hospital"),
   IM("Immigration"),
