@@ -2,15 +2,13 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.LocalDate
 import kotlin.streams.toList
 
-@Component
-class ReportImporter(
+open class ReportImporter(
   @Autowired private val provider: ReportingProvider,
   @Autowired private val monitoringService: MonitoringService
 ) {
@@ -30,7 +28,7 @@ class ReportImporter(
     )
   }
 
-  fun importPeopleOn(date: LocalDate) = importPeople(date, date)
+  open fun importPeopleOn(date: LocalDate) = importPeople(date, date)
 
   private fun importPeople(from: LocalDate, to: LocalDate): Sequence<Person> {
     val peopleContent = getContents("people", from, to)
