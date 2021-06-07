@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 
 enum class AuditEventType(val label: String) {
   DOWNLOAD_SPREADSHEET("Download spreadsheet"),
+  DOWNLOAD_SPREADSHEET_FAILURE("Download spreadsheet failure"),
   JOURNEY_PRICE("Journey price"),
   JOURNEY_PRICE_BULK_UPDATE("Journey price bulk update"),
   LOCATION("Location"),

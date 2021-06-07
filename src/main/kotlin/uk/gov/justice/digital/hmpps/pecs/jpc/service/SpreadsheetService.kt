@@ -20,8 +20,13 @@ class SpreadsheetService(
   fun spreadsheet(authentication: Authentication, supplier: Supplier, startDate: LocalDate): File? {
     logger.info("Generating spreadsheet for supplier '$supplier', moves from '$startDate''")
 
-    return pricesSpreadsheetGenerator.generate(supplier, startDate).also {
-      auditService.create(AuditableEvent.downloadSpreadsheetEvent(startDate, supplier, authentication))
+    return Result.runCatching {
+      pricesSpreadsheetGenerator.generate(supplier, startDate).also {
+        auditService.create(AuditableEvent.downloadSpreadsheetEvent(startDate, supplier, authentication))
+      }
+    }.getOrElse { exception ->
+      auditService.create(AuditableEvent.downloadSpreadsheetFailure(startDate, supplier, authentication))
+      throw exception
     }
   }
 }

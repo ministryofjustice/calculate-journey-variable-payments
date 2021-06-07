@@ -93,6 +93,19 @@ internal class AuditServiceTest {
   }
 
   @Test
+  internal fun `create download spreadsheet failure audit event`() {
+    service.create(
+      AuditableEvent.downloadSpreadsheetFailure(
+        LocalDate.of(2021, 6, 7),
+        Supplier.GEOAMEY,
+        authentication
+      )
+    )
+
+    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE, authentication.name, mapOf("month" to "2021-06", "supplier" to "GEOAMEY"))
+  }
+
+  @Test
   internal fun `create new location audit event`() {
     service.create(AuditableEvent.mapLocation(Location(LocationType.AP, "TEST2", "TEST 2 NAME")))
 

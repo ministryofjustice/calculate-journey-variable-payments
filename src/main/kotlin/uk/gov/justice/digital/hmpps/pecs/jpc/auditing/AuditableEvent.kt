@@ -53,6 +53,13 @@ data class AuditableEvent(
         mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
       )
 
+    fun downloadSpreadsheetFailure(date: LocalDate, supplier: Supplier, authentication: Authentication) =
+      createEvent(
+        AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE,
+        authentication,
+        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
+
+      )
     fun addPrice(newPrice: Price): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
