@@ -48,8 +48,8 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
 
     return journeyQueryRepository.prices(
       supplier,
-      fromSiteName?.trim()?.toUpperCase(),
-      toSiteName?.trim()?.toUpperCase(),
+      fromSiteName?.trim()?.uppercase(),
+      toSiteName?.trim()?.uppercase(),
       effectiveYear
     ).also {
       logger.info("Retrieved ${it.size} prices for $supplier, from site '${fromSiteName.orEmpty()}', to site name '${toSiteName.orEmpty()}' for effective year $effectiveYear")

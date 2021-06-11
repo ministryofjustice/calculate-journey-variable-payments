@@ -149,6 +149,6 @@ enum class JourneyState() {
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { valueOf(value!!.toLowerCase()) }.getOrDefault(unknown)
+      kotlin.runCatching { valueOf(value!!.lowercase()) }.getOrDefault(unknown)
   }
 }

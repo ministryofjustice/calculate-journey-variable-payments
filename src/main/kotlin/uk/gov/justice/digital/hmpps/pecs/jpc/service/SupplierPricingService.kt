@@ -113,5 +113,5 @@ class SupplierPricingService(
       .keys
   }
 
-  private fun sanitised(value: String) = value.trim().toUpperCase()
+  private fun sanitised(value: String) = value.trim().uppercase()
 }

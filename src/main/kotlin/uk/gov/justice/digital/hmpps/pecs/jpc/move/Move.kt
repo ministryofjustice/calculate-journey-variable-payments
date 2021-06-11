@@ -137,7 +137,7 @@ data class Move(
   val person: Person? = null
 ) {
   fun totalInPence() =
-    if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumBy {
+    if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumOf {
       it.priceInPence ?: 0
     }
 
@@ -254,6 +254,6 @@ enum class MoveStatus {
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { valueOf(value!!.toLowerCase()) }.getOrDefault(unknown)
+      kotlin.runCatching { valueOf(value!!.lowercase()) }.getOrDefault(unknown)
   }
 }

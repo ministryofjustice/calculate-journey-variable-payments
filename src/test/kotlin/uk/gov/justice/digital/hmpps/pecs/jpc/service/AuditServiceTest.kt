@@ -53,7 +53,7 @@ internal class AuditServiceTest {
           AuditEvent(
             type,
             dateTime,
-            username.trim().toUpperCase(),
+            username.trim().uppercase(),
             if (metadata != null) Klaxon().toJsonString(metadata) else null
           )
         )
@@ -111,7 +111,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
-    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
       MapLocationMetadata(nomisId = "TEST2", newName = "TEST 2 NAME", newType = LocationType.AP)
@@ -131,7 +131,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
-    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
       MapLocationMetadata(
@@ -155,7 +155,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.LOCATION)
-    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
       MapLocationMetadata(
@@ -203,7 +203,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
-    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
 
     assertThatPricesMetadataIsTheSame(
       eventCaptor.firstValue,
@@ -234,7 +234,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
-    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().toUpperCase())
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
     assertThatPricesMetadataIsTheSame(
       eventCaptor.firstValue,
       PriceMetadata(

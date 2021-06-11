@@ -12,7 +12,7 @@ enum class MoveType(val text: String, val hasMoveType: (m: Move) -> Boolean) {
 
   companion object {
     fun valueOfCaseInsensitive(value: String): MoveType {
-      return MoveType.valueOf(value.toUpperCase())
+      return MoveType.valueOf(value.uppercase())
     }
   }
 }

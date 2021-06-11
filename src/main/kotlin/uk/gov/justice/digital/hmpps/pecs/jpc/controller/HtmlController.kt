@@ -231,7 +231,7 @@ class HtmlController(
   ): String {
     logger.info("finding move")
 
-    val moveRef = form.reference.toUpperCase().trim()
+    val moveRef = form.reference.uppercase().trim()
     if (!moveRef.matches("[A-Za-z0-9]+".toRegex())) return "redirect:$FIND_MOVE_URL/?no-results-for=invalid-reference"
 
     val maybeMove = moveService.findMoveByReferenceAndSupplier(moveRef, supplier)

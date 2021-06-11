@@ -67,5 +67,5 @@ class LocationsService(
     auditService.auditEventsByTypeAndMetaKey(AuditEventType.LOCATION, MapLocationMetadata.key(agencyId))
       .associateWith { MapLocationMetadata.map(it) }.keys
 
-  private fun sanitised(value: String) = value.trim().toUpperCase()
+  private fun sanitised(value: String) = value.trim().uppercase()
 }

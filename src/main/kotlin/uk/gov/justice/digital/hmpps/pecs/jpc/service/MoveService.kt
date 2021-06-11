@@ -69,10 +69,10 @@ data class MoveTypeSummaries(val count: Int, val movesSummaries: List<MovesSumma
     return with(movesSummaries) {
       MovesSummary(
         null,
-        sumByDouble { it.percentage },
-        sumBy { it.volume },
-        sumBy { it.volumeUnpriced },
-        sumBy { it.totalPriceInPence }
+        sumOf { it.percentage },
+        sumOf { it.volume },
+        sumOf { it.volumeUnpriced },
+        sumOf { it.totalPriceInPence }
       )
     }
   }

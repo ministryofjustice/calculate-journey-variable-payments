@@ -131,8 +131,8 @@ class MapFriendlyLocationController(
         "from" -> {
           reflectChangeToLocationWhenReturnToSearchResults {
             model.getOptionalAttribute(PICK_UP_ATTRIBUTE) {
-              searchResultsUrl.queryParam(PICK_UP_ATTRIBUTE, form.locationName.toUpperCase())
-              model.addAttribute(PICK_UP_ATTRIBUTE, form.locationName.toUpperCase())
+              searchResultsUrl.queryParam(PICK_UP_ATTRIBUTE, form.locationName.uppercase())
+              model.addAttribute(PICK_UP_ATTRIBUTE, form.locationName.uppercase())
             }
             model.getOptionalAttribute(DROP_OFF_ATTRIBUTE) { searchResultsUrl.queryParam(DROP_OFF_ATTRIBUTE, it) }
           }
@@ -141,8 +141,8 @@ class MapFriendlyLocationController(
           reflectChangeToLocationWhenReturnToSearchResults {
             model.getOptionalAttribute(PICK_UP_ATTRIBUTE) { searchResultsUrl.queryParam(PICK_UP_ATTRIBUTE, it) }
             model.getOptionalAttribute(DROP_OFF_ATTRIBUTE) {
-              searchResultsUrl.queryParam(DROP_OFF_ATTRIBUTE, form.locationName.toUpperCase())
-              model.addAttribute(DROP_OFF_ATTRIBUTE, form.locationName.toUpperCase())
+              searchResultsUrl.queryParam(DROP_OFF_ATTRIBUTE, form.locationName.uppercase())
+              model.addAttribute(DROP_OFF_ATTRIBUTE, form.locationName.uppercase())
             }
           }
         }
@@ -162,7 +162,7 @@ class MapFriendlyLocationController(
 
   private fun RedirectAttributes.informUserOfChangesOnRedirect(operation: String, form: MapLocationForm) {
     this.addFlashAttribute("flashMessage", operation)
-    this.addFlashAttribute("flashAttrMappedLocationName", form.locationName.toUpperCase())
+    this.addFlashAttribute("flashAttrMappedLocationName", form.locationName.uppercase())
     this.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
   }
 

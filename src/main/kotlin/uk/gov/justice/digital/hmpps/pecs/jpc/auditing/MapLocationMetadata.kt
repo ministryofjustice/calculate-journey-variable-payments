@@ -56,7 +56,7 @@ data class MapLocationMetadata(
         throw IllegalArgumentException("Audit event type is not a location event.")
     }
 
-    fun key(agencyId: String) = agencyId.trim().toUpperCase()
+    fun key(agencyId: String) = agencyId.trim().uppercase()
   }
 
   fun isRemapping() = oldName != null || oldType != null

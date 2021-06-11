@@ -63,7 +63,7 @@ enum class Supplier {
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { valueOf(value!!.toUpperCase()) }.getOrDefault(UNKNOWN)
+      kotlin.runCatching { valueOf(value!!.uppercase()) }.getOrDefault(UNKNOWN)
   }
 }
 

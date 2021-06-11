@@ -200,7 +200,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   }
 
   private fun agencyIds(combined: String) =
-    Pair(combined.split("-")[0].trim().toUpperCase(), combined.split("-")[1].trim().toUpperCase())
+    Pair(combined.split("-")[0].trim().uppercase(), combined.split("-")[1].trim().uppercase())
 
   private fun parseAmount(value: String) =
     Result.runCatching { value.toDouble() }.getOrNull()?.takeIf { it > 0 }?.let { Money.valueOf(it) }
