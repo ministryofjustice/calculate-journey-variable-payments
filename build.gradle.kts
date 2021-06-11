@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.1.7"
-  kotlin("plugin.spring") version "1.4.32"
-  kotlin("plugin.jpa") version "1.4.32"
-  kotlin("plugin.allopen") version "1.4.32"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.0"
+  kotlin("plugin.spring") version "1.5.10"
+  kotlin("plugin.jpa") version "1.5.10"
+  kotlin("plugin.allopen") version "1.5.10"
 }
 
 allOpen {
@@ -19,10 +19,10 @@ dependencies {
   implementation("com.github.kittinunf.result:result:4.0.0")
   implementation("com.github.kittinunf.result:result-coroutines:4.0.0")
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.11.1001")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.3")
   implementation("io.sentry:sentry-spring-boot-starter:4.3.0")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.23.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.23.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.24.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.24.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.3")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
 
@@ -40,21 +40,21 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springframework.session:spring-session-jdbc:2.4.3")
+  implementation("org.springframework.session:spring-session-jdbc:2.5.0")
   implementation("org.springframework.shell:spring-shell-starter:2.0.1.RELEASE")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
 
-  testImplementation("org.mockito:mockito-inline:3.9.0")
+  testImplementation("org.mockito:mockito-inline:3.11.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
   testImplementation("org.testcontainers:postgresql:1.15.3")
 
-  runtimeOnly("org.flywaydb:flyway-core:7.8.1")
+  runtimeOnly("org.flywaydb:flyway-core:7.10.0")
   runtimeOnly("com.h2database:h2")
-  runtimeOnly("org.postgresql:postgresql:42.2.19")
+  runtimeOnly("org.postgresql:postgresql:42.2.20")
 }
 
 tasks {
