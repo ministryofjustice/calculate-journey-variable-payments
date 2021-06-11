@@ -23,10 +23,10 @@ class AutomaticLocationMappingService(
 
   fun mapIfNotPresentLocationsCreatedOn(date: LocalDate) {
     basmClientApi.findNomisAgenciesCreatedOn(date).forEach {
-      locationRepository.findByNomisAgencyIdOrSiteName(it.agencyId.toUpperCase().trim(), it.name.toUpperCase().trim()).let { location ->
+      locationRepository.findByNomisAgencyIdOrSiteName(it.agencyId.uppercase().trim(), it.name.uppercase().trim()).let { location ->
         when (location.size) {
           0 -> {
-            locationRepository.save(Location(it.locationType, it.agencyId.toUpperCase().trim(), it.name.toUpperCase().trim(), timeSource.dateTime())).also { newLocation ->
+            locationRepository.save(Location(it.locationType, it.agencyId.uppercase().trim(), it.name.uppercase().trim(), timeSource.dateTime())).also { newLocation ->
               auditService.create(AuditableEvent.autoMapLocation(newLocation))
 
               logger.info("Automatically mapped new location: agency ID '${it.agencyId}', name '${it.name}' and type '${it.locationType.label}'")

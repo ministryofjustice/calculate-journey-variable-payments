@@ -28,7 +28,7 @@ class PricesSpreadsheet(
 
   val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
 
-  private val locations = supplierLocations.associateBy { it.siteName.toUpperCase() }
+  private val locations = supplierLocations.associateBy { it.siteName.uppercase() }
 
   fun forEachRow(f: (price: Price) -> Unit) {
     getRows().forEach { row -> Result.runCatching { f(mapToPrice(row)) }.onFailure { this.addError(row, it) } }

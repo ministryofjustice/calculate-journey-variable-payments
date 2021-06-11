@@ -58,7 +58,7 @@ class ManageSchedule34LocationsController(
   }
 
   private fun BindingResult.locationNotfound(location: String) {
-    this.rejectValue("location", "notfound", "Location ${location.trim().toUpperCase()} not found")
+    this.rejectValue("location", "notfound", "Location ${location.trim().uppercase()} not found")
   }
 
   @GetMapping("$MANAGE_LOCATION/{agency-id}")
@@ -116,7 +116,7 @@ class ManageSchedule34LocationsController(
       service.setLocationDetails(location.agencyId, location.locationName, location.locationType!!)
 
       redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
-      redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", location.locationName.toUpperCase())
+      redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", location.locationName.uppercase())
       redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", location.agencyId)
 
       return "redirect:search-locations"

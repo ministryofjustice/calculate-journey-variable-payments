@@ -37,7 +37,7 @@ internal class StandardMovesSheetTest(@Autowired private val template: JPCTempla
     val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, ClosedRangeLocalDate(date, date), Supplier.SERCO))
 
     assertThat(sms.sheet.getRow(2).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
-    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.toUpperCase()).isEqualTo(Supplier.SERCO.name)
+    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(Supplier.SERCO.name)
   }
 
   @Test
@@ -45,7 +45,7 @@ internal class StandardMovesSheetTest(@Autowired private val template: JPCTempla
     val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, ClosedRangeLocalDate(date, date), Supplier.GEOAMEY))
 
     assertThat(sms.sheet.getRow(2).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
-    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.toUpperCase()).isEqualTo(Supplier.GEOAMEY.name)
+    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(Supplier.GEOAMEY.name)
   }
 
   @Test

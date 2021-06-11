@@ -44,7 +44,7 @@ class ImporterConfiguration {
 
   @Bean
   fun reportImporter(@Value("\${SENTRY_ENVIRONMENT:}") env: String): ReportImporter {
-    return if (env.trim().toUpperCase() == "LOCAL") {
+    return if (env.trim().uppercase() == "LOCAL") {
       logger.warn("Running importer in PII obfuscation mode")
       ObfuscatingReportImporter(reportingProvider, monitoringString)
     } else {

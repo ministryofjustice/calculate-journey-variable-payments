@@ -25,30 +25,30 @@ class BasmClientApiService(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   fun findNomisAgencyLocationNameBy(agencyId: String): String? {
-    logger.info("Looking up location name for agency ID '${agencyId.trim().toUpperCase()}'.")
+    logger.info("Looking up location name for agency ID '${agencyId.trim().uppercase()}'.")
 
     fun recordIfLocationNotFound(location: LocationResponse?) {
       if (location?.locations.isNullOrEmpty()) {
-        logger.info("Location name for agency ID '${agencyId.trim().toUpperCase()}' not found on calling BaSM API.")
-        monitoringService.capture("Location name for agency ID '${agencyId.trim().toUpperCase()}' not found on calling BaSM API.")
+        logger.info("Location name for agency ID '${agencyId.trim().uppercase()}' not found on calling BaSM API.")
+        monitoringService.capture("Location name for agency ID '${agencyId.trim().uppercase()}' not found on calling BaSM API.")
       }
     }
 
     fun recordLocationLookupFailure(error: Throwable) {
-      logger.error("An error occurred trying to find location name for agency ID '${agencyId.trim().toUpperCase()}' on calling BaSM API: ${error.message}")
-      monitoringService.capture("An error occurred trying to find location name for agency ID '${agencyId.trim().toUpperCase()}' on calling BaSM API: ${error.message}")
+      logger.error("An error occurred trying to find location name for agency ID '${agencyId.trim().uppercase()}' on calling BaSM API: ${error.message}")
+      monitoringService.capture("An error occurred trying to find location name for agency ID '${agencyId.trim().uppercase()}' on calling BaSM API: ${error.message}")
     }
 
     return Result.runCatching {
       basmApiWebClient
         .get()
-        .uri("api/reference/locations?filter[nomis_agency_id]=${agencyId.trim().toUpperCase()}")
+        .uri("api/reference/locations?filter[nomis_agency_id]=${agencyId.trim().uppercase()}")
         .retrieve()
         .bodyToMono(LocationResponse::class.java)
         .block(basmApiTimeout)
     }
       .onFailure { recordLocationLookupFailure(it) }
-      .onSuccess { recordIfLocationNotFound(it) }.getOrNull()?.locations?.elementAtOrNull(0)?.name?.toUpperCase()
+      .onSuccess { recordIfLocationNotFound(it) }.getOrNull()?.locations?.elementAtOrNull(0)?.name?.uppercase()
   }
 
   fun findNomisAgenciesCreatedOn(date: LocalDate): List<BasmNomisLocation> {
@@ -100,8 +100,8 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
 
   override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): BasmNomisLocation? =
     (p?.readValueAsTree() as JsonNode)["attributes"]?.let { attributes ->
-      val title = attributes["title"].asText().trim().toUpperCase()
-      val agencyId = attributes["nomis_agency_id"].asText().trim().toUpperCase()
+      val title = attributes["title"].asText().trim().uppercase()
+      val agencyId = attributes["nomis_agency_id"].asText().trim().uppercase()
       val locationType = attributes["location_type"].asText()
 
       return (mayBe[locationType] ?: mayBeCourt(locationType, title))?.let { BasmNomisLocation(title, agencyId, it) }
@@ -109,7 +109,7 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
 
   private fun mayBeCourt(type: String, title: String): LocationType? {
     return if (type == "court") {
-      val sanitisedTitle = title.toUpperCase()
+      val sanitisedTitle = title.uppercase()
 
       when {
         sanitisedTitle.contains("COMBINED COURT") -> LocationType.CM

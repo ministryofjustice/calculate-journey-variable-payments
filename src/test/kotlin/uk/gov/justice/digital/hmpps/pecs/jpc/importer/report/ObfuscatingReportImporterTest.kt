@@ -38,9 +38,9 @@ internal class ObfuscatingReportImporterTest() {
     ).importPeopleOn(LocalDate.now()).toList().first()
 
     assertThat(obfuscatedPerson.dateOfBirth).isEqualTo(LocalDate.of(1800, 1, 1))
-    assertThat(obfuscatedPerson.prisonNumber?.trim()?.toUpperCase()).isNotEqualTo(prisonNumber.trim().toUpperCase())
-    assertThat(obfuscatedPerson.firstNames?.trim()?.toUpperCase()).isNotEqualTo(firstName.trim().toUpperCase())
-    assertThat(obfuscatedPerson.lastName?.trim()?.toUpperCase()).isNotEqualTo(lastName.trim().toUpperCase())
+    assertThat(obfuscatedPerson.prisonNumber?.trim()?.uppercase()).isNotEqualTo(prisonNumber.trim().uppercase())
+    assertThat(obfuscatedPerson.firstNames?.trim()?.uppercase()).isNotEqualTo(firstName.trim().uppercase())
+    assertThat(obfuscatedPerson.lastName?.trim()?.uppercase()).isNotEqualTo(lastName.trim().uppercase())
     assertThat(obfuscatedPerson.ethnicity).isEqualTo("Other")
   }
 

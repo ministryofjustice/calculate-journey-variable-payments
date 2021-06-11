@@ -61,7 +61,7 @@ data class PriceMetadata(
         throw IllegalArgumentException("Audit event type is not a price event.")
     }
 
-    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) = "$supplier-${fromNomisId.trim().toUpperCase()}-${toNomisId.trim().toUpperCase()}"
+    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) = "$supplier-${fromNomisId.trim().uppercase()}-${toNomisId.trim().uppercase()}"
   }
 
   fun isUpdate() = oldPrice != null
