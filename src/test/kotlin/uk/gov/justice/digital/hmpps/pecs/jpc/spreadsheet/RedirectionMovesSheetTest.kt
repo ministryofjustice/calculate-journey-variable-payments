@@ -1,21 +1,17 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
-@SpringJUnitConfig(TestConfig::class)
-internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTemplateProvider) {
+internal class RedirectionMovesSheetTest {
 
-  private val workbook: Workbook = XSSFWorkbook(template.get())
+  private val workbook: Workbook = SXSSFWorkbook()
 
   @Test
   internal fun `test redirection prices`() {
@@ -34,6 +30,25 @@ internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTem
       )
     )
     sheet.writeMoves(moves)
+
+    assertThat(sheet.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("REDIRECTIONS (a redirection after the move has started)")
+
+    sheet.sheet.getRow(8).apply {
+      assertThat(this.getCell(0).stringCellValue).isEqualTo("Move ID")
+      assertThat(this.getCell(1).stringCellValue).isEqualTo("Pick up")
+      assertThat(this.getCell(2).stringCellValue).isEqualTo("Location Type")
+      assertThat(this.getCell(3).stringCellValue).isEqualTo("Drop off")
+      assertThat(this.getCell(4).stringCellValue).isEqualTo("Location Type")
+      assertThat(this.getCell(5).stringCellValue).isEqualTo("Pick up date")
+      assertThat(this.getCell(6).stringCellValue).isEqualTo("Pick up time")
+      assertThat(this.getCell(7).stringCellValue).isEqualTo("Drop off date")
+      assertThat(this.getCell(8).stringCellValue).isEqualTo("Drop off time")
+      assertThat(this.getCell(9).stringCellValue).isEqualTo("Vehicle reg")
+      assertThat(this.getCell(10).stringCellValue).isEqualTo("NOMIS prison ID")
+      assertThat(this.getCell(11).stringCellValue).isEqualTo("Price")
+      assertThat(this.getCell(12).stringCellValue).isEqualTo("Contractor billable?")
+      assertThat(this.getCell(13).stringCellValue).isEqualTo("Notes (reason codes or supplier notes)")
+    }
 
     assertCellEquals(sheet, 9, 0, "REF1")
 

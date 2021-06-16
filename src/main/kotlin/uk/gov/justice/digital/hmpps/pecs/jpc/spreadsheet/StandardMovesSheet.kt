@@ -9,7 +9,7 @@ class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet
   header,
   "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",
   listOf(
-    "Move Ref ID",
+    "Move ID",
     "Pick up",
     "Location Type",
     "Drop off",
@@ -18,8 +18,8 @@ class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet
     "Pick up time",
     "Drop off date",
     "Drop off time",
-    "Vehicle Reg",
-    "NOMIS Prison ID",
+    "Vehicle reg",
+    "NOMIS prison ID",
     "Price"
   )
 ) {

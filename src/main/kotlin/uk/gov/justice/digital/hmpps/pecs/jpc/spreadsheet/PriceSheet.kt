@@ -21,7 +21,7 @@ abstract class PriceSheet(
   val sheet: Sheet,
   private val header: Header,
   private val subheading: String? = null,
-  private val dateColumnHeadings: List<String> = listOf()
+  private val dataColumnHeadings: List<String> = listOf()
 ) {
 
   private val rowIndex: AtomicInteger = AtomicInteger(9)
@@ -137,12 +137,13 @@ abstract class PriceSheet(
       sheet.createRow(7).apply { this.addHeaderCell(0, subheading, subheadingStyle) }
     }
 
-    if (dateColumnHeadings.isNotEmpty()) {
-      for (column in 0..11) sheet.setColumnWidth(column, 3500)
+    if (dataColumnHeadings.isNotEmpty()) {
+      // TODO may need to be think more when setting the column width. At present this is a one size fits all number.
+      for (column in 0..15) sheet.setColumnWidth(column, 4500)
 
       sheet.createRow(8).apply {
         height = wrapTextRowHeight
-        dateColumnHeadings.forEachIndexed { column, label -> this.addHeaderCell(column, label, columnHeadingStyle) }
+        dataColumnHeadings.forEachIndexed { column, label -> this.addHeaderCell(column, label, columnHeadingStyle) }
       }
     }
   }

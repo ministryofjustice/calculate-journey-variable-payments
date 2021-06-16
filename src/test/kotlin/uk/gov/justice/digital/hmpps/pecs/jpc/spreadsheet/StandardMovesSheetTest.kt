@@ -35,7 +35,7 @@ internal class StandardMovesSheetTest {
     assertThat(sms.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)")
 
     sms.sheet.getRow(8).apply {
-      assertThat(this.getCell(0).stringCellValue).isEqualTo("Move Ref ID")
+      assertThat(this.getCell(0).stringCellValue).isEqualTo("Move ID")
       assertThat(this.getCell(1).stringCellValue).isEqualTo("Pick up")
       assertThat(this.getCell(2).stringCellValue).isEqualTo("Location Type")
       assertThat(this.getCell(3).stringCellValue).isEqualTo("Drop off")
@@ -44,8 +44,8 @@ internal class StandardMovesSheetTest {
       assertThat(this.getCell(6).stringCellValue).isEqualTo("Pick up time")
       assertThat(this.getCell(7).stringCellValue).isEqualTo("Drop off date")
       assertThat(this.getCell(8).stringCellValue).isEqualTo("Drop off time")
-      assertThat(this.getCell(9).stringCellValue).isEqualTo("Vehicle Reg")
-      assertThat(this.getCell(10).stringCellValue).isEqualTo("NOMIS Prison ID")
+      assertThat(this.getCell(9).stringCellValue).isEqualTo("Vehicle reg")
+      assertThat(this.getCell(10).stringCellValue).isEqualTo("NOMIS prison ID")
       assertThat(this.getCell(11).stringCellValue).isEqualTo("Price")
     }
   }
