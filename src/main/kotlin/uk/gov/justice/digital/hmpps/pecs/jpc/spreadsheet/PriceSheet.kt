@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
+import org.apache.pdfbox.util.Hex
 import org.apache.poi.ss.usermodel.BuiltinFormats
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.FillPatternType
@@ -7,88 +8,150 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.util.CellRangeAddress
+import org.apache.poi.xssf.usermodel.XSSFCellStyle
+import org.apache.poi.xssf.usermodel.XSSFColor
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
+abstract class PriceSheet(
+  val sheet: Sheet,
+  private val header: Header,
+  private val subheading: String? = null,
+  private val dateColumnHeadings: List<String> = listOf()
+) {
 
-  protected val rowIndex: AtomicInteger = AtomicInteger(9)
-  protected fun createRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.createRow(rIndex)
-  protected fun getRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.getRow(rIndex)
+  private val rowIndex: AtomicInteger = AtomicInteger(9)
+  private val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
+  private val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat(10))
+  private val formatDate = sheet.workbook.createDataFormat().getFormat("DD/MM/YYYY")
+  private val formatMonthYear = sheet.workbook.createDataFormat().getFormat("MMMM YYYY")
+  private val colourDarkBlue = XSSFColor(Hex.decodeHex("1b75bc"), null)
+  private val colourLightBlue = XSSFColor(Hex.decodeHex("c9daf8"), null)
+  private val wrapTextRowHeight: Short = 500
 
-  protected val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
-  protected val formatPercentage = sheet.workbook.createDataFormat().getFormat(BuiltinFormats.getBuiltinFormat(10))
-  protected val formatDate = sheet.workbook.createDataFormat().getFormat("DD/MM/YYYY")
-  protected val formatMonthYear = sheet.workbook.createDataFormat().getFormat("MMMM YYYY")
+  private val fontWhiteArialBold = sheet.workbook.createFont().apply {
+    color = IndexedColors.WHITE.index
+    fontName = "ARIAL"
+    bold = true
+  }
 
-  protected val headerMonthYearStyle: CellStyle = sheet.workbook.createCellStyle().apply {
-    fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+  private val fontBlackArial = sheet.workbook.createFont().apply {
+    color = IndexedColors.BLACK.index
+    fontName = "ARIAL"
+  }
+
+  protected val fontBlackArialBold = sheet.workbook.createFont().apply {
+    color = IndexedColors.BLACK.index
+    fontName = "ARIAL"
+    bold = true
+  }
+
+  private val fontBlackArialItalic = sheet.workbook.createFont().apply {
+    color = IndexedColors.BLACK.index
+    fontName = "ARIAL"
+    italic = true
+  }
+
+  private val headerStyle: CellStyle = (sheet.workbook.createCellStyle() as XSSFCellStyle).apply {
+    this.setFillForegroundColor(colourDarkBlue)
+    this.fillPattern = FillPatternType.SOLID_FOREGROUND
+    this.alignment = HorizontalAlignment.LEFT
+    this.setFont(fontWhiteArialBold)
+  }
+
+  private val headerSupplierNameStyle: CellStyle = sheet.workbook.createCellStyle().apply { this.cloneStyleFrom(headerStyle) }
+
+  private val headerMonthYearStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+    this.cloneStyleFrom(headerStyle)
+    this.dataFormat = formatMonthYear
+  }
+
+  private val headerExportDateStyle: CellStyle = sheet.workbook.createCellStyle().apply {
+    this.cloneStyleFrom(headerStyle)
+    this.dataFormat = formatDate
+  }
+
+  private val subheadingStyle: CellStyle = (sheet.workbook.createCellStyle() as XSSFCellStyle).apply {
+    this.setFillForegroundColor(colourLightBlue)
     fillPattern = FillPatternType.SOLID_FOREGROUND
-    dataFormat = formatMonthYear
     alignment = HorizontalAlignment.LEFT
+    this.setFont(fontBlackArial)
   }
 
-  protected val headerExportDateStyle: CellStyle = sheet.workbook.createCellStyle().apply {
-    fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
-    fillPattern = FillPatternType.SOLID_FOREGROUND
-    dataFormat = formatDate
+  private val columnHeadingStyle: CellStyle = (sheet.workbook.createCellStyle() as XSSFCellStyle).apply {
     alignment = HorizontalAlignment.LEFT
+    this.setFont(fontBlackArialBold)
+    wrapText = true
   }
 
-  protected val headerSupplierNameStyle: CellStyle = sheet.workbook.createCellStyle().apply {
-    fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
-    fillPattern = FillPatternType.SOLID_FOREGROUND
-    alignment = HorizontalAlignment.LEFT
+  protected val fillShaded: CellStyle = sheet.workbook.createCellStyle().apply {
+    this.fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
+    this.fillPattern = FillPatternType.SOLID_FOREGROUND
   }
 
-  protected val fillGrey = sheet.workbook.createCellStyle()
-  protected val fillShaded = sheet.workbook.createCellStyle()
-
-  protected val fillGreyPound = sheet.workbook.createCellStyle()
-  protected val fillShadedPound = sheet.workbook.createCellStyle()
-  protected val fillWhitePound = sheet.workbook.createCellStyle()
-
-  protected val fillGreyPercentage = sheet.workbook.createCellStyle()
-  protected val fillShadedPercentage = sheet.workbook.createCellStyle()
-  protected val fillWhitePercentage = sheet.workbook.createCellStyle()
-
-  init {
-    fillGrey.fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
-    fillGrey.fillPattern = FillPatternType.LEAST_DOTS
-
-    fillGreyPound.fillForegroundColor = fillGrey.fillForegroundColor
-    fillGreyPound.fillPattern = fillGrey.fillPattern
-    fillGreyPound.dataFormat = formatPound
-
-    fillGreyPercentage.fillForegroundColor = fillGrey.fillForegroundColor
-    fillGreyPercentage.fillPattern = fillGrey.fillPattern
-    fillGreyPercentage.dataFormat = formatPercentage
-
-    fillShaded.fillForegroundColor = IndexedColors.GREY_25_PERCENT.index
-    fillShaded.fillPattern = FillPatternType.SOLID_FOREGROUND
-
-    fillShadedPound.fillForegroundColor = fillShaded.fillForegroundColor
-    fillShadedPound.fillPattern = fillShaded.fillPattern
-    fillShadedPound.dataFormat = formatPound
-
-    fillShadedPercentage.fillForegroundColor = fillShaded.fillForegroundColor
-    fillShadedPercentage.fillPattern = fillShadedPound.fillPattern
-    fillShadedPercentage.dataFormat = formatPercentage
-
-    fillWhitePound.dataFormat = formatPound
-    fillWhitePercentage.dataFormat = formatPercentage
-
-    applyHeader()
+  protected val fillShadedPound: CellStyle = sheet.workbook.createCellStyle().apply {
+    this.fillForegroundColor = fillShaded.fillForegroundColor
+    this.fillPattern = fillShaded.fillPattern
+    this.dataFormat = formatPound
   }
 
-  private fun applyHeader() {
-    sheet.getRow(2).addCell(2, header.dateRange.start, headerMonthYearStyle)
-    sheet.getRow(2).addCell(4, header.dateRun, headerExportDateStyle)
-    sheet.getRow(4).addCell(0, header.supplier.name, headerSupplierNameStyle)
+  protected val fillWhitePound: CellStyle = sheet.workbook.createCellStyle().apply { this.dataFormat = formatPound }
+
+  protected val fillWhitePercentage: CellStyle = sheet.workbook.createCellStyle().apply { this.dataFormat = formatPercentage }
+
+  init { addHeadings() }
+
+  private fun addHeadings() {
+    sheet.mergeCells(0, 0, 5)
+    sheet.mergeCells(1, 0, 5)
+    sheet.mergeCells(2, 0, 5)
+    sheet.mergeCells(5, 0, 5)
+
+    sheet.createRow(0).apply { this.addEmptyHeaderCell(0) }
+    sheet.createRow(1).apply { this.addHeaderCell(0, "Calculate Journey Variable Payments (S2B)") }
+    sheet.createRow(2).apply { this.addEmptyHeaderCell(0) }
+    sheet.createRow(3).apply {
+      this.addHeaderCell(0, "Supplier")
+      this.addEmptyHeaderCell(1)
+      this.addHeaderCell(2, "Total moves for")
+      this.addEmptyHeaderCell(3)
+      this.addHeaderCell(4, "Export date")
+      this.addEmptyHeaderCell(5)
+    }
+    sheet.createRow(4).apply {
+      this.addHeaderCell(0, header.supplier.name, headerSupplierNameStyle)
+      this.addEmptyHeaderCell(1)
+      this.addHeaderCell(2, header.dateRange.start, headerMonthYearStyle)
+      this.addEmptyHeaderCell(3)
+      this.addHeaderCell(4, header.dateRun, headerExportDateStyle)
+      this.addEmptyHeaderCell(5)
+    }
+    sheet.createRow(5).apply { this.addEmptyHeaderCell(0) }
+
+    if (subheading != null) {
+      sheet.mergeCells(7, 0, 10)
+      sheet.createRow(7).apply { this.addHeaderCell(0, subheading, subheadingStyle) }
+    }
+
+    if (dateColumnHeadings.isNotEmpty()) {
+      for (column in 0..11) sheet.setColumnWidth(column, 3500)
+
+      sheet.createRow(8).apply {
+        height = wrapTextRowHeight
+        dateColumnHeadings.forEachIndexed { column, label -> this.addHeaderCell(column, label, columnHeadingStyle) }
+      }
+    }
   }
+
+  private fun Sheet.mergeCells(row: Int, firstCol: Int, lastCol: Int) = this.addMergedRegion(CellRangeAddress(row, row, firstCol, lastCol))
+
+  protected fun Row.addHeaderCell(column: Int, label: Any, style: CellStyle = headerStyle) = this.addCell(column, label, style)
+
+  protected fun Row.addEmptyHeaderCell(column: Int) = this.addCell(column, null, headerStyle)
 
   protected open fun writeMoveRow(move: Move, showNotes: Boolean = true) {
     val fill = fillShaded
@@ -132,6 +195,8 @@ abstract class PriceSheet(val sheet: Sheet, private val header: Header) {
       add(13, notes)
     }
   }
+
+  protected fun createRow(rIndex: Int = rowIndex.getAndIncrement()): Row = sheet.createRow(rIndex)
 
   fun writeJourneyRows(journeys: Collection<Journey>) {
     journeys.forEachIndexed { i, j ->

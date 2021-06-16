@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 import java.io.FileInputStream
 import java.time.LocalDateTime
 import java.util.UUID
+import java.util.stream.Stream
 
 @SpringJUnitConfig(TestConfig::class)
 internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: JPCTemplateProvider) {
@@ -82,7 +83,7 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: J
   private val locationRepository: LocationRepository = mock { on { it.findAll() } doReturn locations }
   private val supplierPrices: SupplierPrices =
     mock {
-      on { it.get(any(), any()) } doReturn listOf(
+      on { it.get(any(), any()) } doReturn Stream.of(
         Price(
           UUID.fromString("00000000-0000-0000-0000-000000000000"),
           Supplier.GEOAMEY,

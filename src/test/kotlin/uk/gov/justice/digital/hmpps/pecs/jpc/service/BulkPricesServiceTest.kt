@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDateTime
+import java.util.stream.Stream
 
 internal class BulkPricesServiceTest {
 
@@ -29,7 +30,7 @@ internal class BulkPricesServiceTest {
 
   @Test
   internal fun `bulk price updates for Serco next effective year 2021`() {
-    val prices = listOf(price(Supplier.SERCO, 1000, 2020), price(Supplier.SERCO, 2000, 2020))
+    val prices = Stream.of(price(Supplier.SERCO, 1000, 2020), price(Supplier.SERCO, 2000, 2020))
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2020)).thenReturn(prices)
 
@@ -53,7 +54,7 @@ internal class BulkPricesServiceTest {
 
   @Test
   internal fun `bulk price updates for Geoamey next effective year 2022`() {
-    val prices = listOf(price(Supplier.GEOAMEY, 1500, 2021), price(Supplier.GEOAMEY, 2000, 2021))
+    val prices = Stream.of(price(Supplier.GEOAMEY, 1500, 2021), price(Supplier.GEOAMEY, 2000, 2021))
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2021)).thenReturn(prices)
 

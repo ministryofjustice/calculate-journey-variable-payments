@@ -4,7 +4,7 @@ import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
-class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.getSheet("Journeys")!!, header) {
+class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.createSheet("Journeys"), header) {
 
   override fun writeMove(move: Move) {}
 

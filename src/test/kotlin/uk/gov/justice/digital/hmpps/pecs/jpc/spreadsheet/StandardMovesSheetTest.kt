@@ -1,51 +1,53 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
-@SpringJUnitConfig(TestConfig::class)
-internal class StandardMovesSheetTest(@Autowired private val template: JPCTemplateProvider) {
+internal class StandardMovesSheetTest {
 
-  private val workbook: Workbook = XSSFWorkbook(template.get())
+  private val workbook: Workbook = SXSSFWorkbook()
 
   private val date: LocalDate = LocalDate.now()
 
   @Test
-  internal fun `fails to instantiate if expected sheet is missing`() {
-    assertThatThrownBy {
-      StandardMovesSheet(
-        XSSFWorkbook(),
-        PriceSheet.Header(LocalDate.now(), ClosedRangeLocalDate(LocalDate.now(), LocalDate.now()), Supplier.SERCO)
-      )
-    }.isInstanceOf(NullPointerException::class.java)
+  internal fun `headings are present for Serco`() {
+    assertOnHeadingsFor(date, Supplier.SERCO)
   }
 
   @Test
-  internal fun `default headings are applied for Serco`() {
-    val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, ClosedRangeLocalDate(date, date), Supplier.SERCO))
-
-    assertThat(sms.sheet.getRow(2).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
-    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(Supplier.SERCO.name)
+  internal fun `headings are present for Geoamey`() {
+    assertOnHeadingsFor(date, Supplier.GEOAMEY)
   }
 
-  @Test
-  internal fun `default headings are applied for Geoamey`() {
-    val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, ClosedRangeLocalDate(date, date), Supplier.GEOAMEY))
+  private fun assertOnHeadingsFor(date: LocalDate, supplier: Supplier) {
+    val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, ClosedRangeLocalDate(date, date), supplier))
 
-    assertThat(sms.sheet.getRow(2).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
-    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(Supplier.GEOAMEY.name)
+    assertThat(sms.sheet.sheetName).isEqualTo("Standard")
+    assertThat(sms.sheet.getRow(4).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
+    assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(supplier.name)
+    assertThat(sms.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)")
+
+    sms.sheet.getRow(8).apply {
+      assertThat(this.getCell(0).stringCellValue).isEqualTo("Move Ref ID")
+      assertThat(this.getCell(1).stringCellValue).isEqualTo("Pick up")
+      assertThat(this.getCell(2).stringCellValue).isEqualTo("Location Type")
+      assertThat(this.getCell(3).stringCellValue).isEqualTo("Drop off")
+      assertThat(this.getCell(4).stringCellValue).isEqualTo("Location Type")
+      assertThat(this.getCell(5).stringCellValue).isEqualTo("Pick up date")
+      assertThat(this.getCell(6).stringCellValue).isEqualTo("Pick up time")
+      assertThat(this.getCell(7).stringCellValue).isEqualTo("Drop off date")
+      assertThat(this.getCell(8).stringCellValue).isEqualTo("Drop off time")
+      assertThat(this.getCell(9).stringCellValue).isEqualTo("Vehicle Reg")
+      assertThat(this.getCell(10).stringCellValue).isEqualTo("NOMIS Prison ID")
+      assertThat(this.getCell(11).stringCellValue).isEqualTo("Price")
+    }
   }
 
   @Test
