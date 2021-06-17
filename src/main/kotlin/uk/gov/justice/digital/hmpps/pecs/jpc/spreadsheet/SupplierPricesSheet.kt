@@ -9,8 +9,8 @@ import java.util.stream.Stream
  * Sheet to represent the actual JPC supplier prices used for all of the calculations in the outputted spreadsheet.
  */
 internal class SupplierPricesSheet(workbook: Workbook, header: Header) : PriceSheet(
-  workbook.createSheet("JPC Price book"),
-  header,
+  sheet = workbook.createSheet("JPC Price book"),
+  header = header,
   dataColumnHeadings = listOf("Pick up", "Drop off", "Unit price")
 ) {
   override fun writeMove(move: Move) {}

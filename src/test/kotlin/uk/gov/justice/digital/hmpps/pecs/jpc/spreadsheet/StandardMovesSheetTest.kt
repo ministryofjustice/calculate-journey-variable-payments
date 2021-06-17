@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -9,10 +8,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 internal class StandardMovesSheetTest {
-
-  private val workbook: Workbook = SXSSFWorkbook()
 
   private val date: LocalDate = LocalDate.now()
 
@@ -27,33 +26,33 @@ internal class StandardMovesSheetTest {
   }
 
   private fun assertOnHeadingsFor(date: LocalDate, supplier: Supplier) {
-    val sms = StandardMovesSheet(workbook, PriceSheet.Header(date, ClosedRangeLocalDate(date, date), supplier))
+    val sms = StandardMovesSheet(SXSSFWorkbook(), PriceSheet.Header(date, ClosedRangeLocalDate(date, date), supplier))
 
-    assertThat(sms.sheet.sheetName).isEqualTo("Standard")
+    assertOnSheetName(sms, "Standard")
     assertThat(sms.sheet.getRow(4).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
     assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(supplier.name)
-    assertThat(sms.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)")
-
-    sms.sheet.getRow(8).apply {
-      assertThat(this.getCell(0).stringCellValue).isEqualTo("Move ID")
-      assertThat(this.getCell(1).stringCellValue).isEqualTo("Pick up")
-      assertThat(this.getCell(2).stringCellValue).isEqualTo("Location Type")
-      assertThat(this.getCell(3).stringCellValue).isEqualTo("Drop off")
-      assertThat(this.getCell(4).stringCellValue).isEqualTo("Location Type")
-      assertThat(this.getCell(5).stringCellValue).isEqualTo("Pick up date")
-      assertThat(this.getCell(6).stringCellValue).isEqualTo("Pick up time")
-      assertThat(this.getCell(7).stringCellValue).isEqualTo("Drop off date")
-      assertThat(this.getCell(8).stringCellValue).isEqualTo("Drop off time")
-      assertThat(this.getCell(9).stringCellValue).isEqualTo("Vehicle reg")
-      assertThat(this.getCell(10).stringCellValue).isEqualTo("NOMIS prison ID")
-      assertThat(this.getCell(11).stringCellValue).isEqualTo("Price")
-    }
+    assertOnSubheading(sms, "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)")
+    assertOnColumnDataHeadings(
+      sms,
+      "Move ID",
+      "Pick up",
+      "Location Type",
+      "Drop off",
+      "Location Type",
+      "Pick up date",
+      "Pick up time",
+      "Drop off date",
+      "Drop off time",
+      "Vehicle reg",
+      "NOMIS prison ID",
+      "Price"
+    )
   }
 
   @Test
   internal fun `test prices`() {
     val sms = StandardMovesSheet(
-      workbook,
+      SXSSFWorkbook(),
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
@@ -91,10 +90,12 @@ internal class StandardMovesSheetTest {
 
 fun <T> assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?) {
   val actualValue = when (expectedVal) {
-    is String -> sheet.sheet.getRow(row).getCell(col).stringCellValue
-    is Double -> sheet.sheet.getRow(row).getCell(col).numericCellValue
-    is Int -> sheet.sheet.getRow(row).getCell(col).numericCellValue.toInt()
-    else -> throw RuntimeException("Must be a string or numeric value")
+    is String -> sheet.getRow(row).getCell(col).stringCellValue
+    is Double -> sheet.getRow(row).getCell(col).numericCellValue
+    is Int -> sheet.getRow(row).getCell(col).numericCellValue.toInt()
+    is LocalDate -> LocalDate.parse(sheet.getRow(row).getCell(col).stringCellValue, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+    is LocalTime -> LocalTime.parse(sheet.getRow(row).getCell(col).stringCellValue, DateTimeFormatter.ofPattern("HH:mm"))
+    else -> throw RuntimeException("Must be a string, numeric value, local date or local time.")
   }
   assertThat(actualValue).isEqualTo(expectedVal)
 }

@@ -4,10 +4,10 @@ import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 class RedirectionMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
-  workbook.createSheet("Redirections"),
-  header,
-  "REDIRECTIONS (a redirection after the move has started)",
-  listOf(
+  sheet = workbook.createSheet("Redirections"),
+  header = header,
+  subheading = "REDIRECTIONS (a redirection after the move has started)",
+  dataColumnHeadings = listOf(
     "Move ID",
     "Pick up",
     "Location Type",

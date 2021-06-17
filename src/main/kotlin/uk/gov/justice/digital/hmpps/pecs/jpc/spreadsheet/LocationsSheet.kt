@@ -6,8 +6,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import java.util.stream.Stream
 
 class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(
-  workbook.createSheet("Locations"),
-  header,
+  sheet = workbook.createSheet("Locations"),
+  header = header,
   dataColumnHeadings = listOf("NOMIS Agency ID", "Name", "Type")
 ) {
   override fun writeMove(move: Move) {}

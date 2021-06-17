@@ -230,5 +230,7 @@ abstract class PriceSheet(
    */
   protected abstract fun writeMove(move: Move)
 
+  fun getRow(rowNum: Int): Row = sheet.getRow(rowNum)
+
   data class Header(val dateRun: LocalDate, val dateRange: ClosedRange<LocalDate>, val supplier: Supplier)
 }

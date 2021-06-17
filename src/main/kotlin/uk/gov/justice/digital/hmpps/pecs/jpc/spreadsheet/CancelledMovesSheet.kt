@@ -4,10 +4,10 @@ import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
-  workbook.createSheet("Cancelled"),
-  header,
-  "CANCELLED MOVES (includes prison to prison transfer moves that have been cancelled by the population management unit after 3pm on the day before the move)",
-  listOf(
+  sheet = workbook.createSheet("Cancelled"),
+  header = header,
+  subheading = "CANCELLED MOVES (includes prison to prison transfer moves that have been cancelled by the population management unit after 3pm on the day before the move)",
+  dataColumnHeadings = listOf(
     "Move ID",
     "Pick up",
     "Location Type",

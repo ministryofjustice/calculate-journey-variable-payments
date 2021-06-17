@@ -10,10 +10,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 
 class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(
-  workbook.createSheet("Summary"),
-  header,
-  "OUTPUT SUMMARY",
-  listOf(
+  sheet = workbook.createSheet("Summary"),
+  header = header,
+  subheading = "OUTPUT SUMMARY",
+  dataColumnHeadings = listOf(
     "Move type",
     "Percentage",
     "Move volume",

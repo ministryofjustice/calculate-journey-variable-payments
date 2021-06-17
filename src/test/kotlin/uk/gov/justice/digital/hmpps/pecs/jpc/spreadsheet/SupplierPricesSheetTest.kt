@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -14,11 +13,9 @@ import java.util.UUID
 
 internal class SupplierPricesSheetTest {
 
-  private val workbook: Workbook = SXSSFWorkbook()
-
   private val header: PriceSheet.Header = PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO)
 
-  private val supplierPricesSheet: SupplierPricesSheet = SupplierPricesSheet(workbook, header)
+  private val supplierPricesSheet: SupplierPricesSheet = SupplierPricesSheet(SXSSFWorkbook(), header)
 
   @Test
   internal fun `prices are copied over output spreadsheet`() {
@@ -43,12 +40,8 @@ internal class SupplierPricesSheetTest {
       )
     )
 
-    supplierPricesSheet.sheet.getRow(8).apply {
-      assertThat(getCell(0).stringCellValue).isEqualTo("Pick up")
-      assertThat(getCell(1).stringCellValue).isEqualTo("Drop off")
-      assertThat(getCell(2).stringCellValue).isEqualTo("Unit price")
-    }
-
+    assertOnSheetName(supplierPricesSheet, "JPC Price book")
+    assertOnColumnDataHeadings(supplierPricesSheet, "Pick up", "Drop off", "Unit price")
     assertOnPriceRow(supplierPricesSheet.sheet.getRow(9), PriceRow("FROM SITE A", "TO SITE A", 200.59))
     assertOnPriceRow(supplierPricesSheet.sheet.getRow(10), PriceRow("FROM SITE B", "TO SITE B", 100.24))
   }

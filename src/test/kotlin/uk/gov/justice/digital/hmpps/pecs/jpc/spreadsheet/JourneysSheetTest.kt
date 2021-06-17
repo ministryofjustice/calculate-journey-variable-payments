@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
@@ -10,8 +8,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class JourneysSheetTest {
-
-  private val workbook: Workbook = SXSSFWorkbook()
 
   @Test
   internal fun `test unique journeys`() {
@@ -28,33 +24,25 @@ internal class JourneysSheetTest {
       totalPriceInPence = 2200
     )
 
-    val sheet = JourneysSheet(
-      workbook,
+    val journeysSheet = JourneysSheet(
+      SXSSFWorkbook(),
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
         Supplier.SERCO
       )
     )
-    sheet.writeJourneys(listOf(journey))
+    journeysSheet.writeJourneys(listOf(journey))
 
-    assertThat(sheet.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("TOTAL VOLUME BY JOURNEY")
-
-    sheet.sheet.getRow(8).apply {
-      assertThat(getCell(0).stringCellValue).isEqualTo("Pick up")
-      assertThat(getCell(1).stringCellValue).isEqualTo("Drop off")
-      assertThat(getCell(2).stringCellValue).isEqualTo("Total journey count")
-      assertThat(getCell(3).stringCellValue).isEqualTo("Billable journey count")
-      assertThat(getCell(4).stringCellValue).isEqualTo("Unit price")
-      assertThat(getCell(5).stringCellValue).isEqualTo("Total price")
-    }
-
-    assertCellEquals(sheet, 9, 0, "from") // from site name
-    assertCellEquals(sheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name
-    assertCellEquals(sheet, 9, 2, 22) // volume
-    assertCellEquals(sheet, 9, 3, 22) // billable journey count
-    assertCellEquals(sheet, 9, 4, 1.0) // unit price in pounds
-    assertCellEquals(sheet, 9, 5, 22.0) // total price in pounds
+    assertOnSheetName(journeysSheet, "Journeys")
+    assertOnSubheading(journeysSheet, "TOTAL VOLUME BY JOURNEY")
+    assertOnColumnDataHeadings(journeysSheet, "Pick up", "Drop off", "Total journey count", "Billable journey count", "Unit price", "Total price")
+    assertCellEquals(journeysSheet, 9, 0, "from") // from site name
+    assertCellEquals(journeysSheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name
+    assertCellEquals(journeysSheet, 9, 2, 22) // volume
+    assertCellEquals(journeysSheet, 9, 3, 22) // billable journey count
+    assertCellEquals(journeysSheet, 9, 4, 1.0) // unit price in pounds
+    assertCellEquals(journeysSheet, 9, 5, 22.0) // total price in pounds
   }
 
   @Test
@@ -73,7 +61,7 @@ internal class JourneysSheetTest {
     )
 
     val sheet = JourneysSheet(
-      workbook,
+      SXSSFWorkbook(),
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),

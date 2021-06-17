@@ -5,10 +5,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet
 (
-  workbook.createSheet("Standard"),
-  header,
-  "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",
-  listOf(
+  sheet = workbook.createSheet("Standard"),
+  header = header,
+  subheading = "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",
+  dataColumnHeadings = listOf(
     "Move ID",
     "Pick up",
     "Location Type",

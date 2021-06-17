@@ -5,10 +5,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
 class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(
-  workbook.createSheet("Journeys"),
-  header,
-  "TOTAL VOLUME BY JOURNEY",
-  listOf("Pick up", "Drop off", "Total journey count", "Billable journey count", "Unit price", "Total price")
+  sheet = workbook.createSheet("Journeys"),
+  header = header,
+  subheading = "TOTAL VOLUME BY JOURNEY",
+  dataColumnHeadings = listOf("Pick up", "Drop off", "Total journey count", "Billable journey count", "Unit price", "Total price")
 ) {
 
   override fun writeMove(move: Move) {}
