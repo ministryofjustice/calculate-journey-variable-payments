@@ -3,7 +3,24 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 
-class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.createSheet("Cancelled"), header) {
+class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
+  workbook.createSheet("Cancelled"),
+  header,
+  "CANCELLED MOVES (includes prison to prison transfer moves that have been cancelled by the population management unit after 3pm on the day before the move)",
+  listOf(
+    "Move ID",
+    "Pick up",
+    "Location Type",
+    "Drop off",
+    "Location Type",
+    "Move date",
+    "Cancellation date",
+    "Cancellation time",
+    "NOMIS prison ID",
+    "Price",
+    "Notes"
+  )
+) {
 
   override fun writeMove(move: Move) = writeMoveRow(move, false)
 

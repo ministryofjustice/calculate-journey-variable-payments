@@ -1,26 +1,18 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@ContextConfiguration(classes = [TestConfig::class])
-internal class CancelledMovesSheetTest(@Autowired private val template: JPCTemplateProvider) {
+internal class CancelledMovesSheetTest {
 
-  private val workbook: Workbook = XSSFWorkbook(template.get())
+  private val workbook: Workbook = SXSSFWorkbook()
 
   @Test
   internal fun `test cancelled prices`() {
@@ -28,6 +20,22 @@ internal class CancelledMovesSheetTest(@Autowired private val template: JPCTempl
     val moves = listOf(move)
     val sheet = CancelledMovesSheet(workbook, PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
     sheet.writeMoves(moves)
+
+    assertThat(sheet.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("CANCELLED MOVES (includes prison to prison transfer moves that have been cancelled by the population management unit after 3pm on the day before the move)")
+
+    sheet.sheet.getRow(8).apply {
+      assertThat(getCell(0).stringCellValue).isEqualTo("Move ID")
+      assertThat(getCell(1).stringCellValue).isEqualTo("Pick up")
+      assertThat(getCell(2).stringCellValue).isEqualTo("Location Type")
+      assertThat(getCell(3).stringCellValue).isEqualTo("Drop off")
+      assertThat(getCell(4).stringCellValue).isEqualTo("Location Type")
+      assertThat(getCell(5).stringCellValue).isEqualTo("Move date")
+      assertThat(getCell(6).stringCellValue).isEqualTo("Cancellation date")
+      assertThat(getCell(7).stringCellValue).isEqualTo("Cancellation time")
+      assertThat(getCell(8).stringCellValue).isEqualTo("NOMIS prison ID")
+      assertThat(getCell(9).stringCellValue).isEqualTo("Price")
+      assertThat(getCell(10).stringCellValue).isEqualTo("Notes")
+    }
 
     assertCellEquals(sheet, 9, 0, "REF1")
 

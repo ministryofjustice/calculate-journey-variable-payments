@@ -1,21 +1,17 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
-@SpringJUnitConfig(TestConfig::class)
-internal class JourneysSheetTest(@Autowired private val template: JPCTemplateProvider) {
+internal class JourneysSheetTest {
 
-  private val workbook: Workbook = XSSFWorkbook(template.get())
+  private val workbook: Workbook = SXSSFWorkbook()
 
   @Test
   internal fun `test unique journeys`() {
@@ -41,6 +37,17 @@ internal class JourneysSheetTest(@Autowired private val template: JPCTemplatePro
       )
     )
     sheet.writeJourneys(listOf(journey))
+
+    assertThat(sheet.sheet.getRow(7).getCell(0).stringCellValue).isEqualTo("TOTAL VOLUME BY JOURNEY")
+
+    sheet.sheet.getRow(8).apply {
+      assertThat(getCell(0).stringCellValue).isEqualTo("Pick up")
+      assertThat(getCell(1).stringCellValue).isEqualTo("Drop off")
+      assertThat(getCell(2).stringCellValue).isEqualTo("Total journey count")
+      assertThat(getCell(3).stringCellValue).isEqualTo("Billable journey count")
+      assertThat(getCell(4).stringCellValue).isEqualTo("Unit price")
+      assertThat(getCell(5).stringCellValue).isEqualTo("Total price")
+    }
 
     assertCellEquals(sheet, 9, 0, "from") // from site name
     assertCellEquals(sheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name

@@ -5,11 +5,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import java.util.stream.Stream
 
-class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(workbook.createSheet("Locations"), header) {
+class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(
+  workbook.createSheet("Locations"),
+  header,
+  dataColumnHeadings = listOf("NOMIS Agency ID", "Name", "Type")
+) {
   override fun writeMove(move: Move) {}
-
-  @Deprecated("Use write locations as stream instead", ReplaceWith("write(locations)"))
-  fun writeLocations(locations: List<Location>) = write(locations.stream())
 
   fun write(locations: Stream<Location>) {
     locations.use {
