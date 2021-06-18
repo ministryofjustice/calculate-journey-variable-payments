@@ -3,6 +3,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.DROP_OFF
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PICK_UP
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.UNIT_PRICE
 import java.util.stream.Stream
 
 /**
@@ -11,11 +14,9 @@ import java.util.stream.Stream
 internal class SupplierPricesSheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("JPC Price book"),
   header = header,
-  dataColumnHeadings = listOf("Pick up", "Drop off", "Unit price")
+  dataColumns = listOf(PICK_UP, DROP_OFF, UNIT_PRICE)
 ) {
   override fun writeMove(move: Move) {}
-
-  fun writePrices(prices: List<Price>) = write(prices.stream())
 
   fun write(prices: Stream<Price>) {
     prices.forEach {

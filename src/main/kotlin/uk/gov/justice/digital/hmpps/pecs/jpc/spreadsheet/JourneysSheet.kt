@@ -3,12 +3,18 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.BILLABLE_JOURNEY_COUNT
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.DROP_OFF
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PICK_UP
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.TOTAL_JOURNEY_COUNT
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.TOTAL_PRICE
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.UNIT_PRICE
 
 class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("Journeys"),
   header = header,
   subheading = "TOTAL VOLUME BY JOURNEY",
-  dataColumnHeadings = listOf("Pick up", "Drop off", "Total journey count", "Billable journey count", "Unit price", "Total price")
+  dataColumns = listOf(PICK_UP, DROP_OFF, TOTAL_JOURNEY_COUNT, BILLABLE_JOURNEY_COUNT, UNIT_PRICE, TOTAL_PRICE)
 ) {
 
   override fun writeMove(move: Move) {}

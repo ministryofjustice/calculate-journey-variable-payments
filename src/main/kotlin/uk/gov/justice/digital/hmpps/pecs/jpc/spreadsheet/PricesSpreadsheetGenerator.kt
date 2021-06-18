@@ -31,10 +31,8 @@ class PricesSpreadsheetGenerator(
     val dateGenerated = timeSource.date()
 
     SXSSFWorkbook().use { workbook ->
-      // TODO consider having header per sheet so can include subheading in constructor???
       val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
 
-      // TODO would be good if we could stream these but not sure how feasible this would be due to the grouping in the code.
       val moves = moveService.moves(supplier, startDate)
 
       SummarySheet(workbook, header).also { logger.info("Adding summaries.") }

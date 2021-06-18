@@ -8,17 +8,22 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_TYPE
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME_WITHOUT_PRICES
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PERCENTAGE
+import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PRICE
 
 class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("Summary"),
   header = header,
   subheading = "OUTPUT SUMMARY",
-  dataColumnHeadings = listOf(
-    "Move type",
-    "Percentage",
-    "Move volume",
-    "Move volume without prices",
-    "Price"
+  dataColumns = listOf(
+    MOVE_TYPE,
+    PERCENTAGE,
+    MOVE_VOLUME,
+    MOVE_VOLUME_WITHOUT_PRICES,
+    PRICE
   )
 ) {
 

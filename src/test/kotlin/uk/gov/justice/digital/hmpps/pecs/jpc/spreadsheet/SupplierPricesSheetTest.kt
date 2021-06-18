@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.util.UUID
+import java.util.stream.Stream
 
 internal class SupplierPricesSheetTest {
 
@@ -19,8 +20,8 @@ internal class SupplierPricesSheetTest {
 
   @Test
   internal fun `prices are copied over output spreadsheet`() {
-    supplierPricesSheet.writePrices(
-      listOf(
+    supplierPricesSheet.write(
+      Stream.of(
         Price(
           UUID.randomUUID(),
           Supplier.SERCO,

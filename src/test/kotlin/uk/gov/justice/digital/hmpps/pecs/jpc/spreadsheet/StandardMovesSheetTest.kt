@@ -83,8 +83,8 @@ internal class StandardMovesSheetTest {
 
     assertCellEquals(sms, 9, 11, 1.0) // price
 
-    assertCellEquals(sms, 9, 12, "") // billable shouldn't be shown
-    assertCellEquals(sms, 9, 13, "") // notes shouldn't be shown for a standard move
+    assertThat(sms.getRow(9).getCell(12)).isNull() // billable shouldn't be shown
+    assertThat(sms.getRow(9).getCell(13)).isNull() // notes shouldn't be shown for a standard move
   }
 }
 

@@ -43,7 +43,7 @@ internal class RedirectionMovesSheetTest {
       "NOMIS prison ID",
       "Price",
       "Contractor billable?",
-      "Notes (reason codes or supplier notes)"
+      "Notes"
     )
 
     assertCellEquals(redirectionMovesSheet, 9, 0, "REF1")

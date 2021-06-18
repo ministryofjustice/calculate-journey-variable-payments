@@ -16,13 +16,43 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.max
 
 abstract class PriceSheet(
   val sheet: Sheet,
   private val header: Header,
   private val subheading: String? = null,
-  private val dataColumnHeadings: List<String> = listOf()
+  private val dataColumns: List<DataColumn> = listOf()
 ) {
+
+  enum class DataColumn(val label: String, val width: Int = 4500) {
+    BILLABLE_JOURNEY_COUNT("Billable journey count"),
+    CANCELLATION_DATE("Cancellation date"),
+    CANCELLATION_TIME("Cancellation time"),
+    CONTRACTOR_BILLABLE("Contractor billable?"),
+    DROP_OFF("Drop off", 9000),
+    DROP_OFF_DATE("Drop off date"),
+    DROP_OFF_TIME("Drop off time"),
+    LOCATION_TYPE("Location Type"),
+    MOVE_DATE("Move date"),
+    MOVE_ID("Move ID"),
+    MOVE_TYPE("Move type"),
+    MOVE_VOLUME("Move volume"),
+    MOVE_VOLUME_WITHOUT_PRICES("Move volume without prices"),
+    NAME("Name"),
+    NOMIS_AGENCY_ID("NOMIS Agency ID"),
+    NOMIS_PRISON_ID("NOMIS prison ID"),
+    NOTES("Notes", 15000),
+    PERCENTAGE("Percentage"),
+    PICK_UP("Pick up", 11000),
+    PICK_UP_DATE("Pick up date"),
+    PICK_UP_TIME("Pick up time"),
+    PRICE("Price"),
+    TOTAL_JOURNEY_COUNT("Total journey count"),
+    TOTAL_PRICE("Total price"),
+    UNIT_PRICE("Unit price"),
+    VEHICLE_REG("Vehicle reg")
+  }
 
   private val rowIndex: AtomicInteger = AtomicInteger(9)
   private val formatPound = sheet.workbook.createDataFormat().getFormat("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
@@ -48,12 +78,6 @@ abstract class PriceSheet(
     color = IndexedColors.BLACK.index
     fontName = "ARIAL"
     bold = true
-  }
-
-  private val fontBlackArialItalic = sheet.workbook.createFont().apply {
-    color = IndexedColors.BLACK.index
-    fontName = "ARIAL"
-    italic = true
   }
 
   private val headerStyle: CellStyle = (sheet.workbook.createCellStyle() as XSSFCellStyle).apply {
@@ -103,13 +127,15 @@ abstract class PriceSheet(
 
   protected val fillWhitePercentage: CellStyle = sheet.workbook.createCellStyle().apply { this.dataFormat = formatPercentage }
 
-  init { addHeadings() }
+  init {
+    addHeadings()
+  }
 
   private fun addHeadings() {
-    sheet.mergeCells(0, 0, 5)
-    sheet.mergeCells(1, 0, 5)
-    sheet.mergeCells(2, 0, 5)
-    sheet.mergeCells(5, 0, 5)
+    sheet.mergeCells(0, 0, 4)
+    sheet.mergeCells(1, 0, 4)
+    sheet.mergeCells(2, 0, 4)
+    sheet.mergeCells(5, 0, 4)
 
     sheet.createRow(0).apply { this.addEmptyHeaderCell(0) }
     sheet.createRow(1).apply { this.addHeaderCell(0, "Calculate Journey Variable Payments (S2B)") }
@@ -120,7 +146,6 @@ abstract class PriceSheet(
       this.addHeaderCell(2, "Total moves for")
       this.addEmptyHeaderCell(3)
       this.addHeaderCell(4, "Export date")
-      this.addEmptyHeaderCell(5)
     }
     sheet.createRow(4).apply {
       this.addHeaderCell(0, header.supplier.name, headerSupplierNameStyle)
@@ -128,22 +153,20 @@ abstract class PriceSheet(
       this.addHeaderCell(2, header.dateRange.start, headerMonthYearStyle)
       this.addEmptyHeaderCell(3)
       this.addHeaderCell(4, header.dateRun, headerExportDateStyle)
-      this.addEmptyHeaderCell(5)
     }
     sheet.createRow(5).apply { this.addEmptyHeaderCell(0) }
 
     if (subheading != null) {
-      sheet.mergeCells(7, 0, 10)
+      sheet.mergeCells(7, 0, max(4, dataColumns.size - 1))
       sheet.createRow(7).apply { this.addHeaderCell(0, subheading, subheadingStyle) }
     }
 
-    if (dataColumnHeadings.isNotEmpty()) {
-      // TODO may need to be think more when setting the column width. At present this is a one size fits all number.
-      for (column in 0..15) sheet.setColumnWidth(column, 4500)
+    if (dataColumns.isNotEmpty()) {
+      for (column in dataColumns.indices) sheet.setColumnWidth(column, dataColumns[column].width)
 
       sheet.createRow(8).apply {
         height = wrapTextRowHeight
-        dataColumnHeadings.forEachIndexed { column, label -> this.addHeaderCell(column, label, columnHeadingStyle) }
+        dataColumns.forEachIndexed { col, dataColumn -> this.addHeaderCell(col, dataColumn.label, columnHeadingStyle) }
       }
     }
   }
@@ -171,8 +194,8 @@ abstract class PriceSheet(
       add(9, vehicleRegistration)
       add(10, person?.prisonNumber)
       if (hasPrice()) row.addCell(11, totalInPounds(), fillShadedPound) else add(11, "NOT PRESENT")
-      add(12, "") // billable is empty for a move
-      add(13, if (showNotes) notes else "")
+      if (dataColumns.contains(DataColumn.CONTRACTOR_BILLABLE)) add(12, "") // billable is empty for a move
+      if (dataColumns.contains(DataColumn.NOTES)) add(13, if (showNotes) notes else "")
     }
   }
 
@@ -192,8 +215,8 @@ abstract class PriceSheet(
       add(9, vehicleRegistration)
       add(10, "") // prison number is empty for a journey
       if (hasPrice()) row.addCell(11, priceInPounds(), fillWhitePound) else add(11, "NOT PRESENT")
-      add(12, isBillable())
-      add(13, notes)
+      if (dataColumns.contains(DataColumn.CONTRACTOR_BILLABLE)) add(12, isBillable())
+      if (dataColumns.contains(DataColumn.NOTES)) add(13, notes)
     }
   }
 
@@ -208,7 +231,7 @@ abstract class PriceSheet(
   /**
    * Write the value to the cell for the given col index
    * @param col - index of the column to create the cell for this row
-   * @param value - String, Double or Int value to write to the cell
+   * @param value - String, Double, Int or LocalDate value to write to the cell
    * @param cellStyle - optional CellStyle to set on the cell
    */
   protected fun <T> Row.addCell(col: Int, value: T?, cellStyle: CellStyle? = null) {
