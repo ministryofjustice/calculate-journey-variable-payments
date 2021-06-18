@@ -31,11 +31,6 @@ class ImporterConfiguration {
   private lateinit var monitoringString: MonitoringService
 
   @Bean
-  fun jpcTemplateProvider(@Value("\${export-files.template}") templateFileLocation: String): JPCTemplateProvider {
-    return JPCTemplateProvider { resourceLoader.getResource(templateFileLocation).inputStream }
-  }
-
-  @Bean
   fun timeSource() = TimeSource { LocalDateTime.now(Clock.systemDefaultZone()) }
 
   @Bean

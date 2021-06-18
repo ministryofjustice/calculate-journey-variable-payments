@@ -4,7 +4,6 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
@@ -19,7 +18,6 @@ import java.time.LocalDate
 
 @Component
 class PricesSpreadsheetGenerator(
-  @Autowired private val template: JPCTemplateProvider,
   @Autowired private val timeSource: TimeSource,
   @Autowired private val moveService: MoveService,
   @Autowired private val journeyService: JourneyService,

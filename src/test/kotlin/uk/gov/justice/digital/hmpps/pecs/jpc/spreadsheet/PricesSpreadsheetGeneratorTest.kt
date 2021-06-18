@@ -6,10 +6,6 @@ import com.nhaarman.mockitokotlin2.mock
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
@@ -30,8 +26,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import java.util.stream.Stream
 
-@SpringJUnitConfig(TestConfig::class)
-internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: JPCTemplateProvider) {
+internal class PricesSpreadsheetGeneratorTest {
   private val timeSource = TimeSource { LocalDateTime.of(2020, 11, 18, 0, 0) }
 
   private fun createMoveList(id: Int, moveType: MoveType) = listOf(
@@ -97,7 +92,6 @@ internal class PricesSpreadsheetGeneratorTest(@Autowired private val template: J
     }
 
   private val pricesSpreadsheetGenerator = PricesSpreadsheetGenerator(
-    template,
     timeSource,
     moveService,
     journeyService,

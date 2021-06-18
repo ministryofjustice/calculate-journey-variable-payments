@@ -58,9 +58,6 @@ env:
   - name: IMPORT_FILES_PRICES_GEO
     value: "geoamey_prices.xlsx"
 
-  - name: EXPORT_FILES_TEMPLATE
-    value: "classpath:/spreadsheets/JPC_template.xlsx"
-
   - name: JPC_AWS_ACCESS_KEY_ID
     valueFrom:
       secretKeyRef:

@@ -58,9 +58,6 @@ import-files:
   serco-prices: ${IMPORT_FILES_PRICES_SERCO}
   geo-prices: ${IMPORT_FILES_PRICES_GEO}
 
-export-files:
-  template: ${EXPORT_FILES_TEMPLATE}
-
 server:
   port: 8080
   servlet:
