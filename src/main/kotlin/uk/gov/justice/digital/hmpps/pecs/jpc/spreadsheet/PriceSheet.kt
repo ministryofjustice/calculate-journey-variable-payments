@@ -26,10 +26,10 @@ abstract class PriceSheet(
 ) {
 
   enum class DataColumn(val label: String, val width: Int = 4500) {
-    BILLABLE_JOURNEY_COUNT("Billable journey count", 5000),
+    BILLABLE_JOURNEY_COUNT("Billable journey count", 6000),
     CANCELLATION_DATE("Cancellation date"),
     CANCELLATION_TIME("Cancellation time"),
-    CONTRACTOR_BILLABLE("Contractor billable?", 5000),
+    CONTRACTOR_BILLABLE("Contractor billable?", 6000),
     DROP_OFF("Drop off", 9000),
     DROP_OFF_DATE("Drop off date"),
     DROP_OFF_TIME("Drop off time"),
