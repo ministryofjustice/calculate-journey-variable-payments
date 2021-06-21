@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.nextEffectiveYearForDate
 import java.util.UUID
+import kotlin.streams.toList
 
 @Service
 @Transactional
@@ -33,7 +34,7 @@ class BulkPricesService(
 
     priceRepository.flush()
 
-    val total = priceRepository.findBySupplierAndEffectiveYear(supplier, effectiveYearForDate(now)).map {
+    val total = priceRepository.findBySupplierAndEffectiveYear(supplier, effectiveYearForDate(now)).toList().map {
       priceRepository.save(
         it.copy(
           id = UUID.randomUUID(),

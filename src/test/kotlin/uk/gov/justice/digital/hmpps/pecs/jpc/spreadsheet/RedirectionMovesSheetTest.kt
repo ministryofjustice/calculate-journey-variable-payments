@@ -1,78 +1,89 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
-@SpringJUnitConfig(TestConfig::class)
-internal class RedirectionMovesSheetTest(@Autowired private val template: JPCTemplateProvider) {
+internal class RedirectionMovesSheetTest {
 
-  private val workbook: Workbook = XSSFWorkbook(template.get())
+  private val journey1 = journeyJ1()
+  private val journey2 = journeyJ1(journeyId = "J2")
+  private val move = moveM1(journeys = listOf(journey1, journey2))
+  private val moves = listOf(move)
+  private val redirectionMovesSheet = RedirectionMovesSheet(
+    SXSSFWorkbook(),
+    PriceSheet.Header(
+      defaultMoveDate10Sep2020,
+      ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+      Supplier.SERCO
+    )
+  )
 
   @Test
   internal fun `test redirection prices`() {
+    redirectionMovesSheet.writeMoves(moves)
 
-    val journey1 = journeyJ1()
-    val journey2 = journeyJ1(journeyId = "J2")
-    val move = moveM1(journeys = listOf(journey1, journey2))
-    val moves = listOf(move)
-
-    val sheet = RedirectionMovesSheet(
-      workbook,
-      PriceSheet.Header(
-        defaultMoveDate10Sep2020,
-        ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-        Supplier.SERCO
-      )
+    assertOnSheetName(redirectionMovesSheet, "Redirections")
+    assertOnSubheading(redirectionMovesSheet, "REDIRECTIONS (a redirection after the move has started)")
+    assertOnColumnDataHeadings(
+      redirectionMovesSheet,
+      "Move ID",
+      "Pick up",
+      "Location Type",
+      "Drop off",
+      "Location Type",
+      "Pick up date",
+      "Pick up time",
+      "Drop off date",
+      "Drop off time",
+      "Vehicle reg",
+      "NOMIS prison ID",
+      "Price",
+      "Contractor billable?",
+      "Notes"
     )
-    sheet.writeMoves(moves)
 
-    assertCellEquals(sheet, 9, 0, "REF1")
+    assertCellEquals(redirectionMovesSheet, 9, 0, "REF1")
 
-    assertCellEquals(sheet, 9, 1, "from") // pick up site name
-    assertCellEquals(sheet, 9, 2, "PR") // pick up location type
-    assertCellEquals(sheet, 9, 3, "to") // drop off site name
-    assertCellEquals(sheet, 9, 4, "PR") // drop off location type
+    assertCellEquals(redirectionMovesSheet, 9, 1, "from") // pick up site name
+    assertCellEquals(redirectionMovesSheet, 9, 2, "PR") // pick up location type
+    assertCellEquals(redirectionMovesSheet, 9, 3, "to") // drop off site name
+    assertCellEquals(redirectionMovesSheet, 9, 4, "PR") // drop off location type
 
-    assertCellEquals(sheet, 9, 5, "10/09/2020") // Pick up date
-    assertCellEquals(sheet, 9, 6, "00:00") // Pick up time
-    assertCellEquals(sheet, 9, 7, "10/09/2020") // Drop off date
-    assertCellEquals(sheet, 9, 8, "10:00") // Drop off time
+    assertCellEquals(redirectionMovesSheet, 9, 5, "10/09/2020") // Pick up date
+    assertCellEquals(redirectionMovesSheet, 9, 6, "00:00") // Pick up time
+    assertCellEquals(redirectionMovesSheet, 9, 7, "10/09/2020") // Drop off date
+    assertCellEquals(redirectionMovesSheet, 9, 8, "10:00") // Drop off time
 
-    assertCellEquals(sheet, 9, 9, "reg100") // vehicle reg
-    assertCellEquals(sheet, 9, 10, "PR101") // prison number
-    assertCellEquals(sheet, 9, 11, 2.0) // price
-    assertCellEquals(sheet, 9, 12, "") // billable shouldn't be shown
-    assertCellEquals(sheet, 9, 13, "some notes") // should only show the redirect event notes
+    assertCellEquals(redirectionMovesSheet, 9, 9, "reg100") // vehicle reg
+    assertCellEquals(redirectionMovesSheet, 9, 10, "PR101") // prison number
+    assertCellEquals(redirectionMovesSheet, 9, 11, 2.0) // price
+    assertCellEquals(redirectionMovesSheet, 9, 12, "") // billable shouldn't be shown
+    assertCellEquals(redirectionMovesSheet, 9, 13, "some notes") // should only show the redirect event notes
 
     // Journey 1
-    assertCellEquals(sheet, 10, 0, "Journey 1")
+    assertCellEquals(redirectionMovesSheet, 10, 0, "Journey 1")
 
-    assertCellEquals(sheet, 10, 1, "from")
-    assertCellEquals(sheet, 10, 2, "PR")
-    assertCellEquals(sheet, 10, 3, "to")
-    assertCellEquals(sheet, 10, 4, "PR")
+    assertCellEquals(redirectionMovesSheet, 10, 1, "from")
+    assertCellEquals(redirectionMovesSheet, 10, 2, "PR")
+    assertCellEquals(redirectionMovesSheet, 10, 3, "to")
+    assertCellEquals(redirectionMovesSheet, 10, 4, "PR")
 
-    assertCellEquals(sheet, 10, 5, "10/09/2020") // Pick up date
-    assertCellEquals(sheet, 10, 6, "00:00") // Pick up time
-    assertCellEquals(sheet, 10, 7, "10/09/2020") // Drop off date
-    assertCellEquals(sheet, 10, 8, "10:00") // Drop off time
+    assertCellEquals(redirectionMovesSheet, 10, 5, "10/09/2020") // Pick up date
+    assertCellEquals(redirectionMovesSheet, 10, 6, "00:00") // Pick up time
+    assertCellEquals(redirectionMovesSheet, 10, 7, "10/09/2020") // Drop off date
+    assertCellEquals(redirectionMovesSheet, 10, 8, "10:00") // Drop off time
 
-    assertCellEquals(sheet, 10, 9, "REG200") // vehicle reg
-    assertCellEquals(sheet, 10, 10, "") // no prison number for journeys
-    assertCellEquals(sheet, 10, 11, 1.0) // price
-    assertCellEquals(sheet, 10, 12, "YES") // contractor billable
-    assertCellEquals(sheet, 10, 13, "some notes")
+    assertCellEquals(redirectionMovesSheet, 10, 9, "REG200") // vehicle reg
+    assertCellEquals(redirectionMovesSheet, 10, 10, "") // no prison number for journeys
+    assertCellEquals(redirectionMovesSheet, 10, 11, 1.0) // price
+    assertCellEquals(redirectionMovesSheet, 10, 12, "YES") // contractor billable
+    assertCellEquals(redirectionMovesSheet, 10, 13, "some notes")
 
     // Journey 2
-    assertCellEquals(sheet, 11, 0, "Journey 2")
+    assertCellEquals(redirectionMovesSheet, 11, 0, "Journey 2")
   }
 }

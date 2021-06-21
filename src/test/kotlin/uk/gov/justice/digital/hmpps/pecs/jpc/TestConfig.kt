@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
@@ -72,9 +71,4 @@ class TestConfig {
 
   @Bean
   fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() })
-
-  @Bean
-  fun jpcTemplateProvider(): JPCTemplateProvider {
-    return JPCTemplateProvider { resourceLoader.getResource("classpath:/spreadsheets/JPC_template.xlsx").inputStream }
-  }
 }

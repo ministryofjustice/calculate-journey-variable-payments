@@ -1,10 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.JPCTemplateProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
@@ -19,7 +18,6 @@ import java.time.LocalDate
 
 @Component
 class PricesSpreadsheetGenerator(
-  @Autowired private val template: JPCTemplateProvider,
   @Autowired private val timeSource: TimeSource,
   @Autowired private val moveService: MoveService,
   @Autowired private val journeyService: JourneyService,
@@ -32,9 +30,13 @@ class PricesSpreadsheetGenerator(
   internal fun generate(supplier: Supplier, startDate: LocalDate): File {
     val dateGenerated = timeSource.date()
 
-    XSSFWorkbook(template.get()).use { workbook ->
+    SXSSFWorkbook().use { workbook ->
       val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
+
       val moves = moveService.moves(supplier, startDate)
+
+      SummarySheet(workbook, header).also { logger.info("Adding summaries.") }
+        .apply { writeSummaries(moveService.moveTypeSummaries(supplier, startDate)) }
 
       StandardMovesSheet(workbook, header).also { logger.info("Adding standard prices.") }
         .apply { writeMoves(moves[0]) }
@@ -56,18 +58,15 @@ class PricesSpreadsheetGenerator(
       JourneysSheet(workbook, header).also { logger.info("Adding journeys.") }
         .apply { writeJourneys(journeyService.distinctJourneysIncludingPriced(supplier, startDate)) }
 
-      SummarySheet(workbook, header).also { logger.info("Adding summaries.") }
-        .apply { writeSummaries(moveService.moveTypeSummaries(supplier, startDate)) }
-
       SupplierPricesSheet(
         workbook,
         header
       ).also {
         logger.info("Adding $supplier prices for effective year ${effectiveYearForDate(startDate)}.")
-      }.apply { writePrices(supplierPrices.get(supplier, effectiveYearForDate(startDate))) }
+      }.apply { write(supplierPrices.get(supplier, effectiveYearForDate(startDate))) }
 
       LocationsSheet(workbook, header).also { logger.info("Adding locations.") }
-        .apply { writeLocations(locationRepository.findAll()) }
+        .apply { write(locationRepository.findAllByOrderBySiteName()) }
 
       return File.createTempFile("tmp", "xlsx").apply {
         FileOutputStream(this).use {

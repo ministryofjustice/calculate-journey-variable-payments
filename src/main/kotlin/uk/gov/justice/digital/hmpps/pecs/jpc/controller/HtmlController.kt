@@ -113,7 +113,7 @@ class HtmlController(
     )
     model.addAttribute("summary", moveTypeSummary.movesSummary)
     model.addAttribute("moves", moves)
-    model.addAttribute("moveType", moveType.text)
+    model.addAttribute("moveType", moveType.label)
     return "moves-by-type"
   }
 
