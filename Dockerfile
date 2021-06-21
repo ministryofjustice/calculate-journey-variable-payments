@@ -12,6 +12,7 @@ LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 RUN apt-get update && \
     apt-get install -y libfreetype6 && \
+    apt-get install -y libfontconfig1 && \
     apt-get install -y curl && \
     rm -rf /var/lib/apt/lists/*
 
