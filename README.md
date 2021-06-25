@@ -15,9 +15,26 @@ To build (append `-x test` to build without running tests):
 ./gradlew clean build
 ```
 
+## Running the integration tests
+
+Rebuild the docker image locally (perhaps after changes to the project), run:
+```bash
+docker build -t quay.io/hmpps/calculate-journey-variable-payments:latest .
+```
+
+Start up the application and its dependencies:
+```bash
+docker-compose up
+```
+
+In a separate terminal window:
+```bash
+./gradlew clean testIntegration
+```
+
 ## Running locally
 
-You can run the dependencies for the projects with Docker compose:
+You can run the latest version of the application using with Docker compose (note this runs the app in a container so you may need to rebuild it, see section on integration tests for an example) :
 
 ```bash
 docker-compose up

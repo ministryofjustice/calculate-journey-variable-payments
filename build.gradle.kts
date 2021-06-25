@@ -45,6 +45,13 @@ dependencies {
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
 
+  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
+  testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
+  testImplementation("org.seleniumhq.selenium:selenium-firefox-driver:3.141.59")
+
+  testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
+  testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
+  testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
   testImplementation("org.mockito:mockito-inline:3.11.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
@@ -60,11 +67,16 @@ dependencies {
 tasks {
   test {
     useJUnitPlatform()
-    exclude("**/integration/*")
+    exclude("**/integration/*", "**/migrations/*")
   }
 
   val testIntegration by registering(Test::class) {
     useJUnitPlatform()
     include("uk/gov/justice/digital/hmpps/pecs/jpc/integration/*")
+  }
+
+  val testMigrations by registering(Test::class) {
+    useJUnitPlatform()
+    include("uk/gov/justice/digital/hmpps/pecs/jpc/migrations/*")
   }
 }
