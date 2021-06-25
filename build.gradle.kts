@@ -30,8 +30,8 @@ dependencies {
     implementation("org.apache.xmlgraphics:batik-all:1.14") {
       because("previous transitive version 1.13 pulled from Apache POI 5.0.0 has CVE")
     }
-    implementation("org.apache.pdfbox:pdfbox:2.0.23") {
-      because("previous transitive version 2.0.22 pulled from Apache POI 5.0.0 has CVE")
+    implementation("org.apache.pdfbox:pdfbox:2.0.24") {
+      because("previous transitive version 2.0.23 pulled from Apache POI 5.0.0 has CVE")
     }
   }
 
