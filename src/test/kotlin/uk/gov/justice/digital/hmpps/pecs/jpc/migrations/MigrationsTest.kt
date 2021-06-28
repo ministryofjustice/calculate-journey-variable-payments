@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.integration
+package uk.gov.justice.digital.hmpps.pecs.jpc.migrations
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
