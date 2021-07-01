@@ -5,7 +5,9 @@ orbs:
 
 jobs:
   validate:
-    executor: hmpps/java
+    executor:
+      name: hmpps/java
+      tag: "11.0"
     steps:
       - checkout
       - restore_cache:
@@ -13,7 +15,7 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew check
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" build
       - save_cache:
           paths:
             - ~/.gradle
@@ -22,6 +24,68 @@ jobs:
           path: build/test-results
       - store_artifacts:
           path: build/reports/tests
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build/libs
+            - build.gradle.kts
+
+  integration_tests:
+    docker:
+      - image: cimg/openjdk:11.0
+        environment:
+          _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
+      - image: quay.io/hmpps/hmpps-auth:latest
+        environment:
+          - SERVER_PORT=9090
+          - SPRING_PROFILES_ACTIVE=dev
+      - image: postgres:10.16
+        environment:
+          POSTGRES_DB: jpc
+          POSTGRES_USER: jpc
+          POSTGRES_PASSWORD: letmein
+        command: -p 5433
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: Wait for auth
+          command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
+      - run:
+          name: Get wiremock
+          command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.2/wiremock-standalone-2.27.2.jar
+      - run:
+          name: Run wiremock
+          command: java -jar wiremock.jar --port 9999
+          background: true
+      - run:
+          name: Run the java app.
+          command: env spring.profiles.active=dev java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar
+          background: true
+      - run:
+          name: Wait for java app to start
+          command: sleep 20
+      - restore_cache:
+          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+      - restore_cache:
+          key: gradle-cache-{{ checksum "build.gradle.kts" }}
+      - run:
+          name: Run Fluent Integration Tests
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration
+      - save_cache:
+          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+          paths:
+            - /home/circleci/.gradle/wrapper
+      - save_cache:
+          key: gradle-cache-{{ checksum "build.gradle.kts" }}
+          paths:
+            - /home/circleci/.gradle/caches
+      - store_artifacts:
+          path: build/reports/tests/testIntegration
+          destination: integration/fluent
+      - store_test_results:
+          path: build/test-results
 
 workflows:
   version: 2
@@ -33,6 +97,9 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
+      - integration_tests:
+          requires:
+            - validate
       - hmpps/build_docker:
           name: build_docker
           filters:
