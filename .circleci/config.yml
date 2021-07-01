@@ -52,9 +52,14 @@ jobs:
       - run:
           name: Install missing OS dependency
           command: sudo apt-get install wget
+#      - run:
+#          name: Install dockerize
+#          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+#          environment:
+#            DOCKERIZE_VERSION: v0.6.1
       - run:
-          name: Wait for auth service
-          command: curl -f http://localhost:9090/auth/health
+          name: Wait for auth
+          command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
       - run:
           name: Get wiremock
           command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.2/wiremock-standalone-2.27.2.jar
