@@ -50,26 +50,18 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
-          name: Install missing OS dependency
-          command: sudo apt-get install wget
-#      - run:
-#          name: Install dockerize
-#          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-#          environment:
-#            DOCKERIZE_VERSION: v0.6.1
-      - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
       - run:
           name: Get wiremock
           command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.2/wiremock-standalone-2.27.2.jar
       - run:
-          name: Run auth wiremock
+          name: Run wiremock
           command: java -jar wiremock.jar --port 9999
           background: true
       - run:
           name: Run the java app.
-          command: env spring.profiles.active=dev java -Xmx1024m -jar build/libs/calculate-journey-variable-payments-*.jar
+          command: env spring.profiles.active=dev java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar
           background: true
       - run:
           name: Wait for java app to start
