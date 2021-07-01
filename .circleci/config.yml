@@ -5,7 +5,9 @@ orbs:
 
 jobs:
   validate:
-    executor: hmpps/java
+    executor:
+      name: hmpps/java
+      tag: "11.0"
     steps:
       - checkout
       - restore_cache:
@@ -29,9 +31,10 @@ jobs:
             - build.gradle.kts
 
   integration_tests:
-    executor:
-      name: hmpps/java
     docker:
+      - image: cimg/openjdk:11.0
+        environment:
+          _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
       - image: quay.io/hmpps/hmpps-auth:latest
         environment:
           - SERVER_PORT=9090
@@ -42,12 +45,13 @@ jobs:
           POSTGRES_USER: jpc
           POSTGRES_PASSWORD: letmein
         command: -p 5433
-    environment:
-      _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
     steps:
       - checkout
       - attach_workspace:
           at: ~/app
+      - run:
+          name: Install missing OS dependency
+          command: sudo apt-get install wget
       - run:
           name: Wait for auth service
           command: curl -f http://localhost:9090/auth/health
