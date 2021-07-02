@@ -19,5 +19,7 @@ abstract class ApplicationPage : FluentPage() {
     return customDriver().firstAttachmentResponse()
   }
 
-  private fun customDriver() = super.getDriver() as CustomHtmlUnitDriver
+  internal fun customDriver() = super.getDriver() as CustomHtmlUnitDriver
+
+  fun gotoPage(url: String) = customDriver().page(url).page
 }

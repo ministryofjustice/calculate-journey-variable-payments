@@ -11,7 +11,7 @@
 
 <div class="govuk-width-container" layout:fragment="content">
 
-    <h1 class="govuk-heading-xl mv2" th:inline="text">[[${#temporals.monthName(startOfMonthDate)}]]
+    <h1 id="month-year-heading" class="govuk-heading-xl mv2" th:inline="text">[[${#temporals.monthName(startOfMonthDate)}]]
         [[${#temporals.format(startOfMonthDate, 'yyyy')}]]</h1>
 
     <div class="govuk-grid-row">
