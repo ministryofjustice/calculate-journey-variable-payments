@@ -1,12 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
-import org.fluentlenium.core.FluentPage
 import org.fluentlenium.core.annotation.PageUrl
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.support.FindBy
 
 @PageUrl("http://localhost:9090/auth/login")
-class LoginPage : FluentPage() {
+class LoginPage : ApplicationPage() {
 
   @FindBy(css = "input[type='submit']")
   private lateinit var signInButton: FluentWebElement

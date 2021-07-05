@@ -71,9 +71,4 @@ tasks {
     useJUnitPlatform()
     include("uk/gov/justice/digital/hmpps/pecs/jpc/integration/*")
   }
-
-  val testMigrations by registering(Test::class) {
-    useJUnitPlatform()
-    include("uk/gov/justice/digital/hmpps/pecs/jpc/migrations/*")
-  }
 }

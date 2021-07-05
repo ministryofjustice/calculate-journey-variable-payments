@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.AddPricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ChooseSupplierPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.DashboardPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.LoginPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ManageJourneyPricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SelectMonthYearPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
@@ -44,49 +45,69 @@ internal class ManagePricesTest : IntegrationTest() {
 
   @Test
   @Order(1)
-  fun `add price`() {
+  fun `missing price is added for GEOAmey journey from Prison One to Prison Two`() {
     goTo(dashboardPage)
-    loginPage.isAt()
-    loginPage.login()
 
-    chooseSupplierPage.isAt()
-    chooseSupplierPage.choose(Supplier.GEOAMEY)
+    loginPage
+      .isAtPage<LoginPage>()
+      .login()
 
-    dashboardPage.isAt()
-    dashboardPage.isAtMonthYear(LocalDate.now().month, Year.now())
-    dashboardPage.navigateToSelectMonthPage()
+    chooseSupplierPage
+      .isAtPage<ChooseSupplierPage>()
+      .choose(Supplier.GEOAMEY)
 
-    selectMonthYearPage.isAt()
-    selectMonthYearPage.navigateToDashboardFor("dec 2020")
+    dashboardPage
+      .isAtPage<DashboardPage>()
+      .isAtMonthYear(LocalDate.now().month, Year.now())
+      .navigateToSelectMonthPage()
 
-    dashboardPage.isAt()
-    dashboardPage.isAtMonthYear(Month.DECEMBER, Year.of(2020))
-    dashboardPage.navigateToJourneysForReview()
+    selectMonthYearPage
+      .isAtPage<SelectMonthYearPage>()
+      .navigateToDashboardFor("dec 2020")
 
-    journeysForReviewPage.isAt()
-    journeysForReviewPage.addPriceForJourney("PRISON1", "PRISON2")
+    dashboardPage
+      .isAtPage<DashboardPage>()
+      .isAtMonthYear(Month.DECEMBER, Year.of(2020))
+      .navigateToJourneysForReview()
 
-    addPricePage.isAtPricePageForJourney("PRISON1", "PRISON2")
-    addPricePage.addPriceForJourney("PRISON1", "PRISON2", Money(1000))
+    journeysForReviewPage
+      .isAtPage<JourneysForReviewPage>()
+      .addPriceForJourney("PRISON1", "PRISON2")
+
+    addPricePage
+      .isAtPricePageForJourney("PRISON1", "PRISON2")
+      .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
+
+    journeysForReviewPage
+      .isAtPage<JourneysForReviewPage>()
+      .priceAddedConfirmationMessageIsDisplayedFor("PRISON ONE", "PRISON TWO", Money(1000))
   }
 
   @Test
   @Order(2)
-  fun `update price`() {
+  fun `price is updated for GEOAmey journey from Prison One to Prison Two`() {
     goTo(dashboardPage)
-    loginPage.isAt()
-    loginPage.login()
 
-    chooseSupplierPage.isAt()
-    chooseSupplierPage.choose(Supplier.GEOAMEY)
+    loginPage
+      .isAtPage<LoginPage>()
+      .login()
 
-    dashboardPage.isAt()
-    dashboardPage.navigateToManageJourneyPrice()
+    chooseSupplierPage
+      .isAtPage<ChooseSupplierPage>()
+      .choose(Supplier.GEOAMEY)
 
-    manageJourneyPricePage.isAt()
-    manageJourneyPricePage.findJourneyToManagePrice("PRISON1", "PRISON2")
+    dashboardPage
+      .isAtPage<DashboardPage>()
+      .navigateToManageJourneyPrice()
 
-    updatePricePage.isAtPricePageForJourney("PRISON1", "PRISON2")
-    updatePricePage.updatePriceForJourney("PRISON1", "PRISON2", Money(2000))
+    manageJourneyPricePage
+      .isAtPage<ManageJourneyPricePage>()
+      .findJourneyToManagePrice("PRISON1", "PRISON2")
+
+    updatePricePage
+      .isAtPricePageForJourney("PRISON1", "PRISON2")
+      .updatePriceForJourney("PRISON1", "PRISON2", Money(2000))
+
+    // TODO - need to look at fixing JS loading issue as this makes asserting on this awkward (even though it has happened/worked).
   }
 }
