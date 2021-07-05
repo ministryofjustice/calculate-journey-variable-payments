@@ -5,16 +5,14 @@ import org.fluentlenium.core.annotation.Page
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ChooseSupplierPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.DashboardPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.LoginPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import java.time.LocalDate
+import java.time.Year
 
-class GotoDashboardTest : IntegrationTest() {
+internal class GotoDashboardTest : IntegrationTest() {
 
   @Page
   private lateinit var dashboardPage: DashboardPage
-
-  @Page
-  private lateinit var loginPage: LoginPage
 
   @Page
   private lateinit var chooseSupplierPage: ChooseSupplierPage
@@ -36,11 +34,12 @@ class GotoDashboardTest : IntegrationTest() {
     chooseSupplierPage.isAt()
     chooseSupplierPage.choose(supplier)
     dashboardPage.isAt()
+    dashboardPage.isAtMonthYear(LocalDate.now().month, Year.now())
 
-    val response = dashboardPage.downloadAllMoves()
-
-    assertThat(response.statusCode).isEqualTo(200)
-    assertThat(response.contentType).isEqualTo("application/vnd.ms-excel")
-    assertThat(response.getResponseHeaderValue("Content-Disposition")).startsWith("attachment;filename=Journey_Variable_Payment_Output_$supplier")
+    dashboardPage.downloadAllMoves().apply {
+      assertThat(this.statusCode).isEqualTo(200)
+      assertThat(this.contentType).isEqualTo("application/vnd.ms-excel")
+      assertThat(this.getResponseHeaderValue("Content-Disposition")).startsWith("attachment;filename=Journey_Variable_Payment_Output_$supplier")
+    }
   }
 }

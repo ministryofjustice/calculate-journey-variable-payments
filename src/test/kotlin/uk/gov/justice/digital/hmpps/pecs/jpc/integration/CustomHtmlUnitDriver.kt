@@ -12,9 +12,9 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver
  *
  * This custom HtmlUnit driver implementation can download attachments by accessing them as [Attachment]s by using the AttachmentHandler interface.
  */
-class CustomHtmlUnitDriver : HtmlUnitDriver() {
+internal class CustomHtmlUnitDriver : HtmlUnitDriver(true) {
 
-  lateinit var attachments: MutableList<Attachment>
+  private lateinit var attachments: MutableList<Attachment>
 
   override fun modifyWebClient(client: WebClient): WebClient {
     attachments = mutableListOf()

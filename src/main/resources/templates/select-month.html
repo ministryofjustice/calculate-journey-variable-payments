@@ -13,11 +13,11 @@
 
     <form th:action="@{/select-month}" th:object="${form}" method="post">
         <div class="govuk-form-group" th:classappend="${#fields.hasErrors('date')} ? 'govuk-form-group--error'">
-            <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="event-name">
+            <h1 class="govuk-label-wrapper"><label class="govuk-label govuk-label--l" for="month-year">
                 Jump to month
             </label>
             </h1>
-            <div id="event-name-hint" class="govuk-hint">
+            <div id="month-year-hint" class="govuk-hint">
                 <span class="db govuk-!-font-weight-bold">Enter month and year you want to view.</span>
                 For example 10/2019 or October 2019
             </div>
@@ -25,12 +25,12 @@
                 <span class="govuk-visually-hidden">Error:</span> Enter a valid month in the correct
                 format
             </p>
-            <input class="govuk-input govuk-input--width-20" id="event-name" name="date" type="text"
-                   aria-describedby="event-name-hint" th:field="*{date}"
+            <input class="govuk-input govuk-input--width-20" id="month-year" name="date" type="text"
+                   aria-describedby="month-year-hint" th:field="*{date}"
                    th:classappend="${#fields.hasErrors('date')} ? 'govuk-input--error'">
         </div>
         <div class="flex items-center">
-            <button class="govuk-button mv3 mr3" data-module="govuk-button">
+            <button id="submit-month-year" class="govuk-button mv3 mr3" data-module="govuk-button">
                 Go to month
             </button>
             <a href="/dashboard" class="govuk-link">Cancel</a>
