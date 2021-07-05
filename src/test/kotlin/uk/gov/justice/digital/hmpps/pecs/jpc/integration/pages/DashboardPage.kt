@@ -27,8 +27,10 @@ class DashboardPage : ApplicationPage() {
     selectMonthLink.click()
   }
 
-  fun isAtMonthYear(month: Month, year: Year) {
+  fun isAtMonthYear(month: Month, year: Year): DashboardPage {
     assertThat(monthYear.text().uppercase()).isEqualTo("$month ${year.value}")
+
+    return this
   }
 
   fun downloadAllMoves(): WebResponse = clickOnLinkText("Download all moves")

@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  calculate-journey-variable-payments:
+    restart: on-failure:3
+    image: quay.io/hmpps/calculate-journey-variable-payments:latest
+    container_name: calculate-journey-variable-payments
+    depends_on:
+      - localstack
+      - db
+      - hmpps-book-secure-move-api
+      - hmpps-auth
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+    network_mode: host

@@ -24,7 +24,7 @@ docker build -t quay.io/hmpps/calculate-journey-variable-payments:latest .
 
 Start up the application and its dependencies:
 ```bash
-docker-compose up
+docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
 ```
 
 In a separate terminal window:
@@ -32,12 +32,20 @@ In a separate terminal window:
 ./gradlew clean testIntegration
 ```
 
-## Running locally
+## Running the service and its dependent services locally
 
 You can run the latest version of the application using with Docker compose (note this runs the app in a container so you may need to rebuild it, see section on integration tests for an example) :
 
 ```bash
-docker-compose up
+docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
+```
+
+## Running dependent services locally when developing:
+
+You can run the dependent services locally using with Docker compose (note this runs the app in a container so you may need to rebuild it, see section on integration tests for an example) :
+
+```bash
+docker-compose docker-compose.yml up
 ```
 
 *Note: to log into the application (via the redirect to the HMPPS auth service) your user will need the PECS_JPC role assigned. A hmpps-auth in-memory user has been set up with this role to help with this 'jpc_user'.*

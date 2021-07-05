@@ -14,8 +14,10 @@ class UpdatePricePage : ApplicationPage() {
   @FindBy(id = "confirm-save-price")
   private lateinit var submit: FluentWebElement
 
-  fun isAtPricePageForJourney(fromAgencyId: String, toAgencyId: String) {
+  fun isAtPricePageForJourney(fromAgencyId: String, toAgencyId: String): UpdatePricePage {
     this.isAt("$fromAgencyId-$toAgencyId")
+
+    return this
   }
 
   fun updatePriceForJourney(fromAgencyId: String, toAgencyId: String, amount: Money) {
