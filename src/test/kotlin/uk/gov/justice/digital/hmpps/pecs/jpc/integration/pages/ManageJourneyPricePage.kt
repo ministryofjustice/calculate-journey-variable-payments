@@ -1,12 +1,25 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
 import org.fluentlenium.core.annotation.PageUrl
+import org.fluentlenium.core.domain.FluentWebElement
+import org.openqa.selenium.support.FindBy
 
 @PageUrl("http://localhost:8080/search-journeys")
 class ManageJourneyPricePage : ApplicationPage() {
 
-  // Note: this is bypassing the actual search journey page due to not liking the JavaScript in the page where the fields are added by the 3rd party JS lib.
-  fun findJourneyToManagePrice(fromAgencyId: String, toAgencyId: String) {
-    newInstance(UpdatePricePage::class.java).go<UpdatePricePage>("$fromAgencyId-$toAgencyId")
+  @FindBy(css = "input[id='from']")
+  private lateinit var from: FluentWebElement
+
+  @FindBy(css = "input[id='to']")
+  private lateinit var to: FluentWebElement
+
+  @FindBy(css = "button[id='find-journeys']")
+  private lateinit var findJourneys: FluentWebElement
+
+  fun findJourneyForPricing(fromAgency: String, toAgency: String) {
+    from.fill().withText(fromAgency)
+    to.fill().withText(toAgency)
+
+    findJourneys.submit()
   }
 }

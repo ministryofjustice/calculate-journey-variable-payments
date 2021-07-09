@@ -8,6 +8,7 @@ import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.AddPricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ChooseSupplierPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.DashboardPage
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneyResultsPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.LoginPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ManageJourneyPricePage
@@ -39,6 +40,9 @@ internal class ManagePricesTest : IntegrationTest() {
 
   @Page
   private lateinit var manageJourneyPricePage: ManageJourneyPricePage
+
+  @Page
+  private lateinit var journeyResultsPage: JourneyResultsPage
 
   @Page
   private lateinit var updatePricePage: UpdatePricePage
@@ -80,7 +84,7 @@ internal class ManagePricesTest : IntegrationTest() {
 
     journeysForReviewPage
       .isAtPage<JourneysForReviewPage>()
-      .priceAddedConfirmationMessageIsDisplayedFor("PRISON ONE", "PRISON TWO", Money(1000))
+      .isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
   }
 
   @Test
@@ -102,12 +106,20 @@ internal class ManagePricesTest : IntegrationTest() {
 
     manageJourneyPricePage
       .isAtPage<ManageJourneyPricePage>()
-      .findJourneyToManagePrice("PRISON1", "PRISON2")
+      .findJourneyForPricing("PRISON ONE", "PRISON TWO")
+
+    journeyResultsPage
+      .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
+      .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(1000))
+      .navigateToUpdatePriceFor("PRISON1", "PRISON2")
 
     updatePricePage
       .isAtPricePageForJourney("PRISON1", "PRISON2")
       .updatePriceForJourney("PRISON1", "PRISON2", Money(2000))
 
-    // TODO - need to look at fixing JS loading issue as this makes asserting on this awkward (even though it has happened/worked).
+    journeyResultsPage
+      .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
+      .isPriceUpdatedMessagePresent("PRISON ONE", "PRISON TWO", Money(2000))
+      .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(2000))
   }
 }

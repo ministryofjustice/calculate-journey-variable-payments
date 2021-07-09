@@ -56,6 +56,9 @@ dependencies {
   testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
   testImplementation("org.testcontainers:postgresql:1.15.3")
 
+  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
+  testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
+
   runtimeOnly("org.flywaydb:flyway-core:7.10.0")
   runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.2.22")
