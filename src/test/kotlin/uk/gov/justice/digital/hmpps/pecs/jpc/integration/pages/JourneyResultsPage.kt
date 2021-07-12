@@ -23,14 +23,9 @@ class JourneyResultsPage : ApplicationPage() {
   }
 
   fun isPriceUpdatedMessagePresent(fromAgency: String, toAgency: String, price: Money): JourneyResultsPage {
-    assertTextIsPresent("Price updated")
-    assertTextIsPresent("Journey from $fromAgency to $toAgency priced at £$price")
+    assertBannerIsPresent("Price updated", "Journey from $fromAgency to $toAgency priced at £$price")
 
     return this
-  }
-
-  private fun assertTextIsPresent(text: String) {
-    find(By.xpath("//p[normalize-space(text())='$text']")).firstOrNull().let { assertThat(it).isNotNull }
   }
 
   fun isJourneyRowPresent(fromAgency: String, toAgency: String, price: Money): JourneyResultsPage {

@@ -16,12 +16,21 @@ class JourneysForReviewPage : ApplicationPage() {
     element?.click()
   }
 
-  fun isPriceAddedMessagePresent(fromAgency: String, toAgency: String, price: Money) {
-    assertTextIsPresent("Price added")
-    assertTextIsPresent("Journey from $fromAgency to $toAgency priced at £$price")
+  fun chooseLocationToMap(agencyId: String) {
+    val element = this.find(By.xpath("//a[@href='/map-location/$agencyId']")).firstOrNull()
+
+    assertThat(element).isNotNull
+
+    element?.click()
   }
 
-  private fun assertTextIsPresent(text: String) {
-    find(By.xpath("//p[normalize-space(text())='$text']")).firstOrNull().let { assertThat(it).isNotNull }
+  fun isPriceAddedMessagePresent(fromAgency: String, toAgency: String, price: Money) {
+    assertBannerIsPresent("Price added", "Journey from $fromAgency to $toAgency priced at £$price")
+  }
+
+  fun isLocationUpdatedMessagePresent(agencyId: String, locationName: String): JourneysForReviewPage {
+    assertBannerIsPresent("Location updated", "$agencyId successfully mapped to $locationName")
+
+    return this
   }
 }
