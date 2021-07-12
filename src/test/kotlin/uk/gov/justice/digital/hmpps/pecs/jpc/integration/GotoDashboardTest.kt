@@ -9,7 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.Year
 
-internal class GotoDashboardTest : IntegrationTest() {
+internal class GotoDashboardTest : IntegrationTest(true) {
 
   @Page
   private lateinit var dashboardPage: DashboardPage

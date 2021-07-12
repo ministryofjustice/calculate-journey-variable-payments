@@ -11,41 +11,49 @@
 ## Building
 
 To build (append `-x test` to build without running tests):
-```
-./gradlew clean build
-```
-
-## Running the integration tests
-
-Rebuild the docker image locally (perhaps after changes to the project), run:
 ```bash
-docker build -t quay.io/hmpps/calculate-journey-variable-payments:latest .
+$ ./gradlew clean build
 ```
 
-Start up the application and its dependencies:
+## Running the integration tests locally
+
+*Note: This will require chromedriver available on the path - check the version of selenium in build.gradle.kts*
+
+Start up the dependencies followed by the application and then running the integration tests:
+
+In a terminal window:
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
+$ docker-compose down --remove-orphans
+
+$ docker-compose up
 ```
 
 In a separate terminal window:
 ```bash
-./gradlew clean testIntegration
+$ SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
+```
+
+In another separate terminal window:
+```bash
+$ ./gradlew clean testIntegration
 ```
 
 ## Running the service and its dependent services locally
 
-You can run the latest version of the application using with Docker compose (note this runs the app in a container so you may need to rebuild it, see section on integration tests for an example) :
+You can run the latest version of the application using with Docker compose (note this runs the app in a container, you may need to rebuild it. See section on integration tests for an example) :
 
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
+$ docker-compose down --remove-orphans
+
+$ docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
 ```
 
 ## Running dependent services locally when developing:
 
-You can run the dependent services locally using with Docker compose (note this runs the app in a container so you may need to rebuild it, see section on integration tests for an example) :
+You can run the dependent services locally using with Docker compose (note this runs the app in a container, so you may need to rebuild it, see section on integration tests for an example) :
 
 ```bash
-docker-compose docker-compose.yml up
+$ docker-compose up
 ```
 
 *Note: to log into the application (via the redirect to the HMPPS auth service) your user will need the PECS_JPC role assigned. A hmpps-auth in-memory user has been set up with this role to help with this 'jpc_user'.*
@@ -134,25 +142,25 @@ The CRON job is configured in the helm config of this project via the **CRON_AUT
 
 ### Common gradle tasks 
 To list project dependencies, run:
-```
-./gradlew dependencies
+```bash
+$ ./gradlew dependencies
 ```
 
 To check for dependency updates, run:
-```
-./gradlew dependencyUpdates --warning-mode all
+```bash
+$ ./gradlew dependencyUpdates --warning-mode all
 ```
 
 To run an OWASP dependency check, run:
-```
-./gradlew clean dependencyCheckAnalyze --info
+```bash
+$ ./gradlew clean dependencyCheckAnalyze --info
 ```
 
 To upgrade the gradle wrapper version, run:
-```
-./gradlew wrapper --gradle-version=<VERSION>
+```bash
+$ ./gradlew wrapper --gradle-version=<VERSION>
 ```
 To automatically update project dependencies, run:
-```
-./gradlew useLatestVersions
+```bash
+$ ./gradlew useLatestVersions
 ```

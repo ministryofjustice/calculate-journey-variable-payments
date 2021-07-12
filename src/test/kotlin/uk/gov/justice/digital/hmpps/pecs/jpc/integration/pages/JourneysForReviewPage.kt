@@ -16,7 +16,7 @@ class JourneysForReviewPage : ApplicationPage() {
     element?.click()
   }
 
-  fun priceAddedConfirmationMessageIsDisplayedFor(fromAgency: String, toAgency: String, price: Money) {
+  fun isPriceAddedMessagePresent(fromAgency: String, toAgency: String, price: Money) {
     assertTextIsPresent("Price added")
     assertTextIsPresent("Journey from $fromAgency to $toAgency priced at £$price")
   }
