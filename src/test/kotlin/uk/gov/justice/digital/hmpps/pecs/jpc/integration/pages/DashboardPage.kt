@@ -20,6 +20,12 @@ class DashboardPage : ApplicationPage() {
   @FindBy(linkText = "Journeys for review")
   private lateinit var journeysForReviewLink: FluentWebElement
 
+  @FindBy(linkText = "Manage Locations")
+  private lateinit var manageLocationsLink: FluentWebElement
+
+  @FindBy(linkText = "Find by move reference ID")
+  private lateinit var findMoveByReferenceIdLink: FluentWebElement
+
   @FindBy(id = "month-year-heading")
   private lateinit var monthYear: FluentWebElement
 
@@ -41,5 +47,13 @@ class DashboardPage : ApplicationPage() {
 
   fun navigateToManageJourneyPrice() {
     manageJourneyPriceCatalogueLink.click()
+  }
+
+  fun navigateToManageLocations() {
+    manageLocationsLink.click()
+  }
+
+  fun navigateToFindMoveByReferenceId() {
+    findMoveByReferenceIdLink.click()
   }
 }
