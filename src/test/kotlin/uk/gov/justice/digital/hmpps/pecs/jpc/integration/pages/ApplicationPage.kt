@@ -23,12 +23,6 @@ abstract class ApplicationPage : FluentPage() {
 
   private fun customDriver() = super.getDriver() as CustomHtmlUnitDriver
 
-  inline fun <reified T : ApplicationPage> isAtPage(): T {
-    this.isAt()
-
-    return this as T
-  }
-
   fun assertBannerIsPresent(title: String, body: String) {
     assertTextIsPresent(title)
     assertTextIsPresent(body)

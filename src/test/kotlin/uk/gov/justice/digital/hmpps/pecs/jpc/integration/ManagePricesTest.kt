@@ -1,19 +1,18 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
-import org.fluentlenium.core.annotation.Page
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.AddPricePage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ChooseSupplierPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.DashboardPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneyResultsPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.LoginPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ManageJourneyPricePage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SelectMonthYearPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AddPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneyResults
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneysForReview
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
@@ -23,101 +22,57 @@ import java.time.Year
 @TestMethodOrder(OrderAnnotation::class)
 internal class ManagePricesTest : IntegrationTest() {
 
-  @Page
-  private lateinit var dashboardPage: DashboardPage
-
-  @Page
-  private lateinit var chooseSupplierPage: ChooseSupplierPage
-
-  @Page
-  private lateinit var selectMonthYearPage: SelectMonthYearPage
-
-  @Page
-  private lateinit var journeysForReviewPage: JourneysForReviewPage
-
-  @Page
-  private lateinit var addPricePage: AddPricePage
-
-  @Page
-  private lateinit var manageJourneyPricePage: ManageJourneyPricePage
-
-  @Page
-  private lateinit var journeyResultsPage: JourneyResultsPage
-
-  @Page
-  private lateinit var updatePricePage: UpdatePricePage
-
   @Test
   @Order(1)
   fun `missing price is added for GEOAmey journey from Prison One to Prison Two`() {
-    goTo(dashboardPage)
+    goToPage(Dashboard)
 
-    loginPage
-      .isAtPage<LoginPage>()
-      .login()
+    isAtPage(Login).login()
 
-    chooseSupplierPage
-      .isAtPage<ChooseSupplierPage>()
-      .choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
-    dashboardPage
-      .isAtPage<DashboardPage>()
+    isAtPage(Dashboard)
       .isAtMonthYear(LocalDate.now().month, Year.now())
       .navigateToSelectMonthPage()
 
-    selectMonthYearPage
-      .isAtPage<SelectMonthYearPage>()
-      .navigateToDashboardFor("dec 2020")
+    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
 
-    dashboardPage
-      .isAtPage<DashboardPage>()
+    isAtPage(Dashboard)
       .isAtMonthYear(Month.DECEMBER, Year.of(2020))
       .navigateToJourneysForReview()
 
-    journeysForReviewPage
-      .isAtPage<JourneysForReviewPage>()
-      .addPriceForJourney("PRISON1", "PRISON2")
+    isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
 
-    addPricePage
+    isAtPage(AddPrice)
       .isAtPricePageForJourney("PRISON1", "PRISON2")
       .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
 
-    journeysForReviewPage
-      .isAtPage<JourneysForReviewPage>()
-      .isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
+    isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
   }
 
   @Test
   @Order(2)
   fun `price is updated for GEOAmey journey from Prison One to Prison Two`() {
-    goTo(dashboardPage)
+    goToPage(Dashboard)
 
-    loginPage
-      .isAtPage<LoginPage>()
-      .login()
+    isAtPage(Login).login()
 
-    chooseSupplierPage
-      .isAtPage<ChooseSupplierPage>()
-      .choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
-    dashboardPage
-      .isAtPage<DashboardPage>()
-      .navigateToManageJourneyPrice()
+    isAtPage(Dashboard).navigateToManageJourneyPrice()
 
-    manageJourneyPricePage
-      .isAtPage<ManageJourneyPricePage>()
-      .findJourneyForPricing("PRISON ONE", "PRISON TWO")
+    isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE", "PRISON TWO")
 
-    journeyResultsPage
+    isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
       .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(1000))
       .navigateToUpdatePriceFor("PRISON1", "PRISON2")
 
-    updatePricePage
+    isAtPage(UpdatePrice)
       .isAtPricePageForJourney("PRISON1", "PRISON2")
       .updatePriceForJourney("PRISON1", "PRISON2", Money(2000))
 
-    journeyResultsPage
+    isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
       .isPriceUpdatedMessagePresent("PRISON ONE", "PRISON TWO", Money(2000))
       .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(2000))

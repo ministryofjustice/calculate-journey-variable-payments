@@ -1,19 +1,18 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
-import org.fluentlenium.core.annotation.Page
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ManageLocationPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.MapLocationPage
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.CHOOSE_SUPPLIER
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.DASHBOARD
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JOURNEYS_FOR_REVIEW
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.LOGIN
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SEARCH_LOCATIONS
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SELECT_MONTH_YEAR
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneysForReview
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MapLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SearchLocations
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
@@ -23,38 +22,32 @@ import java.time.Year
 @TestMethodOrder(OrderAnnotation::class)
 internal class ManageLocationsTest : IntegrationTest() {
 
-  @Page
-  private lateinit var mapLocationPage: MapLocationPage
-
-  @Page
-  private lateinit var manageLocationPage: ManageLocationPage
-
   @Test
   @Order(1)
   fun `map missing location name and location type to agency id WYI`() {
-    goToPage(DASHBOARD)
+    goToPage(Dashboard)
 
-    isAtPage(LOGIN).login()
+    isAtPage(Login).login()
 
-    isAtPage(CHOOSE_SUPPLIER).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
-    isAtPage(DASHBOARD)
+    isAtPage(Dashboard)
       .isAtMonthYear(LocalDate.now().month, Year.now())
       .navigateToSelectMonthPage()
 
-    isAtPage(SELECT_MONTH_YEAR).navigateToDashboardFor("dec 2020")
+    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
 
-    isAtPage(DASHBOARD)
+    isAtPage(Dashboard)
       .isAtMonthYear(Month.DECEMBER, Year.of(2020))
       .navigateToJourneysForReview()
 
-    isAtPage(JOURNEYS_FOR_REVIEW).chooseLocationToMap("WYI")
+    isAtPage(JourneysForReview).chooseLocationToMap("WYI")
 
-    mapLocationPage
+    isAtPage(MapLocation)
       .isAtMapLocationPageForAgency("WYI")
       .mapLocation("a prison", LocationType.PR)
 
-    isAtPage(JOURNEYS_FOR_REVIEW)
+    isAtPage(JourneysForReview)
       .isLocationUpdatedMessagePresent("WYI", "A PRISON")
       .isRowPresent<JourneysForReviewPage>("A PRISON", LocationType.PR.name)
   }
@@ -62,20 +55,20 @@ internal class ManageLocationsTest : IntegrationTest() {
   @Test
   @Order(2)
   fun `update location name and type for agency id WYI`() {
-    goToPage(DASHBOARD)
+    goToPage(Dashboard)
 
-    isAtPage(LOGIN).login()
+    isAtPage(Login).login()
 
-    isAtPage(CHOOSE_SUPPLIER).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
-    isAtPage(DASHBOARD).navigateToManageLocations()
+    isAtPage(Dashboard).navigateToManageLocations()
 
-    isAtPage(SEARCH_LOCATIONS).searchForLocation("A PRISON")
+    isAtPage(SearchLocations).searchForLocation("A PRISON")
 
-    manageLocationPage
+    isAtPage(ManageLocation)
       .isAtManageLocationPageForAgency("WYI")
       .updateLocation("A POLICE STATION", LocationType.PS)
 
-    isAtPage(SEARCH_LOCATIONS).isLocationUpdatedMessagePresent("WYI", "A POLICE STATION")
+    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("WYI", "A POLICE STATION")
   }
 }
