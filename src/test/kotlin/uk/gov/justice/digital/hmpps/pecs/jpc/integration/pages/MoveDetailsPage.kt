@@ -1,12 +1,27 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
+import org.assertj.core.api.Assertions.assertThat
 import org.fluentlenium.core.annotation.PageUrl
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import java.time.format.DateTimeFormatter
 
 @PageUrl("http://localhost:8080/moves/{moveId}")
 class MoveDetailsPage : ApplicationPage() {
 
-  /**
-   * Moves are actually retrieved by their reference number but the URL contains the move ID.
-   */
-  fun isAtPageForMoveID(moveRefId: String) = this.isAt(moveRefId).let { this }
+  fun isAtPageFor(move: Move) {
+    this.isAt(move.moveId).let {
+      val source = this.pageSource()
+
+      assertThat(source).contains(move.person?.prisonNumber)
+      assertThat(source).contains(move.person?.firstNames)
+      assertThat(source).contains(move.person?.lastName)
+      assertThat(source).contains(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
+      assertThat(source).contains(move.person?.gender)
+      assertThat(source).contains(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
+      assertThat(source).contains(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
+      assertThat(source).contains(move.fromSiteName)
+      assertThat(source).contains(move.toSiteName)
+      assertThat(source).contains(move.moveType?.name)
+    }
+  }
 }
