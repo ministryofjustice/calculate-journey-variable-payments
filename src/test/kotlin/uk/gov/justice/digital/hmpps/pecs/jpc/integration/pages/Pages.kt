@@ -1,20 +1,36 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
-sealed class Pages<T : ApplicationPage>(val page: Class<T>) {
+import kotlin.reflect.KClass
 
-  object CHOOSE_SUPPLIER : Pages<ChooseSupplierPage>(ChooseSupplierPage::class.java)
+sealed class Pages<T : ApplicationPage>(clazz: KClass<T>) {
 
-  object DASHBOARD : Pages<DashboardPage>(DashboardPage::class.java)
+  val page: Class<T> = clazz.java
 
-  object FIND_MOVE : Pages<FindMovePage>(FindMovePage::class.java)
+  object AddPrice : Pages<AddPricePage>(AddPricePage::class)
 
-  object JOURNEYS_FOR_REVIEW : Pages<JourneysForReviewPage>(JourneysForReviewPage::class.java)
+  object ChooseSupplier : Pages<ChooseSupplierPage>(ChooseSupplierPage::class)
 
-  object LOGIN : Pages<LoginPage>(LoginPage::class.java)
+  object Dashboard : Pages<DashboardPage>(DashboardPage::class)
 
-  object MOVE_DETAILS_PAGE : Pages<MoveDetailsPage>(MoveDetailsPage::class.java)
+  object FindMove : Pages<FindMovePage>(FindMovePage::class)
 
-  object SEARCH_LOCATIONS : Pages<SearchLocationsPage>(SearchLocationsPage::class.java)
+  object JourneysForReview : Pages<JourneysForReviewPage>(JourneysForReviewPage::class)
 
-  object SELECT_MONTH_YEAR : Pages<SelectMonthYearPage>(SelectMonthYearPage::class.java)
+  object JourneyResults : Pages<JourneyResultsPage>(JourneyResultsPage::class)
+
+  object Login : Pages<LoginPage>(LoginPage::class)
+
+  object ManageJourneyPrice : Pages<ManageJourneyPricePage>(ManageJourneyPricePage::class)
+
+  object ManageLocation : Pages<ManageLocationPage>(ManageLocationPage::class)
+
+  object MapLocation : Pages<MapLocationPage>(MapLocationPage::class)
+
+  object MoveDetails : Pages<MoveDetailsPage>(MoveDetailsPage::class)
+
+  object SearchLocations : Pages<SearchLocationsPage>(SearchLocationsPage::class)
+
+  object SelectMonthYear : Pages<SelectMonthYearPage>(SelectMonthYearPage::class)
+
+  object UpdatePrice : Pages<UpdatePricePage>(UpdatePricePage::class)
 }
