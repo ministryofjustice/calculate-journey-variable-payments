@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.FindMove
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.moveM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class ViewMoveDetailsTest : IntegrationTest() {
@@ -20,10 +21,8 @@ internal class ViewMoveDetailsTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToFindMoveByReferenceId()
 
-    isAtPage(FindMove).findMoveByReferenceId("STANDARDMOVE2")
+    isAtPage(FindMove).findBy(moveM4())
 
-    isAtPage(MoveDetails).isAtPageForMoveID("M4")
-
-    // TODO assert on details in the page
+    isAtPage(MoveDetails).isAtPageFor(moveM4())
   }
 }
