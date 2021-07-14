@@ -4,7 +4,9 @@ import com.gargoylesoftware.htmlunit.WebResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.fluentlenium.core.annotation.PageUrl
 import org.fluentlenium.core.domain.FluentWebElement
+import org.openqa.selenium.By
 import org.openqa.selenium.support.FindBy
+import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import java.time.Month
 import java.time.Year
 
@@ -55,5 +57,9 @@ class DashboardPage : ApplicationPage() {
 
   fun navigateToFindMoveByReferenceId() {
     findMoveByReferenceIdLink.click()
+  }
+
+  fun navigateToMovesBy(moveType: MoveType) {
+    find(By.linkText(moveType.label)).click()
   }
 }
