@@ -26,6 +26,8 @@ sealed class Pages<T : ApplicationPage>(clazz: KClass<T>) {
 
   object MapLocation : Pages<MapLocationPage>(MapLocationPage::class)
 
+  object MovesByType : Pages<MovesByTypePage>(MovesByTypePage::class)
+
   object MoveDetails : Pages<MoveDetailsPage>(MoveDetailsPage::class)
 
   object SearchLocations : Pages<SearchLocationsPage>(SearchLocationsPage::class)

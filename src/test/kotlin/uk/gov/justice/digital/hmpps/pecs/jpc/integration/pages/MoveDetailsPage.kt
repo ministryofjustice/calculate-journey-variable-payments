@@ -9,19 +9,19 @@ import java.time.format.DateTimeFormatter
 class MoveDetailsPage : ApplicationPage() {
 
   fun isAtPageFor(move: Move) {
-    this.isAt(move.moveId).let {
-      val source = this.pageSource()
+    this.isAt(move.moveId)
 
-      assertThat(source).contains(move.person?.prisonNumber)
-      assertThat(source).contains(move.person?.firstNames)
-      assertThat(source).contains(move.person?.lastName)
-      assertThat(source).contains(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
-      assertThat(source).contains(move.person?.gender)
-      assertThat(source).contains(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
-      assertThat(source).contains(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
-      assertThat(source).contains(move.fromSiteName)
-      assertThat(source).contains(move.toSiteName)
-      assertThat(source).contains(move.moveType?.name)
-    }
+    val source = this.pageSource()
+
+    assertThat(source).contains(move.person?.prisonNumber)
+    assertThat(source).contains(move.person?.firstNames)
+    assertThat(source).contains(move.person?.lastName)
+    assertThat(source).contains(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
+    assertThat(source).contains(move.person?.gender)
+    assertThat(source).contains(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")) ?: "Not known")
+    assertThat(source).contains(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
+    assertThat(source).contains(move.fromSiteName)
+    assertThat(source).contains(move.toSiteName)
+    assertThat(source).contains(move.moveType?.name)
   }
 }
