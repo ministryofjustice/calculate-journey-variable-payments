@@ -1,18 +1,19 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.cancelledMoveM60
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.lockoutMoveM40
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.longHaulMoveM30
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.multiMoveM50
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.redirectMoveM20
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.standardMoveM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MovesByType
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.cancelledMoveM60
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.lockoutMoveM40
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.longHaulMoveM30
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.multiMoveM50
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.redirectMoveM20
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.standardMoveM4
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.PresentDayMoveData.standardMoveSM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
@@ -22,7 +23,25 @@ import java.time.Year
 internal class ViewAllMoveTypesTest : IntegrationTest() {
 
   @Test
-  fun `go to a previous month and view all available move types`() {
+  fun `view one of each move type for Serco today`() {
+    goToPage(Dashboard)
+
+    isAtPage(Login).login()
+
+    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+
+    isAtPage(Dashboard)
+      .isAtMonthYear(LocalDate.now().month, Year.now())
+      .navigateToSelectMonthPage()
+
+    listOf(
+      // TODO WIP - at the moment this is only checking a standard move.
+      standardMoveSM1(),
+    ).forEach { move -> verifyDetailsOf(move, LocalDate.now().month, Year.now()) }
+  }
+
+  @Test
+  fun `view one of each move type for GEOAmey in a previous month (Dec 2020)`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -42,14 +61,14 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
       lockoutMoveM40(),
       multiMoveM50(),
       cancelledMoveM60()
-    ).forEach { move -> verifyDetailsOf(move) }
+    ).forEach { move -> verifyDetailsOf(move, Month.DECEMBER, Year.of(2020)) }
   }
 
-  private fun verifyDetailsOf(move: Move) {
+  private fun verifyDetailsOf(move: Move, month: Month, year: Year) {
     goToPage(Dashboard)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(Month.DECEMBER, Year.of(2020))
+      .isAtMonthYear(month, year)
       .navigateToMovesBy(move.moveType!!)
 
     isAtPage(MovesByType)
