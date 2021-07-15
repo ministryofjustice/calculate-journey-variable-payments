@@ -35,6 +35,7 @@ dependencies {
     }
   }
 
+  implementation("org.flywaydb:flyway-core:7.10.0")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -59,7 +60,6 @@ dependencies {
   testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
 
-  runtimeOnly("org.flywaydb:flyway-core:7.10.0")
   runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.2.22")
 }
