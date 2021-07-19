@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -66,7 +65,3 @@ enum class Supplier {
       kotlin.runCatching { valueOf(value!!.uppercase()) }.getOrDefault(UNKNOWN)
   }
 }
-
-fun effectiveYearForDate(date: LocalDate) = if (date.monthValue >= 9) date.year else date.year - 1
-
-fun nextEffectiveYearForDate(date: LocalDate) = effectiveYearForDate(date) + 1
