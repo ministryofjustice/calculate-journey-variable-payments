@@ -31,28 +31,28 @@ internal class BulkPriceImportCommandTest {
   internal fun `import prices for Serco for 2019 succeeds`() {
     command.bulkImportPricesFor(Supplier.SERCO, 2019)
 
-    verify(importService).importPrices(Supplier.SERCO)
+    verify(importService).importPrices(Supplier.SERCO, 2019)
   }
 
   @Test
   internal fun `import prices for Geoamey for 2019 succeeds`() {
     command.bulkImportPricesFor(Supplier.GEOAMEY, 2019)
 
-    verify(importService).importPrices(Supplier.GEOAMEY)
+    verify(importService).importPrices(Supplier.GEOAMEY, 2019)
   }
 
   @Test
   internal fun `import prices for Serco for the current effective year (2020) succeeds`() {
     command.bulkImportPricesFor(Supplier.SERCO, 2020)
 
-    verify(importService).importPrices(Supplier.SERCO)
+    verify(importService).importPrices(Supplier.SERCO, 2020)
   }
 
   @Test
   internal fun `import prices for Geoamey for the current effective year (2020) succeeds`() {
     command.bulkImportPricesFor(Supplier.GEOAMEY, 2020)
 
-    verify(importService).importPrices(Supplier.GEOAMEY)
+    verify(importService).importPrices(Supplier.GEOAMEY, 2020)
   }
 
   @Test

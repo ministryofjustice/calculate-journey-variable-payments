@@ -23,8 +23,7 @@ class BulkPriceImportCommand(
 
     when (supplier) {
       Supplier.UNKNOWN -> throw RuntimeException("UNKNOWN is not a valid supplier")
-      // TODO update service layer to take in the effective year.
-      else -> importService.importPrices(supplier)
+      else -> importService.importPrices(supplier, year)
     }
 
     logger.info("Finished import of prices for $supplier for effective year $year.")
