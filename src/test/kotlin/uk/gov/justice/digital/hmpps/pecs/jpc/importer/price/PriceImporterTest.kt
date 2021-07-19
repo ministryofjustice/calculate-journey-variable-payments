@@ -20,7 +20,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
-internal class PriceImportTest {
+internal class PriceImporterTest {
 
   private val priceRepo: PriceRepository = mock()
 
