@@ -4,9 +4,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.time.LocalDate
 
@@ -16,25 +14,6 @@ internal class ImportCommandsTest {
   private val date: LocalDate = LocalDate.of(2020, 9, 30)
 
   private val commands: ImportCommands = ImportCommands(importService)
-
-  @Test
-  internal fun `import prices for Serco`() {
-    commands.importPrices(Supplier.SERCO)
-
-    verify(importService).importPrices(Supplier.SERCO)
-  }
-
-  @Test
-  internal fun `import prices for Geoamey`() {
-    commands.importPrices(Supplier.GEOAMEY)
-
-    verify(importService).importPrices(Supplier.GEOAMEY)
-  }
-
-  @Test
-  internal fun `import prices for Unknown fails`() {
-    assertThatThrownBy { commands.importPrices(Supplier.UNKNOWN) }.isInstanceOf(RuntimeException::class.java)
-  }
 
   @Test
   internal fun `import one days reporting data`() {

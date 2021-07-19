@@ -20,7 +20,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
-internal class PriceImportTest {
+internal class PriceImporterTest {
 
   private val priceRepo: PriceRepository = mock()
 
@@ -43,7 +43,6 @@ internal class PriceImportTest {
 
     verify(locationRepo).findAll()
     verify(sercoPricesProvider).get()
-    verify(priceRepo).deleteBySupplierAndEffectiveYear(Supplier.SERCO, 2019)
     verify(priceRepo, times(2)).count()
     verify(priceRepo).save(any())
   }
@@ -59,7 +58,6 @@ internal class PriceImportTest {
 
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
-    verify(priceRepo).deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2019)
     verify(priceRepo, times(2)).count()
     verify(priceRepo).save(any())
   }

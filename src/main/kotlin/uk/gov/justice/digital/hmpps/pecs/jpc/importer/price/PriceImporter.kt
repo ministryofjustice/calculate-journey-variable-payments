@@ -25,11 +25,9 @@ class PriceImporter(
 
     when (supplier) {
       Supplier.SERCO -> {
-        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.SERCO, effectiveYear)
         sercoPrices.get().use { import(it, Supplier.SERCO, effectiveYear) }
       }
       Supplier.GEOAMEY -> {
-        priceRepo.deleteBySupplierAndEffectiveYear(Supplier.GEOAMEY, effectiveYear)
         geoameyPrices.get().use { import(it, Supplier.GEOAMEY, effectiveYear) }
       }
       else -> throw RuntimeException("Supplier '$supplier' not supported.")
