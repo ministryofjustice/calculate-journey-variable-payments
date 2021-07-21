@@ -36,6 +36,7 @@ dependencies {
   }
 
   implementation("org.flywaydb:flyway-core:7.10.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -46,11 +47,12 @@ dependencies {
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
 
-  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1")
   testImplementation("org.mockito:mockito-inline:3.11.2")
+  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
