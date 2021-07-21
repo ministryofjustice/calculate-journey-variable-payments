@@ -55,8 +55,6 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
-  testImplementation("org.testcontainers:postgresql:1.15.3")
-
   testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
 
