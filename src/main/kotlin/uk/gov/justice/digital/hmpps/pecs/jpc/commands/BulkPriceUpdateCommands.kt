@@ -5,9 +5,14 @@ import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BulkPricesService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.PriceUpliftService
+import java.lang.RuntimeException
 
 @ShellComponent
-class BulkPriceUpdateCommands(private val bulkPricesService: BulkPricesService) {
+class BulkPriceUpdateCommands(
+  private val bulkPricesService: BulkPricesService,
+  private val priceUpliftService: PriceUpliftService
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -18,5 +23,13 @@ class BulkPriceUpdateCommands(private val bulkPricesService: BulkPricesService) 
     bulkPricesService.addNextYearsPrices(supplier, multiplier)
 
     logger.info("Finished bulk price update for $supplier with multiplier $multiplier")
+  }
+
+  @ShellMethod("Performs a price uplift for the given supplier, effective year and the supplied multiplier.")
+  fun uplift(supplier: Supplier, effectiveYear: Int, multiplier: Double, force: Boolean = false) {
+    if (force)
+      priceUpliftService.uplift(supplier, effectiveYear, multiplier)
+    else
+      throw RuntimeException("Force is required for this operation to complete.")
   }
 }

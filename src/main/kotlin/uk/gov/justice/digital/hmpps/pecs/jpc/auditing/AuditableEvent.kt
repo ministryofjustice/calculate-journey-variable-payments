@@ -78,11 +78,12 @@ data class AuditableEvent(
 
     fun journeyPriceBulkUpdateEvent(
       supplier: Supplier,
+      effectiveYear: Int,
       multiplier: Double
     ) = createEvent(
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
       null,
-      mapOf("supplier" to supplier, "multiplier" to multiplier),
+      mapOf("supplier" to supplier, "effective_year" to effectiveYear, "multiplier" to multiplier),
       true
     )
 

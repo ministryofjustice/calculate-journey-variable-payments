@@ -5,4 +5,6 @@ import java.util.UUID
 
 interface SupplierPriceUpliftRepository : JpaRepository<SupplierPriceUplift, UUID> {
   fun findBySupplier(supplier: Supplier): SupplierPriceUplift?
+
+  fun deleteBySupplier(supplier: Supplier)
 }
