@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
@@ -10,7 +9,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.Year
 
-@Disabled("Trialing disable of test due to hanging in CI pipeline on this test.  This does not happen locally.")
 internal class GotoDashboardTest : IntegrationTest(true) {
 
   @Test
