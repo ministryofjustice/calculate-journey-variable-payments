@@ -1,10 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 
 /**
- * Domain level service to perform the actual uplift for a supplier.
+ * Domain level service to perform the actual price adjustments for a supplier.
+ *
+ * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
  */
 @Component
 class PriceUplifter(
@@ -13,8 +16,10 @@ class PriceUplifter(
   private val timeSource: TimeSource
 ) {
 
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   /**
-   * Any exception thrown calling this function will passed onto the onFailure function.
+   * Any exception thrown calling this function will passed onto the onFailure lambda function.
    */
   internal fun uplift(
     supplier: Supplier,
@@ -24,18 +29,18 @@ class PriceUplifter(
     onSuccess: (upliftedPriceCount: Int) -> Unit
   ) {
     Result.runCatching {
-      inProgress(supplier, effectiveYear, multiplier)
-      applyPriceChanges(supplier, effectiveYear, multiplier)
+      upliftInProgress(supplier, effectiveYear, multiplier)
+      upliftPrices(supplier, effectiveYear, multiplier)
     }.onFailure {
-      done(supplier)
+      upliftDone(supplier)
       onFailure(it)
     }.onSuccess {
-      done(supplier)
+      upliftDone(supplier)
       onSuccess(it)
     }
   }
 
-  private fun inProgress(supplier: Supplier, effectiveYear: Int, multiplier: Double) {
+  private fun upliftInProgress(supplier: Supplier, effectiveYear: Int, multiplier: Double) {
     priceUpliftRepository.saveAndFlush(
       SupplierPriceUplift(
         supplier = supplier,
@@ -46,12 +51,30 @@ class PriceUplifter(
     )
   }
 
-  private fun applyPriceChanges(supplier: Supplier, effectiveYear: Int, multiplier: Double): Int {
-    // TODO to be implemented
-    return -1
+  private fun upliftPrices(supplier: Supplier, effectiveYear: Int, multiplier: Double) =
+    priceRepository
+      .previousYearPrices(supplier, effectiveYear)
+      .map {
+        priceRepository.save(upliftedPriceAdjustment(it, effectiveYear, multiplier))
+      }.count().toInt()
+
+  private fun PriceRepository.previousYearPrices(supplier: Supplier, effectiveYear: Int) =
+    this.findBySupplierAndEffectiveYear(supplier, effectiveYear - 1)
+
+  private fun upliftedPriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: Double): Price {
+    return priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      previousYearPrice.supplier,
+      previousYearPrice.fromLocation,
+      previousYearPrice.toLocation,
+      effectiveYear
+    )?.apply { this.priceInPence = previousYearPrice.price().times(multiplier).pence } ?: previousYearPrice.copy(
+      priceInPence = previousYearPrice.price().times(multiplier).pence,
+      effectiveYear = effectiveYear,
+      addedAt = timeSource.dateTime()
+    )
   }
 
-  private fun done(supplier: Supplier) {
+  private fun upliftDone(supplier: Supplier) {
     with(priceUpliftRepository) {
       deleteBySupplier(supplier)
       flush()
