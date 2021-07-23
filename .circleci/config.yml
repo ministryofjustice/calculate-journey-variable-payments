@@ -46,6 +46,7 @@ jobs:
           POSTGRES_USER: jpc
           POSTGRES_PASSWORD: letmein
         command: -p 5433
+    resource_class: "xlarge"
     steps:
       - checkout
       - attach_workspace:
