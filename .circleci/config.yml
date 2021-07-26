@@ -51,7 +51,8 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/app
-      - browser-tools/install-browser-tools
+      - browser-tools/install-browser-tools:
+          chrome-version: 91.0.4472.164
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
@@ -100,9 +101,9 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
-#      - integration_tests:
-#          requires:
-#            - validate
+      - integration_tests:
+          requires:
+            - validate
       - hmpps/build_docker:
           name: build_docker
           filters:
