@@ -87,10 +87,11 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
-      priceRepository.findBySupplierAndFromLocationAndToLocation(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
         Supplier.SERCO,
         fromLocation,
-        toLocation
+        toLocation,
+        effectiveYear
       )
     ).thenReturn(price)
 
@@ -99,7 +100,7 @@ internal class SupplierPricingServiceTest {
     assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
-    verify(priceRepository).findBySupplierAndFromLocationAndToLocation(Supplier.SERCO, fromLocation, toLocation)
+    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)
   }
 
   @Test
