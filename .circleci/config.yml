@@ -100,9 +100,9 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
-      - integration_tests:
-          requires:
-            - validate
+#      - integration_tests:
+#          requires:
+#            - validate
       - hmpps/build_docker:
           name: build_docker
           filters:
