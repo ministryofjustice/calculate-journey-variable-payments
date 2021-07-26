@@ -11,8 +11,6 @@ FROM openjdk:11-slim
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 RUN apt-get update && \
-    apt-get install -y libnspr4 && \
-    apt-get install -y libnss3 && \
     apt-get install -y libfreetype6 && \
     apt-get install -y libfontconfig1 && \
     apt-get install -y curl && \
