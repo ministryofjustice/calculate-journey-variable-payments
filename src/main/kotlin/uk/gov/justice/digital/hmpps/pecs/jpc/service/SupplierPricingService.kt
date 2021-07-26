@@ -50,7 +50,7 @@ class SupplierPricingService(
     effectiveYear: Int
   ): Triple<String, String, Money> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val price = priceRepository.findBySupplierAndFromLocationAndToLocation(supplier, fromLocation, toLocation)
+    val price = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(supplier, fromLocation, toLocation, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
 
     return Triple(fromLocation.siteName, toLocation.siteName, Money(price.priceInPence))
