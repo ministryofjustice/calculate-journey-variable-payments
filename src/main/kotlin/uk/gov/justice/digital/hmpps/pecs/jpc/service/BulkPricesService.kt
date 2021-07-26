@@ -47,6 +47,6 @@ class BulkPricesService(
 
     logger.info("$total $supplier prices added for effective year ${nextEffectiveYearForDate(now)}")
 
-    auditService.create(AuditableEvent.journeyPriceBulkUpdateEvent(supplier, multiplier))
+    auditService.create(AuditableEvent.journeyPriceBulkUpdateEvent(supplier, nextEffectiveYearForDate(now), multiplier))
   }
 }

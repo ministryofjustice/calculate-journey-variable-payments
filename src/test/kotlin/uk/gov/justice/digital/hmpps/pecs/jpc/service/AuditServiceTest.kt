@@ -89,7 +89,11 @@ internal class AuditServiceTest {
       )
     )
 
-    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET, authentication.name, mapOf("month" to "2021-02", "supplier" to "SERCO"))
+    verifyEvent(
+      AuditEventType.DOWNLOAD_SPREADSHEET,
+      authentication.name,
+      mapOf("month" to "2021-02", "supplier" to "SERCO")
+    )
   }
 
   @Test
@@ -102,7 +106,11 @@ internal class AuditServiceTest {
       )
     )
 
-    verifyEvent(AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE, authentication.name, mapOf("month" to "2021-06", "supplier" to "GEOAMEY"))
+    verifyEvent(
+      AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE,
+      authentication.name,
+      mapOf("month" to "2021-06", "supplier" to "GEOAMEY")
+    )
   }
 
   @Test
@@ -256,19 +264,19 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price bulk update audit event`() {
-    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.SERCO, 1.5))
-    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.GEOAMEY, 2.0))
+    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.SERCO, 2020, 1.5))
+    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.GEOAMEY, 2021, 2.0))
 
     verifyEvent(
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
       "_TERMINAL_",
-      mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
+      mapOf("supplier" to Supplier.SERCO, "effective_year" to 2020, "multiplier" to 1.5)
     )
 
     verifyEvent(
       AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
       "_TERMINAL_",
-      mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
+      mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
     )
   }
 

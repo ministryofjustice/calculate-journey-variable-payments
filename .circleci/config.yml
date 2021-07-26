@@ -46,6 +46,7 @@ jobs:
           POSTGRES_USER: jpc
           POSTGRES_PASSWORD: letmein
         command: -p 5433
+    resource_class: "xlarge"
     steps:
       - checkout
       - attach_workspace:
@@ -99,9 +100,9 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
-      - integration_tests:
-          requires:
-            - validate
+#      - integration_tests:
+#          requires:
+#            - validate
       - hmpps/build_docker:
           name: build_docker
           filters:

@@ -45,7 +45,7 @@ internal class BulkPricesServiceTest {
       AuditableEvent(
         AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
         "_TERMINAL_",
-        mapOf("supplier" to Supplier.SERCO, "multiplier" to 1.5)
+        mapOf("supplier" to Supplier.SERCO, "effective_year" to 2021, "multiplier" to 1.5)
       )
     )
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.firstValue, Supplier.SERCO, Money(1500), 2021)
@@ -69,7 +69,7 @@ internal class BulkPricesServiceTest {
       AuditableEvent(
         AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
         "_TERMINAL_",
-        mapOf("supplier" to Supplier.GEOAMEY, "multiplier" to 2.0)
+        mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2022, "multiplier" to 2.0)
       )
     )
     assertOnSupplierPriceAndEffectiveYear(priceCaptor.firstValue, Supplier.GEOAMEY, Money(3000), 2022)
