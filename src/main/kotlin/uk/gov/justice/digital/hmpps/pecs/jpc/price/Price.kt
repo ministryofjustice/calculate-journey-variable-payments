@@ -53,6 +53,16 @@ data class Price(
   fun journey() = "${fromLocation.nomisAgencyId}-${toLocation.nomisAgencyId}"
 
   fun price() = Money(priceInPence)
+
+  /**
+   * Returns a new instance of the price with the provided adjustments.  The locations remain the same.
+   */
+  fun adjusted(amount: Money, effectiveYear: Int, addedAt: LocalDateTime) = this.copy(
+    id = UUID.randomUUID(),
+    priceInPence = amount.pence,
+    effectiveYear = effectiveYear,
+    addedAt = addedAt
+  )
 }
 
 enum class Supplier {
