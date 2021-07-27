@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 
@@ -15,8 +14,6 @@ class PriceUplifter(
   private val priceUpliftRepository: SupplierPriceUpliftRepository,
   private val timeSource: TimeSource
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
    * Any exception thrown calling this function will passed onto the onFailure lambda function.
@@ -67,8 +64,8 @@ class PriceUplifter(
       previousYearPrice.fromLocation,
       previousYearPrice.toLocation,
       effectiveYear
-    )?.apply { this.priceInPence = previousYearPrice.price().times(multiplier).pence } ?: previousYearPrice.copy(
-      priceInPence = previousYearPrice.price().times(multiplier).pence,
+    )?.apply { this.priceInPence = previousYearPrice.price().times(multiplier).pence } ?: previousYearPrice.adjusted(
+      amount = previousYearPrice.price().times(multiplier),
       effectiveYear = effectiveYear,
       addedAt = timeSource.dateTime()
     )
