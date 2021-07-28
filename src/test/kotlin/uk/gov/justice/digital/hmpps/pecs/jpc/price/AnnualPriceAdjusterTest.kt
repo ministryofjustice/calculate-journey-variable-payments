@@ -13,13 +13,13 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import java.time.LocalDateTime
 import java.util.stream.Stream
 
-internal class PriceUplifterTest {
+internal class AnnualPriceAdjusterTest {
 
-  private val supplierPriceUpliftRepository: SupplierPriceUpliftRepository = mock()
+  private val priceAdjustmentRepository: PriceAdjustmentRepository = mock()
   private val priceRepository: PriceRepository = mock()
   private val timeSource = TimeSource { LocalDateTime.of(2021, 7, 22, 0, 0) }
-  private val uplifter = PriceUplifter(priceRepository, supplierPriceUpliftRepository, timeSource)
-  private val upliftCaptor = argumentCaptor<SupplierPriceUplift>()
+  private val uplifter = AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, timeSource)
+  private val upliftCaptor = argumentCaptor<PriceAdjustment>()
   private val fromLocation: Location = mock()
   private val toLocation: Location = mock()
 
@@ -32,30 +32,28 @@ internal class PriceUplifterTest {
 
     uplifter.uplift(Supplier.SERCO, 2020, 1.5, {}, { count -> assertThat(count).isEqualTo(1) })
 
-    verify(supplierPriceUpliftRepository).saveAndFlush(upliftCaptor.capture())
+    verify(priceAdjustmentRepository).saveAndFlush(upliftCaptor.capture())
 
     with(upliftCaptor.firstValue) {
       assertThat(supplier).isEqualTo(Supplier.SERCO)
-      assertThat(effectiveYear).isEqualTo(2020)
-      assertThat(multiplier).isEqualTo(1.5)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
     }
 
     verify(priceRepository).findBySupplierAndEffectiveYear(Supplier.SERCO, 2019)
-    verify(supplierPriceUpliftRepository).deleteBySupplier(Supplier.SERCO)
+    verify(priceAdjustmentRepository).deleteBySupplier(Supplier.SERCO)
   }
 
   @Test
   fun `failed uplift for Serco`() {
     val exception = RuntimeException("something went wrong for Serco uplift")
 
-    whenever(supplierPriceUpliftRepository.saveAndFlush(any())).thenThrow(exception)
+    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenThrow(exception)
 
     uplifter.uplift(Supplier.SERCO, 2020, 1.0, { thrown -> assertThat(thrown).isEqualTo(exception) }, {})
 
-    verify(supplierPriceUpliftRepository).saveAndFlush(any())
+    verify(priceAdjustmentRepository).saveAndFlush(any())
     verifyZeroInteractions(priceRepository)
-    verify(supplierPriceUpliftRepository).deleteBySupplier(Supplier.SERCO)
+    verify(priceAdjustmentRepository).deleteBySupplier(Supplier.SERCO)
   }
 
   @Test
@@ -66,29 +64,27 @@ internal class PriceUplifterTest {
 
     uplifter.uplift(Supplier.GEOAMEY, 2021, 2.0, {}, { count -> assertThat(count).isEqualTo(1) })
 
-    verify(supplierPriceUpliftRepository).saveAndFlush(upliftCaptor.capture())
+    verify(priceAdjustmentRepository).saveAndFlush(upliftCaptor.capture())
 
     with(upliftCaptor.firstValue) {
       assertThat(supplier).isEqualTo(Supplier.GEOAMEY)
-      assertThat(effectiveYear).isEqualTo(2021)
-      assertThat(multiplier).isEqualTo(2.0)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
     }
 
     verify(priceRepository).findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2020)
-    verify(supplierPriceUpliftRepository).deleteBySupplier(Supplier.GEOAMEY)
+    verify(priceAdjustmentRepository).deleteBySupplier(Supplier.GEOAMEY)
   }
 
   @Test
   fun `failed uplift for GEOAmey`() {
     val exception = RuntimeException("something went wrong for GEOAmey uplift")
 
-    whenever(supplierPriceUpliftRepository.saveAndFlush(any())).thenThrow(exception)
+    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenThrow(exception)
 
     uplifter.uplift(Supplier.GEOAMEY, 2020, 1.0, { thrown -> assertThat(thrown).isEqualTo(exception) }, {})
 
-    verify(supplierPriceUpliftRepository).saveAndFlush(any())
+    verify(priceAdjustmentRepository).saveAndFlush(any())
     verifyZeroInteractions(priceRepository)
-    verify(supplierPriceUpliftRepository).deleteBySupplier(Supplier.GEOAMEY)
+    verify(priceAdjustmentRepository).deleteBySupplier(Supplier.GEOAMEY)
   }
 }

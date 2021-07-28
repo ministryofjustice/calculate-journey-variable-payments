@@ -9,19 +9,19 @@ import org.springframework.test.context.ActiveProfiles
 
 @ActiveProfiles("test")
 @DataJpaTest
-internal class SupplierSupplierPriceUpliftRepositoryTest {
+internal class PriceAdjustmentRepositoryTest {
 
   @Autowired
-  lateinit var repository: SupplierPriceUpliftRepository
+  lateinit var repository: PriceAdjustmentRepository
 
   @Autowired
   lateinit var entityManager: TestEntityManager
 
   @Test
-  fun `can create price uplift for Serco and retrieve by supplier`() {
+  fun `can create price adjustment for Serco and retrieve by supplier`() {
     assertThat(repository.findBySupplier(Supplier.SERCO)).isNull()
 
-    val persisted = repository.save(SupplierPriceUplift(supplier = Supplier.SERCO, effectiveYear = 2020, multiplier = 1.0))
+    val persisted = repository.save(PriceAdjustment(supplier = Supplier.SERCO))
 
     entityManager.flush()
 
@@ -29,10 +29,10 @@ internal class SupplierSupplierPriceUpliftRepositoryTest {
   }
 
   @Test
-  fun `can create price uplift for GEOAmey and retrieve by supplier`() {
+  fun `can create price adjustment for GEOAmey and retrieve by supplier`() {
     assertThat(repository.findBySupplier(Supplier.GEOAMEY)).isNull()
 
-    val persisted = repository.save(SupplierPriceUplift(supplier = Supplier.GEOAMEY, effectiveYear = 2021, multiplier = 2.0))
+    val persisted = repository.save(PriceAdjustment(supplier = Supplier.GEOAMEY))
 
     entityManager.flush()
 

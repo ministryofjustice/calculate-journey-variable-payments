@@ -10,48 +10,64 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceAdjustmentRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceUplifter
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.SupplierPriceUpliftRepository
 import java.time.LocalDateTime
 
-internal class PriceUpliftServiceTest {
+internal class AnnualPriceAdjustmentsServiceTest {
 
-  private val supplierPriceUpliftRepository: SupplierPriceUpliftRepository = mock()
+  private val priceAdjustmentRepository: PriceAdjustmentRepository = mock()
   private val priceRepository: PriceRepository = mock()
   private val timeSource = TimeSource { LocalDateTime.now() }
   private val monitoringService: MonitoringService = mock()
-  private val priceUplifter: PriceUplifter = PriceUplifter(priceRepository, supplierPriceUpliftRepository, timeSource)
-  private val priceUplifterSpy: PriceUplifter = mock { spy(priceUplifter) }
+  private val annualPriceAdjuster: AnnualPriceAdjuster = AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, timeSource)
+  private val annualPriceAdjusterSpy: AnnualPriceAdjuster = mock { spy(annualPriceAdjuster) }
   private val auditService: AuditService = mock()
 
   @Test
   internal fun `price uplift for Serco`() {
-    PriceUpliftService(priceUplifterSpy, monitoringService, auditService).uplift(Supplier.SERCO, 2020, 1.0)
+    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService).uplift(
+      Supplier.SERCO,
+      2020,
+      1.0
+    )
 
-    verify(priceUplifterSpy).uplift(eq(Supplier.SERCO), eq(2020), eq(1.0), any(), any())
+    verify(annualPriceAdjusterSpy).uplift(eq(Supplier.SERCO), eq(2020), eq(1.0), any(), any())
   }
 
   @Test
   internal fun `price uplift for GEOAmey`() {
-    PriceUpliftService(priceUplifterSpy, monitoringService, auditService).uplift(Supplier.GEOAMEY, 2021, 2.0)
+    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService).uplift(
+      Supplier.GEOAMEY,
+      2021,
+      2.0
+    )
 
-    verify(priceUplifterSpy).uplift(eq(Supplier.GEOAMEY), eq(2021), eq(2.0), any(), any())
+    verify(annualPriceAdjusterSpy).uplift(eq(Supplier.GEOAMEY), eq(2021), eq(2.0), any(), any())
   }
 
   @Test
   internal fun `monitoring service captures failed price uplift`() {
-    whenever(supplierPriceUpliftRepository.saveAndFlush(any())).thenThrow(RuntimeException("something went wrong"))
+    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenThrow(RuntimeException("something went wrong"))
 
-    PriceUpliftService(priceUplifter, monitoringService, auditService).uplift(Supplier.GEOAMEY, 2021, 2.0)
+    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService).uplift(
+      Supplier.GEOAMEY,
+      2021,
+      2.0
+    )
 
     verify(monitoringService).capture("Failed price uplift for GEOAMEY for effective year 2021 and multiplier 2.0.")
   }
 
   @Test
   internal fun `auditing service captures successful price uplift`() {
-    PriceUpliftService(priceUplifter, monitoringService, auditService).uplift(Supplier.GEOAMEY, 2021, 2.0)
+    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService).uplift(
+      Supplier.GEOAMEY,
+      2021,
+      2.0
+    )
 
     verify(auditService).create(
       AuditableEvent(
