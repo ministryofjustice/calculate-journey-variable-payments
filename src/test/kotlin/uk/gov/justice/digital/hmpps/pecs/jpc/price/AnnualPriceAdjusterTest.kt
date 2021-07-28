@@ -10,6 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import java.time.LocalDateTime
 import java.util.stream.Stream
 
@@ -18,7 +19,8 @@ internal class AnnualPriceAdjusterTest {
   private val priceAdjustmentRepository: PriceAdjustmentRepository = mock()
   private val priceRepository: PriceRepository = mock()
   private val timeSource = TimeSource { LocalDateTime.of(2021, 7, 22, 0, 0) }
-  private val uplifter = AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, timeSource)
+  private val auditService: AuditService = mock()
+  private val priceAdjuster = AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, auditService, timeSource)
   private val upliftCaptor = argumentCaptor<PriceAdjustment>()
   private val fromLocation: Location = mock()
   private val toLocation: Location = mock()
@@ -30,7 +32,7 @@ internal class AnnualPriceAdjusterTest {
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2019)).thenReturn(Stream.of(previousYearPrice))
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(any(), any(), any(), any())).thenReturn(null)
 
-    uplifter.uplift(Supplier.SERCO, 2020, 1.5, {}, { count -> assertThat(count).isEqualTo(1) })
+    priceAdjuster.uplift(Supplier.SERCO, 2020, 1.5, {}, { count -> assertThat(count).isEqualTo(1) })
 
     verify(priceAdjustmentRepository).saveAndFlush(upliftCaptor.capture())
 
@@ -49,7 +51,7 @@ internal class AnnualPriceAdjusterTest {
 
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenThrow(exception)
 
-    uplifter.uplift(Supplier.SERCO, 2020, 1.0, { thrown -> assertThat(thrown).isEqualTo(exception) }, {})
+    priceAdjuster.uplift(Supplier.SERCO, 2020, 1.0, { thrown -> assertThat(thrown).isEqualTo(exception) }, {})
 
     verify(priceAdjustmentRepository).saveAndFlush(any())
     verifyZeroInteractions(priceRepository)
@@ -62,7 +64,7 @@ internal class AnnualPriceAdjusterTest {
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2020)).thenReturn(Stream.of(previousYearPrice))
 
-    uplifter.uplift(Supplier.GEOAMEY, 2021, 2.0, {}, { count -> assertThat(count).isEqualTo(1) })
+    priceAdjuster.uplift(Supplier.GEOAMEY, 2021, 2.0, {}, { count -> assertThat(count).isEqualTo(1) })
 
     verify(priceAdjustmentRepository).saveAndFlush(upliftCaptor.capture())
 
@@ -81,7 +83,7 @@ internal class AnnualPriceAdjusterTest {
 
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenThrow(exception)
 
-    uplifter.uplift(Supplier.GEOAMEY, 2020, 1.0, { thrown -> assertThat(thrown).isEqualTo(exception) }, {})
+    priceAdjuster.uplift(Supplier.GEOAMEY, 2020, 1.0, { thrown -> assertThat(thrown).isEqualTo(exception) }, {})
 
     verify(priceAdjustmentRepository).saveAndFlush(any())
     verifyZeroInteractions(priceRepository)

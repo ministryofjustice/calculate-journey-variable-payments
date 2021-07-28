@@ -43,7 +43,7 @@ internal class BulkPricesServiceTest {
     verify(priceRepository, times(2)).save(priceCaptor.capture())
     verify(auditService).create(
       AuditableEvent(
-        AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+        AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
         "_TERMINAL_",
         mapOf("supplier" to Supplier.SERCO, "effective_year" to 2021, "multiplier" to 1.5)
       )
@@ -67,7 +67,7 @@ internal class BulkPricesServiceTest {
     verify(priceRepository, times(2)).save(priceCaptor.capture())
     verify(auditService).create(
       AuditableEvent(
-        AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+        AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
         "_TERMINAL_",
         mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2022, "multiplier" to 2.0)
       )

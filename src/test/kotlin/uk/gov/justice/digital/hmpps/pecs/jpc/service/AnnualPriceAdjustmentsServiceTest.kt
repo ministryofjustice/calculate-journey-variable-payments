@@ -22,9 +22,9 @@ internal class AnnualPriceAdjustmentsServiceTest {
   private val priceRepository: PriceRepository = mock()
   private val timeSource = TimeSource { LocalDateTime.now() }
   private val monitoringService: MonitoringService = mock()
-  private val annualPriceAdjuster: AnnualPriceAdjuster = AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, timeSource)
-  private val annualPriceAdjusterSpy: AnnualPriceAdjuster = mock { spy(annualPriceAdjuster) }
   private val auditService: AuditService = mock()
+  private val annualPriceAdjuster: AnnualPriceAdjuster = AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, auditService, timeSource)
+  private val annualPriceAdjusterSpy: AnnualPriceAdjuster = mock { spy(annualPriceAdjuster) }
 
   @Test
   internal fun `price uplift for Serco`() {
@@ -71,7 +71,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
     verify(auditService).create(
       AuditableEvent(
-        AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+        AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
         "_TERMINAL_",
         mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
       )

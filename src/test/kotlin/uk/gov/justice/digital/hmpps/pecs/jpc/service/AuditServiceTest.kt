@@ -263,18 +263,18 @@ internal class AuditServiceTest {
   private inline fun <reified T> jsonTo(json: String): T = Klaxon().parse<T>(json)!!
 
   @Test
-  internal fun `create journey price bulk update audit event`() {
-    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.SERCO, 2020, 1.5))
-    service.create(AuditableEvent.journeyPriceBulkUpdateEvent(Supplier.GEOAMEY, 2021, 2.0))
+  internal fun `create journey price bulk uplift audit event`() {
+    service.create(AuditableEvent.journeyPriceBulkUpliftEvent(Supplier.SERCO, 2020, 1.5))
+    service.create(AuditableEvent.journeyPriceBulkUpliftEvent(Supplier.GEOAMEY, 2021, 2.0))
 
     verifyEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+      AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
       "_TERMINAL_",
       mapOf("supplier" to Supplier.SERCO, "effective_year" to 2020, "multiplier" to 1.5)
     )
 
     verifyEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_UPDATE,
+      AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
       "_TERMINAL_",
       mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
     )
@@ -288,6 +288,73 @@ internal class AuditServiceTest {
       AuditEventType.REPORTING_DATA_IMPORT,
       "_TERMINAL_",
       mapOf("type" to "moves", "report_date" to "2021-02-22", "processed" to 20, "saved" to 10)
+    )
+  }
+
+  @Test
+  internal fun `create authenticated journey price uplift audit event`() {
+    service.create(
+      AuditableEvent.upliftPrice(
+        price = Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 200,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        original = Money(100),
+        multiplier = 2.0,
+        authentication = authentication
+      )
+    )
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        Supplier.SERCO,
+        "TEST2",
+        "TEST21",
+        effectiveYearForDate(timeSource.date()),
+        2.0,
+        1.0,
+        2.0
+      )
+    )
+  }
+
+  @Test
+  internal fun `create un-authenticated journey price uplift audit event`() {
+    service.create(
+      AuditableEvent.upliftPrice(
+        price = Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 200,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        original = Money(100),
+        multiplier = 2.0,
+      )
+    )
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        Supplier.SERCO,
+        "TEST2",
+        "TEST21",
+        effectiveYearForDate(timeSource.date()),
+        2.0,
+        1.0,
+        2.0
+      )
     )
   }
 }

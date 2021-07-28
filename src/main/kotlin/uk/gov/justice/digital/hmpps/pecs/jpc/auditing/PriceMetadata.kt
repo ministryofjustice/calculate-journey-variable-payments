@@ -27,6 +27,10 @@ data class PriceMetadata(
 
   @Json(name = "old_price", index = 6, serializeNull = false)
   val oldPrice: Double? = null,
+
+  @Json(name = "multiplier", index = 7, serializeNull = false)
+  val multiplier: Double? = null
+
 ) : Metadata {
   private constructor(price: Price) : this(
     price.supplier,
@@ -45,6 +49,16 @@ data class PriceMetadata(
     oldPrice = old.pounds()
   )
 
+  private constructor(old: Money, new: Price, multiplier: Double) : this(
+    supplier = new.supplier,
+    fromNomisId = new.fromLocation.nomisAgencyId,
+    toNomisId = new.toLocation.nomisAgencyId,
+    effectiveYear = new.effectiveYear,
+    newPrice = new.price().pounds(),
+    oldPrice = old.pounds(),
+    multiplier = multiplier
+  )
+
   companion object {
     fun new(price: Price) = PriceMetadata(price)
 
@@ -54,6 +68,8 @@ data class PriceMetadata(
       return PriceMetadata(old, new)
     }
 
+    fun uplift(new: Price, old: Money, multiplier: Double) = PriceMetadata(old, new, multiplier)
+
     fun map(event: AuditEvent): PriceMetadata {
       return if (event.eventType == AuditEventType.JOURNEY_PRICE)
         Klaxon().parse<PriceMetadata>(event.metadata!!)!!
@@ -61,10 +77,13 @@ data class PriceMetadata(
         throw IllegalArgumentException("Audit event type is not a price event.")
     }
 
-    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) = "$supplier-${fromNomisId.trim().uppercase()}-${toNomisId.trim().uppercase()}"
+    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) =
+      "$supplier-${fromNomisId.trim().uppercase()}-${toNomisId.trim().uppercase()}"
   }
 
-  fun isUpdate() = oldPrice != null
+  fun isUpdate() = oldPrice != null && multiplier == null
+
+  fun isUplift() = multiplier != null
 
   override fun toJsonString(): String = Klaxon().toJsonString(this)
 
