@@ -6,27 +6,30 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceUplifter
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 /**
- * Service to handle (annual) contractual price uplifts for suppliers in relation to inflationary changes.
+ * Service to handle annual price adjustments for suppliers in relation to inflationary changes.
  *
- * Generally speaking but not always uplifts mainly take place in at the start of the new contractual year e.g. September.
+ * Generally speaking (but not always) annual adjustments take place at the start of a new effective year e.g. September.
  */
 @Service
 @Transactional
-class PriceUpliftService(
-  private val priceUplifter: PriceUplifter,
+class AnnualPriceAdjustmentsService(
+  private val annualPriceAdjuster: AnnualPriceAdjuster,
   private val monitoringService: MonitoringService,
   private val auditService: AuditService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  /**
+   * An uplift normally takes place at the start of the effective year is based around inflationary price rises.
+   */
   fun uplift(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
     launch {
-      priceUplifter.uplift(
+      annualPriceAdjuster.uplift(
         supplier,
         effectiveYear,
         multiplier,

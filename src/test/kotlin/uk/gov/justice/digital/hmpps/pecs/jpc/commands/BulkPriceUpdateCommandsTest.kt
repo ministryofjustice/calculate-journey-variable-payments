@@ -4,14 +4,14 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BulkPricesService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.PriceUpliftService
 
 internal class BulkPriceUpdateCommandsTest {
 
   private val bulkPricesService: BulkPricesService = mock()
-  private val priceUpliftService: PriceUpliftService = mock()
-  private val command: BulkPriceUpdateCommands = BulkPriceUpdateCommands(bulkPricesService, priceUpliftService)
+  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService = mock()
+  private val command: BulkPriceUpdateCommands = BulkPriceUpdateCommands(bulkPricesService, annualPriceAdjustmentsService)
 
   @Test
   internal fun `service invoked for Serco with expected multiplier`() {

@@ -11,15 +11,15 @@ import javax.persistence.Index
 import javax.persistence.Table
 
 /**
- * The purpose of this entity is to identify if there is an uplift already in progress.  Its lack of existence indicates
- * no uplift is in progress.
+ * The purpose of this entity is to identify if there is supplier price adjustment (already) in progress. Its lack of
+ * existence indicates no adjustment is in progress.
  *
- * To avoid pricing uplift issues in a distributed environment there can only ever be be one uplift in progress for a
- * supplier at any given point in time.
+ * To avoid pricing adjustment issues in a distributed environment there can only ever be one adjustment in progress for
+ * a supplier at any given point in time.
  */
 @Entity
 @Table(
-  name = "SUPPLIER_PRICE_UPLIFTS",
+  name = "PRICE_ADJUSTMENTS",
   indexes = [
     Index(
       name = "SUPPLIER_UNIQUE",
@@ -28,7 +28,7 @@ import javax.persistence.Table
     )
   ]
 )
-data class SupplierPriceUplift(
+data class PriceAdjustment(
   @Id
   @Column(name = "id", nullable = false)
   val id: UUID = UUID.randomUUID(),
@@ -36,12 +36,6 @@ data class SupplierPriceUplift(
   @Column(name = "supplier", nullable = false)
   @Enumerated(EnumType.STRING)
   val supplier: Supplier,
-
-  @Column(name = "multiplier", nullable = false)
-  val multiplier: Double,
-
-  @Column(name = "effective_year", nullable = false)
-  val effectiveYear: Int,
 
   @Column(name = "added_at", nullable = false)
   val addedAt: LocalDateTime = LocalDateTime.now()

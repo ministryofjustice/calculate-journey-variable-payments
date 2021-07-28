@@ -5,17 +5,17 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import kotlin.streams.asSequence
 
 /**
- * Domain level service to perform the actual price adjustments for a supplier.
- *
- * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
+ * Domain level service to perform the annual price adjustments for a supplier.
  */
 @Component
-class PriceUplifter(
+class AnnualPriceAdjuster(
   private val priceRepository: PriceRepository,
-  private val priceUpliftRepository: SupplierPriceUpliftRepository,
+  private val priceUpliftRepository: PriceAdjustmentRepository,
   private val timeSource: TimeSource
 ) {
   /**
+   * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
+   *
    * Any exception thrown calling this function will be passed onto the onFailure lambda function.
    */
   internal fun uplift(
@@ -26,7 +26,7 @@ class PriceUplifter(
     onSuccess: (upliftedPriceCount: Int) -> Unit
   ) {
     Result.runCatching {
-      attemptDatabaseLockForPriceAdjustment(supplier, effectiveYear, multiplier)
+      attemptDatabaseLockForPriceAdjustment(supplier)
       applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier, effectiveYear, multiplier)
     }.onFailure {
       releaseDatabaseLockForPriceAdjustment(supplier)
@@ -40,12 +40,10 @@ class PriceUplifter(
   /**
    * There can only every be one supplier price adjustment in progress. This will fail (as expected) if one already exists!
    */
-  private fun attemptDatabaseLockForPriceAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double) {
+  private fun attemptDatabaseLockForPriceAdjustment(supplier: Supplier) {
     priceUpliftRepository.saveAndFlush(
-      SupplierPriceUplift(
+      PriceAdjustment(
         supplier = supplier,
-        effectiveYear = effectiveYear,
-        multiplier = multiplier,
         addedAt = timeSource.dateTime()
       )
     )
