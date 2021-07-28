@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 /**
- * Service to handle annual price adjustments for suppliers in relation to inflationary changes.
+ * Service to handle annual price adjustments for suppliers.
  *
  * Generally speaking (but not always) annual adjustments take place at the start of a new effective year e.g. September.
  */
@@ -43,7 +43,7 @@ class AnnualPriceAdjustmentsService(
         },
         {
           logger.info("Succeeded price uplift for $supplier for effective year $effectiveYear and multiplier $multiplier. Total prices uplifted $it.")
-          auditService.create(AuditableEvent.journeyPriceBulkUpdateEvent(supplier, effectiveYear, multiplier))
+          auditService.create(AuditableEvent.journeyPriceBulkUpliftEvent(supplier, effectiveYear, multiplier))
         }
       )
     }

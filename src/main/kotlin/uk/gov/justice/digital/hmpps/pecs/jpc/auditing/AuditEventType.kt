@@ -4,7 +4,7 @@ enum class AuditEventType(val label: String) {
   DOWNLOAD_SPREADSHEET("Download spreadsheet"),
   DOWNLOAD_SPREADSHEET_FAILURE("Download spreadsheet failure"),
   JOURNEY_PRICE("Journey price"),
-  JOURNEY_PRICE_BULK_UPDATE("Journey price bulk update"),
+  JOURNEY_PRICE_BULK_UPLIFT("Journey price bulk uplift"),
   LOCATION("Location"),
   LOG_IN("Log in"),
   LOG_OUT("Log out"),

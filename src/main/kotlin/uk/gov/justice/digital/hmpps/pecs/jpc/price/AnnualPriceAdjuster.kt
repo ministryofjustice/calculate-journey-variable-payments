@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import kotlin.streams.asSequence
 
 /**
@@ -11,6 +13,7 @@ import kotlin.streams.asSequence
 class AnnualPriceAdjuster(
   private val priceRepository: PriceRepository,
   private val priceUpliftRepository: PriceAdjustmentRepository,
+  private val auditService: AuditService,
   private val timeSource: TimeSource
 ) {
   /**
@@ -49,7 +52,11 @@ class AnnualPriceAdjuster(
     )
   }
 
-  private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier: Supplier, effectiveYear: Int, multiplier: Double) =
+  private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(
+    supplier: Supplier,
+    effectiveYear: Int,
+    multiplier: Double
+  ) =
     priceRepository
       .possiblePricesForAdjustment(supplier, effectiveYear)
       .map { maybePriceAdjustment(it, effectiveYear, multiplier) }
@@ -65,12 +72,19 @@ class AnnualPriceAdjuster(
 
     if (existingAdjustedPrice != null) {
       return existingAdjustedPrice
-        .takeUnless { it.price() == previousYearPrice.price().times(multiplier) }
+        .takeUnless { priceIsTheSame(it, previousYearPrice.price().times(multiplier)) }
         ?.apply { priceInPence = previousYearPrice.price().times(multiplier).pence }
+        ?.also {
+          auditService.create(AuditableEvent.upliftPrice(it, previousYearPrice.price(), multiplier))
+        }
     }
 
-    return newPriceAdjustmentFor(previousYearPrice, effectiveYear, multiplier)
+    return newPriceAdjustmentFor(previousYearPrice, effectiveYear, multiplier).also {
+      auditService.create(AuditableEvent.upliftPrice(it, previousYearPrice.price(), multiplier))
+    }
   }
+
+  private fun priceIsTheSame(price: Price, amount: Money) = price.price() == amount
 
   private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: Double) =
     price.adjusted(

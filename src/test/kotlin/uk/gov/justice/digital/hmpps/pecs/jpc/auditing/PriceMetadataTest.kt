@@ -39,6 +39,7 @@ internal class PriceMetadataTest {
     assertThat(metadata.newPrice).isEqualTo(1.0)
     assertThat(metadata.oldPrice).isEqualTo(2.0)
     assertThat(metadata.isUpdate()).isTrue
+    assertThat(metadata.isUplift()).isFalse
     assertThat(metadata.key()).isEqualTo("GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
@@ -49,5 +50,24 @@ internal class PriceMetadataTest {
     }
       .isInstanceOf(IllegalArgumentException::class.java)
       .hasMessage("Old price and new price are the same '${Money.valueOf(1.0)}'.")
+  }
+
+  @Test
+  fun `price uplift`() {
+    val metadata = PriceMetadata.uplift(
+      new = Price(supplier = Supplier.SERCO, fromLocation = fromLocation, toLocation = toLocation, effectiveYear = 2020, priceInPence = 200),
+      old = Money(100),
+      multiplier = 2.0
+    )
+
+    assertThat(metadata.supplier).isEqualTo(Supplier.SERCO)
+    assertThat(metadata.fromNomisId).isEqualTo("FROM_AGENCY_ID")
+    assertThat(metadata.toNomisId).isEqualTo("TO_AGENCY_ID")
+    assertThat(metadata.effectiveYear).isEqualTo(2020)
+    assertThat(metadata.newPrice).isEqualTo(2.0)
+    assertThat(metadata.oldPrice).isEqualTo(1.0)
+    assertThat(metadata.multiplier).isEqualTo(2.0)
+    assertThat(metadata.isUpdate()).isFalse
+    assertThat(metadata.isUplift()).isTrue
   }
 }
