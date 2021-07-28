@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import kotlin.streams.asSequence
 
 /**
  * Domain level service to perform the actual price adjustments for a supplier.
@@ -14,9 +15,8 @@ class PriceUplifter(
   private val priceUpliftRepository: SupplierPriceUpliftRepository,
   private val timeSource: TimeSource
 ) {
-
   /**
-   * Any exception thrown calling this function will passed onto the onFailure lambda function.
+   * Any exception thrown calling this function will be passed onto the onFailure lambda function.
    */
   internal fun uplift(
     supplier: Supplier,
@@ -26,18 +26,21 @@ class PriceUplifter(
     onSuccess: (upliftedPriceCount: Int) -> Unit
   ) {
     Result.runCatching {
-      upliftInProgress(supplier, effectiveYear, multiplier)
-      upliftPrices(supplier, effectiveYear, multiplier)
+      attemptDatabaseLockForPriceAdjustment(supplier, effectiveYear, multiplier)
+      applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier, effectiveYear, multiplier)
     }.onFailure {
-      upliftDone(supplier)
+      releaseDatabaseLockForPriceAdjustment(supplier)
       onFailure(it)
     }.onSuccess {
-      upliftDone(supplier)
+      releaseDatabaseLockForPriceAdjustment(supplier)
       onSuccess(it)
     }
   }
 
-  private fun upliftInProgress(supplier: Supplier, effectiveYear: Int, multiplier: Double) {
+  /**
+   * There can only every be one supplier price adjustment in progress. This will fail (as expected) if one already exists!
+   */
+  private fun attemptDatabaseLockForPriceAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double) {
     priceUpliftRepository.saveAndFlush(
       SupplierPriceUplift(
         supplier = supplier,
@@ -48,30 +51,45 @@ class PriceUplifter(
     )
   }
 
-  private fun upliftPrices(supplier: Supplier, effectiveYear: Int, multiplier: Double) =
+  private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier: Supplier, effectiveYear: Int, multiplier: Double) =
     priceRepository
-      .previousYearPrices(supplier, effectiveYear)
-      .map {
-        priceRepository.save(upliftedPriceAdjustment(it, effectiveYear, multiplier))
-      }.count().toInt()
+      .possiblePricesForAdjustment(supplier, effectiveYear)
+      .map { maybePriceAdjustment(it, effectiveYear, multiplier) }
+      .filterNotNull()
+      .map { priceRepository.save(it) }
+      .count()
 
-  private fun PriceRepository.previousYearPrices(supplier: Supplier, effectiveYear: Int) =
-    this.findBySupplierAndEffectiveYear(supplier, effectiveYear - 1)
+  private fun PriceRepository.possiblePricesForAdjustment(supplier: Supplier, effectiveYear: Int) =
+    this.findBySupplierAndEffectiveYear(supplier, effectiveYear - 1).asSequence()
 
-  private fun upliftedPriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: Double): Price {
-    return priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-      previousYearPrice.supplier,
-      previousYearPrice.fromLocation,
-      previousYearPrice.toLocation,
-      effectiveYear
-    )?.apply { this.priceInPence = previousYearPrice.price().times(multiplier).pence } ?: previousYearPrice.adjusted(
-      amount = previousYearPrice.price().times(multiplier),
+  private fun maybePriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: Double): Price? {
+    val existingAdjustedPrice = maybeExistingAdjustedPrice(previousYearPrice, effectiveYear)
+
+    if (existingAdjustedPrice != null) {
+      return existingAdjustedPrice
+        .takeUnless { it.price() == previousYearPrice.price().times(multiplier) }
+        ?.apply { priceInPence = previousYearPrice.price().times(multiplier).pence }
+    }
+
+    return newPriceAdjustmentFor(previousYearPrice, effectiveYear, multiplier)
+  }
+
+  private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: Double) =
+    price.adjusted(
+      amount = price.price().times(multiplier),
       effectiveYear = effectiveYear,
       addedAt = timeSource.dateTime()
     )
-  }
 
-  private fun upliftDone(supplier: Supplier) {
+  private fun maybeExistingAdjustedPrice(price: Price, effectiveYear: Int) =
+    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      price.supplier,
+      price.fromLocation,
+      price.toLocation,
+      effectiveYear
+    )
+
+  private fun releaseDatabaseLockForPriceAdjustment(supplier: Supplier) {
     with(priceUpliftRepository) {
       deleteBySupplier(supplier)
       flush()
