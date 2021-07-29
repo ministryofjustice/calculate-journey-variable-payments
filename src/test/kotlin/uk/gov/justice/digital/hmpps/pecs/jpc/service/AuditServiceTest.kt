@@ -196,7 +196,38 @@ internal class AuditServiceTest {
   }
 
   @Test
-  internal fun `create journey price set audit event`() {
+  internal fun `create authenticated journey price set audit event`() {
+    service.create(
+      AuditableEvent.addPrice(
+        Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 234,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        authentication
+      )
+    )
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
+
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        Supplier.SERCO,
+        "TEST2",
+        "TEST21",
+        effectiveYearForDate(timeSource.date()),
+        2.34,
+      )
+    )
+  }
+
+  @Test
+  internal fun `create un-authenticated journey price set audit event`() {
     service.create(
       AuditableEvent.addPrice(
         Price(
@@ -211,7 +242,7 @@ internal class AuditServiceTest {
 
     verify(auditEventRepository).save(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
-    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
+    assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
 
     assertThatPricesMetadataIsTheSame(
       eventCaptor.firstValue,

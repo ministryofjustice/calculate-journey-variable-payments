@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
@@ -73,7 +74,7 @@ class SupplierPricingService(
         priceInPence = price.pence,
         effectiveYear = effectiveYear
       )
-    ).let { auditService.create(AuditableEvent.addPrice(it)) }
+    ).let { auditService.create(AuditableEvent.addPrice(it, SecurityContextHolder.getContext().authentication)) }
   }
 
   fun updatePriceForSupplier(
