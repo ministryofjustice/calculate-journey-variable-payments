@@ -60,10 +60,14 @@ data class AuditableEvent(
         mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
 
       )
-    fun addPrice(newPrice: Price): AuditableEvent {
+
+    /**
+     * A price can be added via the front end in which case it is authenticated or by the back end via bulk price import which is un-authenticated.
+     */
+    fun addPrice(newPrice: Price, authentication: Authentication? = null): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
-        username = authentication().name,
+        username = authentication?.name ?: terminal,
         metadata = PriceMetadata.new(newPrice)
       )
     }
