@@ -4,7 +4,7 @@ import org.fluentlenium.core.annotation.PageUrl
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.support.FindBy
 
-@PageUrl("http://localhost:9090/auth/login")
+@PageUrl("http://localhost:9090/auth/sign-in")
 class LoginPage : ApplicationPage() {
 
   @FindBy(css = "input[type='submit']")
