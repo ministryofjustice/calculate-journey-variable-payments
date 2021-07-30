@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 /**
@@ -19,15 +20,30 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 class AnnualPriceAdjustmentsService(
   private val annualPriceAdjuster: AnnualPriceAdjuster,
   private val monitoringService: MonitoringService,
-  private val auditService: AuditService
+  private val auditService: AuditService,
+  private val actualEffectiveYear: EffectiveYear
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
+   * Price uplifts cannot be before the current effective year, if the supplied effective year is before it then an
+   * exception will be thrown.
+   */
+  fun uplift(supplier: Supplier, suppliedEffective: Int, multiplier: Double) {
+    if (suppliedEffective < actualEffectiveYear.current()) {
+      throw RuntimeException("Price uplifts cannot be before the current effective year ${actualEffectiveYear.current()}.")
+    }
+
+    logger.info("Starting price uplift for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
+
+    doUplift(supplier, suppliedEffective, multiplier)
+  }
+
+  /**
    * An uplift normally takes place at the start of the effective year is based around inflationary price rises.
    */
-  fun uplift(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
+  private fun doUplift(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
     launch {
       annualPriceAdjuster.uplift(
         supplier,
