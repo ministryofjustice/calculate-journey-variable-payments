@@ -1,8 +1,8 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.4"
-  kotlin("plugin.spring") version "1.5.20"
-  kotlin("plugin.jpa") version "1.5.20"
-  kotlin("plugin.allopen") version "1.5.20"
+  kotlin("plugin.spring") version "1.5.21"
+  kotlin("plugin.jpa") version "1.5.21"
+  kotlin("plugin.allopen") version "1.5.21"
 }
 
 allOpen {
@@ -16,13 +16,11 @@ dependencyCheck {
 }
 
 dependencies {
-  implementation("com.github.kittinunf.result:result:4.0.0")
-  implementation("com.github.kittinunf.result:result-coroutines:4.0.0")
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.14")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.36")
   implementation("io.sentry:sentry-spring-boot-starter:5.0.1")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.24.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.24.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.25.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.25.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.3")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
 
@@ -38,7 +36,7 @@ dependencies {
     }
   }
 
-  implementation("org.flywaydb:flyway-core:7.10.0")
+  implementation("org.flywaydb:flyway-core:7.12.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -64,7 +62,7 @@ dependencies {
   testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
 
   runtimeOnly("com.h2database:h2")
-  runtimeOnly("org.postgresql:postgresql:42.2.22")
+  runtimeOnly("org.postgresql:postgresql:42.2.23")
 }
 
 tasks {
