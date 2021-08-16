@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -16,6 +17,9 @@ class AnnualPriceAdjuster(
   private val auditService: AuditService,
   private val timeSource: TimeSource
 ) {
+
+  private val logger = LoggerFactory.getLogger(javaClass)
+
   /**
    * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
    *
@@ -56,13 +60,23 @@ class AnnualPriceAdjuster(
     supplier: Supplier,
     effectiveYear: Int,
     multiplier: Double
-  ) =
-    priceRepository
+  ): Int {
+    var adjustments = 0
+
+    return priceRepository
       .possiblePricesForAdjustment(supplier, effectiveYear)
       .map { maybePriceAdjustment(it, effectiveYear, multiplier) }
       .filterNotNull()
-      .map { priceRepository.save(it) }
+      .map {
+        priceRepository.save(it)
+        showProgressForEveryOneHundredPrice(adjustments++)
+      }
       .count()
+  }
+
+  private fun showProgressForEveryOneHundredPrice(adjustments: Int) {
+    if (adjustments % 100 == 0) logger.info("$adjustments prices adjusted...")
+  }
 
   private fun PriceRepository.possiblePricesForAdjustment(supplier: Supplier, effectiveYear: Int) =
     this.findBySupplierAndEffectiveYear(supplier, effectiveYear - 1).asSequence()
