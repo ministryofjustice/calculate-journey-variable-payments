@@ -7,4 +7,6 @@ interface PriceAdjustmentRepository : JpaRepository<PriceAdjustment, UUID> {
   fun findBySupplier(supplier: Supplier): PriceAdjustment?
 
   fun deleteBySupplier(supplier: Supplier)
+
+  fun existsPriceAdjustmentBySupplier(supplier: Supplier): Boolean
 }

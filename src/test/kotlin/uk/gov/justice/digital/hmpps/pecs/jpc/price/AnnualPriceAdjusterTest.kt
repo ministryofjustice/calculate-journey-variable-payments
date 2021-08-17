@@ -26,6 +26,20 @@ internal class AnnualPriceAdjusterTest {
   private val toLocation: Location = mock()
 
   @Test
+  fun `adjustment is not in progress for supplier`() {
+    whenever(priceAdjustmentRepository.existsPriceAdjustmentBySupplier(Supplier.SERCO)).thenReturn(false)
+
+    assertThat(priceAdjuster.isInProgressFor(Supplier.SERCO))
+  }
+
+  @Test
+  fun `adjustment is in progress for supplier`() {
+    whenever(priceAdjustmentRepository.existsPriceAdjustmentBySupplier(Supplier.GEOAMEY)).thenReturn(true)
+
+    assertThat(priceAdjuster.isInProgressFor(Supplier.GEOAMEY))
+  }
+
+  @Test
   fun `previous years prices are successfully uplifted for Serco`() {
     val previousYearPrice = Price(supplier = Supplier.SERCO, fromLocation = fromLocation, toLocation = toLocation, priceInPence = 10000, effectiveYear = 2019)
 

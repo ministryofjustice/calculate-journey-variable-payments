@@ -13,12 +13,14 @@ import kotlin.streams.asSequence
 @Component
 class AnnualPriceAdjuster(
   private val priceRepository: PriceRepository,
-  private val priceUpliftRepository: PriceAdjustmentRepository,
+  private val priceAdjustmentRepository: PriceAdjustmentRepository,
   private val auditService: AuditService,
   private val timeSource: TimeSource
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
+
+  internal fun isInProgressFor(supplier: Supplier) = priceAdjustmentRepository.existsPriceAdjustmentBySupplier(supplier)
 
   /**
    * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
@@ -48,7 +50,7 @@ class AnnualPriceAdjuster(
    * There can only every be one supplier price adjustment in progress. This will fail (as expected) if one already exists!
    */
   private fun attemptDatabaseLockForPriceAdjustment(supplier: Supplier) {
-    priceUpliftRepository.saveAndFlush(
+    priceAdjustmentRepository.saveAndFlush(
       PriceAdjustment(
         supplier = supplier,
         addedAt = timeSource.dateTime()
@@ -116,7 +118,7 @@ class AnnualPriceAdjuster(
     )
 
   private fun releaseDatabaseLockForPriceAdjustment(supplier: Supplier) {
-    with(priceUpliftRepository) {
+    with(priceAdjustmentRepository) {
       deleteBySupplier(supplier)
       flush()
     }

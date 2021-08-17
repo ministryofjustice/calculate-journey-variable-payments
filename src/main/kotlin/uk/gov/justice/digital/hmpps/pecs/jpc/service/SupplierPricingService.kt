@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
@@ -19,9 +20,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 @Transactional
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class SupplierPricingService(
-  val locationRepository: LocationRepository,
-  val priceRepository: PriceRepository,
-  private val auditService: AuditService
+  private val locationRepository: LocationRepository,
+  private val priceRepository: PriceRepository,
+  private val annualPriceAdjuster: AnnualPriceAdjuster,
+  private val auditService: AuditService,
 ) {
   fun getSiteNamesForPricing(
     supplier: Supplier,
@@ -64,6 +66,8 @@ class SupplierPricingService(
     price: Money,
     effectiveYear: Int
   ) {
+    failIfPriceAdjustmentInProgressFor(supplier)
+
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
     priceRepository.save(
@@ -84,6 +88,8 @@ class SupplierPricingService(
     agreedNewPrice: Money,
     effectiveYear: Int
   ) {
+    failIfPriceAdjustmentInProgressFor(supplier)
+
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
     val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
       supplier,
@@ -98,6 +104,10 @@ class SupplierPricingService(
 
       priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence }).let { auditService.create(AuditableEvent.updatePrice(it, oldPrice)) }
     }
+  }
+
+  private fun failIfPriceAdjustmentInProgressFor(supplier: Supplier) {
+    if (annualPriceAdjuster.isInProgressFor(supplier)) throw RuntimeException("Price adjustment in currently progress for $supplier")
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =
