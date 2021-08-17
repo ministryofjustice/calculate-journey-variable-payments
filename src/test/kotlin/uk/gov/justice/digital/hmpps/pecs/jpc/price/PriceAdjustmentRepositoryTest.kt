@@ -29,6 +29,17 @@ internal class PriceAdjustmentRepositoryTest {
   }
 
   @Test
+  fun `price adjustment is in progress for Serco and exists by supplier`() {
+    assertThat(repository.existsPriceAdjustmentBySupplier(Supplier.SERCO)).isFalse
+
+    repository.save(PriceAdjustment(supplier = Supplier.SERCO))
+
+    entityManager.flush()
+
+    assertThat(repository.existsPriceAdjustmentBySupplier(Supplier.SERCO)).isTrue
+  }
+
+  @Test
   fun `can create price adjustment for GEOAmey and retrieve by supplier`() {
     assertThat(repository.findBySupplier(Supplier.GEOAMEY)).isNull()
 

@@ -7,6 +7,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
@@ -15,6 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
@@ -26,15 +28,25 @@ import java.time.LocalDateTime
 @ExtendWith(FakeAuthentication::class)
 internal class SupplierPricingServiceTest {
 
+  private val annualPriceAdjuster: AnnualPriceAdjuster = mock()
   private val auditService: AuditService = mock()
   private val effectiveYear = effectiveYearForDate(LocalDate.now())
   private val locationRepository: LocationRepository = mock()
-  private val fromLocation: Location = Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
-  private val toLocation: Location = Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
+  private val fromLocation: Location =
+    Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
+  private val toLocation: Location =
+    Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
   private val priceRepository: PriceRepository = mock()
-  private val price: Price = Price(supplier = Supplier.SERCO, priceInPence = 10024, fromLocation = fromLocation, toLocation = toLocation, effectiveYear = effectiveYear)
+  private val price: Price = Price(
+    supplier = Supplier.SERCO,
+    priceInPence = 10024,
+    fromLocation = fromLocation,
+    toLocation = toLocation,
+    effectiveYear = effectiveYear
+  )
   private val priceCaptor = argumentCaptor<Price>()
-  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository, auditService)
+  private val service: SupplierPricingService =
+    SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService)
 
   @Test
   internal fun `site names returned for new pricing`() {
@@ -83,6 +95,23 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
+  internal fun `add new price fails for supplier if price adjustment in progress`() {
+    whenever(annualPriceAdjuster.isInProgressFor(Supplier.SERCO)).thenReturn(true)
+
+    assertThatThrownBy {
+      service.addPriceForSupplier(
+        Supplier.SERCO,
+        "from",
+        "to",
+        Money.valueOf(100.24),
+        effectiveYear
+      )
+    }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for SERCO")
+
+    verify(priceRepository, never()).save(any())
+  }
+
+  @Test
   internal fun `existing site names and price returned`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
@@ -100,7 +129,12 @@ internal class SupplierPricingServiceTest {
     assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
-    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)
+    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      Supplier.SERCO,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
   }
 
   @Test
@@ -108,8 +142,7 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
-      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear
-      (
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
         Supplier.SERCO,
         fromLocation,
         toLocation,
@@ -135,8 +168,7 @@ internal class SupplierPricingServiceTest {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
-      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear
-      (
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
         Supplier.SERCO,
         fromLocation,
         toLocation,
@@ -166,11 +198,34 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
+  internal fun `update existing price for supplier fails if price adjustment in progress`() {
+    whenever(annualPriceAdjuster.isInProgressFor(Supplier.GEOAMEY)).thenReturn(true)
+
+    assertThatThrownBy {
+      service.updatePriceForSupplier(
+        Supplier.GEOAMEY,
+        "from",
+        "to",
+        Money.Factory.valueOf(200.35),
+        effectiveYear
+      )
+    }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for GEOAMEY")
+
+    verify(priceRepository, never()).save(any())
+  }
+
+  @Test
   internal fun `finds single price history entry for Serco`() {
     val sercoOriginalPrice = PriceMetadata(Supplier.SERCO, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
-    val sercoOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", sercoOriginalPrice)
+    val sercoOriginalPriceEvent =
+      AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", sercoOriginalPrice)
 
-    whenever(auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "SERCO-FROM_AGENCY_ID-TO_AGENCY_ID")).thenReturn(listOf(sercoOriginalPriceEvent))
+    whenever(
+      auditService.auditEventsByTypeAndMetaKey(
+        AuditEventType.JOURNEY_PRICE,
+        "SERCO-FROM_AGENCY_ID-TO_AGENCY_ID"
+      )
+    ).thenReturn(listOf(sercoOriginalPriceEvent))
 
     val sercoPriceHistory = service.priceHistoryForJourney(Supplier.SERCO, "from_agency_id", "to_agency_id")
 
@@ -180,18 +235,29 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `finds multiple price history entries for GEOAmey`() {
-    val geoameyOriginalPrice = PriceMetadata(Supplier.GEOAMEY, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
-    val geoameyOriginalPriceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", geoameyOriginalPrice)
+    val geoameyOriginalPrice =
+      PriceMetadata(Supplier.GEOAMEY, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
+    val geoameyOriginalPriceEvent =
+      AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now(), "Jane", geoameyOriginalPrice)
 
     val geoameyPriceChange = geoameyOriginalPrice.copy(newPrice = Money(2000).pounds(), oldPrice = Money(1000).pounds())
-    val geoameyPriceChangeEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now().plusDays(1), "Jane", geoameyPriceChange)
+    val geoameyPriceChangeEvent =
+      AuditEvent(AuditEventType.JOURNEY_PRICE, LocalDateTime.now().plusDays(1), "Jane", geoameyPriceChange)
 
-    whenever(auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent))
+    whenever(
+      auditService.auditEventsByTypeAndMetaKey(
+        AuditEventType.JOURNEY_PRICE,
+        "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID"
+      )
+    ).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent))
 
     val geoameyPriceHistory = service.priceHistoryForJourney(Supplier.GEOAMEY, "from_agency_id", "to_agency_id")
 
     assertThat(geoameyPriceHistory).containsExactly(geoameyOriginalPriceEvent, geoameyPriceChangeEvent)
 
-    verify(auditService).auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")
+    verify(auditService).auditEventsByTypeAndMetaKey(
+      AuditEventType.JOURNEY_PRICE,
+      "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID"
+    )
   }
 }
