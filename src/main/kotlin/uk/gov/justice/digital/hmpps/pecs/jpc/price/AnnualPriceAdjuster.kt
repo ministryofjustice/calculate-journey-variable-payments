@@ -2,15 +2,18 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
+import java.util.UUID
 import kotlin.streams.asSequence
 
 /**
  * Domain level service to perform the annual price adjustments for a supplier.
  */
 @Component
+@Transactional
 class AnnualPriceAdjuster(
   private val priceRepository: PriceRepository,
   private val priceAdjustmentRepository: PriceAdjustmentRepository,
@@ -24,39 +27,34 @@ class AnnualPriceAdjuster(
 
   /**
    * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
-   *
-   * Any exception thrown calling this function will be passed onto the onFailure lambda function.
    */
   internal fun uplift(
+    id: UUID,
     supplier: Supplier,
     effectiveYear: Int,
     multiplier: Double,
-    onFailure: (e: Throwable) -> Unit,
-    onSuccess: (upliftedPriceCount: Int) -> Unit
-  ) {
-    Result.runCatching {
-      attemptDatabaseLockForPriceAdjustment(supplier)
-      applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier, effectiveYear, multiplier)
-    }.onFailure {
-      releaseDatabaseLockForPriceAdjustment(supplier)
-      onFailure(it)
-    }.onSuccess {
-      releaseDatabaseLockForPriceAdjustment(supplier)
-      onSuccess(it)
-    }
+  ): Int {
+    priceAdjustmentRepository.failIfLockNotPresent(id, supplier)
+
+    return applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier, effectiveYear, multiplier)
+  }
+
+  fun PriceAdjustmentRepository.failIfLockNotPresent(id: UUID, supplier: Supplier) {
+    if (!priceAdjustmentRepository.existsById(id)) throw RuntimeException("Unable to upflift lock is not present for $supplier.")
   }
 
   /**
    * There can only every be one supplier price adjustment in progress. This will fail (as expected) if one already exists!
+   *
+   * Returns the ID of the lock (if successfully created).
    */
-  private fun attemptDatabaseLockForPriceAdjustment(supplier: Supplier) {
+  internal fun attemptLockForPriceAdjustment(supplier: Supplier) =
     priceAdjustmentRepository.saveAndFlush(
       PriceAdjustment(
         supplier = supplier,
         addedAt = timeSource.dateTime()
       )
-    )
-  }
+    ).id
 
   private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(
     supplier: Supplier,
@@ -117,9 +115,9 @@ class AnnualPriceAdjuster(
       effectiveYear
     )
 
-  private fun releaseDatabaseLockForPriceAdjustment(supplier: Supplier) {
+  internal fun releaseLockForPriceAdjustment(id: UUID) {
     with(priceAdjustmentRepository) {
-      deleteBySupplier(supplier)
+      deleteById(id)
       flush()
     }
   }
