@@ -39,7 +39,7 @@ internal class PriceMetadataTest {
     assertThat(metadata.newPrice).isEqualTo(1.0)
     assertThat(metadata.oldPrice).isEqualTo(2.0)
     assertThat(metadata.isUpdate()).isTrue
-    assertThat(metadata.isUplift()).isFalse
+    assertThat(metadata.isAdjustment()).isFalse
     assertThat(metadata.key()).isEqualTo("GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
@@ -53,8 +53,8 @@ internal class PriceMetadataTest {
   }
 
   @Test
-  fun `price uplift`() {
-    val metadata = PriceMetadata.uplift(
+  fun `price adjustment`() {
+    val metadata = PriceMetadata.adjustment(
       new = Price(supplier = Supplier.SERCO, fromLocation = fromLocation, toLocation = toLocation, effectiveYear = 2020, priceInPence = 200),
       old = Money(100),
       multiplier = 2.0
@@ -68,6 +68,6 @@ internal class PriceMetadataTest {
     assertThat(metadata.oldPrice).isEqualTo(1.0)
     assertThat(metadata.multiplier).isEqualTo(2.0)
     assertThat(metadata.isUpdate()).isFalse
-    assertThat(metadata.isUplift()).isTrue
+    assertThat(metadata.isAdjustment()).isTrue
   }
 }

@@ -25,28 +25,27 @@ class AnnualPriceAdjustmentsService(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
-   * Price uplifts cannot be before the current effective year, if the supplied effective year is before it then an
+   * Price adjustments cannot be before the current effective year, if the supplied effective year is before it then an
    * exception will be thrown.
+   *
+   * An adjustment normally takes place at the start of the effective year is based around inflationary price rises.
    */
-  fun uplift(supplier: Supplier, suppliedEffective: Int, multiplier: Double) {
+  fun adjust(supplier: Supplier, suppliedEffective: Int, multiplier: Double) {
     if (suppliedEffective < actualEffectiveYear.current()) {
-      throw RuntimeException("Price uplifts cannot be before the current effective year ${actualEffectiveYear.current()}.")
+      throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
     }
 
-    logger.info("Starting price uplift for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
+    logger.info("Starting price adjustment for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
 
-    doUplift(supplier, suppliedEffective, multiplier)
+    doAdjustment(supplier, suppliedEffective, multiplier)
   }
 
-  /**
-   * An uplift normally takes place at the start of the effective year is based around inflationary price rises.
-   */
-  private fun doUplift(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
+  private fun doAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
     launch {
       Result.runCatching {
         val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier)
 
-        annualPriceAdjuster.uplift(
+        annualPriceAdjuster.adjust(
           lockId,
           supplier,
           effectiveYear,
@@ -56,14 +55,14 @@ class AnnualPriceAdjustmentsService(
         }
       }.onFailure {
         logger.error(
-          "Failed price uplift for $supplier for effective year $effectiveYear and multiplier $multiplier.",
+          "Failed price adjustment for $supplier for effective year $effectiveYear and multiplier $multiplier.",
           it
         )
 
-        monitoringService.capture("Failed price uplift for $supplier for effective year $effectiveYear and multiplier $multiplier.")
+        monitoringService.capture("Failed price adjustment for $supplier for effective year $effectiveYear and multiplier $multiplier.")
       }.onSuccess {
-        logger.info("Succeeded price uplift for $supplier for effective year $effectiveYear and multiplier $multiplier. Total prices uplifted $it.")
-        auditService.create(AuditableEvent.journeyPriceBulkUpliftEvent(supplier, effectiveYear, multiplier))
+        logger.info("Succeeded price adjustment for $supplier for effective year $effectiveYear and multiplier $multiplier. Total prices adjusted $it.")
+        auditService.create(AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(supplier, effectiveYear, multiplier))
       }
     }
   }

@@ -9,10 +9,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsServi
 class BulkPriceUpdateCommands(
   private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService
 ) {
-  @ShellMethod("Performs a price uplift for the given supplier, effective year and the supplied multiplier.")
-  fun uplift(supplier: Supplier, effectiveYear: Int, multiplier: Double, force: Boolean = false) {
+  @ShellMethod("Performs a bulk price adjustment for the given supplier, effective year and the supplied multiplier.")
+  fun bulkPriceAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double, force: Boolean = false) {
     if (force)
-      annualPriceAdjustmentsService.uplift(supplier, effectiveYear, multiplier)
+      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, multiplier)
     else
       throw RuntimeException("Force is required for this operation to complete.")
   }
