@@ -123,9 +123,9 @@ import-prices --supplier SERCO/GEOAMEY --year 2020
 import-reports --from YYYY-MM-DD --to YYYY-MM-DD
 ```
 ```
-# Bulk price uplift
+# Bulk price adjustments
 
-uplift --supplier SERCO/GEOAMEY --effective-year 2021 --multiplier 1.12 --force
+bulk-price-adjustment --supplier SERCO/GEOAMEY --effective-year 2021 --multiplier 1.12 --force
 ```
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 

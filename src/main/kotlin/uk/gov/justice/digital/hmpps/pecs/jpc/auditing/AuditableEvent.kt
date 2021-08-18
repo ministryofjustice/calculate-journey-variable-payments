@@ -80,21 +80,21 @@ data class AuditableEvent(
       )
     }
 
-    fun upliftPrice(price: Price, original: Money, multiplier: Double, authentication: Authentication? = null): AuditableEvent {
+    fun adjustPrice(price: Price, original: Money, multiplier: Double, authentication: Authentication? = null): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = authentication?.name ?: terminal,
-        metadata = PriceMetadata.uplift(price, original, multiplier)
+        metadata = PriceMetadata.adjustment(price, original, multiplier)
       )
     }
 
-    fun journeyPriceBulkUpliftEvent(
+    fun journeyPriceBulkPriceAdjustmentEvent(
       supplier: Supplier,
       effectiveYear: Int,
       multiplier: Double,
       authentication: Authentication? = null
     ) = createEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
+      AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
       authentication,
       mapOf("supplier" to supplier, "effective_year" to effectiveYear, "multiplier" to multiplier),
       true

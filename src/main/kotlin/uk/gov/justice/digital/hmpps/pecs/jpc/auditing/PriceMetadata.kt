@@ -68,7 +68,7 @@ data class PriceMetadata(
       return PriceMetadata(old, new)
     }
 
-    fun uplift(new: Price, old: Money, multiplier: Double) = PriceMetadata(old, new, multiplier)
+    fun adjustment(new: Price, old: Money, multiplier: Double) = PriceMetadata(old, new, multiplier)
 
     fun map(event: AuditEvent): PriceMetadata {
       return if (event.eventType == AuditEventType.JOURNEY_PRICE)
@@ -83,7 +83,7 @@ data class PriceMetadata(
 
   fun isUpdate() = oldPrice != null && multiplier == null
 
-  fun isUplift() = multiplier != null
+  fun isAdjustment() = multiplier != null
 
   override fun toJsonString(): String = Klaxon().toJsonString(this)
 

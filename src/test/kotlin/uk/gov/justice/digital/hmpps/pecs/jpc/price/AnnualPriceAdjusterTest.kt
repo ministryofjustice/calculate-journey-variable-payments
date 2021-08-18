@@ -43,7 +43,7 @@ internal class AnnualPriceAdjusterTest {
   }
 
   @Test
-  fun `attempted lock for GEOAmey uplift is successful`() {
+  fun `attempted lock for GEOAmey adjustment is successful`() {
     val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.GEOAMEY, addedAt = timeSource.dateTime())
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
@@ -60,7 +60,7 @@ internal class AnnualPriceAdjusterTest {
   }
 
   @Test
-  fun `attempted lock required for Serco uplift is successful`() {
+  fun `attempted lock required for Serco adjustment is successful`() {
     val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.SERCO, addedAt = timeSource.dateTime())
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
@@ -77,7 +77,7 @@ internal class AnnualPriceAdjusterTest {
   }
 
   @Test
-  fun `previous years prices are successfully uplifted for Serco`() {
+  fun `previous years prices are successfully adjusted for Serco`() {
     val lockId = fakeLock()
 
     val previousYearPrice = Price(supplier = Supplier.SERCO, fromLocation = fromLocation, toLocation = toLocation, priceInPence = 10000, effectiveYear = 2019)
@@ -85,7 +85,7 @@ internal class AnnualPriceAdjusterTest {
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2019)).thenReturn(Stream.of(previousYearPrice))
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(any(), any(), any(), any())).thenReturn(null)
 
-    val adjusted = priceAdjuster.uplift(lockId, Supplier.SERCO, 2020, 1.5)
+    val adjusted = priceAdjuster.adjust(lockId, Supplier.SERCO, 2020, 1.5)
 
     assertThat(adjusted).isEqualTo(1)
 
@@ -93,10 +93,10 @@ internal class AnnualPriceAdjusterTest {
   }
 
   @Test
-  fun `failed uplift for Serco due to price adjustment lock not being in place`() {
+  fun `failed adjustment for Serco due to price adjustment lock not being in place`() {
     val lockId = fakeLock(false)
 
-    assertThatThrownBy { priceAdjuster.uplift(lockId, Supplier.SERCO, 2020, 1.0) }
+    assertThatThrownBy { priceAdjuster.adjust(lockId, Supplier.SERCO, 2020, 1.0) }
       .isInstanceOf(RuntimeException::class.java)
       .hasMessage("Unable to upflift lock is not present for SERCO.")
 
@@ -104,14 +104,14 @@ internal class AnnualPriceAdjusterTest {
   }
 
   @Test
-  fun `previous years prices are successfully uplifted for GEOAmey`() {
+  fun `previous years prices are successfully adjusted for GEOAmey`() {
     val lockId = fakeLock()
 
     val previousYearPrice = Price(supplier = Supplier.GEOAMEY, fromLocation = fromLocation, toLocation = toLocation, priceInPence = 10000, effectiveYear = 2020)
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2020)).thenReturn(Stream.of(previousYearPrice))
 
-    val adjusted = priceAdjuster.uplift(lockId, Supplier.GEOAMEY, 2021, 2.0)
+    val adjusted = priceAdjuster.adjust(lockId, Supplier.GEOAMEY, 2021, 2.0)
 
     assertThat(adjusted).isEqualTo(1)
 
@@ -119,10 +119,10 @@ internal class AnnualPriceAdjusterTest {
   }
 
   @Test
-  fun `failed uplift for GEOAmey due to price adjustment lock not being in place`() {
+  fun `failed adjustment for GEOAmey due to price adjustment lock not being in place`() {
     val lockId = fakeLock(false)
 
-    assertThatThrownBy { priceAdjuster.uplift(lockId, Supplier.GEOAMEY, 2020, 1.0) }
+    assertThatThrownBy { priceAdjuster.adjust(lockId, Supplier.GEOAMEY, 2020, 1.0) }
       .isInstanceOf(RuntimeException::class.java)
       .hasMessage("Unable to upflift lock is not present for GEOAMEY.")
 

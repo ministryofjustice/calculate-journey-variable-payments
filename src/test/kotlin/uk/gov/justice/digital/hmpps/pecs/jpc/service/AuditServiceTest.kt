@@ -294,18 +294,18 @@ internal class AuditServiceTest {
   private inline fun <reified T> jsonTo(json: String): T = Klaxon().parse<T>(json)!!
 
   @Test
-  internal fun `create journey price bulk uplift audit event`() {
-    service.create(AuditableEvent.journeyPriceBulkUpliftEvent(Supplier.SERCO, 2020, 1.5))
-    service.create(AuditableEvent.journeyPriceBulkUpliftEvent(Supplier.GEOAMEY, 2021, 2.0))
+  internal fun `create journey price bulk adjustment audit event`() {
+    service.create(AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(Supplier.SERCO, 2020, 1.5))
+    service.create(AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(Supplier.GEOAMEY, 2021, 2.0))
 
     verifyEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
+      AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
       "_TERMINAL_",
       mapOf("supplier" to Supplier.SERCO, "effective_year" to 2020, "multiplier" to 1.5)
     )
 
     verifyEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
+      AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
       "_TERMINAL_",
       mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
     )
@@ -323,9 +323,9 @@ internal class AuditServiceTest {
   }
 
   @Test
-  internal fun `create authenticated journey price uplift audit event`() {
+  internal fun `create authenticated journey price adjustment audit event`() {
     service.create(
-      AuditableEvent.upliftPrice(
+      AuditableEvent.adjustPrice(
         price = Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
@@ -357,9 +357,9 @@ internal class AuditServiceTest {
   }
 
   @Test
-  internal fun `create un-authenticated journey price uplift audit event`() {
+  internal fun `create un-authenticated journey price adjustment audit event`() {
     service.create(
-      AuditableEvent.upliftPrice(
+      AuditableEvent.adjustPrice(
         price = Price(
           supplier = Supplier.SERCO,
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),

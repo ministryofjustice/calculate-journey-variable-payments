@@ -33,52 +33,52 @@ internal class AnnualPriceAdjustmentsServiceTest {
   private val annualPriceAdjusterSpy: AnnualPriceAdjuster = mock { spy(annualPriceAdjuster) }
 
   @Test
-  internal fun `price uplift for Serco`() {
+  internal fun `price adjustment for Serco`() {
     val lockId = fakeLockForFor(Supplier.SERCO)
 
-    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService, effectiveYear).uplift(
+    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService, effectiveYear).adjust(
       Supplier.SERCO,
       2020,
       1.0
     )
 
-    verify(annualPriceAdjusterSpy).uplift(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(1.0))
+    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(1.0))
   }
 
   @Test
-  internal fun `price uplift for GEOAmey`() {
+  internal fun `price adjustment for GEOAmey`() {
     val lockId = fakeLockForFor(Supplier.GEOAMEY)
 
-    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService, effectiveYear).uplift(
+    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService, effectiveYear).adjust(
       Supplier.GEOAMEY,
       2021,
       2.0
     )
 
-    verify(annualPriceAdjusterSpy).uplift(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))
+    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))
   }
 
   @Test
-  internal fun `monitoring service captures failed price uplift`() {
+  internal fun `monitoring service captures failed price adjustment`() {
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(PriceAdjustment(supplier = Supplier.GEOAMEY))
-    whenever(annualPriceAdjusterSpy.uplift(any(), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))).thenThrow(RuntimeException("something went wrong"))
+    whenever(annualPriceAdjusterSpy.adjust(any(), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))).thenThrow(RuntimeException("something went wrong"))
 
-    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).uplift(
+    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
       Supplier.GEOAMEY,
       2021,
       2.0
     )
 
-    verify(monitoringService).capture("Failed price uplift for GEOAMEY for effective year 2021 and multiplier 2.0.")
+    verify(monitoringService).capture("Failed price adjustment for GEOAMEY for effective year 2021 and multiplier 2.0.")
   }
 
   @Test
-  internal fun `auditing service captures successful price uplift`() {
+  internal fun `auditing service captures successful price adjustment`() {
     fakeLockForFor(Supplier.GEOAMEY)
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(PriceAdjustment(supplier = Supplier.GEOAMEY))
     whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
 
-    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).uplift(
+    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
       Supplier.GEOAMEY,
       2021,
       2.0
@@ -86,7 +86,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
     verify(auditService).create(
       AuditableEvent(
-        AuditEventType.JOURNEY_PRICE_BULK_UPLIFT,
+        AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         "_TERMINAL_",
         mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
       )
@@ -94,15 +94,15 @@ internal class AnnualPriceAdjustmentsServiceTest {
   }
 
   @Test
-  internal fun `cannot uplift years prior to the current effective year`() {
+  internal fun `cannot adjust years prior to the current effective year`() {
     assertThatThrownBy {
-      AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).uplift(
+      AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
         Supplier.GEOAMEY,
         effectiveYear.current() - 1,
         2.0
       )
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price uplifts cannot be before the current effective year ${effectiveYear.current()}.")
+      .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")
   }
 
   private fun fakeLockForFor(supplier: Supplier): UUID {

@@ -26,9 +26,9 @@ class AnnualPriceAdjuster(
   internal fun isInProgressFor(supplier: Supplier) = priceAdjustmentRepository.existsPriceAdjustmentBySupplier(supplier)
 
   /**
-   * Prices for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
+   * Price adjustments for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
    */
-  internal fun uplift(
+  internal fun adjust(
     id: UUID,
     supplier: Supplier,
     effectiveYear: Int,
@@ -89,12 +89,12 @@ class AnnualPriceAdjuster(
         .takeUnless { priceIsTheSame(it, previousYearPrice.price().times(multiplier)) }
         ?.apply { priceInPence = previousYearPrice.price().times(multiplier).pence }
         ?.also {
-          auditService.create(AuditableEvent.upliftPrice(it, previousYearPrice.price(), multiplier))
+          auditService.create(AuditableEvent.adjustPrice(it, previousYearPrice.price(), multiplier))
         }
     }
 
     return newPriceAdjustmentFor(previousYearPrice, effectiveYear, multiplier).also {
-      auditService.create(AuditableEvent.upliftPrice(it, previousYearPrice.price(), multiplier))
+      auditService.create(AuditableEvent.adjustPrice(it, previousYearPrice.price(), multiplier))
     }
   }
 
