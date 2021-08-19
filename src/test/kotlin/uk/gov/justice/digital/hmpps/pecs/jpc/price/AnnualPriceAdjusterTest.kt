@@ -44,16 +44,18 @@ internal class AnnualPriceAdjusterTest {
 
   @Test
   fun `attempted lock for GEOAmey adjustment is successful`() {
-    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.GEOAMEY, addedAt = timeSource.dateTime())
+    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.GEOAMEY, addedAt = timeSource.dateTime(), multiplier = 1.5, effectiveYear = 2020)
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
-    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.GEOAMEY)
+    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.GEOAMEY, 1.5, 2020)
 
     verify(priceAdjustmentRepository).saveAndFlush(priceAdjusterCaptor.capture())
 
     with(priceAdjusterCaptor.firstValue) {
       assertThat(supplier).isEqualTo(Supplier.GEOAMEY)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
+      assertThat(multiplier).isEqualTo(1.5)
+      assertThat(effectiveYear).isEqualTo(2020)
     }
 
     assertThat(actualLockId).isEqualTo(expectedPriceAdjustment.id)
@@ -61,16 +63,18 @@ internal class AnnualPriceAdjusterTest {
 
   @Test
   fun `attempted lock required for Serco adjustment is successful`() {
-    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.SERCO, addedAt = timeSource.dateTime())
+    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.SERCO, addedAt = timeSource.dateTime(), multiplier = 2.0, effectiveYear = 2021)
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
-    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.SERCO)
+    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.SERCO, 2.0, 2021)
 
     verify(priceAdjustmentRepository).saveAndFlush(priceAdjusterCaptor.capture())
 
     with(priceAdjusterCaptor.firstValue) {
       assertThat(supplier).isEqualTo(Supplier.SERCO)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
+      assertThat(multiplier).isEqualTo(2.0)
+      assertThat(effectiveYear).isEqualTo(2021)
     }
 
     assertThat(actualLockId).isEqualTo(expectedPriceAdjustment.id)

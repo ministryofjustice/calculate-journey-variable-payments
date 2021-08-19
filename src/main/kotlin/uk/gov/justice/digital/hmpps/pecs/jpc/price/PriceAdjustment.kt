@@ -38,5 +38,11 @@ data class PriceAdjustment(
   val supplier: Supplier,
 
   @Column(name = "added_at", nullable = false)
-  val addedAt: LocalDateTime = LocalDateTime.now()
+  val addedAt: LocalDateTime = LocalDateTime.now(),
+
+  @Column(name = "effective_year", nullable = false)
+  val effectiveYear: Int,
+
+  @Column(name = "multiplier", nullable = false)
+  val multiplier: Double
 )
