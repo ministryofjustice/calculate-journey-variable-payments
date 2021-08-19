@@ -48,11 +48,13 @@ class AnnualPriceAdjuster(
    *
    * Returns the ID of the lock (if successfully created).
    */
-  internal fun attemptLockForPriceAdjustment(supplier: Supplier) =
+  internal fun attemptLockForPriceAdjustment(supplier: Supplier, multiplier: Double, effectiveYear: Int) =
     priceAdjustmentRepository.saveAndFlush(
       PriceAdjustment(
         supplier = supplier,
-        addedAt = timeSource.dateTime()
+        addedAt = timeSource.dateTime(),
+        multiplier = multiplier,
+        effectiveYear = effectiveYear
       )
     ).id
 

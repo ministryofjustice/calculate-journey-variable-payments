@@ -21,7 +21,7 @@ internal class PriceAdjustmentRepositoryTest {
   fun `can create price adjustment for Serco and retrieve by supplier`() {
     assertThat(repository.findBySupplier(Supplier.SERCO)).isNull()
 
-    val persisted = repository.save(PriceAdjustment(supplier = Supplier.SERCO))
+    val persisted = repository.save(PriceAdjustment(supplier = Supplier.SERCO, multiplier = 1.5, effectiveYear = 2020))
 
     entityManager.flush()
 
@@ -32,7 +32,7 @@ internal class PriceAdjustmentRepositoryTest {
   fun `price adjustment is in progress for Serco and exists by supplier`() {
     assertThat(repository.existsPriceAdjustmentBySupplier(Supplier.SERCO)).isFalse
 
-    repository.save(PriceAdjustment(supplier = Supplier.SERCO))
+    repository.save(PriceAdjustment(supplier = Supplier.SERCO, multiplier = 1.2, effectiveYear = 2021))
 
     entityManager.flush()
 
@@ -43,7 +43,7 @@ internal class PriceAdjustmentRepositoryTest {
   fun `can create price adjustment for GEOAmey and retrieve by supplier`() {
     assertThat(repository.findBySupplier(Supplier.GEOAMEY)).isNull()
 
-    val persisted = repository.save(PriceAdjustment(supplier = Supplier.GEOAMEY))
+    val persisted = repository.save(PriceAdjustment(supplier = Supplier.GEOAMEY, multiplier = 2.0, effectiveYear = 2022))
 
     entityManager.flush()
 

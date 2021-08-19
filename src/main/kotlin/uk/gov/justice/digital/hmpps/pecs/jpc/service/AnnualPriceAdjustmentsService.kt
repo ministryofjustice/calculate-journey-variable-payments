@@ -43,7 +43,7 @@ class AnnualPriceAdjustmentsService(
   private fun doAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
     launch {
       Result.runCatching {
-        val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier)
+        val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)
 
         annualPriceAdjuster.adjust(
           lockId,
