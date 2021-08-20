@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.constraint
+package uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MapFriendlyLocationController.MapLocationForm

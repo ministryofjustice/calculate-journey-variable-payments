@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.constraint
+package uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import javax.validation.ConstraintValidator

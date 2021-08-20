@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.constraint
+package uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints
 
 import javax.validation.Constraint
 import kotlin.reflect.KClass
