@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Person
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Profile
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Profile
 
 @Component
 class PersonPersister(

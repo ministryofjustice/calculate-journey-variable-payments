@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID

@@ -16,8 +16,8 @@ import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 
 @SpringBootTest
 @AutoConfigureMockMvc

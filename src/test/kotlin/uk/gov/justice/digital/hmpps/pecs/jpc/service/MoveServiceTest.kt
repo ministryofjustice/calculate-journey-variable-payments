@@ -12,8 +12,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.eventE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyEventJE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 import java.util.Optional
 
 internal class MoveServiceTest {

@@ -20,9 +20,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 import java.util.Optional
 
 @SpringBootTest

@@ -4,7 +4,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Person
 import java.time.LocalDate
 import java.time.LocalDateTime
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.core.Authentication
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PricesSpreadsheetGenerator
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound.PricesSpreadsheetGenerator
 import java.time.LocalDate
 
 internal class SpreadsheetServiceTest {
