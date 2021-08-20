@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
+package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn

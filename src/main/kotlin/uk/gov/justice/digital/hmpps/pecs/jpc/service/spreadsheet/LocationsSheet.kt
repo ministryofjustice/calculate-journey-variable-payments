@@ -1,11 +1,11 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
+package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.LOCATION_TYPE
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.NAME
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.NOMIS_AGENCY_ID
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.LOCATION_TYPE
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.NAME
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.NOMIS_AGENCY_ID
 import java.util.stream.Stream
 
 class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(

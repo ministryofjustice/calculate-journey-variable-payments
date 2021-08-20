@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
+package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet
 
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.HorizontalAlignment
@@ -8,11 +8,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_TYPE
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME_WITHOUT_PRICES
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PERCENTAGE
-import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PRICE
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.MOVE_TYPE
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME_WITHOUT_PRICES
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.PERCENTAGE
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.PRICE
 
 class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("Summary"),
