@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.location
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.location
 
 import java.time.LocalDateTime
 import java.util.UUID

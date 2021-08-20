@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.location
 
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.InboundSpreadsheet
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
 
 private const val TYPE = 1
 private const val SITE = 2

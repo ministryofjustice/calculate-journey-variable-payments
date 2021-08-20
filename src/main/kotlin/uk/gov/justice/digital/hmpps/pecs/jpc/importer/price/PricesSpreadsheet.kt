@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.price
 
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Workbook
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.InboundSpreadsheet
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
@@ -71,7 +71,12 @@ class PricesSpreadsheet(
   }
 
   private fun failIfPriceAlreadyExists(supplier: Supplier, fromLocation: Location, toLocation: Location) {
-    pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(supplier, fromLocation, toLocation, effectiveYear)?.let {
+    pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )?.let {
       throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
     }
   }

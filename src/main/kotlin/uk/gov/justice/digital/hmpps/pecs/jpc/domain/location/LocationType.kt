@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.location
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.location
 
 /**
  * Enum responsible for mapping location type string values in the locations spreadsheet to an abbreviation (in this case the enum value).

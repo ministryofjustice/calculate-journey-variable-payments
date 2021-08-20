@@ -9,11 +9,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultMoveTypeStandard
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
@@ -61,7 +61,8 @@ internal class MoveQueryRepositoryTest {
   private val sercoMoveWithMissingType = standardMoveSerco.copy(moveId = "MWMT", moveType = null)
 
   private val standardMoveGeoamey = standardMoveSerco.copy(moveId = "M2", supplier = Supplier.GEOAMEY)
-  private val journeyModelGeoamey = journeyModel1Serco.copy(journeyId = "J3", supplier = Supplier.GEOAMEY, moveId = standardMoveGeoamey.moveId)
+  private val journeyModelGeoamey =
+    journeyModel1Serco.copy(journeyId = "J3", supplier = Supplier.GEOAMEY, moveId = standardMoveGeoamey.moveId)
 
   @BeforeEach
   fun beforeEach() {
@@ -110,7 +111,12 @@ internal class MoveQueryRepositoryTest {
   @Test
   fun `Serco move with person and journeys with missing move_type is null`() {
     assertThat(moveRepository.findById(sercoMoveWithMissingType.moveId)).isPresent
-    assertThat(moveQueryRepository.moveWithPersonAndJourneys(sercoMoveWithMissingType.moveId, sercoMoveWithMissingType.supplier)).isNull()
+    assertThat(
+      moveQueryRepository.moveWithPersonAndJourneys(
+        sercoMoveWithMissingType.moveId,
+        sercoMoveWithMissingType.supplier
+      )
+    ).isNull()
   }
 
   @Test
@@ -223,11 +229,23 @@ internal class MoveQueryRepositoryTest {
 
   @Test
   fun `Serco moves count`() {
-    assertThat(moveQueryRepository.moveCountInDateRange(defaultSupplierSerco, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)).isEqualTo(1)
+    assertThat(
+      moveQueryRepository.moveCountInDateRange(
+        defaultSupplierSerco,
+        defaultMoveDate10Sep2020,
+        defaultMoveDate10Sep2020
+      )
+    ).isEqualTo(1)
   }
 
   @Test
   fun `GEOAMey moves count`() {
-    assertThat(moveQueryRepository.moveCountInDateRange(Supplier.GEOAMEY, defaultMoveDate10Sep2020, defaultMoveDate10Sep2020)).isEqualTo(1)
+    assertThat(
+      moveQueryRepository.moveCountInDateRange(
+        Supplier.GEOAMEY,
+        defaultMoveDate10Sep2020,
+        defaultMoveDate10Sep2020
+      )
+    ).isEqualTo(1)
   }
 }

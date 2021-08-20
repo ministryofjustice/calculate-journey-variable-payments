@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 import com.beust.klaxon.Klaxon
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier

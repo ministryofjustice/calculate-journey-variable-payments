@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.price
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column

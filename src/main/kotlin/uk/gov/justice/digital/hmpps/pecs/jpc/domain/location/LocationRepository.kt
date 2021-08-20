@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.location
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.location
 
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID

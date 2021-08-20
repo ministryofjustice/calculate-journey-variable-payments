@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.Location
-import uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 
 /**
  * Metadata to capture mapping of new locations and remapping of existing locations.
