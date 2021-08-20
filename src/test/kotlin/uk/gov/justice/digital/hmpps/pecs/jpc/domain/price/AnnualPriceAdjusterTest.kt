@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.price
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -52,7 +52,7 @@ internal class AnnualPriceAdjusterTest {
     verify(priceAdjustmentRepository).saveAndFlush(priceAdjusterCaptor.capture())
 
     with(priceAdjusterCaptor.firstValue) {
-      assertThat(supplier).isEqualTo(Supplier.GEOAMEY)
+      assertThat(supplier).isEqualTo(uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.GEOAMEY)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
       assertThat(multiplier).isEqualTo(1.5)
       assertThat(effectiveYear).isEqualTo(2020)
@@ -71,7 +71,7 @@ internal class AnnualPriceAdjusterTest {
     verify(priceAdjustmentRepository).saveAndFlush(priceAdjusterCaptor.capture())
 
     with(priceAdjusterCaptor.firstValue) {
-      assertThat(supplier).isEqualTo(Supplier.SERCO)
+      assertThat(supplier).isEqualTo(uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.SERCO)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
       assertThat(multiplier).isEqualTo(2.0)
       assertThat(effectiveYear).isEqualTo(2021)

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
@@ -14,7 +15,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageLocat
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MapLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SearchLocations
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.Month
 import java.time.Year

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.price
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource

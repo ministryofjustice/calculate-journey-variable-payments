@@ -11,6 +11,10 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.journeyEventFactory
@@ -18,11 +22,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.moveEventFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportJourneyFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportMoveFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.toCourtNomisAgencyId
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDateTime
+import java.util.UUID
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation as WYIPrisonLocation1
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.fromPrisonNomisAgencyId as fromPrisonNomisAgencyId1
 
@@ -53,8 +54,8 @@ internal class MovePersisterTest {
 
   private val timeSource: TimeSource = TimeSource { LocalDateTime.now() }
 
-  private final val fromSeptember1st2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 1)
-  private final val toSeptember6th2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 6)
+  private val fromSeptember1st2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 1)
+  private val toSeptember6th2020: java.time.LocalDate = java.time.LocalDate.of(2020, 9, 6)
 
   lateinit var redirectMove: Move
 
@@ -69,7 +70,7 @@ internal class MovePersisterTest {
 
     priceRepository.save(
       Price(
-        id = java.util.UUID.randomUUID(),
+        id = UUID.randomUUID(),
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = 999,

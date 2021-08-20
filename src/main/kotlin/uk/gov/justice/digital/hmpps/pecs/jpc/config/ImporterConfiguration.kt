@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ResourceLoader
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ObfuscatingReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.Clock
 import java.time.LocalDateTime

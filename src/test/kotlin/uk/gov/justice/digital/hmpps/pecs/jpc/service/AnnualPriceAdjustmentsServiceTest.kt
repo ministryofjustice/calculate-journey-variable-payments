@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.EffectiveYear
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceAdjustment
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceAdjustmentRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceAdjustment
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceAdjustmentRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 import java.util.UUID
 

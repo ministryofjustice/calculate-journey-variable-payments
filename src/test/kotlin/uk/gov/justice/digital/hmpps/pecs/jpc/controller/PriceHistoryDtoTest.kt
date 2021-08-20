@@ -8,8 +8,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDateTime
 
 internal class PriceHistoryDtoTest {

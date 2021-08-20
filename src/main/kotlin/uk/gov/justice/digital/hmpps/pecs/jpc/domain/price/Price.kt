@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.price
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import java.time.LocalDateTime

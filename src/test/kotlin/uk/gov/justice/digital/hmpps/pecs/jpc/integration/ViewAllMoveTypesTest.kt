@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.cancelledMoveM60
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.lockoutMoveM40
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.longHaulMoveM30
@@ -20,7 +21,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.PresentDayMoveDat
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.PresentDayMoveData.redirectMoveRM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.PresentDayMoveData.standardMoveSM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.Month
 import java.time.Year

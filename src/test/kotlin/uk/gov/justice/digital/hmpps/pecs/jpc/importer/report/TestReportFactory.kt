@@ -2,12 +2,12 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

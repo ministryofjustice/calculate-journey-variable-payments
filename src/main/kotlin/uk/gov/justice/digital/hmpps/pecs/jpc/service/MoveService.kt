@@ -1,13 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.EventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovesSummary
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 
 @Service

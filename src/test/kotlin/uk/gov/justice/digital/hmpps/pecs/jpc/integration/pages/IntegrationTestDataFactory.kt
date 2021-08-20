@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 

@@ -11,9 +11,9 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.util.CellRangeAddress
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
@@ -87,7 +87,8 @@ abstract class PriceSheet(
     this.setFont(fontWhiteArialBold)
   }
 
-  private val headerSupplierNameStyle: CellStyle = sheet.workbook.createCellStyle().apply { this.cloneStyleFrom(headerStyle) }
+  private val headerSupplierNameStyle: CellStyle =
+    sheet.workbook.createCellStyle().apply { this.cloneStyleFrom(headerStyle) }
 
   private val headerMonthYearStyle: CellStyle = sheet.workbook.createCellStyle().apply {
     this.cloneStyleFrom(headerStyle)
@@ -125,7 +126,8 @@ abstract class PriceSheet(
 
   protected val fillWhitePound: CellStyle = sheet.workbook.createCellStyle().apply { this.dataFormat = formatPound }
 
-  protected val fillWhitePercentage: CellStyle = sheet.workbook.createCellStyle().apply { this.dataFormat = formatPercentage }
+  protected val fillWhitePercentage: CellStyle =
+    sheet.workbook.createCellStyle().apply { this.dataFormat = formatPercentage }
 
   init {
     addHeadings()
@@ -171,9 +173,11 @@ abstract class PriceSheet(
     }
   }
 
-  private fun Sheet.mergeCells(row: Int, firstCol: Int, lastCol: Int) = this.addMergedRegion(CellRangeAddress(row, row, firstCol, lastCol))
+  private fun Sheet.mergeCells(row: Int, firstCol: Int, lastCol: Int) =
+    this.addMergedRegion(CellRangeAddress(row, row, firstCol, lastCol))
 
-  protected fun Row.addHeaderCell(column: Int, label: Any, style: CellStyle = headerStyle) = this.addCell(column, label, style)
+  protected fun Row.addHeaderCell(column: Int, label: Any, style: CellStyle = headerStyle) =
+    this.addCell(column, label, style)
 
   protected fun Row.addEmptyHeaderCell(column: Int) = this.addCell(column, null, headerStyle)
 

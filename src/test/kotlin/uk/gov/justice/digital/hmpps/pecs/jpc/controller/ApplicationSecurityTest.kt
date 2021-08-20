@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 
 @SpringBootTest

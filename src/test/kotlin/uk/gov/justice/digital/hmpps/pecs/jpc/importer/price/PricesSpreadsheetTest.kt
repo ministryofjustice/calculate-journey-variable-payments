@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 internal class PricesSpreadsheetTest {
 

@@ -15,8 +15,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")

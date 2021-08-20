@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.price
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

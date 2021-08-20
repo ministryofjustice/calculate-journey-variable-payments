@@ -10,11 +10,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 @Service
 @Transactional
@@ -53,7 +53,12 @@ class SupplierPricingService(
     effectiveYear: Int
   ): Triple<String, String, Money> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val price = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(supplier, fromLocation, toLocation, effectiveYear)
+    val price = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
       ?: throw RuntimeException("No matching price found for $supplier")
 
     return Triple(fromLocation.siteName, toLocation.siteName, Money(price.priceInPence))
@@ -102,7 +107,8 @@ class SupplierPricingService(
     if (existingPrice.price() != agreedNewPrice) {
       val oldPrice = existingPrice.price().copy()
 
-      priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence }).let { auditService.create(AuditableEvent.updatePrice(it, oldPrice)) }
+      priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
+        .let { auditService.create(AuditableEvent.updatePrice(it, oldPrice)) }
     }
   }
 
@@ -119,7 +125,10 @@ class SupplierPricingService(
   private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
 
   fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
-    return auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE, PriceMetadata.key(supplier, fromAgencyId, toAgencyId))
+    return auditService.auditEventsByTypeAndMetaKey(
+      AuditEventType.JOURNEY_PRICE,
+      PriceMetadata.key(supplier, fromAgencyId, toAgencyId)
+    )
       .associateWith { PriceMetadata.map(it) }
       .keys
   }

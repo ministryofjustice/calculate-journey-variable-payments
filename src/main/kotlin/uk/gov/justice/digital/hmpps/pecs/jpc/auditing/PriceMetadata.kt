@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 /**
  * Metadata to capture price changes, both new and updates.

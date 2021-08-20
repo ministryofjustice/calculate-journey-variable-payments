@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 import org.assertj.core.api.Assertions.assertThat
 import org.fluentlenium.core.annotation.PageUrl
 import org.openqa.selenium.By
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 
 @PageUrl("http://localhost:8080/journeys-results?pick-up={fromAgency}&drop-off={toAgency}")
 class JourneyResultsPage : ApplicationPage() {

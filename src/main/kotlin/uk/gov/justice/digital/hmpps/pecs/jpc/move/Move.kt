@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.move
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventDateTime
@@ -14,8 +16,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.dateConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.dateTimeConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.moveStatusConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.supplierConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

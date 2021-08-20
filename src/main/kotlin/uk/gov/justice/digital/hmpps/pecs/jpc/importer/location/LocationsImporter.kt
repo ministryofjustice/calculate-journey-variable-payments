@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 
 @Component
 class LocationsImporter(

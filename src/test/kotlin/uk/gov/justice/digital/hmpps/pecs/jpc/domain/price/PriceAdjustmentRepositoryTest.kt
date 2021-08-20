@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.price
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy

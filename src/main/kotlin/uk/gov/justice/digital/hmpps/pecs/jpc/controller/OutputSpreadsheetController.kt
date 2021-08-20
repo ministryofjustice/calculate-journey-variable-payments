@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.SessionAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SpreadsheetService
 import java.io.FileInputStream
 import java.io.IOException
@@ -43,17 +43,19 @@ class OutputSpreadsheetController(
   ): ResponseEntity<InputStreamResource?>? {
     logger.info("getting spreadsheet for $supplier")
 
-    return spreadsheetService.spreadsheet(authentication!!, Supplier.valueOfCaseInsensitive(supplier), movesFrom)?.let { file ->
-      val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))
-      val filename = "Journey_Variable_Payment_Output_${Supplier.valueOfCaseInsensitive(supplier)}_$uploadDateTime.xlsx"
-      val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")
-      val resource = InputStreamResource(FileInputStream(file))
+    return spreadsheetService.spreadsheet(authentication!!, Supplier.valueOfCaseInsensitive(supplier), movesFrom)
+      ?.let { file ->
+        val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))
+        val filename =
+          "Journey_Variable_Payment_Output_${Supplier.valueOfCaseInsensitive(supplier)}_$uploadDateTime.xlsx"
+        val mediaType: MediaType = MediaType.parseMediaType("application/vnd.ms-excel")
+        val resource = InputStreamResource(FileInputStream(file))
 
-      ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=$filename")
-        .contentType(mediaType)
-        .contentLength(file.length())
-        .body(resource)
-    } ?: ResponseEntity.noContent().build()
+        ResponseEntity.ok()
+          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=$filename")
+          .contentType(mediaType)
+          .contentLength(file.length())
+          .body(resource)
+      } ?: ResponseEntity.noContent().build()
   }
 }

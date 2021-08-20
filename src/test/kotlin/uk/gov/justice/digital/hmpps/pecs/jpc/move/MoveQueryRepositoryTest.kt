@@ -10,13 +10,13 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.WYIPrisonLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultMoveTypeStandard
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 import java.time.LocalDate
 import java.util.UUID
 

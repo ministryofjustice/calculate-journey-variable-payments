@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.LocalDate
 import javax.validation.Valid
@@ -160,7 +160,12 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
       model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
       model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
 
-      agencyIds(form.moveId).let { (from, to) -> model.addAttribute("history", priceHistoryForMove(supplier, from, to)) }
+      agencyIds(form.moveId).let { (from, to) ->
+        model.addAttribute(
+          "history",
+          priceHistoryForMove(supplier, from, to)
+        )
+      }
 
       return "update-price"
     }

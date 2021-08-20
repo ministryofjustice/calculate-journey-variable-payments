@@ -7,8 +7,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.PriceRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import java.io.InputStream
 

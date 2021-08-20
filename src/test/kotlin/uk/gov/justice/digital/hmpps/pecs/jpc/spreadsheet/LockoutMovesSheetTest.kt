@@ -2,11 +2,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 internal class LockoutMovesSheetTest {
   private val journey1 = journeyJ1()

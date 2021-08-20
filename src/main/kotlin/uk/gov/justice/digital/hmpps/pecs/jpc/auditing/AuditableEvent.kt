@@ -4,9 +4,9 @@ import com.beust.klaxon.Klaxon
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -15,7 +15,11 @@ data class AuditableEvent(
   val username: String,
   val metadata: Metadata? = null
 ) {
-  constructor(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) : this(type, username, metadata?.let { MetadataWrapper(it) })
+  constructor(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) : this(
+    type,
+    username,
+    metadata?.let { MetadataWrapper(it) }
+  )
 
   companion object {
     private val terminal = "_TERMINAL_"
@@ -80,7 +84,12 @@ data class AuditableEvent(
       )
     }
 
-    fun adjustPrice(price: Price, original: Money, multiplier: Double, authentication: Authentication? = null): AuditableEvent {
+    fun adjustPrice(
+      price: Price,
+      original: Money,
+      multiplier: Double,
+      authentication: Authentication? = null
+    ): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = authentication?.name ?: terminal,

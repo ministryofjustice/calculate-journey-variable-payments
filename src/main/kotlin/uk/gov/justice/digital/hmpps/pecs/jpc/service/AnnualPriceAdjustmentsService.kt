@@ -5,9 +5,9 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.AnnualPriceAdjuster
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.EffectiveYear
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 /**
  * Service to handle annual price adjustments for suppliers.

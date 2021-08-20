@@ -5,14 +5,14 @@ import org.flywaydb.core.api.migration.Context
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.SingleConnectionDataSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -48,7 +48,10 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       "SM2" to "PR2",
       "SM3" to "PR3"
     ).forEach {
-      create(move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY"), template).also { move ->
+      create(
+        move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY"),
+        template
+      ).also { move ->
         create(moveStartEvent(move), template)
         create(moveCompleteEvent(move), template)
         create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY"), template).also { journey ->
@@ -67,11 +70,29 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     mapOf(
       "RM1" to "PR4",
     ).forEach {
-      create(move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", type = MoveType.REDIRECTION), template).also { move ->
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "FROM_AGENCY",
+          toAgencyId = "TO_AGENCY",
+          type = MoveType.REDIRECTION
+        ),
+        template
+      ).also { move ->
         create(moveStartEvent(move), template)
         create(moveRedirectEvent(move), template)
         create(moveCompleteEvent(move), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "STOPOVER_AGENCY", state = JourneyState.cancelled, dropOff = null), template)
+        create(
+          journey(
+            move,
+            fromAgencyId = "FROM_AGENCY",
+            toAgencyId = "STOPOVER_AGENCY",
+            state = JourneyState.cancelled,
+            dropOff = null
+          ),
+          template
+        )
         create(journey(move, fromAgencyId = "STOPOVER_AGENCY", toAgencyId = "TO_AGENCY"), template)
       }
     }
@@ -83,11 +104,30 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     mapOf(
       "LHM1" to "PR5",
     ).forEach {
-      create(move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", type = MoveType.LONG_HAUL, days = 1), template).also { move ->
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "FROM_AGENCY",
+          toAgencyId = "TO_AGENCY",
+          type = MoveType.LONG_HAUL,
+          days = 1
+        ),
+        template
+      ).also { move ->
         create(moveStartEvent(move), template)
         create(moveCompleteEvent(move), template)
         create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "STOPOVER_AGENCY"), template)
-        create(journey(move, fromAgencyId = "STOPOVER_AGENCY", toAgencyId = "TO_AGENCY", pickUp = move.pickUpDateTime?.plusDays(1), dropOff = move.dropOffOrCancelledDateTime), template)
+        create(
+          journey(
+            move,
+            fromAgencyId = "STOPOVER_AGENCY",
+            toAgencyId = "TO_AGENCY",
+            pickUp = move.pickUpDateTime?.plusDays(1),
+            dropOff = move.dropOffOrCancelledDateTime
+          ),
+          template
+        )
       }
     }
   }
@@ -98,11 +138,30 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     mapOf(
       "LM1" to "PR6",
     ).forEach {
-      create(move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", type = MoveType.LOCKOUT, days = 1), template).also { move ->
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "FROM_AGENCY",
+          toAgencyId = "TO_AGENCY",
+          type = MoveType.LOCKOUT,
+          days = 1
+        ),
+        template
+      ).also { move ->
         create(moveStartEvent(move), template)
         create(moveCompleteEvent(move), template)
         create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "LOCKOUT_AGENCY"), template)
-        create(journey(move, fromAgencyId = "LOCKOUT_AGENCY", toAgencyId = "TO_AGENCY", pickUp = move.pickUpDateTime?.plusDays(1), dropOff = move.dropOffOrCancelledDateTime), template)
+        create(
+          journey(
+            move,
+            fromAgencyId = "LOCKOUT_AGENCY",
+            toAgencyId = "TO_AGENCY",
+            pickUp = move.pickUpDateTime?.plusDays(1),
+            dropOff = move.dropOffOrCancelledDateTime
+          ),
+          template
+        )
       }
     }
   }
@@ -113,12 +172,40 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     mapOf(
       "MM1" to "PR7",
     ).forEach {
-      create(move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY4", type = MoveType.MULTI, days = 1), template).also { move ->
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "FROM_AGENCY",
+          toAgencyId = "TO_AGENCY4",
+          type = MoveType.MULTI,
+          days = 1
+        ),
+        template
+      ).also { move ->
         create(moveStartEvent(move), template)
         create(moveCompleteEvent(move), template)
         create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY2"), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY2", toAgencyId = "TO_AGENCY3", state = JourneyState.cancelled, dropOff = null), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY2", toAgencyId = "TO_AGENCY4", pickUp = move.pickUpDateTime?.plusDays(1), dropOff = move.dropOffOrCancelledDateTime), template)
+        create(
+          journey(
+            move,
+            fromAgencyId = "FROM_AGENCY2",
+            toAgencyId = "TO_AGENCY3",
+            state = JourneyState.cancelled,
+            dropOff = null
+          ),
+          template
+        )
+        create(
+          journey(
+            move,
+            fromAgencyId = "FROM_AGENCY2",
+            toAgencyId = "TO_AGENCY4",
+            pickUp = move.pickUpDateTime?.plusDays(1),
+            dropOff = move.dropOffOrCancelledDateTime
+          ),
+          template
+        )
       }
     }
   }
@@ -129,10 +216,22 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     mapOf(
       "CM1" to "PR8",
     ).forEach {
-      create(move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", type = MoveType.CANCELLED), template).also { move ->
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "FROM_AGENCY",
+          toAgencyId = "TO_AGENCY",
+          type = MoveType.CANCELLED
+        ),
+        template
+      ).also { move ->
         create(moveAcceptEvent(move), template)
         create(moveCancelEvent(move), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.cancelled), template)
+        create(
+          journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.cancelled),
+          template
+        )
       }
     }
   }

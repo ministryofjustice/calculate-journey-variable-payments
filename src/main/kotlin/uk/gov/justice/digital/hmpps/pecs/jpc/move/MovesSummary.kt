@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.move
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 
 data class MovesSummary(
   val moveType: MoveType? = null,

@@ -2,9 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
 
 class ReportMoveParserTest {
 

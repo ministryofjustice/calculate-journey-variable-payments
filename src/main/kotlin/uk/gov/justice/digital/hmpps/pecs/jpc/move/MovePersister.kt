@@ -4,9 +4,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
 import java.time.LocalDateTime
 import java.util.UUID
 
