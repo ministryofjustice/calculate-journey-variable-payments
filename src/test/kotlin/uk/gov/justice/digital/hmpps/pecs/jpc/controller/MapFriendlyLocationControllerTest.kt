@@ -17,9 +17,9 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
@@ -51,7 +51,14 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
     mockMvc.get("/map-location/$agencyId")
-      .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)) } }
+      .andExpect {
+        model {
+          attribute(
+            "form",
+            MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)
+          )
+        }
+      }
       .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 
@@ -64,7 +71,17 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(null)
 
     mockMvc.get("/map-location/$agencyId")
-      .andExpect { model { attribute("form", MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.")) } }
+      .andExpect {
+        model {
+          attribute(
+            "form",
+            MapFriendlyLocationController.MapLocationForm(
+              agencyId,
+              nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
+            )
+          )
+        }
+      }
       .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 
@@ -79,7 +96,16 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
 
-    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(setOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata)))
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
+      setOf(
+        AuditEvent(
+          AuditEventType.LOCATION,
+          auditEventDatetime,
+          "Jane",
+          auditEventMetadata
+        )
+      )
+    )
 
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
 
@@ -88,11 +114,30 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
         model {
           attribute(
             "form",
-            MapFriendlyLocationController.MapLocationForm("ABCDEF", "EXISTING LOCATION", LocationType.CC, "update", nomisLocationName)
+            MapFriendlyLocationController.MapLocationForm(
+              "ABCDEF",
+              "EXISTING LOCATION",
+              LocationType.CC,
+              "update",
+              nomisLocationName
+            )
           )
         }
       }
-      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name 'EXISTING LOCATION' and type 'Crown Court'", "Jane"))) } }
+      .andExpect {
+        model {
+          attribute(
+            "history",
+            listOf(
+              LocationHistoryDto(
+                auditEventDatetime,
+                "Assigned to location name 'EXISTING LOCATION' and type 'Crown Court'",
+                "Jane"
+              )
+            )
+          )
+        }
+      }
       .andExpect { view { name("update-location") } }
       .andExpect { model { attribute("origin", "from") } }
       .andExpect { status { isOk() } }

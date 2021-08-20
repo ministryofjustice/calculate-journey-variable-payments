@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDateTime

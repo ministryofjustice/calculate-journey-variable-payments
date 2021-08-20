@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.MapLocationMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -17,7 +17,8 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `initial journey pricing via the system`() {
     val datetime = LocalDateTime.now()
-    val priceMetadata = PriceMetadata(Supplier.GEOAMEY, "from_geo_agency_id", "to_geo_agency_id", 2020, Money(1100).pounds())
+    val priceMetadata =
+      PriceMetadata(Supplier.GEOAMEY, "from_geo_agency_id", "to_geo_agency_id", 2020, Money(1100).pounds())
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "_TERMINAL_", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
 
@@ -33,7 +34,8 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `initial journey pricing via a user`() {
     val datetime = LocalDateTime.now()
-    val priceMetadata = PriceMetadata(Supplier.SERCO, "from_serco_agency_id", "to_serco_agency_id", 2021, Money(1450).pounds())
+    val priceMetadata =
+      PriceMetadata(Supplier.SERCO, "from_serco_agency_id", "to_serco_agency_id", 2021, Money(1450).pounds())
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.SERCO, priceEvent)
 
@@ -49,7 +51,14 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `updated journey pricing via a user`() {
     val datetime = LocalDateTime.now()
-    val priceMetadata = PriceMetadata(Supplier.GEOAMEY, "from_agency_id", "to_agency_id", 2021, Money(1450).pounds(), Money(1650).pounds())
+    val priceMetadata = PriceMetadata(
+      Supplier.GEOAMEY,
+      "from_agency_id",
+      "to_agency_id",
+      2021,
+      Money(1450).pounds(),
+      Money(1650).pounds()
+    )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
 
@@ -65,16 +74,30 @@ internal class PriceHistoryDtoTest {
   @Test
   fun `throws a runtime exception if not correct event type`() {
     assertThatThrownBy {
-      PriceHistoryDto.valueOf(Supplier.GEOAMEY, AuditEvent(AuditEventType.LOCATION, LocalDateTime.now(), "Jane", MapLocationMetadata("agency_id", "site name", LocationType.CC)))
+      PriceHistoryDto.valueOf(
+        Supplier.GEOAMEY,
+        AuditEvent(
+          AuditEventType.LOCATION,
+          LocalDateTime.now(),
+          "Jane",
+          MapLocationMetadata("agency_id", "site name", LocationType.CC)
+        )
+      )
     }.isInstanceOf(RuntimeException::class.java)
   }
 
   @Test
   fun `throws a runtime exception if incorrect supplier for history event`() {
     val datetime = LocalDateTime.now()
-    val priceMetadata = PriceMetadata(Supplier.SERCO, "from_serco_agency_id", "to_serco_agency_id", 2022, Money(1450).pounds())
+    val priceMetadata =
+      PriceMetadata(Supplier.SERCO, "from_serco_agency_id", "to_serco_agency_id", 2022, Money(1450).pounds())
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
 
-    assertThatThrownBy { PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent) }.isInstanceOf(RuntimeException::class.java)
+    assertThatThrownBy {
+      PriceHistoryDto.valueOf(
+        Supplier.GEOAMEY,
+        priceEvent
+      )
+    }.isInstanceOf(RuntimeException::class.java)
   }
 }

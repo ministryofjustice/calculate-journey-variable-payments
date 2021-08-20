@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing
 
 import java.time.LocalDateTime
 import java.util.UUID

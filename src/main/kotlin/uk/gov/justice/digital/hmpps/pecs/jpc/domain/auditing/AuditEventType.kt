@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing
 
 enum class AuditEventType(val label: String) {
   DOWNLOAD_SPREADSHEET("Download spreadsheet"),

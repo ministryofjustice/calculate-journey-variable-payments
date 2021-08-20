@@ -4,7 +4,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier

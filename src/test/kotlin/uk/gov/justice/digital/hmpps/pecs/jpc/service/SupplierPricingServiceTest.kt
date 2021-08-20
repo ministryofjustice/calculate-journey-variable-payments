@@ -10,9 +10,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType

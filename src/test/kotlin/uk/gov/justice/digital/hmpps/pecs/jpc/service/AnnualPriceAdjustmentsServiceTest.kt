@@ -8,9 +8,9 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceAdjustment
@@ -60,8 +60,21 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
   @Test
   internal fun `monitoring service captures failed price adjustment`() {
-    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(PriceAdjustment(supplier = Supplier.GEOAMEY, multiplier = 1.0, effectiveYear = 2021))
-    whenever(annualPriceAdjusterSpy.adjust(any(), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))).thenThrow(RuntimeException("something went wrong"))
+    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
+      PriceAdjustment(
+        supplier = Supplier.GEOAMEY,
+        multiplier = 1.0,
+        effectiveYear = 2021
+      )
+    )
+    whenever(
+      annualPriceAdjusterSpy.adjust(
+        any(),
+        eq(Supplier.GEOAMEY),
+        eq(2021),
+        eq(2.0)
+      )
+    ).thenThrow(RuntimeException("something went wrong"))
 
     AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
       Supplier.GEOAMEY,
@@ -75,7 +88,13 @@ internal class AnnualPriceAdjustmentsServiceTest {
   @Test
   internal fun `auditing service captures successful price adjustment`() {
     fakeLockForFor(Supplier.GEOAMEY, 2.0, 2021)
-    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(PriceAdjustment(supplier = Supplier.GEOAMEY, multiplier = 2.0, effectiveYear = 2021))
+    whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
+      PriceAdjustment(
+        supplier = Supplier.GEOAMEY,
+        multiplier = 2.0,
+        effectiveYear = 2021
+      )
+    )
     whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
 
     AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
@@ -108,7 +127,9 @@ internal class AnnualPriceAdjustmentsServiceTest {
   private fun fakeLockForFor(supplier: Supplier, multiplier: Double, effectiveYear: Int): UUID {
     val lockId = UUID.randomUUID()
 
-    whenever(annualPriceAdjusterSpy.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)).thenReturn(lockId)
+    whenever(annualPriceAdjusterSpy.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)).thenReturn(
+      lockId
+    )
 
     return lockId
   }

@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.MapLocationMetadata
 import java.time.LocalDateTime
 
 data class LocationHistoryDto(val datetime: LocalDateTime, val action: String, val by: String) {

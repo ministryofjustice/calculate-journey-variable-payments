@@ -17,9 +17,9 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.MapLocationMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
@@ -52,7 +52,13 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
   @Test
   internal fun `search for existing location redirects to manage location screen`() {
-    whenever(service.findLocationBySiteName("LOCATION NAME")).thenReturn(Location(LocationType.PR, "AGENCY_ID", "LOCATION NAME"))
+    whenever(service.findLocationBySiteName("LOCATION NAME")).thenReturn(
+      Location(
+        LocationType.PR,
+        "AGENCY_ID",
+        "LOCATION NAME"
+      )
+    )
 
     mockMvc.post("/search-locations") {
       param("location", "LOCATION NAME")
@@ -71,11 +77,45 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
     whenever(service.findAgencyLocationAndType(agencyId)).thenReturn(Triple(agencyId, agencyName, agencyType))
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn("DIFFERENT AGENCY NAME")
-    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(setOf(AuditEvent(AuditEventType.LOCATION, auditEventDatetime, "Jane", auditEventMetadata)))
+    whenever(service.locationHistoryForAgencyId(agencyId)).thenReturn(
+      setOf(
+        AuditEvent(
+          AuditEventType.LOCATION,
+          auditEventDatetime,
+          "Jane",
+          auditEventMetadata
+        )
+      )
+    )
 
     mockMvc.get("/manage-location/ABCDEF")
-      .andExpect { model { attribute("form", ManageSchedule34LocationsController.LocationForm(agencyId, agencyName, LocationType.CC, "DIFFERENT AGENCY NAME")) } }
-      .andExpect { model { attribute("history", listOf(LocationHistoryDto(auditEventDatetime, "Assigned to location name 'AGENCY NAME' and type 'Crown Court'", "Jane"))) } }
+      .andExpect {
+        model {
+          attribute(
+            "form",
+            ManageSchedule34LocationsController.LocationForm(
+              agencyId,
+              agencyName,
+              LocationType.CC,
+              "DIFFERENT AGENCY NAME"
+            )
+          )
+        }
+      }
+      .andExpect {
+        model {
+          attribute(
+            "history",
+            listOf(
+              LocationHistoryDto(
+                auditEventDatetime,
+                "Assigned to location name 'AGENCY NAME' and type 'Crown Court'",
+                "Jane"
+              )
+            )
+          )
+        }
+      }
       .andExpect { view { name("manage-location") } }
       .andExpect { status { isOk() } }
 

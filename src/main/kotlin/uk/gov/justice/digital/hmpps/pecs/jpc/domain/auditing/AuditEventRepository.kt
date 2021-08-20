@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing
 
 import org.springframework.data.repository.CrudRepository
 import java.util.UUID

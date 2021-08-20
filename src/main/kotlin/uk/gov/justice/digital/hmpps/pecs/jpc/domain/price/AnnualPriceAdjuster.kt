@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import java.util.UUID
 import kotlin.streams.asSequence

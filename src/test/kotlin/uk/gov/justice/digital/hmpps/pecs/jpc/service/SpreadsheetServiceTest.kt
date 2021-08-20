@@ -6,7 +6,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.security.core.Authentication
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PricesSpreadsheetGenerator
 import java.time.LocalDate
@@ -46,7 +46,12 @@ internal class SpreadsheetServiceTest {
 
   @Test
   internal fun `failure to download Serco spreadsheet is audited`() {
-    whenever(pricesSpreadsheetGenerator.generate(Supplier.SERCO, LocalDate.of(2021, 6, 7))).thenThrow(RuntimeException("spreadsheet download failed for Serco"))
+    whenever(
+      pricesSpreadsheetGenerator.generate(
+        Supplier.SERCO,
+        LocalDate.of(2021, 6, 7)
+      )
+    ).thenThrow(RuntimeException("spreadsheet download failed for Serco"))
 
     assertThatThrownBy { service.spreadsheet(authentication, Supplier.SERCO, LocalDate.of(2021, 6, 7)) }
       .isInstanceOf(RuntimeException::class.java)
@@ -63,7 +68,12 @@ internal class SpreadsheetServiceTest {
 
   @Test
   internal fun `failure to download GEOAmey spreadsheet is audited`() {
-    whenever(pricesSpreadsheetGenerator.generate(Supplier.GEOAMEY, LocalDate.of(2021, 6, 6))).thenThrow(RuntimeException("spreadsheet download failed for GEOAmey"))
+    whenever(
+      pricesSpreadsheetGenerator.generate(
+        Supplier.GEOAMEY,
+        LocalDate.of(2021, 6, 6)
+      )
+    ).thenThrow(RuntimeException("spreadsheet download failed for GEOAmey"))
 
     assertThatThrownBy { service.spreadsheet(authentication, Supplier.GEOAMEY, LocalDate.of(2021, 6, 6)) }
       .isInstanceOf(RuntimeException::class.java)

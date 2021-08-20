@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.auditing
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -49,7 +49,10 @@ internal class MapLocationMetadataTest {
   @Test
   fun `remapping of existing location name and type`() {
     val existingLocation = Location(LocationType.PR, "AGENCY_ID", "OLD SITE NAME")
-    val metadata = MapLocationMetadata.remap(existingLocation, existingLocation.copy(siteName = "NEW SITE NAME", locationType = LocationType.AP))
+    val metadata = MapLocationMetadata.remap(
+      existingLocation,
+      existingLocation.copy(siteName = "NEW SITE NAME", locationType = LocationType.AP)
+    )
 
     assertThat(metadata.nomisId).isEqualTo("AGENCY_ID")
     assertThat(metadata.newName).isEqualTo("NEW SITE NAME")

@@ -11,11 +11,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
@@ -41,7 +41,8 @@ internal class PriceImporterTest {
 
   private val auditCaptor = argumentCaptor<AuditableEvent>()
 
-  private val import: PriceImporter = PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo, auditService)
+  private val import: PriceImporter =
+    PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo, auditService)
 
   @Test
   internal fun `verify import interactions for serco`() {
@@ -49,7 +50,13 @@ internal class PriceImporterTest {
 
     val fromLocation = Location(LocationType.PR, "ID1", "SERCO FROM")
     val toLocation = Location(LocationType.CC, "ID2", "SERCO TO")
-    val priceToAudit = Price(supplier = Supplier.SERCO, fromLocation = fromLocation, toLocation = toLocation, priceInPence = 10000, effectiveYear = 2020)
+    val priceToAudit = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = fromLocation,
+      toLocation = toLocation,
+      priceInPence = 10000,
+      effectiveYear = 2020
+    )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
@@ -75,7 +82,13 @@ internal class PriceImporterTest {
 
     val fromLocation = Location(LocationType.PR, "ID1", "GEO FROM")
     val toLocation = Location(LocationType.CC, "ID2", "GEO TO")
-    val priceToAudit = Price(supplier = Supplier.GEOAMEY, fromLocation = fromLocation, toLocation = toLocation, priceInPence = 10100, effectiveYear = 2019)
+    val priceToAudit = Price(
+      supplier = Supplier.GEOAMEY,
+      fromLocation = fromLocation,
+      toLocation = toLocation,
+      priceInPence = 10100,
+      effectiveYear = 2019
+    )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
