@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
 import org.assertj.core.api.Assertions.assertThat
 import org.fluentlenium.core.annotation.PageUrl
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import java.time.format.DateTimeFormatter
 
 @PageUrl("http://localhost:8080/moves/{moveId}")

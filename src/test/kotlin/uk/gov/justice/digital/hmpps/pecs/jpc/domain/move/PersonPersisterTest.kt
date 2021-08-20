@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
@@ -18,7 +18,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.profileFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.reportPersonFactory
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.LocalDateTime
 

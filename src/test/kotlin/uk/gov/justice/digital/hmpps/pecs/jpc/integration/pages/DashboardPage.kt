@@ -6,7 +6,7 @@ import org.fluentlenium.core.annotation.PageUrl
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.By
 import org.openqa.selenium.support.FindBy
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import java.time.Month
 import java.time.Year
 

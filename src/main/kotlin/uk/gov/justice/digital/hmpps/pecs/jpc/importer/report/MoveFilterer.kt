@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.slf4j.LoggerFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 
 object MoveFilterer {
 

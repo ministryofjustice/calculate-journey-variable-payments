@@ -4,9 +4,9 @@ import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Workbook
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovesSummary
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_TYPE
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.MOVE_VOLUME

@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 
 internal class ReportMoveTest {
 

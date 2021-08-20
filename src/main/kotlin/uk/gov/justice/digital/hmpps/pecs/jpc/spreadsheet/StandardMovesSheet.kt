@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.ss.usermodel.Workbook
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.DROP_OFF
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.DROP_OFF_DATE
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.DROP_OFF_TIME
@@ -14,8 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.P
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.PRICE
 import uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet.PriceSheet.DataColumn.VEHICLE_REG
 
-class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet
-(
+class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("Standard"),
   header = header,
   subheading = "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",

@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovesSummary
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 
 internal class MovesSummarySheetTest {
@@ -17,7 +17,10 @@ internal class MovesSummarySheetTest {
   private val multiTypeSummary = MovesSummary(MoveType.MULTI, 5.0, 1, 1, 0)
   private val cancelledSummary = MovesSummary(MoveType.CANCELLED, 10.0, 2, 1, 200)
 
-  private val summaries = MoveTypeSummaries(1, listOf(standardSummary, longHaulSummary, redirectionSummary, lockoutSummary, multiTypeSummary, cancelledSummary))
+  private val summaries = MoveTypeSummaries(
+    1,
+    listOf(standardSummary, longHaulSummary, redirectionSummary, lockoutSummary, multiTypeSummary, cancelledSummary)
+  )
   private val summarySheet = SummarySheet(
     SXSSFWorkbook(),
     PriceSheet.Header(

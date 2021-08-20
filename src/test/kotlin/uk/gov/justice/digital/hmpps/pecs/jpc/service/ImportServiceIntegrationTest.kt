@@ -11,10 +11,10 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovePersister
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.PersonPersister
 import java.time.LocalDate
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -36,7 +36,15 @@ internal class ImportServiceIntegrationTest(
 
   @BeforeEach
   internal fun beforeEach() {
-    service = ImportService(timeSource, priceImporter, reportImporter, movePersister, personPersister, auditService, monitoringService)
+    service = ImportService(
+      timeSource,
+      priceImporter,
+      reportImporter,
+      movePersister,
+      personPersister,
+      auditService,
+      monitoringService
+    )
   }
 
   @Test

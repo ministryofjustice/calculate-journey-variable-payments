@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveStatus
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import java.time.LocalDate
 
 internal class MoveFiltererTest {

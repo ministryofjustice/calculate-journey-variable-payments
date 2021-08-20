@@ -2,12 +2,19 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 
 internal class MultiTypeMovesSheetTest {
 
-  private val multiTypeMovesSheet = MultiTypeMovesSheet(SXSSFWorkbook(), PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
+  private val multiTypeMovesSheet = MultiTypeMovesSheet(
+    SXSSFWorkbook(),
+    PriceSheet.Header(
+      defaultMoveDate10Sep2020,
+      ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+      Supplier.SERCO
+    )
+  )
 
   @Test
   internal fun `multi type moves`() {

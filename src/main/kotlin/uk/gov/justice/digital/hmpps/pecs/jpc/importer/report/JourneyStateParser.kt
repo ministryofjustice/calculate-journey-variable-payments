@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 
 import com.beust.klaxon.Converter
 import com.beust.klaxon.JsonValue
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 
 @Target(AnnotationTarget.FIELD)
 annotation class JourneyStateParser

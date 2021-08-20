@@ -3,10 +3,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -31,7 +31,10 @@ internal class StandardMovesSheetTest {
     assertOnSheetName(sms, "Standard")
     assertThat(sms.sheet.getRow(4).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
     assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(supplier.name)
-    assertOnSubheading(sms, "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)")
+    assertOnSubheading(
+      sms,
+      "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)"
+    )
     assertOnColumnDataHeadings(
       sms,
       "Move ID",
@@ -93,8 +96,14 @@ fun <T> assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?)
     is String -> sheet.getRow(row).getCell(col).stringCellValue
     is Double -> sheet.getRow(row).getCell(col).numericCellValue
     is Int -> sheet.getRow(row).getCell(col).numericCellValue.toInt()
-    is LocalDate -> LocalDate.parse(sheet.getRow(row).getCell(col).stringCellValue, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-    is LocalTime -> LocalTime.parse(sheet.getRow(row).getCell(col).stringCellValue, DateTimeFormatter.ofPattern("HH:mm"))
+    is LocalDate -> LocalDate.parse(
+      sheet.getRow(row).getCell(col).stringCellValue,
+      DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    )
+    is LocalTime -> LocalTime.parse(
+      sheet.getRow(row).getCell(col).stringCellValue,
+      DateTimeFormatter.ofPattern("HH:mm")
+    )
     else -> throw RuntimeException("Must be a string, numeric value, local date or local time.")
   }
   assertThat(actualValue).isEqualTo(expectedVal)

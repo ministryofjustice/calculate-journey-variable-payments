@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

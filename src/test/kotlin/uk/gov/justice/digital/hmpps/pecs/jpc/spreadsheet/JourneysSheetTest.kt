@@ -3,9 +3,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyWithPrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
 
 internal class JourneysSheetTest {
 
@@ -36,7 +36,15 @@ internal class JourneysSheetTest {
 
     assertOnSheetName(journeysSheet, "Journeys")
     assertOnSubheading(journeysSheet, "TOTAL VOLUME BY JOURNEY")
-    assertOnColumnDataHeadings(journeysSheet, "Pick up", "Drop off", "Total journey count", "Billable journey count", "Unit price", "Total price")
+    assertOnColumnDataHeadings(
+      journeysSheet,
+      "Pick up",
+      "Drop off",
+      "Total journey count",
+      "Billable journey count",
+      "Unit price",
+      "Total price"
+    )
     assertCellEquals(journeysSheet, 9, 0, "from") // from site name
     assertCellEquals(journeysSheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name
     assertCellEquals(journeysSheet, 9, 2, 22) // volume

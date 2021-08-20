@@ -2,17 +2,24 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.spreadsheet
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.defaultMoveDate10Sep2020
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
 
 internal class LockoutMovesSheetTest {
   private val journey1 = journeyJ1()
   private val journey2 = journeyJ1(journeyId = "J2")
   private val move = moveM1(journeys = listOf(journey1, journey2)).copy(moveType = MoveType.LOCKOUT, notes = "lockout")
-  private val lockoutMovesSheet = LockoutMovesSheet(SXSSFWorkbook(), PriceSheet.Header(defaultMoveDate10Sep2020, ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020), Supplier.SERCO))
+  private val lockoutMovesSheet = LockoutMovesSheet(
+    SXSSFWorkbook(),
+    PriceSheet.Header(
+      defaultMoveDate10Sep2020,
+      ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+      Supplier.SERCO
+    )
+  )
 
   @Test
   internal fun `lockout moves`() {

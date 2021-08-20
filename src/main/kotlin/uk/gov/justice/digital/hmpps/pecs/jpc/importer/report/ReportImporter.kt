@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.importer.report
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.LocalDate
 import kotlin.streams.toList
