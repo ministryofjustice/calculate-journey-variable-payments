@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.test.context.ActiveProfiles
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Person
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.profileFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.reportPersonFactory
 import java.time.LocalDate

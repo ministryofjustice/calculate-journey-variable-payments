@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Person
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDate

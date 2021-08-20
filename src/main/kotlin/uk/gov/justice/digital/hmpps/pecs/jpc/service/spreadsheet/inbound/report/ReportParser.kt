@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
 
 @Component
 object ReportParser {
