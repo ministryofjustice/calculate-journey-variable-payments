@@ -27,12 +27,8 @@ class PriceImporter(
     val start = System.currentTimeMillis()
 
     when (supplier) {
-      Supplier.SERCO -> {
-        sercoPrices.get().use { import(it, Supplier.SERCO, effectiveYear) }
-      }
-      Supplier.GEOAMEY -> {
-        geoameyPrices.get().use { import(it, Supplier.GEOAMEY, effectiveYear) }
-      }
+      Supplier.SERCO -> sercoPrices.get().use { import(it, Supplier.SERCO, effectiveYear) }
+      Supplier.GEOAMEY -> geoameyPrices.get().use { import(it, Supplier.GEOAMEY, effectiveYear) }
       else -> throw RuntimeException("Supplier '$supplier' not supported.")
     }
 

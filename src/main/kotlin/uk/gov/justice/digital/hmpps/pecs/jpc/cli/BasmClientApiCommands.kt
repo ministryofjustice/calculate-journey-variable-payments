@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.commands
+package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
