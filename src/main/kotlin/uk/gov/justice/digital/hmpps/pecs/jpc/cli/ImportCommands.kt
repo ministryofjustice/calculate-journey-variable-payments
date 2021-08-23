@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.commands
+package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
 import io.sentry.Sentry
 import org.slf4j.LoggerFactory

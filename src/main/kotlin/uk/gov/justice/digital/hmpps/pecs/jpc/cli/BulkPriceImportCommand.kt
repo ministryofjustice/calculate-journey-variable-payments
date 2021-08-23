@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.commands
+package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
 import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
