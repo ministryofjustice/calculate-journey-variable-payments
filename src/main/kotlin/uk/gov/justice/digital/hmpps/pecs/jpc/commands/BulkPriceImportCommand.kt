@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.commands
 import org.slf4j.LoggerFactory
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.EffectiveYear
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 
 @ShellComponent

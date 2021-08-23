@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 import org.fluentlenium.core.annotation.PageUrl
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.support.FindBy
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 
 @PageUrl("http://localhost:8080/find-move")
 class FindMovePage : ApplicationPage() {

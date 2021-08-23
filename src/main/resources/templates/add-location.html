@@ -58,7 +58,7 @@
                 <li class="mv3">
                     <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="location-type-id">Add location type</label>
                     <select name="location-type" id="location-type-id" th:field="*{locationType}" class="govuk-select">
-                        <option th:each="type : ${T(uk.gov.justice.digital.hmpps.pecs.jpc.location.LocationType).values()}"
+                        <option th:each="type : ${T(uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType).values()}"
                                 th:value="${type}"
                                 th:text="${type.label}">type
                         </option>

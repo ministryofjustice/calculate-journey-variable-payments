@@ -7,16 +7,16 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.price.PriceImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Person
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.Profile
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MovePersister
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.PersonPersister
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersonPersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
 import java.time.LocalDateTime
 
 internal class ImportServiceTest {

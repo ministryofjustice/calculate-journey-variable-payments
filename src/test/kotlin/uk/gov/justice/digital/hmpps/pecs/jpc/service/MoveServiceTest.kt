@@ -4,16 +4,16 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.importer.report.defaultSupplierSerco
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.EventRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveQueryRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.MoveRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.eventE1
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyEventJE1
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.journeyJ1
-import uk.gov.justice.digital.hmpps.pecs.jpc.move.moveM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.eventE1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyEventJE1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 import java.util.Optional
 
 internal class MoveServiceTest {

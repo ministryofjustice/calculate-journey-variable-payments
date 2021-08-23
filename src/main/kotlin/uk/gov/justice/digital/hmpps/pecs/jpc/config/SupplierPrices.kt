@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Price
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.util.stream.Stream
 
 fun interface SupplierPrices {

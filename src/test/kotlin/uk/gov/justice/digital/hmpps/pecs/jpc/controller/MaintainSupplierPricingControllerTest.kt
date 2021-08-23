@@ -18,12 +18,12 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEvent
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.AuditEventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.PriceMetadata
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Money
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.price.effectiveYearForDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -112,7 +112,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/journeys") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(100.24), effectiveYearForDate(effectiveDate))
+    verify(service).addPriceForSupplier(
+      Supplier.SERCO,
+      fromAgencyId,
+      toAgencyId,
+      Money.valueOf(100.24),
+      effectiveYearForDate(effectiveDate)
+    )
   }
 
   @Test
@@ -195,7 +201,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     )
 
     val priceHistoryDateTime = LocalDateTime.now()
-    val priceHistory = PriceMetadata(Supplier.GEOAMEY, fromAgencyId, toAgencyId, effectiveYearForDate(effectiveDate), Money(1000).pounds())
+    val priceHistory = PriceMetadata(
+      Supplier.GEOAMEY,
+      fromAgencyId,
+      toAgencyId,
+      effectiveYearForDate(effectiveDate),
+      Money(1000).pounds()
+    )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
     whenever(service.priceHistoryForJourney(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
@@ -216,7 +228,11 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           attribute(
             "history",
             listOf(
-              PriceHistoryDto(priceHistoryDateTime, "Journey priced at £10.00. Effective from ${effectiveYearForDate(effectiveDate)} to ${effectiveYearForDate(effectiveDate) + 1}.", "SYSTEM")
+              PriceHistoryDto(
+                priceHistoryDateTime,
+                "Journey priced at £10.00. Effective from ${effectiveYearForDate(effectiveDate)} to ${effectiveYearForDate(effectiveDate) + 1}.",
+                "SYSTEM"
+              )
             )
           )
         }
@@ -240,6 +256,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
-    mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }.andExpect { status { isForbidden() } }
+    mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
+      .andExpect { status { isForbidden() } }
   }
 }

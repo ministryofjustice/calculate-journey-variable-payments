@@ -25,8 +25,8 @@ import org.springframework.session.FindByIndexNameSessionRepository
 import org.springframework.session.Session
 import org.springframework.session.security.SpringSessionBackedSessionRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogInAuditHandler
-import uk.gov.justice.digital.hmpps.pecs.jpc.auditing.LogOutAuditHandler
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogInAuditHandler
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogOutAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import kotlin.streams.toList
 
