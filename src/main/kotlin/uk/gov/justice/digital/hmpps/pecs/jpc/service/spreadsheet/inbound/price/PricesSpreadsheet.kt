@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.InboundSpreadsheet
+import java.io.Closeable
 
 private const val FROM_LOCATION = 1
 private const val TO_LOCATION = 2
@@ -24,7 +24,7 @@ class PricesSpreadsheet(
   supplierLocations: List<Location>,
   private val pricesRepository: PriceRepository,
   private val effectiveYear: Int
-) : InboundSpreadsheet(spreadsheet) {
+) : Closeable {
 
   val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
 
@@ -89,4 +89,15 @@ class PricesSpreadsheet(
         ?: error
     )
   )
+
+  /**
+   * Strips all whitespace and converts to uppercase.  If blank then returns null.
+   */
+  private fun Row.getFormattedStringCell(cell: Int): String? {
+    return getCell(cell).stringCellValue.uppercase().trim().takeIf { it.isNotBlank() }
+  }
+
+  override fun close() {
+    spreadsheet.close()
+  }
 }
