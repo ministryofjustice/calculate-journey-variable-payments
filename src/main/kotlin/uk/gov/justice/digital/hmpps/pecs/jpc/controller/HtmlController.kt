@@ -19,20 +19,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DATE_ATTRIBUTE
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.DROP_OFF_ATTRIBUTE
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.END_OF_MONTH_DATE_ATTRIBUTE
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.PICK_UP_ATTRIBUTE
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.START_OF_MONTH_DATE_ATTRIBUTE
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController.Companion.SUPPLIER_ATTRIBUTE
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import java.time.LocalDate
 import javax.validation.Valid
@@ -240,18 +232,6 @@ class HtmlController(
     return "redirect:$uri"
   }
 
-  @GetMapping(SEARCH_JOURNEYS_URL)
-  fun searchJourneys(model: ModelMap): Any {
-    logger.info("getting search journey")
-
-    val effectiveYear = model.getEffectiveYear()
-
-    model.addAttribute("form", SearchJourneyForm())
-    model.addAttribute("contractualYearStart", "$effectiveYear")
-    model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
-    return "search-journeys"
-  }
-
   @ValidJourneySearch
   data class SearchJourneyForm(val from: String? = null, val to: String? = null)
 
@@ -321,23 +301,7 @@ class HtmlController(
     }
   }
 
-  private fun ModelMap.getStartOfMonth() =
-    this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate }
-      ?: throw RuntimeException("date attribute not present in model")
-
-  private fun ModelMap.getEndOfMonth() = endOfMonth(getStartOfMonth())
-
-  private fun ModelMap.getEffectiveYear() = effectiveYearForDate(getStartOfMonth())
-
   companion object {
-    const val PICK_UP_ATTRIBUTE = "pick-up"
-    const val DROP_OFF_ATTRIBUTE = "drop-off"
-    const val DATE_ATTRIBUTE = "date"
-    const val SUPPLIER_ATTRIBUTE = "supplier"
-    const val START_OF_MONTH_DATE_ATTRIBUTE = "startOfMonthDate"
-    const val END_OF_MONTH_DATE_ATTRIBUTE = "endOfMonthDate"
-    const val MOVE_ATTRIBUTE = "move"
-
     const val DASHBOARD_URL = "/dashboard"
     const val SELECT_MONTH_URL = "/select-month"
     const val MOVES_BY_TYPE_URL = "/moves-by-type"

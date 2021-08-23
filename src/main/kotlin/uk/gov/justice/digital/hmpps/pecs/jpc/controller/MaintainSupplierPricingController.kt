@@ -24,10 +24,10 @@ import javax.validation.constraints.NotNull
 
 @Controller
 @SessionAttributes(
-  HtmlController.SUPPLIER_ATTRIBUTE,
-  HtmlController.PICK_UP_ATTRIBUTE,
-  HtmlController.DROP_OFF_ATTRIBUTE,
-  HtmlController.DATE_ATTRIBUTE
+  SUPPLIER_ATTRIBUTE,
+  PICK_UP_ATTRIBUTE,
+  DROP_OFF_ATTRIBUTE,
+  DATE_ATTRIBUTE
 )
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
@@ -47,7 +47,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   fun addPrice(
     @PathVariable moveId: String,
     model: ModelMap,
-    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): Any {
     logger.info("getting add price for move $moveId")
 
@@ -75,7 +75,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     @Valid @ModelAttribute("form") form: PriceForm,
     result: BindingResult,
     model: ModelMap,
-    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("adding price for move $supplier")
@@ -114,7 +114,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   fun updatePrice(
     @PathVariable moveId: String,
     model: ModelMap,
-    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): String {
     logger.info("getting update price for move $moveId")
 
@@ -146,7 +146,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     @Valid @ModelAttribute("form") form: PriceForm,
     result: BindingResult,
     model: ModelMap,
-    @ModelAttribute(name = HtmlController.SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("updating price for move $supplier")
@@ -210,19 +210,19 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   private fun parseAmount(value: String) =
     Result.runCatching { value.toDouble() }.getOrNull()?.takeIf { it > 0 }?.let { Money.valueOf(it) }
 
-  private fun ModelMap.getFromLocation() = this.getAttribute(HtmlController.PICK_UP_ATTRIBUTE).takeUnless { it == "" }
+  private fun ModelMap.getFromLocation() = this.getAttribute(PICK_UP_ATTRIBUTE).takeUnless { it == "" }
 
-  private fun ModelMap.getToLocation() = this.getAttribute(HtmlController.DROP_OFF_ATTRIBUTE).takeUnless { it == "" }
+  private fun ModelMap.getToLocation() = this.getAttribute(DROP_OFF_ATTRIBUTE).takeUnless { it == "" }
 
   private fun ModelMap.getEffectiveYear() =
-    effectiveYearForDate(this.getAttribute(HtmlController.DATE_ATTRIBUTE) as LocalDate)
+    effectiveYearForDate(this.getAttribute(DATE_ATTRIBUTE) as LocalDate)
 
   private fun UriComponentsBuilder.fromQueryParam(from: Any) {
-    this.queryParam(HtmlController.PICK_UP_ATTRIBUTE, from)
+    this.queryParam(PICK_UP_ATTRIBUTE, from)
   }
 
   private fun UriComponentsBuilder.toQueryParam(to: Any) {
-    this.queryParam(HtmlController.DROP_OFF_ATTRIBUTE, to)
+    this.queryParam(DROP_OFF_ATTRIBUTE, to)
   }
 
   companion object Routes {

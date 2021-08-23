@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManagePriceCatalogueController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageSchedule34LocationsController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MapFriendlyLocationController
 import uk.gov.justice.digital.hmpps.pecs.jpc.filter.ChooseSupplierFilter
@@ -19,7 +20,8 @@ class FilterConfiguration {
         *HtmlController.routes(),
         *MaintainSupplierPricingController.routes(),
         *ManageSchedule34LocationsController.routes(),
-        *MapFriendlyLocationController.routes()
+        *MapFriendlyLocationController.routes(),
+        *ManagePriceCatalogueController.routes()
       )
     }
 }
