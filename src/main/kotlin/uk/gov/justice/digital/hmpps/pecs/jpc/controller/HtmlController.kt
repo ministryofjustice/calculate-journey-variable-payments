@@ -60,8 +60,10 @@ class HtmlController(
   fun chooseSupplierSerco(model: ModelMap): RedirectView {
     logger.info("chosen supplier Serco")
 
-    model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.SERCO)
-    model.addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
+    with(model) {
+      addAttribute(SUPPLIER_ATTRIBUTE, Supplier.SERCO)
+      addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
+    }
 
     return RedirectView(DASHBOARD_URL)
   }
@@ -70,8 +72,10 @@ class HtmlController(
   fun chooseSupplierGeoAmey(model: ModelMap): RedirectView {
     logger.info("chosen supplier GEOAmey")
 
-    model.addAttribute(SUPPLIER_ATTRIBUTE, Supplier.GEOAMEY)
-    model.addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
+    with(model) {
+      addAttribute(SUPPLIER_ATTRIBUTE, Supplier.GEOAMEY)
+      addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
+    }
 
     return RedirectView(DASHBOARD_URL)
   }
@@ -91,17 +95,20 @@ class HtmlController(
     val moves = moveService.movesForMoveType(supplier, moveType, startOfMonth)
     val moveTypeSummary = moveService.summaryForMoveType(supplier, moveType, startOfMonth)
 
-    model.addAttribute(
-      "months",
-      MonthsWidget(
-        (startOfMonth),
-        nextMonth = (startOfMonth.plusMonths(1)),
-        previousMonth = (startOfMonth.minusMonths(1))
+    with(model) {
+      addAttribute(
+        "months",
+        MonthsWidget(
+          (startOfMonth),
+          nextMonth = (startOfMonth.plusMonths(1)),
+          previousMonth = (startOfMonth.minusMonths(1))
+        )
       )
-    )
-    model.addAttribute("summary", moveTypeSummary.movesSummary)
-    model.addAttribute("moves", moves)
-    model.addAttribute("moveType", moveType.label)
+      addAttribute("summary", moveTypeSummary.movesSummary)
+      addAttribute("moves", moves)
+      addAttribute("moveType", moveType.label)
+    }
+
     return "moves-by-type"
   }
 
@@ -133,8 +140,10 @@ class HtmlController(
 
     removeAttributesIf(locationName.isNullOrEmpty(), model, "flashAttrMappedLocationName", "flashAttrMappedAgencyId")
 
-    model.addAttribute("journeysSummary", journeyService.journeysSummary(supplier, startOfMonth))
-    model.addAttribute("journeys", journeyService.distinctJourneysExcludingPriced(supplier, startOfMonth))
+    with(model) {
+      addAttribute("journeysSummary", journeyService.journeysSummary(supplier, startOfMonth))
+      addAttribute("journeys", journeyService.distinctJourneysExcludingPriced(supplier, startOfMonth))
+    }
 
     return "journeys"
   }
@@ -154,27 +163,30 @@ class HtmlController(
   ): Any {
     logger.info("dashboard for $supplier")
 
-    requestParamStartOfMonth?.let { model.addAttribute(DATE_ATTRIBUTE, requestParamStartOfMonth) }
+    requestParamStartOfMonth?.let { model.addAttribute(DATE_ATTRIBUTE, it) }
 
-    val startOfMonth = model.getStartOfMonth()
-    val endOfMonth = model.getEndOfMonth()
-    model.addAttribute(START_OF_MONTH_DATE_ATTRIBUTE, startOfMonth)
-    model.addAttribute(END_OF_MONTH_DATE_ATTRIBUTE, endOfMonth)
+    with(model) {
+      val startOfMonth = getStartOfMonth()
+      val endOfMonth = getEndOfMonth()
 
-    val countAndSummaries = moveService.moveTypeSummaries(supplier, startOfMonth)
-    val journeysSummary = journeyService.journeysSummary(supplier, startOfMonth)
+      addAttribute(START_OF_MONTH_DATE_ATTRIBUTE, startOfMonth)
+      addAttribute(END_OF_MONTH_DATE_ATTRIBUTE, endOfMonth)
 
-    model.addAttribute(
-      "months",
-      MonthsWidget(
-        (startOfMonth),
-        nextMonth = (startOfMonth.plusMonths(1)),
-        previousMonth = (startOfMonth.minusMonths(1))
+      val countAndSummaries = moveService.moveTypeSummaries(supplier, startOfMonth)
+      val journeysSummary = journeyService.journeysSummary(supplier, startOfMonth)
+
+      addAttribute(
+        "months",
+        MonthsWidget(
+          (startOfMonth),
+          nextMonth = (startOfMonth.plusMonths(1)),
+          previousMonth = (startOfMonth.minusMonths(1))
+        )
       )
-    )
-    model.addAttribute("summary", countAndSummaries.summary())
-    model.addAttribute("journeysSummary", journeysSummary)
-    model.addAttribute("summaries", countAndSummaries.allSummaries())
+      addAttribute("summary", countAndSummaries.summary())
+      addAttribute("journeysSummary", journeysSummary)
+      addAttribute("summaries", countAndSummaries.allSummaries())
+    }
     return "dashboard"
   }
 
