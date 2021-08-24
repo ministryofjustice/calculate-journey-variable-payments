@@ -60,7 +60,7 @@ class HtmlController(
   fun chooseSupplierSerco(model: ModelMap): RedirectView {
     logger.info("chosen supplier Serco")
 
-    with(model) {
+    model.apply {
       addAttribute(SUPPLIER_ATTRIBUTE, Supplier.SERCO)
       addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
     }
@@ -72,7 +72,7 @@ class HtmlController(
   fun chooseSupplierGeoAmey(model: ModelMap): RedirectView {
     logger.info("chosen supplier GEOAmey")
 
-    with(model) {
+    model.apply {
       addAttribute(SUPPLIER_ATTRIBUTE, Supplier.GEOAMEY)
       addAttribute(DATE_ATTRIBUTE, timeSource.startOfMonth())
     }
@@ -95,7 +95,7 @@ class HtmlController(
     val moves = moveService.movesForMoveType(supplier, moveType, startOfMonth)
     val moveTypeSummary = moveService.summaryForMoveType(supplier, moveType, startOfMonth)
 
-    with(model) {
+    model.apply {
       addAttribute(
         "months",
         MonthsWidget(
@@ -140,7 +140,7 @@ class HtmlController(
 
     removeAttributesIf(locationName.isNullOrEmpty(), model, "flashAttrMappedLocationName", "flashAttrMappedAgencyId")
 
-    with(model) {
+    model.apply {
       addAttribute("journeysSummary", journeyService.journeysSummary(supplier, startOfMonth))
       addAttribute("journeys", journeyService.distinctJourneysExcludingPriced(supplier, startOfMonth))
     }
@@ -163,9 +163,9 @@ class HtmlController(
   ): Any {
     logger.info("dashboard for $supplier")
 
-    requestParamStartOfMonth?.let { model.addAttribute(DATE_ATTRIBUTE, it) }
+    model.apply {
+      requestParamStartOfMonth?.let { addAttribute(DATE_ATTRIBUTE, it) }
 
-    with(model) {
       val startOfMonth = getStartOfMonth()
       val endOfMonth = getEndOfMonth()
 
