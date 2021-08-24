@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.filter
 
 import org.slf4j.LoggerFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.SUPPLIER_ATTRIBUTE
 import java.io.IOException
 import javax.servlet.Filter
 import javax.servlet.FilterChain
@@ -24,7 +25,7 @@ class ChooseSupplierFilter : Filter {
   override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
     val session = (request as HttpServletRequest).session
 
-    when (session.getAttribute(HtmlController.SUPPLIER_ATTRIBUTE)) {
+    when (session.getAttribute(SUPPLIER_ATTRIBUTE)) {
       null -> {
         logger.info("no supplier present in the session, redirecting to '${HtmlController.CHOOSE_SUPPLIER_URL}'")
 

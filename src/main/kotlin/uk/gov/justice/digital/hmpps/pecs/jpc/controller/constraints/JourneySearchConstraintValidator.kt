@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageJourneyPriceCatalogueController
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
 
-class JourneySearchConstraintValidator : ConstraintValidator<ValidJourneySearch, HtmlController.SearchJourneyForm> {
+class JourneySearchConstraintValidator : ConstraintValidator<ValidJourneySearch, ManageJourneyPriceCatalogueController.SearchJourneyForm> {
   override fun initialize(arg0: ValidJourneySearch) {}
 
-  override fun isValid(form: HtmlController.SearchJourneyForm, context: ConstraintValidatorContext) =
+  override fun isValid(form: ManageJourneyPriceCatalogueController.SearchJourneyForm, context: ConstraintValidatorContext) =
     !form.from.isNullOrBlank() || !form.to.isNullOrBlank()
 }

@@ -22,6 +22,8 @@ sealed class Pages<T : ApplicationPage>(clazz: KClass<T>) {
 
   object ManageJourneyPrice : Pages<ManageJourneyPricePage>(ManageJourneyPricePage::class)
 
+  object ManageJourneyPriceCatalogue : Pages<ManageJourneyPriceCataloguePage>(ManageJourneyPriceCataloguePage::class)
+
   object ManageLocation : Pages<ManageLocationPage>(ManageLocationPage::class)
 
   object MapLocation : Pages<MapLocationPage>(MapLocationPage::class)

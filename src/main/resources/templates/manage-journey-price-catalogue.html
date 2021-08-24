@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+  <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+  <div class="mv4">
+    <h1 class="govuk-heading-xl mv2" th:inline="text">
+      Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]
+    </h1>
+  </div>
+
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header" scope="col" aria-sort="none"></th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell" scope="row">
+        <a href="/search-journeys" class="govuk-heading-s govuk-link--no-visited-state">Find journeys</a>
+        Search and edit individual journey prices
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+
+</html>

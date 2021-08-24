@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
 
 @RestController
-@SessionAttributes(HtmlController.SUPPLIER_ATTRIBUTE)
+@SessionAttributes(SUPPLIER_ATTRIBUTE)
 class OutputSpreadsheetController(
   private val spreadsheetService: SpreadsheetService,
   private val timeSource: TimeSource
