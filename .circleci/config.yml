@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.10
+  hmpps: ministryofjustice/hmpps@3.11
   browser-tools: circleci/browser-tools@1.1.3
 
 jobs:
@@ -149,10 +149,10 @@ workflows:
           requires:
             - request-prod-approval
 
-  scheduled:
+  security:
     triggers:
       - schedule:
-          cron: "0 7 * * 1-5"
+          cron: "34 3 * * 1-5"
           filters:
             branches:
               only:
