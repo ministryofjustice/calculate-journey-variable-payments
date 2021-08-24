@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneyResu
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneysForReview
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import java.time.LocalDate
@@ -60,6 +61,8 @@ internal class ManagePricesTest : IntegrationTest() {
     isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
+
+    isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
 
     isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE", "PRISON TWO")
 

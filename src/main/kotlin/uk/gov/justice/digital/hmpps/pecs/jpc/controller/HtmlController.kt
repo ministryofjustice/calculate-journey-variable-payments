@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
-import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -36,9 +34,7 @@ data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, v
   SUPPLIER_ATTRIBUTE,
   DATE_ATTRIBUTE,
   START_OF_MONTH_DATE_ATTRIBUTE,
-  END_OF_MONTH_DATE_ATTRIBUTE,
-  PICK_UP_ATTRIBUTE,
-  DROP_OFF_ATTRIBUTE
+  END_OF_MONTH_DATE_ATTRIBUTE
 )
 class HtmlController(
   @Autowired val moveService: MoveService,
@@ -232,87 +228,16 @@ class HtmlController(
     return "redirect:$uri"
   }
 
-  @ValidJourneySearch
-  data class SearchJourneyForm(val from: String? = null, val to: String? = null)
-
-  @PostMapping(SEARCH_JOURNEYS_URL)
-  fun performJourneySearch(
-    @Valid @ModelAttribute("form") form: SearchJourneyForm,
-    result: BindingResult,
-    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    model: ModelMap,
-    redirectAttributes: RedirectAttributes,
-  ): String {
-    logger.info("performing search journeys for $supplier")
-
-    if (result.hasErrors()) return "search-journeys"
-
-    model.removeAnyPreviousSearchHistory()
-
-    val from = form.from?.trim().orEmpty()
-    val to = form.to?.trim().orEmpty()
-
-    val url = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
-
-    if (from.isNotBlank()) {
-      url.queryParam(PICK_UP_ATTRIBUTE, from)
-      model.addAttribute(PICK_UP_ATTRIBUTE, from)
-    }
-
-    if (to.isNotBlank()) {
-      url.queryParam(DROP_OFF_ATTRIBUTE, to)
-      model.addAttribute(DROP_OFF_ATTRIBUTE, to)
-    }
-
-    return "redirect:${url.build().toUri()}"
-  }
-
-  private fun ModelMap.removeAnyPreviousSearchHistory() {
-    this.addAttribute(PICK_UP_ATTRIBUTE, "")
-    this.addAttribute(DROP_OFF_ATTRIBUTE, "")
-  }
-
-  @GetMapping(SEARCH_JOURNEYS_RESULTS_URL)
-  fun searchJourneys(
-    @RequestParam(name = PICK_UP_ATTRIBUTE, required = false) pickUpLocation: String?,
-    @RequestParam(name = DROP_OFF_ATTRIBUTE, required = false) dropOffLocation: String?,
-    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    model: ModelMap
-  ): Any {
-    logger.info("getting search journey results for $supplier")
-
-    if (pickUpLocation.isNullOrEmpty() && dropOffLocation.isNullOrEmpty()) {
-      return RedirectView(SEARCH_JOURNEYS_URL)
-    }
-
-    val effectiveYear = model.getEffectiveYear()
-    val journeys = journeyService.prices(supplier, pickUpLocation, dropOffLocation, effectiveYear)
-
-    model.addAttribute("contractualYearStart", "$effectiveYear")
-    model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
-
-    return if (journeys.isEmpty()) {
-      model.addAttribute("pickUpLocation", pickUpLocation ?: "")
-      model.addAttribute("dropOffLocation", dropOffLocation ?: "")
-      "no-search-journeys-results"
-    } else {
-      model.addAttribute("journeys", journeys)
-      "search-journeys-results"
-    }
-  }
-
   companion object {
     const val DASHBOARD_URL = "/dashboard"
     const val SELECT_MONTH_URL = "/select-month"
     const val MOVES_BY_TYPE_URL = "/moves-by-type"
     const val MOVES_URL = "/moves"
     const val JOURNEYS_URL = "/journeys"
-    const val SEARCH_JOURNEYS_URL = "/search-journeys"
-    const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
     const val FIND_MOVE_URL = "/find-move"
     const val CHOOSE_SUPPLIER_URL = "/choose-supplier"
 
     fun routes(): Array<String> =
-      arrayOf(DASHBOARD_URL, JOURNEYS_URL, MOVES_BY_TYPE_URL, SEARCH_JOURNEYS_URL, SELECT_MONTH_URL)
+      arrayOf(DASHBOARD_URL, JOURNEYS_URL, MOVES_BY_TYPE_URL, SELECT_MONTH_URL)
   }
 }

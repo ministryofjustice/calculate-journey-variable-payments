@@ -196,7 +196,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
       .sortedByDescending { lh -> lh.datetime }
 
   private fun ModelMap.getJourneySearchResultsUrl(): String {
-    val url = UriComponentsBuilder.fromUriString(HtmlController.SEARCH_JOURNEYS_RESULTS_URL)
+    val url = UriComponentsBuilder.fromUriString(ManageJourneyPriceCatalogueController.SEARCH_JOURNEYS_RESULTS_URL)
 
     getFromLocation()?.apply { url.fromQueryParam(this) }
     getToLocation()?.apply { url.toQueryParam(this) }
