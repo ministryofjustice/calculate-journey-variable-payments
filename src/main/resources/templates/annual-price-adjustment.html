@@ -11,6 +11,60 @@
 
 <div class="govuk-width-container" layout:fragment="content">
   <div th:insert="fragments/contractual-year.html :: contractualYear"></div>
+
+  <div class="govuk-tabs" data-module="govuk-tabs">
+    <h2 class="govuk-tabs__title">
+      Contents
+    </h2>
+    <ul class="govuk-tabs__list">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+        <a class="govuk-tabs__tab" href="#annual-price-adjustment">
+          Apply bulk price adjustment
+        </a>
+      </li>
+    </ul>
+    <div class="govuk-tabs__panel" id="annual-price-adjustment">
+      <form th:action="@{/apply-annual-price-adjustment}" th:object="${form}" method="post">
+        <div>
+          <h2 class="govuk-heading-l" th:inline="text">Apply bulk price adjustment</h2>
+          <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">
+            Enter blended adjustment rate to calculate journey prices for the current contractual year.
+          </p>
+        </div>
+        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('rate')} ? 'govuk-form-group--error'">
+          <ol class="list pl0">
+            <li class="mv1">
+              <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="rate">Rate</label>
+              <div id="price-hint" class="govuk-hint">Example 1.5</div>
+              <p th:if="${#fields.hasErrors('rate')}" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
+                Enter a valid price adjustment in the correct format
+              </p>
+              <div class="govuk-input__wrapper">
+                <div class="govuk-input__prefix" aria-hidden="true">£</div>
+                <input class="govuk-input govuk-input--width-5" id="rate" name="price" type="text"
+                       aria-describedby="price-hint" th:field="*{rate}"
+                       th:classappend="${#fields.hasErrors('rate')} ? 'govuk-input--error'">
+              </div>
+            </li>
+          </ol>
+        </div>
+        <div class="govuk-warning-text mv3">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            <span th:inline="text">By applying this rate any existing journey prices in the current contractual year will be adjusted.</span>
+          </strong>
+        </div>
+        <div class="flex items-center">
+          <button id="confirm-price-adjustment" class="govuk-button mv3 mr3" data-module="govuk-button">
+            Apply adjustment
+          </button>
+          <a href="/manage-journey-price-catalogue" class="govuk-link">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 </body>

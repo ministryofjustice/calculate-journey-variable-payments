@@ -20,7 +20,7 @@ import java.time.LocalDate
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
 @WithMockUser(roles = ["PECS_MAINTAIN_PRICE"])
-class AnnualPriceAdjustmentControllerTest(@Autowired private val wac: WebApplicationContext) {
+class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
