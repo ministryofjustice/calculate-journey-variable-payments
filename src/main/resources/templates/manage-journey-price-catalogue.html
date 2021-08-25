@@ -14,11 +14,7 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-  <div class="mv4">
-    <h1 class="govuk-heading-xl mv2" th:inline="text">
-      Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]
-    </h1>
-  </div>
+  <div th:insert="fragments/contractual-year.html :: contractualYear"></div>
 
   <table class="govuk-table">
     <thead class="govuk-table__head">
