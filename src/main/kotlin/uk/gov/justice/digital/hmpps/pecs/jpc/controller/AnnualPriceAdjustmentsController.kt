@@ -46,6 +46,14 @@ class AnnualPriceAdjustmentsController {
   ): Any {
     logger.info("posting annual price adjustment")
 
+    val rate = parseAdjustment(form.rate).also { if (it == null) result.rejectValue("rate", "Invalid rate") }
+
+    if (result.hasErrors()) {
+      model.addContractStartAndEndDates()
+
+      return "annual-price-adjustment"
+    }
+
     TODO()
   }
 
@@ -60,4 +68,10 @@ class AnnualPriceAdjustmentsController {
 
     fun routes(): Array<String> = arrayOf(ANNUAL_PRICE_ADJUSTMENT, APPLY_ANNUAL_PRICE_ADJUSTMENT)
   }
+}
+
+fun parseAdjustment(rate: String): Double? {
+  if (!rate.matches("^[0-9]{1,5}(\\.[0-9]{0,3})?\$".toRegex())) return null
+
+  return rate.toDoubleOrNull()?.let { "%.3f".format(it).toDouble() }
 }
