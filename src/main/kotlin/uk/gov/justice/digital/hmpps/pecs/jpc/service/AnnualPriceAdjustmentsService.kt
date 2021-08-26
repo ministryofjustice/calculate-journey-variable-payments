@@ -45,6 +45,8 @@ class AnnualPriceAdjustmentsService(
       Result.runCatching {
         val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)
 
+        for (i in 1..900000) logger.info("$i")
+
         annualPriceAdjuster.adjust(
           lockId,
           supplier,

@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
 import javax.validation.Valid
-import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 /**
  * Controller to handle the flows around 'Annual Price Adjustments' carried out by the commercial team.
@@ -20,7 +22,10 @@ import javax.validation.constraints.NotNull
 @Controller
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
-class AnnualPriceAdjustmentsController {
+class AnnualPriceAdjustmentsController(
+  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
+  private val effectiveYear: EffectiveYear
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -36,7 +41,7 @@ class AnnualPriceAdjustmentsController {
     return "annual-price-adjustment"
   }
 
-  @PostMapping(APPLY_ANNUAL_PRICE_ADJUSTMENT)
+  @PostMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun applyAnnualPriceAdjustment(
     @Valid @ModelAttribute("form") form: AnnualPriceAdjustmentForm,
     result: BindingResult,
@@ -46,32 +51,33 @@ class AnnualPriceAdjustmentsController {
   ): Any {
     logger.info("posting annual price adjustment")
 
-    val rate = parseAdjustment(form.rate).also { if (it == null) result.rejectValue("rate", "Invalid rate") }
+    val mayBeRate = form.mayBeRate() ?: result.rejectInvalidAdjustmentRate().let { null }
 
-    if (result.hasErrors()) {
+    if (result.hasErrors() || mayBeRate == null) {
       model.addContractStartAndEndDates()
 
       return "annual-price-adjustment"
     }
 
-    TODO()
+    annualPriceAdjustmentsService.adjust(supplier, effectiveYear.current(), mayBeRate)
+
+    return "manage-journey-price-catalogue"
+  }
+
+  private fun BindingResult.rejectInvalidAdjustmentRate() {
+    this.rejectValue("rate", "rate", "Invalid rate")
   }
 
   data class AnnualPriceAdjustmentForm(
-    @get: NotNull(message = "Apply an annual price adjustment rate")
-    val rate: String,
-  )
+    @get: Pattern(regexp = "^[0-9]{1,5}(\\.[0-9]{0,3})?\$", message = "Invalid rate")
+    val rate: String?,
+  ) {
+    fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }
+  }
 
   companion object {
     const val ANNUAL_PRICE_ADJUSTMENT = "/annual-price-adjustment"
-    const val APPLY_ANNUAL_PRICE_ADJUSTMENT = "/apply-annual-price-adjustment"
 
-    fun routes(): Array<String> = arrayOf(ANNUAL_PRICE_ADJUSTMENT, APPLY_ANNUAL_PRICE_ADJUSTMENT)
+    fun routes(): Array<String> = arrayOf(ANNUAL_PRICE_ADJUSTMENT)
   }
-}
-
-fun parseAdjustment(rate: String): Double? {
-  if (!rate.matches("^[0-9]{1,5}(\\.[0-9]{0,3})?\$".toRegex())) return null
-
-  return rate.toDoubleOrNull()?.let { "%.3f".format(it).toDouble() }
 }
