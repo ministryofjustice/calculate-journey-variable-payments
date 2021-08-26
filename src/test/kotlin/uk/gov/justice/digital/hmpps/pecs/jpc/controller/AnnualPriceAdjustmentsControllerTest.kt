@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -113,6 +115,6 @@ class AnnualPriceAdjustmentsControllerTest(
       .andExpect { view { name("manage-journey-price-catalogue") } }
       .andExpect { status { isOk() } }
 
-    verify(adjustmentsService).adjust(Supplier.SERCO, effectiveYear.current(), 1.5)
+    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYear.current()), eq(1.5), anyOrNull())
   }
 }

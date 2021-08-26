@@ -12,7 +12,7 @@ class BulkPriceUpdateCommands(
   @ShellMethod("Performs a bulk price adjustment for the given supplier, effective year and the supplied multiplier.")
   fun bulkPriceAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double, force: Boolean = false) {
     if (force)
-      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, multiplier)
+      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, multiplier, null)
     else
       throw RuntimeException("Force is required for this operation to complete.")
   }

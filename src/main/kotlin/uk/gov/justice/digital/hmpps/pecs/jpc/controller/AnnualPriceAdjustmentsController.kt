@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -48,6 +49,7 @@ class AnnualPriceAdjustmentsController(
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes,
+    authentication: Authentication?
   ): Any {
     logger.info("posting annual price adjustment")
 
@@ -59,7 +61,7 @@ class AnnualPriceAdjustmentsController(
       return "annual-price-adjustment"
     }
 
-    annualPriceAdjustmentsService.adjust(supplier, effectiveYear.current(), mayBeRate)
+    annualPriceAdjustmentsService.adjust(supplier, effectiveYear.current(), mayBeRate, authentication)
 
     return "manage-journey-price-catalogue"
   }
