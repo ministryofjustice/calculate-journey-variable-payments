@@ -1,7 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
@@ -19,7 +17,8 @@ class AnnualPriceAdjustmentsService(
   private val annualPriceAdjuster: AnnualPriceAdjuster,
   private val monitoringService: MonitoringService,
   private val auditService: AuditService,
-  private val actualEffectiveYear: EffectiveYear
+  private val actualEffectiveYear: EffectiveYear,
+  private val jobRunner: JobRunner
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -38,15 +37,15 @@ class AnnualPriceAdjustmentsService(
     logger.info("Starting price adjustment for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
 
     doAdjustment(supplier, suppliedEffective, multiplier)
+
+    logger.info("Running price adjustment for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
   }
 
-  private fun doAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double) = runBlocking {
-    launch {
+  private fun doAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double) {
+    val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)
+
+    jobRunner.run("annual price adjustment") {
       Result.runCatching {
-        val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)
-
-        for (i in 1..900000) logger.info("$i")
-
         annualPriceAdjuster.adjust(
           lockId,
           supplier,

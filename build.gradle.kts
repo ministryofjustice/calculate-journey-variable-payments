@@ -37,7 +37,6 @@ dependencies {
   }
 
   implementation("org.flywaydb:flyway-core:7.12.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
