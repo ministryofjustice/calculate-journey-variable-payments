@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
@@ -11,10 +12,10 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
 import javax.validation.Valid
+import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.Pattern
 
 /**
@@ -24,8 +25,7 @@ import javax.validation.constraints.Pattern
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class AnnualPriceAdjustmentsController(
-  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
-  private val effectiveYear: EffectiveYear
+  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -61,7 +61,8 @@ class AnnualPriceAdjustmentsController(
       return "annual-price-adjustment"
     }
 
-    annualPriceAdjustmentsService.adjust(supplier, effectiveYear.current(), mayBeRate, authentication)
+    // TODO capture (and store) the details of the adjustment in the auditing work/ticket.
+    annualPriceAdjustmentsService.adjust(supplier, model.getEffectiveYear(), mayBeRate, authentication)
 
     return "manage-journey-price-catalogue"
   }
@@ -73,6 +74,10 @@ class AnnualPriceAdjustmentsController(
   data class AnnualPriceAdjustmentForm(
     @get: Pattern(regexp = "^[0-9]{1,5}(\\.[0-9]{0,3})?\$", message = "Invalid rate")
     val rate: String?,
+
+    @get: NotEmpty(message = "Enter details upto 255 characters")
+    @get: Length(max = 255, message = "Enter details upto 255 characters")
+    val details: String? = null
   ) {
     fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }
   }

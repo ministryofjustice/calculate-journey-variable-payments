@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
@@ -28,10 +27,7 @@ import java.time.LocalDate
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
 @WithMockUser(roles = ["PECS_MAINTAIN_PRICE"])
-class AnnualPriceAdjustmentsControllerTest(
-  @Autowired private val wac: WebApplicationContext,
-  @Autowired val effectiveYear: EffectiveYear
-) {
+class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
@@ -61,14 +57,10 @@ class AnnualPriceAdjustmentsControllerTest(
 
   @Test
   fun `fails upon submission of an invalid format rate price adjustment`() {
-    mockSession.apply {
-      this.setAttribute("supplier", Supplier.SERCO)
-      this.setAttribute("date", effectiveDate)
-    }
-
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
       param("rate", "1.O5")
+      param("details", "some details")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
@@ -79,16 +71,39 @@ class AnnualPriceAdjustmentsControllerTest(
 
   @Test
   fun `fails upon submission of an zero rate price adjustment`() {
-    mockSession.apply {
-      this.setAttribute("supplier", Supplier.SERCO)
-      this.setAttribute("date", effectiveDate)
-    }
-
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
       param("rate", "0")
+      param("details", "some details")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "rate") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("annual-price-adjustment") } }
+      .andExpect { status { isOk() } }
+  }
+
+  @Test
+  fun `fails upon submission when missing details for price adjustment`() {
+    mockMvc.post("/annual-price-adjustment") {
+      session = mockSession
+      param("rate", "10")
+    }
+      .andExpect { model { attributeHasFieldErrorCode("form", "details", "NotEmpty") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("annual-price-adjustment") } }
+      .andExpect { status { isOk() } }
+  }
+
+  @Test
+  fun `fails upon submission when details too long for price adjustment`() {
+    mockMvc.post("/annual-price-adjustment") {
+      session = mockSession
+      param("rate", "10")
+      param("details", "z".padEnd(256, 'z'))
+    }
+      .andExpect { model { attributeHasFieldErrorCode("form", "details", "Length") } }
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("annual-price-adjustment") } }
@@ -103,18 +118,14 @@ class AnnualPriceAdjustmentsControllerTest(
 
   @Test
   fun `annual price adjustment with valid rate is applied for supplier`() {
-    mockSession.apply {
-      this.setAttribute("supplier", Supplier.SERCO)
-      this.setAttribute("date", effectiveDate)
-    }
-
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
       param("rate", "1.5")
+      param("details", "some details")
     }
       .andExpect { view { name("manage-journey-price-catalogue") } }
       .andExpect { status { isOk() } }
 
-    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYear.current()), eq(1.5), anyOrNull())
+    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.5), anyOrNull())
   }
 }
