@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/base}">
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/base}">
 
 <head>
   <title>Calculate Journey Variable Payments - GOV.UK</title>
@@ -10,11 +14,7 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
-  <div class="mv4">
-    <h1 class="govuk-heading-xl mv2" th:inline="text">
-      Manage Journey Price Catalogue [[${contractualYearStart}]] to [[${contractualYearEnd}]]
-    </h1>
-  </div>
+  <div th:insert="fragments/contractual-year.html :: contractualYear"></div>
 
   <table class="govuk-table">
     <thead class="govuk-table__head">
@@ -26,9 +26,16 @@
     <tr class="govuk-table__row">
       <td class="govuk-table__cell" scope="row">
         <a href="/search-journeys" class="govuk-heading-s govuk-link--no-visited-state">Find journeys</a>
-        Search and edit individual journey prices
+        Search and edit individual journey prices.
       </td>
     </tr>
+    <div sec:authorize="hasRole('ROLE_PECS_MAINTAIN_PRICE')">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell" scope="row">
+          <a href="/annual-price-adjustment" class="govuk-heading-s govuk-link--no-visited-state">Apply bulk price adjustment</a>
+          Make pricing adjustments to the entire catalogue.
+        </td>
+    </div>
     </tbody>
   </table>
 </div>

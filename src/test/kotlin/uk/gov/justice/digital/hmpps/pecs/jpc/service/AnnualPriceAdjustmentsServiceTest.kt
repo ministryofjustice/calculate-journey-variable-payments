@@ -7,7 +7,11 @@ import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
@@ -20,6 +24,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 import java.util.UUID
 
+@ExtendWith(FakeAuthentication::class)
 internal class AnnualPriceAdjustmentsServiceTest {
 
   private val priceAdjustmentRepository: PriceAdjustmentRepository = mock()
@@ -31,15 +36,29 @@ internal class AnnualPriceAdjustmentsServiceTest {
   private val annualPriceAdjuster: AnnualPriceAdjuster =
     AnnualPriceAdjuster(priceRepository, priceAdjustmentRepository, auditService, timeSource)
   private val annualPriceAdjusterSpy: AnnualPriceAdjuster = mock { spy(annualPriceAdjuster) }
+  private val jobRunner = JobRunner { _, job -> job() }
+  private lateinit var authentication: Authentication
+
+  @BeforeEach
+  fun before() {
+    authentication = SecurityContextHolder.getContext().authentication
+  }
 
   @Test
   internal fun `price adjustment for Serco`() {
     val lockId = fakeLockForFor(Supplier.SERCO, 1.0, 2020)
 
-    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService, effectiveYear).adjust(
+    AnnualPriceAdjustmentsService(
+      annualPriceAdjusterSpy,
+      monitoringService,
+      auditService,
+      effectiveYear,
+      jobRunner
+    ).adjust(
       Supplier.SERCO,
       2020,
-      1.0
+      1.0,
+      authentication
     )
 
     verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(1.0))
@@ -49,10 +68,17 @@ internal class AnnualPriceAdjustmentsServiceTest {
   internal fun `price adjustment for GEOAmey`() {
     val lockId = fakeLockForFor(Supplier.GEOAMEY, 2.0, 2021)
 
-    AnnualPriceAdjustmentsService(annualPriceAdjusterSpy, monitoringService, auditService, effectiveYear).adjust(
+    AnnualPriceAdjustmentsService(
+      annualPriceAdjusterSpy,
+      monitoringService,
+      auditService,
+      effectiveYear,
+      jobRunner
+    ).adjust(
       Supplier.GEOAMEY,
       2021,
-      2.0
+      2.0,
+      authentication
     )
 
     verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))
@@ -76,10 +102,17 @@ internal class AnnualPriceAdjustmentsServiceTest {
       )
     ).thenThrow(RuntimeException("something went wrong"))
 
-    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
+    AnnualPriceAdjustmentsService(
+      annualPriceAdjuster,
+      monitoringService,
+      auditService,
+      effectiveYear,
+      jobRunner
+    ).adjust(
       Supplier.GEOAMEY,
       2021,
-      2.0
+      2.0,
+      authentication
     )
 
     verify(monitoringService).capture("Failed price adjustment for GEOAMEY for effective year 2021 and multiplier 2.0.")
@@ -97,16 +130,23 @@ internal class AnnualPriceAdjustmentsServiceTest {
     )
     whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
 
-    AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
+    AnnualPriceAdjustmentsService(
+      annualPriceAdjuster,
+      monitoringService,
+      auditService,
+      effectiveYear,
+      jobRunner
+    ).adjust(
       Supplier.GEOAMEY,
       2021,
-      2.0
+      2.0,
+      authentication
     )
 
     verify(auditService).create(
       AuditableEvent(
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
-        "_TERMINAL_",
+        authentication.name,
         mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
       )
     )
@@ -115,10 +155,17 @@ internal class AnnualPriceAdjustmentsServiceTest {
   @Test
   internal fun `cannot adjust years prior to the current effective year`() {
     assertThatThrownBy {
-      AnnualPriceAdjustmentsService(annualPriceAdjuster, monitoringService, auditService, effectiveYear).adjust(
+      AnnualPriceAdjustmentsService(
+        annualPriceAdjuster,
+        monitoringService,
+        auditService,
+        effectiveYear,
+        jobRunner
+      ).adjust(
         Supplier.GEOAMEY,
         effectiveYear.current() - 1,
-        2.0
+        2.0,
+        authentication
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")

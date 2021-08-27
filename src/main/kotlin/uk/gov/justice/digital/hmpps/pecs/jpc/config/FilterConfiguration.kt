@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.config
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.AnnualPriceAdjustmentsController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageJourneyPriceCatalogueController
@@ -21,7 +22,8 @@ class FilterConfiguration {
         *MaintainSupplierPricingController.routes(),
         *ManageSchedule34LocationsController.routes(),
         *MapFriendlyLocationController.routes(),
-        *ManageJourneyPriceCatalogueController.routes()
+        *ManageJourneyPriceCatalogueController.routes(),
+        *AnnualPriceAdjustmentsController.routes()
       )
     }
 }
