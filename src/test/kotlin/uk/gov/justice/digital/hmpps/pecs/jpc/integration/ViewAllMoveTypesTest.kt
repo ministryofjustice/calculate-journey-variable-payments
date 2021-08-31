@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -25,6 +26,7 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.Year
 
+@Disabled
 internal class ViewAllMoveTypesTest : IntegrationTest() {
 
   @Test

@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
+import java.time.LocalDateTime
 import javax.validation.Valid
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.Pattern
@@ -31,12 +35,13 @@ class AnnualPriceAdjustmentsController(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   @GetMapping(ANNUAL_PRICE_ADJUSTMENT)
-  fun index(model: ModelMap): Any {
+  fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     logger.info("getting annual price adjustment")
 
     model.apply {
       addContractStartAndEndDates()
-      addAttribute("form", AnnualPriceAdjustmentForm("0.000"))
+      addAttribute("form", AnnualPriceAdjustmentForm("0.0000"))
+      addAttribute("history", priceAdjustmentHistoryFor(supplier))
     }
 
     return "annual-price-adjustment"
@@ -56,13 +61,15 @@ class AnnualPriceAdjustmentsController(
     val mayBeRate = form.mayBeRate() ?: result.rejectInvalidAdjustmentRate().let { null }
 
     if (result.hasErrors() || mayBeRate == null) {
-      model.addContractStartAndEndDates()
+      model.apply {
+        addContractStartAndEndDates()
+        addAttribute("history", priceAdjustmentHistoryFor(supplier))
+      }
 
       return "annual-price-adjustment"
     }
 
-    // TODO capture (and store) the details of the adjustment in the auditing work/ticket.
-    annualPriceAdjustmentsService.adjust(supplier, model.getEffectiveYear(), mayBeRate, authentication)
+    annualPriceAdjustmentsService.adjust(supplier, model.getEffectiveYear(), mayBeRate, authentication, form.details!!)
 
     return "manage-journey-price-catalogue"
   }
@@ -71,8 +78,13 @@ class AnnualPriceAdjustmentsController(
     this.rejectValue("rate", "rate", "Invalid rate")
   }
 
+  private fun priceAdjustmentHistoryFor(supplier: Supplier): List<PriceAdjustmentHistoryDto> =
+    annualPriceAdjustmentsService.adjustmentsHistoryFor(supplier)
+      .map { history -> PriceAdjustmentHistoryDto.valueOf(supplier, history) }
+      .sortedByDescending { lh -> lh.datetime }
+
   data class AnnualPriceAdjustmentForm(
-    @get: Pattern(regexp = "^[0-9]{1,5}(\\.[0-9]{0,3})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9]{1,5}(\\.[0-9]{0,4})?\$", message = "Invalid rate")
     val rate: String?,
 
     @get: NotEmpty(message = "Enter details upto 255 characters")
@@ -86,5 +98,30 @@ class AnnualPriceAdjustmentsController(
     const val ANNUAL_PRICE_ADJUSTMENT = "/annual-price-adjustment"
 
     fun routes(): Array<String> = arrayOf(ANNUAL_PRICE_ADJUSTMENT)
+  }
+}
+
+data class PriceAdjustmentHistoryDto(
+  val datetime: LocalDateTime,
+  val action: String,
+  val by: String,
+  val details: String
+) {
+  companion object {
+    /**
+     * Throws a runtime exception if the [AuditEvent] is not a journey price event or if there is a supplier mismatch.
+     */
+    fun valueOf(supplier: Supplier, event: AuditEvent): PriceAdjustmentHistoryDto {
+      val data = AnnualPriceAdjustmentMetadata.map(event)
+
+      if (data.supplier != supplier) throw RuntimeException("Audit bulk price adjusted event not for supplier $supplier")
+
+      return PriceAdjustmentHistoryDto(
+        event.createdAt,
+        "Prices adjusted by blended rate of ${data.multiplier}",
+        if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username,
+        data.details
+      )
+    }
   }
 }

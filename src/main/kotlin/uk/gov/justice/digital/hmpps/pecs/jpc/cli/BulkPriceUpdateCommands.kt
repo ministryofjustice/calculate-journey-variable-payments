@@ -10,9 +10,9 @@ class BulkPriceUpdateCommands(
   private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService
 ) {
   @ShellMethod("Performs a bulk price adjustment for the given supplier, effective year and the supplied multiplier.")
-  fun bulkPriceAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double, force: Boolean = false) {
+  fun bulkPriceAdjustment(supplier: Supplier, effectiveYear: Int, multiplier: Double, details: String, force: Boolean = false) {
     if (force)
-      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, multiplier, null)
+      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, multiplier, null, details)
     else
       throw RuntimeException("Force is required for this operation to complete.")
   }
