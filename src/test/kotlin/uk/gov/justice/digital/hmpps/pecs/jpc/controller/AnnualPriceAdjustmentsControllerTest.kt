@@ -1,7 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,6 +55,8 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         }
       }
       .andExpect { status { isOk() } }
+
+    verify(adjustmentsService).adjustmentsHistoryFor(Supplier.SERCO)
   }
 
   @Test
@@ -67,6 +71,8 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("annual-price-adjustment") } }
       .andExpect { status { isOk() } }
+
+    verify(adjustmentsService).adjustmentsHistoryFor(Supplier.SERCO)
   }
 
   @Test
@@ -141,5 +147,6 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { status { isOk() } }
 
     verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq("some details"))
+    verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
   }
 }
