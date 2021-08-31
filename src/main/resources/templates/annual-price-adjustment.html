@@ -90,6 +90,7 @@
           <th scope="col" class="govuk-table__header">Time</th>
           <th scope="col" class="govuk-table__header">Action</th>
           <th scope="col" class="govuk-table__header">By</th>
+          <th scope="col" class="govuk-table__header">Notes</th>
         </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -98,6 +99,7 @@
           <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'HH:mm a')}]]</td>
           <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.action}]]</td>
           <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.by}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.details}]]</td>
         </tr>
         </tbody>
       </table>
