@@ -30,10 +30,6 @@ data class PriceMetadata(
 
   @Json(name = "multiplier", index = 7, serializeNull = false)
   val multiplier: Double? = null,
-
-  @Json(name = "details", index = 7, serializeNull = false)
-  val details: String? = null
-
 ) : Metadata {
   private constructor(price: Price) : this(
     price.supplier,
