@@ -40,7 +40,7 @@ class AnnualPriceAdjustmentsController(
 
     model.apply {
       addContractStartAndEndDates()
-      addAttribute("form", AnnualPriceAdjustmentForm("0.000"))
+      addAttribute("form", AnnualPriceAdjustmentForm("0.0000"))
       addAttribute("history", priceAdjustmentHistoryFor(supplier))
     }
 
@@ -84,7 +84,7 @@ class AnnualPriceAdjustmentsController(
       .sortedByDescending { lh -> lh.datetime }
 
   data class AnnualPriceAdjustmentForm(
-    @get: Pattern(regexp = "^[0-9]{1,5}(\\.[0-9]{0,3})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9]{1,5}(\\.[0-9]{0,4})?\$", message = "Invalid rate")
     val rate: String?,
 
     @get: NotEmpty(message = "Enter details upto 255 characters")
@@ -120,7 +120,7 @@ data class PriceAdjustmentHistoryDto(
         event.createdAt,
         "Prices adjusted by blended rate of ${data.multiplier}",
         if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username,
-        data.details ?: "No details"
+        data.details
       )
     }
   }

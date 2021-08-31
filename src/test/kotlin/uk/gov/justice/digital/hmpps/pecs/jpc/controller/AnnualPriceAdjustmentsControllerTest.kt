@@ -48,7 +48,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         model {
           attribute(
             "form",
-            AnnualPriceAdjustmentsController.AnnualPriceAdjustmentForm("0.000")
+            AnnualPriceAdjustmentsController.AnnualPriceAdjustmentForm("0.0000")
           )
         }
       }
@@ -77,6 +77,20 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       param("details", "some details")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "rate") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("annual-price-adjustment") } }
+      .andExpect { status { isOk() } }
+  }
+
+  @Test
+  fun `fails upon submission of an rate with more than 4 decimal places `() {
+    mockMvc.post("/annual-price-adjustment") {
+      session = mockSession
+      param("rate", "1.12345")
+      param("details", "some details")
+    }
+      .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("annual-price-adjustment") } }
@@ -120,12 +134,12 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   fun `annual price adjustment with valid rate is applied for supplier`() {
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
-      param("rate", "1.5")
+      param("rate", "1.1234")
       param("details", "some details")
     }
       .andExpect { view { name("manage-journey-price-catalogue") } }
       .andExpect { status { isOk() } }
 
-    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.5), anyOrNull(), eq("some details"))
+    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq("some details"))
   }
 }
