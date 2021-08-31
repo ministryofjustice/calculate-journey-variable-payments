@@ -4,6 +4,7 @@ import com.beust.klaxon.Klaxon
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -13,6 +14,7 @@ import org.mockito.ArgumentMatcher
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
@@ -295,20 +297,42 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create journey price bulk adjustment audit event`() {
-    service.create(AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(Supplier.SERCO, 2020, 1.5))
-    service.create(AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(Supplier.GEOAMEY, 2021, 2.0))
-
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
-      "_TERMINAL_",
-      mapOf("supplier" to Supplier.SERCO, "effective_year" to 2020, "multiplier" to 1.5)
+    service.create(
+      AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
+        Supplier.SERCO,
+        2020,
+        1.5,
+        null,
+        "serco details"
+      )
+    )
+    service.create(
+      AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
+        Supplier.GEOAMEY,
+        2021,
+        2.0,
+        null,
+        "geo details"
+      )
     )
 
-    verifyEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
-      "_TERMINAL_",
-      mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
+    verify(auditEventRepository, times(2)).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT)
+    assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
+    assertPriceAdjustmentIsSame(
+      eventCaptor.firstValue,
+      AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2020, 1.5, "serco details")
     )
+    assertThat(eventCaptor.secondValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT)
+    assertThat(eventCaptor.secondValue.username).isEqualTo("_TERMINAL_")
+    assertPriceAdjustmentIsSame(
+      eventCaptor.secondValue,
+      AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0, "geo details")
+    )
+  }
+
+  private fun assertPriceAdjustmentIsSame(event: AuditEvent, priceAdjustmentMetadata: AnnualPriceAdjustmentMetadata) {
+    assertThat(jsonTo<AnnualPriceAdjustmentMetadata>(event.metadata!!)).isEqualTo(priceAdjustmentMetadata)
   }
 
   @Test

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
@@ -58,7 +59,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
       Supplier.SERCO,
       2020,
       1.0,
-      authentication
+      authentication,
+      "some details"
     )
 
     verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(1.0))
@@ -78,7 +80,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
       Supplier.GEOAMEY,
       2021,
       2.0,
-      authentication
+      authentication,
+      "some details"
     )
 
     verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))
@@ -112,7 +115,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
       Supplier.GEOAMEY,
       2021,
       2.0,
-      authentication
+      authentication,
+      "some details"
     )
 
     verify(monitoringService).capture("Failed price adjustment for GEOAMEY for effective year 2021 and multiplier 2.0.")
@@ -140,14 +144,15 @@ internal class AnnualPriceAdjustmentsServiceTest {
       Supplier.GEOAMEY,
       2021,
       2.0,
-      authentication
+      authentication,
+      "some audit details"
     )
 
     verify(auditService).create(
       AuditableEvent(
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         authentication.name,
-        mapOf("supplier" to Supplier.GEOAMEY, "effective_year" to 2021, "multiplier" to 2.0)
+        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0, "some audit details")
       )
     )
   }
@@ -165,7 +170,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
         Supplier.GEOAMEY,
         effectiveYear.current() - 1,
         2.0,
-        authentication
+        authentication,
+        "some details"
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")

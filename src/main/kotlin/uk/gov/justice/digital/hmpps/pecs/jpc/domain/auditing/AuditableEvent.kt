@@ -88,7 +88,7 @@ data class AuditableEvent(
       price: Price,
       original: Money,
       multiplier: Double,
-      authentication: Authentication? = null
+      authentication: Authentication? = null,
     ): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
@@ -101,12 +101,12 @@ data class AuditableEvent(
       supplier: Supplier,
       effectiveYear: Int,
       multiplier: Double,
-      authentication: Authentication? = null
-    ) = createEvent(
-      AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
-      authentication,
-      mapOf("supplier" to supplier, "effective_year" to effectiveYear, "multiplier" to multiplier),
-      true
+      authentication: Authentication? = null,
+      details: String
+    ) = AuditableEvent(
+      type = AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
+      username = authentication?.name ?: terminal,
+      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier, details)
     )
 
     fun mapLocation(location: Location) =

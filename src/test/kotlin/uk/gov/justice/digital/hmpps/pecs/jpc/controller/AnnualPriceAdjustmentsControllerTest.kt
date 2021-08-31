@@ -126,6 +126,6 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { view { name("manage-journey-price-catalogue") } }
       .andExpect { status { isOk() } }
 
-    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.5), anyOrNull())
+    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.5), anyOrNull(), eq("some details"))
   }
 }

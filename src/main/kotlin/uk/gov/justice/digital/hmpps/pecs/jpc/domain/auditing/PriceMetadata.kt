@@ -29,7 +29,10 @@ data class PriceMetadata(
   val oldPrice: Double? = null,
 
   @Json(name = "multiplier", index = 7, serializeNull = false)
-  val multiplier: Double? = null
+  val multiplier: Double? = null,
+
+  @Json(name = "details", index = 7, serializeNull = false)
+  val details: String? = null
 
 ) : Metadata {
   private constructor(price: Price) : this(
@@ -56,7 +59,7 @@ data class PriceMetadata(
     effectiveYear = new.effectiveYear,
     newPrice = new.price().pounds(),
     oldPrice = old.pounds(),
-    multiplier = multiplier
+    multiplier = multiplier,
   )
 
   companion object {

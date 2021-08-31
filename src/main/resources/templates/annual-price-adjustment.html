@@ -22,6 +22,11 @@
           Apply bulk price adjustment
         </a>
       </li>
+      <li class="govuk-tabs__list-item">
+        <a class="govuk-tabs__tab" href="#price-adjustment-history">
+          Price adjustment history
+        </a>
+      </li>
     </ul>
     <div class="govuk-tabs__panel" id="annual-price-adjustment">
       <form th:action="@{/annual-price-adjustment}" th:object="${form}" method="post">
@@ -41,7 +46,6 @@
                 Enter a valid price adjustment greater than zero in the correct format ###.###
               </p>
               <div class="govuk-input__wrapper">
-                <div class="govuk-input__prefix" aria-hidden="true">£</div>
                 <input class="govuk-input govuk-input--width-5" id="rate" name="rate" type="text"
                        aria-describedby="rate-hint" th:field="*{rate}"
                        th:classappend="${#fields.hasErrors('rate')} ? 'govuk-input--error'">
@@ -76,6 +80,27 @@
           <a href="/manage-journey-price-catalogue" class="govuk-link">Cancel</a>
         </div>
       </form>
+    </div>
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-adjustment-history">
+      <h2 class="govuk-heading-l">Price history</h2>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Date</th>
+          <th scope="col" class="govuk-table__header">Time</th>
+          <th scope="col" class="govuk-table__header">Action</th>
+          <th scope="col" class="govuk-table__header">By</th>
+        </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        <tr class="govuk-table__row" th:each="event: ${history}">
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'dd MMMM yyyy')}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'HH:mm a')}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.action}]]</td>
+          <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.by}]]</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
