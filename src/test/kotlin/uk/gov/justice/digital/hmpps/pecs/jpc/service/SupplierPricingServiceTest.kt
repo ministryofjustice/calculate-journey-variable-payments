@@ -146,7 +146,7 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        2020
+        effectiveYear
       )
     ).thenReturn(price)
     whenever(priceRepository.save(any())).thenReturn(price)
@@ -172,7 +172,7 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        2020
+        effectiveYear
       )
     ).thenReturn(price)
     whenever(priceRepository.save(any())).thenReturn(price)
