@@ -40,7 +40,7 @@ class AnnualPriceAdjustmentsController(
   fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     logger.info("getting annual price adjustment")
 
-    if (model.getEffectiveYear().isBefore(actualEffectiveYear)) {
+    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
       model.addContractStartAndEndDates()
       model.addAttribute("history", priceAdjustmentHistoryFor(supplier))
 
@@ -80,7 +80,7 @@ class AnnualPriceAdjustmentsController(
       return "annual-price-adjustment"
     }
 
-    annualPriceAdjustmentsService.adjust(supplier, model.getEffectiveYear(), mayBeRate, authentication, form.details!!)
+    annualPriceAdjustmentsService.adjust(supplier, model.getSelectedEffectiveYear(), mayBeRate, authentication, form.details!!)
 
     return "manage-journey-price-catalogue"
   }

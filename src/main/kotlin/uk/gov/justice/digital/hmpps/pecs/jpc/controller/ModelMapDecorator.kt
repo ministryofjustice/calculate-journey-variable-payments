@@ -8,13 +8,13 @@ import java.time.LocalDate
 internal fun ModelMap.getEndOfMonth() = endOfMonth(getStartOfMonth())
 
 internal fun ModelMap.addContractStartAndEndDates() {
-  getEffectiveYear().also {
+  getSelectedEffectiveYear().also {
     this.addAttribute("contractualYearStart", "$it")
     this.addAttribute("contractualYearEnd", "${it + 1}")
   }
 }
 
-internal fun ModelMap.getEffectiveYear() = effectiveYearForDate(getStartOfMonth())
+internal fun ModelMap.getSelectedEffectiveYear() = effectiveYearForDate(getStartOfMonth())
 
 internal fun ModelMap.getStartOfMonth() =
   this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate }
