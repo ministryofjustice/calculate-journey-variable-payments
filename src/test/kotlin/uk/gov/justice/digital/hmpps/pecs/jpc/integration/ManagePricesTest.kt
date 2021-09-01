@@ -60,6 +60,10 @@ internal class ManagePricesTest : IntegrationTest() {
 
     isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
+    isAtPage(Dashboard).navigateToSelectMonthPage()
+
+    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
+
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
     isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
