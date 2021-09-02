@@ -100,4 +100,28 @@ internal class PriceHistoryDtoTest {
       )
     }.isInstanceOf(RuntimeException::class.java)
   }
+
+  @Test
+  fun `price change via an a price adjustment`() {
+    val datetime = LocalDateTime.now()
+    val priceMetadata = PriceMetadata(
+      supplier = Supplier.GEOAMEY,
+      fromNomisId = "from_agency_id",
+      toNomisId = "to_agency_id",
+      effectiveYear = 2021,
+      oldPrice = Money(1000).pounds(),
+      newPrice = Money(2000).pounds(),
+      multiplier = 2.0
+    )
+    val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
+    val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
+
+    assertThat(history).isEqualTo(
+      PriceHistoryDto(
+        datetime,
+        "Price adjusted from £10.00 to £20.00 with blended rate multiplier 2.0. Effective from 2021 to 2022.",
+        "Jane"
+      )
+    )
+  }
 }
