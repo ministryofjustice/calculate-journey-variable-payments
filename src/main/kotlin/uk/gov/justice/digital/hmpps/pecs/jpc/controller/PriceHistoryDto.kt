@@ -26,6 +26,7 @@ data class PriceHistoryDto(
         append(
           when {
             data.isUpdate() -> "Price changed from £${Money.valueOf(data.oldPrice!!)} to £${Money.valueOf(data.newPrice)}. Effective from ${data.effectiveYear} to ${data.effectiveYear + 1}."
+            data.isAdjustment() -> "Price adjusted from £${Money.valueOf(data.oldPrice!!)} to £${Money.valueOf(data.newPrice)} with blended rate multiplier ${data.multiplier}. Effective from ${data.effectiveYear} to ${data.effectiveYear + 1}."
             else -> "Journey priced at £${Money.valueOf(data.newPrice)}. Effective from ${data.effectiveYear} to ${data.effectiveYear + 1}."
           }
         )
