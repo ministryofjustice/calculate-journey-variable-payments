@@ -5,6 +5,8 @@ import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -19,6 +21,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
@@ -35,6 +38,9 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
 
   private val effectiveDate = LocalDate.now()
 
+  @MockBean
+  private lateinit var effectiveYear: EffectiveYear
+
   private val mockSession = MockHttpSession(wac.servletContext).apply {
     this.setAttribute("supplier", Supplier.SERCO)
     this.setAttribute("date", effectiveDate)
@@ -43,9 +49,29 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   @MockBean
   private lateinit var adjustmentsService: AnnualPriceAdjustmentsService
 
+  @BeforeEach
+  fun before() {
+    whenever(effectiveYear.current()).thenReturn(effectiveDate.year)
+  }
+
+  @Test
+  fun `user can only see the price adjustment history if not in current effective year`() {
+    whenever(effectiveYear.current()).thenReturn(effectiveDate.year + 1)
+
+    mockMvc.get("/annual-price-adjustment") { session = mockSession }
+      .andExpect { view { name("annual-price-adjustment-history") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attributeExists("history") } }
+      .andExpect { status { isOk() } }
+
+    verify(adjustmentsService).adjustmentsHistoryFor(Supplier.SERCO)
+  }
+
   @Test
   fun `user with the maintain price role can navigate to the page`() {
     mockMvc.get("/annual-price-adjustment") { session = mockSession }
+      .andExpect { view { name("annual-price-adjustment") } }
       .andExpect {
         model {
           attribute(
@@ -54,6 +80,9 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
           )
         }
       }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attributeExists("history") } }
       .andExpect { status { isOk() } }
 
     verify(adjustmentsService).adjustmentsHistoryFor(Supplier.SERCO)
@@ -69,6 +98,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attributeExists("history") } }
       .andExpect { view { name("annual-price-adjustment") } }
       .andExpect { status { isOk() } }
 

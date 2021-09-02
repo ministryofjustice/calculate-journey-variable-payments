@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
 import java.time.LocalDateTime
@@ -29,7 +30,8 @@ import javax.validation.constraints.Pattern
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class AnnualPriceAdjustmentsController(
-  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService
+  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
+  private val actualEffectiveYear: EffectiveYear
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -37,6 +39,13 @@ class AnnualPriceAdjustmentsController(
   @GetMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     logger.info("getting annual price adjustment")
+
+    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
+      model.addContractStartAndEndDates()
+      model.addAttribute("history", priceAdjustmentHistoryFor(supplier))
+
+      return "annual-price-adjustment-history"
+    }
 
     model.apply {
       addContractStartAndEndDates()
@@ -46,6 +55,8 @@ class AnnualPriceAdjustmentsController(
 
     return "annual-price-adjustment"
   }
+
+  private fun Int.isBefore(effectiveYear: EffectiveYear): Boolean = this < effectiveYear.current()
 
   @PostMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun applyAnnualPriceAdjustment(
@@ -69,7 +80,7 @@ class AnnualPriceAdjustmentsController(
       return "annual-price-adjustment"
     }
 
-    annualPriceAdjustmentsService.adjust(supplier, model.getEffectiveYear(), mayBeRate, authentication, form.details!!)
+    annualPriceAdjustmentsService.adjust(supplier, model.getSelectedEffectiveYear(), mayBeRate, authentication, form.details!!)
 
     return "manage-journey-price-catalogue"
   }

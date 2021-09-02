@@ -56,7 +56,7 @@ class ManageJourneyPriceCatalogueController(@Autowired val journeyService: Journ
       return RedirectView(SEARCH_JOURNEYS_URL)
     }
 
-    val effectiveYear = model.getEffectiveYear()
+    val effectiveYear = model.getSelectedEffectiveYear()
     val journeys = journeyService.prices(supplier, pickUpLocation, dropOffLocation, effectiveYear)
 
     model.addAttribute("contractualYearStart", "$effectiveYear")
