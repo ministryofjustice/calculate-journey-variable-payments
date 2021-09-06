@@ -16,10 +16,23 @@ class AnnualPriceAdjustmentPage : ApplicationPage() {
   @FindBy(id = "confirm-price-adjustment")
   private lateinit var submitButton: FluentWebElement
 
+  @FindBy(linkText = "Price adjustment history")
+  private lateinit var priceAdjustmentHistoryTab: FluentWebElement
+
   fun applyAdjustment(rate: Double, details: String) {
     this.rate.fill().withText(rate.toString())
     this.details.fill().withText(details)
 
     submitButton.submit()
+  }
+
+  fun showPriceAdjustmentHistoryTab(): AnnualPriceAdjustmentPage {
+    priceAdjustmentHistoryTab.click()
+
+    return this
+  }
+
+  fun isPriceHistoryRowPresent(rate: Double) {
+    isRowPresent<AnnualPriceAdjustmentPage>("Prices adjusted by blended rate of $rate")
   }
 }
