@@ -24,8 +24,6 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
     isAtPage(AnnualPriceAdjustment).applyAdjustment(1.6, "Indexation rate of 1.6.")
 
-    isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
-
-    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(1.6)
+    isAtPage(ManageJourneyPriceCatalogue)
   }
 }
