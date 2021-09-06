@@ -173,8 +173,8 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       param("rate", "1.1234")
       param("details", "some details")
     }
-      .andExpect { view { name("manage-journey-price-catalogue") } }
-      .andExpect { status { isOk() } }
+      .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq("some details"))
     verify(adjustmentsService, never()).adjustmentsHistoryFor(any())

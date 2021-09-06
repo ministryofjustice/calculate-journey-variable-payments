@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="govuk-template " xmlns:th="http://www.w3.org/1999/xhtml"
+<html lang="en" class="govuk-template " xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
     <head>
@@ -49,6 +49,26 @@
             </div>
         </div>
 
+        <div
+          id="application-info"
+          class="govuk-width-container mt3"
+          style="display:none;">
+          <div
+            class="govuk-notification-banner"
+            role="region"
+            aria-labelledby="govuk-notification-banner-title"
+            data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+              <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                Important
+              </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+              <p id="application-message" class="govuk-notification-banner__heading"></p>
+            </div>
+          </div>
+        </div>
+
         <div layout:fragment="content"></div>
 
         <footer class="govuk-footer mt4 " role="contentinfo">
@@ -82,6 +102,28 @@
         <script>
         window.GOVUKFrontend.initAll()
 
+        </script>
+
+        <script>
+          function checkAndShowAppInfo(message){
+            if (!message) {
+              document.getElementById("application-info").style.display = 'none'
+              document.getElementById("application-message").textContent = ''
+              return
+            }
+
+            document.getElementById("application-message").textContent = message
+            document.getElementById("application-info").style.display = 'block'
+          }
+
+          const appInfoRequest = new XMLHttpRequest()
+
+          appInfoRequest.addEventListener('load', function () {
+            checkAndShowAppInfo(JSON.parse(this.responseText)['message'])
+          })
+
+          appInfoRequest.open('GET', '/app/info');
+          appInfoRequest.send();
         </script>
     </body>
 </html>

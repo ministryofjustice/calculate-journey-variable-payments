@@ -8,6 +8,8 @@ sealed class Pages<T : ApplicationPage>(clazz: KClass<T>) {
 
   object AddPrice : Pages<AddPricePage>(AddPricePage::class)
 
+  object AnnualPriceAdjustment : Pages<AnnualPriceAdjustmentPage>(AnnualPriceAdjustmentPage::class)
+
   object ChooseSupplier : Pages<ChooseSupplierPage>(ChooseSupplierPage::class)
 
   object Dashboard : Pages<DashboardPage>(DashboardPage::class)

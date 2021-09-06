@@ -82,7 +82,7 @@ class AnnualPriceAdjustmentsController(
 
     annualPriceAdjustmentsService.adjust(supplier, model.getSelectedEffectiveYear(), mayBeRate, authentication, form.details!!)
 
-    return "manage-journey-price-catalogue"
+    return "redirect:/manage-journey-price-catalogue"
   }
 
   private fun BindingResult.rejectInvalidAdjustmentRate() {

@@ -10,7 +10,14 @@ class ManageJourneyPriceCataloguePage : ApplicationPage() {
   @FindBy(linkText = "Find journeys")
   private lateinit var findJourneysLink: FluentWebElement
 
+  @FindBy(linkText = "Apply bulk price adjustment")
+  private lateinit var applyBulkPriceAdjustment: FluentWebElement
+
   fun navigateToFindJourneys() {
     findJourneysLink.click()
+  }
+
+  fun navigateToApplyBulkPriceAdjustment() {
+    applyBulkPriceAdjustment.click()
   }
 }
