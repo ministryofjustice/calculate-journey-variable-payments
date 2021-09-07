@@ -16,9 +16,7 @@ import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
-import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
@@ -52,7 +50,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   ): Any {
     logger.info("getting add price for move $moveId")
 
-    val effectiveYear = model.getEffectiveYear()
+    val effectiveYear = model.getSelectedEffectiveYear()
     val (fromSite, toSite) = agencyIds(moveId).let { (from, to) ->
       supplierPricingService.getSiteNamesForPricing(
         supplier,
@@ -64,8 +62,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     model.apply {
       addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
-      addAttribute("contractualYearStart", "$effectiveYear")
-      addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+      addContractStartAndEndDates()
     }
 
     return "add-price"
@@ -83,10 +80,9 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
-    val effectiveYear = model.getEffectiveYear()
+    val effectiveYear = model.getSelectedEffectiveYear()
     if (result.hasErrors()) {
-      model.addAttribute("contractualYearStart", "$effectiveYear")
-      model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+      model.addContractStartAndEndDates()
 
       return "add-price"
     }
@@ -119,7 +115,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   ): String {
     logger.info("getting update price for move $moveId")
 
-    val effectiveYear = model.getEffectiveYear()
+    val effectiveYear = model.getSelectedEffectiveYear()
 
     val (fromAgencyId, toAgencyId) = agencyIds(moveId)
 
@@ -132,12 +128,10 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     model.apply {
       addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
-      addAttribute("contractualYearStart", "$effectiveYear")
-      addAttribute("contractualYearEnd", "${effectiveYear + 1}")
+      addContractStartAndEndDates()
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
+      addAttribute("cancelLink", getJourneySearchResultsUrl())
     }
-
-    model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
 
     return "update-price"
   }
@@ -154,18 +148,19 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
-    val effectiveYear = model.getEffectiveYear()
+    val effectiveYear = model.getSelectedEffectiveYear()
 
     if (result.hasErrors()) {
-      model.addAttribute("contractualYearStart", "$effectiveYear")
-      model.addAttribute("contractualYearEnd", "${effectiveYear + 1}")
-      model.addAttribute("cancelLink", model.getJourneySearchResultsUrl())
+      model.apply {
+        addContractStartAndEndDates()
+        addAttribute("cancelLink", getJourneySearchResultsUrl())
 
-      agencyIds(form.moveId).let { (from, to) ->
-        model.addAttribute(
-          "history",
-          priceHistoryForMove(supplier, from, to)
-        )
+        agencyIds(form.moveId).let { (from, to) ->
+          addAttribute(
+            "history",
+            priceHistoryForMove(supplier, from, to)
+          )
+        }
       }
 
       return "update-price"
@@ -214,9 +209,6 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   private fun ModelMap.getFromLocation() = this.getAttribute(PICK_UP_ATTRIBUTE).takeUnless { it == "" }
 
   private fun ModelMap.getToLocation() = this.getAttribute(DROP_OFF_ATTRIBUTE).takeUnless { it == "" }
-
-  private fun ModelMap.getEffectiveYear() =
-    effectiveYearForDate(this.getAttribute(DATE_ATTRIBUTE) as LocalDate)
 
   private fun UriComponentsBuilder.fromQueryParam(from: Any) {
     this.queryParam(PICK_UP_ATTRIBUTE, from)
