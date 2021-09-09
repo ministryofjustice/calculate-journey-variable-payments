@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -20,8 +21,19 @@ internal class PriceTest {
 
   @Test
   fun `new instance is created with relevant attributes changed upon price adjustment`() {
-    val originalPrice = Price(supplier = Supplier.SERCO, fromLocation = mock(), toLocation = mock(), effectiveYear = 2020, priceInPence = 1000, addedAt = LocalDate.of(2020, 7, 27).atStartOfDay())
-    val adjustedPrice = originalPrice.adjusted(amount = Money(2000), effectiveYear = 2021, addedAt = LocalDate.of(2021, 7, 27).atStartOfDay())
+    val originalPrice = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      effectiveYear = 2020,
+      priceInPence = 1000,
+      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+    )
+    val adjustedPrice = originalPrice.adjusted(
+      amount = Money(2000),
+      effectiveYear = 2021,
+      addedAt = LocalDate.of(2021, 7, 27).atStartOfDay()
+    )
 
     with(originalPrice) {
       assertThat(this).isNotSameAs(adjustedPrice)
@@ -41,5 +53,41 @@ internal class PriceTest {
       assertThat(effectiveYear).isEqualTo(2021)
       assertThat(addedAt).isEqualTo(LocalDate.of(2021, 7, 27).atStartOfDay())
     }
+  }
+
+  @Test
+  fun `cannot create price less than one pence`() {
+    Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      effectiveYear = 2020,
+      priceInPence = 1,
+      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+    )
+
+    assertThatThrownBy {
+      Price(
+        supplier = Supplier.SERCO,
+        fromLocation = mock(),
+        toLocation = mock(),
+        effectiveYear = 2020,
+        priceInPence = 0,
+        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+      )
+    }
+      .isInstanceOf(IllegalArgumentException::class.java)
+
+    assertThatThrownBy {
+      Price(
+        supplier = Supplier.SERCO,
+        fromLocation = mock(),
+        toLocation = mock(),
+        effectiveYear = 2020,
+        priceInPence = -1,
+        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+      )
+    }
+      .isInstanceOf(IllegalArgumentException::class.java)
   }
 }

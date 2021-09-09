@@ -98,7 +98,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
-  internal fun `can add price for Serco`() {
+  internal fun `can add up to max price for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
       this.setAttribute("date", effectiveDate)
@@ -107,7 +107,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     mockMvc.post("/add-price") {
       session = mockSession
       param("moveId", "$fromAgencyId-$toAgencyId")
-      param("price", "100.24")
+      param("price", "9999.99")
     }
       .andExpect { redirectedUrl("/journeys") }
       .andExpect { status { is3xxRedirection() } }
@@ -116,7 +116,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       Supplier.SERCO,
       fromAgencyId,
       toAgencyId,
-      Money.valueOf(100.24),
+      Money.valueOf(9999.99),
       effectiveYearForDate(effectiveDate)
     )
   }
@@ -148,7 +148,28 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "1O.00")
     }
-      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("add-price") } }
+      .andExpect { status { isOk() } }
+
+    verify(service, never()).addPriceForSupplier(any(), any(), any(), any(), any())
+  }
+
+  @Test
+  internal fun `cannot add price greater than but less than one for Serco`() {
+    mockSession.apply {
+      this.setAttribute("supplier", Supplier.SERCO)
+      this.setAttribute("date", effectiveDate)
+    }
+
+    mockMvc.post("/add-price") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("price", "0.001")
+    }
+      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("add-price") } }
@@ -169,7 +190,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "-10.00")
     }
-      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Invalid price") } }
+      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { view { name("add-price") } }

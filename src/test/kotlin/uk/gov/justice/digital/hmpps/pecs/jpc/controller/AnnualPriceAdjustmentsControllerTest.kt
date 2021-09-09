@@ -120,10 +120,24 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   }
 
   @Test
-  fun `fails upon submission of an rate with more than 4 decimal places `() {
+  fun `fails upon submission of an rate with more than 4 decimal places`() {
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
       param("rate", "1.12345")
+      param("details", "some details")
+    }
+      .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
+      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { view { name("annual-price-adjustment") } }
+      .andExpect { status { isOk() } }
+  }
+
+  @Test
+  fun `fails upon submission of an rate greater than max rate of 9_9999`() {
+    mockMvc.post("/annual-price-adjustment") {
+      session = mockSession
+      param("rate", "10.00")
       param("details", "some details")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
@@ -177,6 +191,20 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { status { is3xxRedirection() } }
 
     verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq("some details"))
+    verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
+  }
+
+  @Test
+  fun `annual price adjustment succeeds upto max rate for supplier`() {
+    mockMvc.post("/annual-price-adjustment") {
+      session = mockSession
+      param("rate", "9.9999")
+      param("details", "some details")
+    }
+      .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(9.9999), anyOrNull(), eq("some details"))
     verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
   }
 }

@@ -42,6 +42,8 @@ class AnnualPriceAdjustmentsService(
       throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
     }
 
+    if (multiplier >= 10) throw RuntimeException("Max allowed multiplier exceeded.")
+
     logger.info("Starting price adjustment for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
 
     doAdjustment(supplier, suppliedEffective, multiplier, authentication, details)

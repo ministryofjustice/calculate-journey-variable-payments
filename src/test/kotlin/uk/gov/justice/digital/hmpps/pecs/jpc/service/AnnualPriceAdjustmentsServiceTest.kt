@@ -177,6 +177,47 @@ internal class AnnualPriceAdjustmentsServiceTest {
       .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")
   }
 
+  @Test
+  internal fun `adjustment cannot exceed 9_9999`() {
+    assertThatThrownBy {
+      AnnualPriceAdjustmentsService(
+        annualPriceAdjuster,
+        monitoringService,
+        auditService,
+        effectiveYear,
+        jobRunner
+      ).adjust(
+        Supplier.GEOAMEY,
+        effectiveYear.current(),
+        10.0,
+        authentication,
+        "some details"
+      )
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Max allowed multiplier exceeded.")
+  }
+
+  @Test
+  internal fun `max allowed price adjustment for GEOAmey`() {
+    val lockId = fakeLockForFor(Supplier.GEOAMEY, 9.99, 2021)
+
+    AnnualPriceAdjustmentsService(
+      annualPriceAdjusterSpy,
+      monitoringService,
+      auditService,
+      effectiveYear,
+      jobRunner
+    ).adjust(
+      Supplier.GEOAMEY,
+      2021,
+      9.99,
+      authentication,
+      "some details"
+    )
+
+    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(9.99))
+  }
+
   private fun fakeLockForFor(supplier: Supplier, multiplier: Double, effectiveYear: Int): UUID {
     val lockId = UUID.randomUUID()
 
