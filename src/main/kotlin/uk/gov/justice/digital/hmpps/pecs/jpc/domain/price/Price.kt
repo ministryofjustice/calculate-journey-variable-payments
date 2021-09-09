@@ -50,6 +50,15 @@ data class Price(
   @Column(name = "effective_year", nullable = false)
   val effectiveYear: Int
 ) {
+
+  init {
+    failOnZeroOrLessPrice()
+  }
+
+  private fun failOnZeroOrLessPrice() {
+    if (priceInPence < 1) throw IllegalArgumentException("Price in pence must be greater than zero.")
+  }
+
   fun journey() = "${fromLocation.nomisAgencyId}-${toLocation.nomisAgencyId}"
 
   fun price() = Money(priceInPence)

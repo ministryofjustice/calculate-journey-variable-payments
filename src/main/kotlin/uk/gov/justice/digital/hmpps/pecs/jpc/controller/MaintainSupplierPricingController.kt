@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.LocalDate
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 @Controller
 @SessionAttributes(
@@ -37,7 +38,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
   data class PriceForm(
     @get: NotNull(message = "Invalid message id")
     val moveId: String,
-    @get: NotNull(message = "Add a price")
+    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid rate")
     val price: String,
     val from: String?,
     val to: String?,
