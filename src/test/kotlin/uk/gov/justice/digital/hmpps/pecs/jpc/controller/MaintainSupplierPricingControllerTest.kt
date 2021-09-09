@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.Warning
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
@@ -55,12 +56,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
+    val effectiveYear = effectiveYearForDate(effectiveDate)
+
     whenever(
       service.getSiteNamesForPricing(
         Supplier.SERCO,
         fromAgencyId,
         toAgencyId,
-        effectiveYearForDate(effectiveDate)
+        effectiveYear
       )
     ).thenReturn(Pair("from", "to"))
 
@@ -73,8 +76,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
-      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attribute("warnings", listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $effectiveYear to ${effectiveYear + 1}."))) } }
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
@@ -143,14 +145,15 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
+    val effectiveYear = effectiveYearForDate(effectiveDate)
+
     mockMvc.post("/add-price") {
       session = mockSession
       param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "1O.00")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
-      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attribute("warnings", listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $effectiveYear to ${effectiveYear + 1}."))) } }
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
@@ -158,11 +161,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
-  internal fun `cannot add price greater than but less than one for Serco`() {
+  internal fun `cannot add price less than one pence for Serco`() {
     mockSession.apply {
       this.setAttribute("supplier", Supplier.SERCO)
       this.setAttribute("date", effectiveDate)
     }
+
+    val effectiveYear = effectiveYearForDate(effectiveDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
@@ -170,8 +175,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("price", "0.001")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
-      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attribute("warnings", listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $effectiveYear to ${effectiveYear + 1}."))) } }
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
@@ -185,14 +189,15 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       this.setAttribute("date", effectiveDate)
     }
 
+    val effectiveYear = effectiveYearForDate(effectiveDate)
+
     mockMvc.post("/add-price") {
       session = mockSession
       param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "-10.00")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
-      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attribute("warnings", listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $effectiveYear to ${effectiveYear + 1}."))) } }
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
@@ -207,7 +212,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     }
 
     whenever(
-      service.getExistingSiteNamesAndPrice(
+      service.getMaybeSiteNamesAndPrice(
         Supplier.GEOAMEY,
         fromAgencyId,
         toAgencyId,
@@ -233,6 +238,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     whenever(service.priceHistoryForJourney(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
 
+    val effectiveYear = effectiveYearForDate(effectiveDate)
+
     mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
       .andExpect {
         model {
@@ -242,8 +249,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
-      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+      .andExpect { model { attribute("warnings", listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by GEOAMEY in the current contractual year $effectiveYear to ${effectiveYear + 1}."))) } }
       .andExpect {
         model {
           attribute(
@@ -261,7 +267,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getExistingSiteNamesAndPrice(
+    verify(service).getMaybeSiteNamesAndPrice(
       Supplier.GEOAMEY,
       fromAgencyId,
       toAgencyId,
