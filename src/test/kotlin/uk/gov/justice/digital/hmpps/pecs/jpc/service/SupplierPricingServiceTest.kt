@@ -124,7 +124,7 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(price)
 
-    val result = service.getExistingSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYear)
+    val result = service.getMaybeSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYear)
 
     assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")

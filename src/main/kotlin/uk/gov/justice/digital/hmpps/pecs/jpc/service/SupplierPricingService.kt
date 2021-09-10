@@ -46,22 +46,20 @@ class SupplierPricingService(
     return Pair(fromLocation.siteName, toLocation.siteName)
   }
 
-  fun getExistingSiteNamesAndPrice(
+  fun getMaybeSiteNamesAndPrice(
     supplier: Supplier,
     fromAgencyId: String,
     toAgencyId: String,
     effectiveYear: Int
-  ): Triple<String, String, Money> {
-    val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val price = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-      supplier,
-      fromLocation,
-      toLocation,
-      effectiveYear
-    )
-      ?: throw RuntimeException("No matching price found for $supplier")
-
-    return Triple(fromLocation.siteName, toLocation.siteName, Money(price.priceInPence))
+  ): Triple<String, String, Money>? {
+    return getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        supplier,
+        from,
+        to,
+        effectiveYear
+      )?.let { Triple(from.siteName, to.siteName, Money(it.priceInPence)) }
+    }
   }
 
   fun addPriceForSupplier(

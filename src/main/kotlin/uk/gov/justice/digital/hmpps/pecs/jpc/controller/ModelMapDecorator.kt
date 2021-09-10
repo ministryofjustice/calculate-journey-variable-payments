@@ -5,6 +5,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.time.LocalDate
 
+/**
+ * Decorates the ModalMap with extension functions for the most common calls/needs in the controller classes.
+ */
 internal fun ModelMap.getEndOfMonth() = endOfMonth(getStartOfMonth())
 
 internal fun ModelMap.addContractStartAndEndDates() {

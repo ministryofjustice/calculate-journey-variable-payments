@@ -68,7 +68,10 @@
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">
                 <span class="govuk-warning-text__assistive">Warning</span>
-                <span th:inline="text">Please note the added price will be effective for all instances of this journey undertaken by [[${supplier}]] in the current contractual year [[${contractualYearStart}]] to [[${contractualYearEnd}]].</span>
+                <div th:each="warning: ${warnings}" >
+                  <span th:inline="text" th:text="${warning.text}"></span>
+                  <p></p>
+                </div>
             </strong>
         </div>
         <div class="flex items-center">
