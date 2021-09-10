@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.SessionAttributes
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
@@ -35,7 +36,10 @@ import javax.validation.constraints.Pattern
   DATE_ATTRIBUTE
 )
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
-class MaintainSupplierPricingController(@Autowired val supplierPricingService: SupplierPricingService) {
+class MaintainSupplierPricingController(
+  @Autowired val supplierPricingService: SupplierPricingService,
+  @Autowired val actualEffectiveYear: EffectiveYear
+) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -50,7 +54,14 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
   data class Warning(val text: String) {
     companion object {
-      fun default(supplier: Supplier, effectiveYear: Int) = Warning("Please note the added price will be effective for all instances of this journey undertaken by $supplier in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
+      fun standard(supplier: Supplier, effectiveYear: Int) =
+        Warning("Please note the added price will be effective for all instances of this journey undertaken by $supplier in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
+
+      fun beforeWithCurrentPrice(effectiveYear: Int) =
+        Warning("Please note a price for this journey already exists in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
+
+      fun before(effectiveYear: Int) =
+        Warning("Making this change will only affect journeys undertaken in the contractual year $effectiveYear to ${effectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
     }
   }
 
@@ -63,18 +74,19 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     logger.info("getting add price for move $moveId")
 
     val effectiveYear = model.getSelectedEffectiveYear()
-    val (fromSite, toSite) = agencyIds(moveId).let { (from, to) ->
+    val (fromAgencyId, toAgencyId) = agencyIds(moveId)
+
+    val (fromSite, toSite) =
       supplierPricingService.getSiteNamesForPricing(
         supplier,
-        from,
-        to,
+        fromAgencyId,
+        toAgencyId,
         effectiveYear
       )
-    }
 
     model.apply {
       addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
-      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear()))
+      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
     }
 
     return "add-price"
@@ -94,21 +106,24 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     val effectiveYear = model.getSelectedEffectiveYear()
 
+    val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
+
     if (result.hasErrors()) {
-      model.addAttribute("warnings", getWarningTexts(supplier, model.getSelectedEffectiveYear()))
+      model.addAttribute(
+        "warnings",
+        getWarningTexts(supplier, model.getSelectedEffectiveYear(), fromAgencyId, toAgencyId)
+      )
 
       return "add-price"
     }
 
-    agencyIds(form.moveId).let { (from, to) ->
-      supplierPricingService.addPriceForSupplier(
-        supplier,
-        from,
-        to,
-        price!!,
-        effectiveYear
-      )
-    }
+    supplierPricingService.addPriceForSupplier(
+      supplier,
+      fromAgencyId,
+      toAgencyId,
+      price!!,
+      effectiveYear
+    )
 
     redirectAttributes.apply {
       addFlashAttribute("flashMessage", "price-created")
@@ -141,7 +156,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
 
     model.apply {
       addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
-      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear()))
+      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
     }
@@ -155,7 +170,7 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     result: BindingResult,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    redirectAttributes: RedirectAttributes,
+    redirectAttributes: RedirectAttributes
   ): Any {
     logger.info("updating price for move $supplier")
 
@@ -164,16 +179,12 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     val effectiveYear = model.getSelectedEffectiveYear()
 
     if (result.hasErrors()) {
-      model.apply {
-        addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear()))
-        addAttribute("cancelLink", getJourneySearchResultsUrl())
+      val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
 
-        agencyIds(form.moveId).let { (from, to) ->
-          addAttribute(
-            "history",
-            priceHistoryForMove(supplier, from, to)
-          )
-        }
+      model.apply {
+        addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
+        addAttribute("cancelLink", getJourneySearchResultsUrl())
+        addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       }
 
       return "update-price"
@@ -199,8 +210,19 @@ class MaintainSupplierPricingController(@Autowired val supplierPricingService: S
     return RedirectView(model.getJourneySearchResultsUrl())
   }
 
-  // TODO check what year is currently selected versus the current contractual year so can derive the warning(s)
-  private fun getWarningTexts(supplier: Supplier, effectiveYear: Int) = listOf(Warning.default(supplier, effectiveYear))
+  private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
+    if (selectedEffectiveYear >= actualEffectiveYear.current())
+      return listOf(Warning.standard(supplier, selectedEffectiveYear))
+
+    supplierPricingService.getMaybeSiteNamesAndPrice(supplier, from, to, actualEffectiveYear.current())?.let {
+      return listOf(
+        Warning.beforeWithCurrentPrice(actualEffectiveYear.current()),
+        Warning.before(selectedEffectiveYear)
+      )
+    }
+
+    return listOf(Warning.before(selectedEffectiveYear))
+  }
 
   private fun priceHistoryForMove(supplier: Supplier, from: String, to: String) =
     supplierPricingService.priceHistoryForJourney(supplier, from, to)
