@@ -63,6 +63,8 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
       .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
       .andExpect { model { attributeExists("history") } }
+      // including check for the feedback URL
+      .andExpect { model { attribute("feedbackUrl", "#") } }
       .andExpect { status { isOk() } }
 
     verify(adjustmentsService).adjustmentsHistoryFor(Supplier.SERCO)

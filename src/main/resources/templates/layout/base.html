@@ -71,6 +71,12 @@
 
         <div layout:fragment="content"></div>
 
+        <div class="govuk-width-container app-feedback-prompt">
+          <div class="app-feedback-prompt__content">
+            <p>Help us improve this service — <a th:href="${feedbackUrl}" th:target="${feedbackUrl=='#' ? '_self' : '_blank'}" rel="noopener noreferrer">give us your feedback</a></p>
+          </div>
+        </div>
+
         <footer class="govuk-footer mt4 " role="contentinfo">
             <div class="govuk-width-container ">
                 <div class="govuk-footer__meta">
