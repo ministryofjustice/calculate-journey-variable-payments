@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
@@ -14,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -22,13 +24,16 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
+import java.time.LocalDate
 import java.util.Optional
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
+@TestPropertySource(properties = ["FEEDBACK_URL=http://fake_feeback_url_url"])
 class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
@@ -43,6 +48,16 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   @BeforeEach
   fun beforeEach() {
     mockSession.setAttribute("supplier", defaultSupplierSerco)
+  }
+
+  @Test
+  internal fun `feedback URL is available upon navigation to the dashboard`() {
+    mockSession.setAttribute("date", LocalDate.now())
+    whenever(moveService.moveTypeSummaries(eq(defaultSupplierSerco), any())).thenReturn(MoveTypeSummaries(0, listOf()))
+
+    mockMvc.get("/dashboard") { session = mockSession }
+      .andExpect { model { attribute("feedbackUrl", "http://fake_feeback_url_url") } }
+      .andExpect { status { isOk() } }
   }
 
   @Test

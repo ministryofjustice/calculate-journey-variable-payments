@@ -723,3 +723,23 @@
 .govuk-notification-banner--success .govuk-notification-banner__link:focus {
   color:#0b0c0c
 }
+
+.app-feedback-prompt {
+  margin-left: auto;
+  margin-right: auto;
+  background: #1d70b8;
+  max-width: 960px;
+}
+.app-feedback-prompt__content {
+  color:#fff;
+  font-weight:700;
+  margin:0;
+  padding:25px
+}
+.app-feedback-prompt__content a,
+.app-feedback-prompt__content a:active,
+.app-feedback-prompt__content a:hover,
+.app-feedback-prompt__content a:link,
+.app-feedback-prompt__content a:visited {
+  color:#fff
+}

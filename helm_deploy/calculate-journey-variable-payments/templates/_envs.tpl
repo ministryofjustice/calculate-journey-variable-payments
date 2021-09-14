@@ -130,4 +130,10 @@ env:
   - name: BASM_API_BASE_URL
     value: "{{ .Values.env.BASM_API_BASE_URL }}"
 
+  - name: FEEDBACK_URL
+    valueFrom:
+      secretKeyRef:
+        name: "{{ .Values.feedback.secret_name }}"
+        key: feedback_url
+
 {{- end -}}
