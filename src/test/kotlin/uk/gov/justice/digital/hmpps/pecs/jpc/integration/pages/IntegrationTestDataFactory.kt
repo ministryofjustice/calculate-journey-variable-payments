@@ -11,7 +11,6 @@ import java.time.LocalDateTime
 /**
  * The integration test data comes from the DEV Spring Profile data loaded via the database migration scripts at startup.
  */
-
 private val billyTheKid =
   Person(
     personId = "_",
@@ -214,125 +213,127 @@ object Dec2020MoveData {
     )
 }
 
-object PresentDayMoveData {
+object SercoPreviousMonthMoveData {
 
-  private val today = LocalDate.now()
+  private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
 
-  private val startHoursOffset = 10L
+  private const val startHoursOffset = 10L
 
-  private val endHoursOffset = 12L
+  private const val endHoursOffset = 12L
 
   fun standardMoveSM1() =
     Move(
       moveId = "SM1",
-      updatedAt = today.atStartOfDay(),
+      updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.STANDARD,
       status = MoveStatus.completed,
       reference = "STANDARDSM1",
-      fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
-      toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromNomisAgencyId = "PRISON1",
+      fromSiteName = "PRISON ONE",
+      toNomisAgencyId = "PRISON2",
+      toSiteName = "PRISON TWO",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = today.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = today.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
       person = billyTheKid
     )
 
   fun redirectMoveRM1() =
     Move(
       moveId = "RM1",
-      updatedAt = today.atStartOfDay(),
+      updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.REDIRECTION,
       status = MoveStatus.completed,
       reference = "REDIRECTIONRM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = today.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = today.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
       person = ronnieBiggs
     )
 
   fun longHaulMoveLHM1() =
     Move(
       moveId = "LHM1",
-      updatedAt = today.atStartOfDay(),
+      updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.LONG_HAUL,
       status = MoveStatus.completed,
       reference = "LONG_HAULLHM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = today.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = today.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
       person = fredBloggs
     )
 
   fun lockoutMoveLM1() =
     Move(
       moveId = "LM1",
-      updatedAt = today.atStartOfDay(),
+      updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.LOCKOUT,
       status = MoveStatus.completed,
       reference = "LOCKOUTLM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = today.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = today.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
       person = janeBloggs
     )
 
   fun multiMoveMM1() =
     Move(
       moveId = "MM1",
-      updatedAt = today.atStartOfDay(),
+      updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.MULTI,
       status = MoveStatus.completed,
       reference = "MULTIMM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = today.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = today.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
       person = donaldDuck
     )
 
   fun cancelledMoveCM1() =
     Move(
       moveId = "CM1",
-      updatedAt = today.atStartOfDay(),
+      updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.CANCELLED,
       status = MoveStatus.completed,
       reference = "CANCELLEDCM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = today.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = today.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
       person = professorMoriarty
     )
 }
+
+internal fun LocalDate.previousMonth() = this.minusMonths(1).month

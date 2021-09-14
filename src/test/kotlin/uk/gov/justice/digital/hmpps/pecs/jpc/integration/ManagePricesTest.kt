@@ -16,30 +16,34 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourn
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import java.time.LocalDate
-import java.time.Month
 import java.time.Year
 
 @TestMethodOrder(OrderAnnotation::class)
 internal class ManagePricesTest : IntegrationTest() {
 
+  private val currentDate = LocalDate.now()
+
+  private val year = Year.now()
+
   @Test
   @Order(1)
-  fun `missing price is added for GEOAmey journey from Prison One to Prison Two`() {
+  fun `missing price is added for Serco journey from Prison One to Prison Two`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
 
-    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(LocalDate.now().month, Year.now())
+      .isAtMonthYear(currentDate.month, Year.now())
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(Month.DECEMBER, Year.of(2020))
+      .isAtMonthYear(currentDate.previousMonth(), year)
       .navigateToJourneysForReview()
 
     isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
@@ -53,16 +57,16 @@ internal class ManagePricesTest : IntegrationTest() {
 
   @Test
   @Order(2)
-  fun `price is updated for GEOAmey journey from Prison One to Prison Two`() {
+  fun `price is updated for Serco journey from Prison One to Prison Two`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
 
-    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 

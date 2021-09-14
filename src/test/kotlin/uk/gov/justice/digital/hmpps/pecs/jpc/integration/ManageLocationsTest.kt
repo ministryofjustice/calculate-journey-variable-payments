@@ -15,60 +15,64 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageLocat
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MapLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SearchLocations
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import java.time.LocalDate
-import java.time.Month
 import java.time.Year
 
 @TestMethodOrder(OrderAnnotation::class)
 internal class ManageLocationsTest : IntegrationTest() {
 
+  private val currentDate = LocalDate.now()
+
+  private val year = Year.now()
+
   @Test
   @Order(1)
-  fun `map missing location name and location type to agency id WYI`() {
+  fun `map missing location name and location type to agency id FROM_AGENCY`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
 
-    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(LocalDate.now().month, Year.now())
+      .isAtMonthYear(currentDate.month, year)
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(Month.DECEMBER, Year.of(2020))
+      .isAtMonthYear(currentDate.previousMonth(), year)
       .navigateToJourneysForReview()
 
-    isAtPage(JourneysForReview).chooseLocationToMap("WYI")
+    isAtPage(JourneysForReview).chooseLocationToMap("FROM_AGENCY")
 
     isAtPage(MapLocation)
-      .isAtMapLocationPageForAgency("WYI")
-      .mapLocation("a prison", LocationType.PR)
+      .isAtMapLocationPageForAgency("FROM_AGENCY")
+      .mapLocation("from agenc", LocationType.PR)
 
     isAtPage(JourneysForReview)
-      .isLocationUpdatedMessagePresent("WYI", "A PRISON")
-      .isRowPresent<JourneysForReviewPage>("A PRISON", LocationType.PR.name)
+      .isLocationUpdatedMessagePresent("FROM_AGENCY", "FROM AGENC")
+      .isRowPresent<JourneysForReviewPage>("FROM AGENC", LocationType.PR.name)
   }
 
   @Test
   @Order(2)
-  fun `update location name and type for agency id WYI`() {
+  fun `update location name and type for agency id FROM_AGENCY`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
 
-    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToManageLocations()
 
-    isAtPage(SearchLocations).searchForLocation("A PRISON")
+    isAtPage(SearchLocations).searchForLocation("FROM AGENC")
 
     isAtPage(ManageLocation)
-      .isAtManageLocationPageForAgency("WYI")
-      .updateLocation("A POLICE STATION", LocationType.PS)
+      .isAtManageLocationPageForAgency("FROM_AGENCY")
+      .updateLocation("FROM AGENCY", LocationType.PS)
 
-    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("WYI", "A POLICE STATION")
+    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("FROM_AGENCY", "FROM AGENCY")
   }
 }
