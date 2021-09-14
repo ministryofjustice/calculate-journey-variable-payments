@@ -20,8 +20,9 @@ import java.util.UUID
 /**
  * This is a code based migration which serves two (main) purposes:
  *
- * 1. Generate a fresh set of moves on the day of execution to assist with development.
- * 2. As in point one, we can the moves in the integration tests as we have fine control over the move dates.
+ * 1. Generate a fresh set of Serco moves starting at the beginning of the previous month. Move data is always in the
+ *    past and for purposes of testing all moves need to start and end within the same month.
+ * 2. As in point one, we use the moves in the integration tests as we have fine control over the move dates.
  *
  */
 @Suppress("ClassName", "unused")
@@ -297,7 +298,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
   }
 }
 
-private val today = LocalDate.now()
+private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
 
 private fun move(
   moveId: String,
@@ -308,13 +309,13 @@ private fun move(
   supplier: Supplier = Supplier.SERCO,
   days: Long = 0
 ) = Move(
-  dropOffOrCancelledDateTime = today.plusDays(days).atStartOfDay().plusHours(12),
+  dropOffOrCancelledDateTime = startOfPreviousMonth.plusDays(days).atStartOfDay().plusHours(12),
   fromNomisAgencyId = fromAgencyId,
-  moveDate = today,
+  moveDate = startOfPreviousMonth,
   moveId = moveId,
   moveType = type,
   notes = "some notes",
-  pickUpDateTime = today.atStartOfDay().plusHours(10),
+  pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(10),
   profileId = profileId,
   reference = "${type.name}$moveId",
   reportFromLocationType = "prison",
@@ -322,7 +323,7 @@ private fun move(
   status = MoveStatus.completed,
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
-  updatedAt = today.atStartOfDay()
+  updatedAt = startOfPreviousMonth.atStartOfDay()
 )
 
 private val moveSql = """
@@ -350,23 +351,23 @@ private fun moveStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) = mo
 
 private fun moveRedirectEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Redirect")
 
-private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Complete")
+private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Complete", move.dropOffOrCancelledDateTime)
 
 private fun moveAcceptEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Accept")
 
 private fun moveCancelEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Cancel")
 
-private fun moveEvent(move: Move, supplier: Supplier = Supplier.SERCO, type: String) = Event(
+private fun moveEvent(move: Move, supplier: Supplier = Supplier.SERCO, type: String, occurredAt: LocalDateTime? = null) = Event(
   details = emptyMap(),
   eventId = "ME" + UUID.randomUUID().toString(),
   eventableId = move.moveId,
   eventableType = "move",
   notes = "Note for move $type event",
-  occurredAt = move.pickUpDateTime!!,
-  recordedAt = today.atStartOfDay(),
+  occurredAt = occurredAt ?: move.pickUpDateTime!!,
+  recordedAt = startOfPreviousMonth.atStartOfDay(),
   supplier = supplier,
   type = "Move$type",
-  updatedAt = today.atStartOfDay(),
+  updatedAt = startOfPreviousMonth.atStartOfDay(),
 )
 
 private fun journey(
@@ -379,9 +380,9 @@ private fun journey(
   dropOff: LocalDateTime? = move.dropOffOrCancelledDateTime
 ) = Journey(
   billable = true,
-  clientTimeStamp = today.atStartOfDay(),
+  clientTimeStamp = startOfPreviousMonth.atStartOfDay(),
   dropOffDateTime = dropOff,
-  effectiveYear = effectiveYearForDate(today),
+  effectiveYear = effectiveYearForDate(startOfPreviousMonth),
   fromNomisAgencyId = fromAgencyId,
   journeyId = UUID.randomUUID().toString(),
   moveId = move.moveId,
@@ -390,7 +391,7 @@ private fun journey(
   state = state,
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
-  updatedAt = today.atStartOfDay(),
+  updatedAt = startOfPreviousMonth.atStartOfDay(),
   vehicleRegistration = "ABCDEFG"
 )
 
@@ -421,10 +422,10 @@ private fun journeyStartEvent(journey: Journey, supplier: Supplier = Supplier.SE
   eventableType = "journey",
   notes = "Note for journey start event",
   occurredAt = journey.pickUpDateTime!!,
-  recordedAt = today.atStartOfDay(),
+  recordedAt = startOfPreviousMonth.atStartOfDay(),
   supplier = supplier,
   type = "JourneyStart",
-  updatedAt = today.atStartOfDay(),
+  updatedAt = startOfPreviousMonth.atStartOfDay(),
 )
 
 private fun journeyCompleteEvent(journey: Journey, supplier: Supplier = Supplier.SERCO) = Event(
@@ -434,10 +435,10 @@ private fun journeyCompleteEvent(journey: Journey, supplier: Supplier = Supplier
   eventableType = "journey",
   notes = "Note for journey complete event",
   occurredAt = journey.dropOffDateTime!!,
-  recordedAt = today.atStartOfDay(),
+  recordedAt = startOfPreviousMonth.atStartOfDay(),
   supplier = supplier,
   type = "JourneyComplete",
-  updatedAt = today.atStartOfDay(),
+  updatedAt = startOfPreviousMonth.atStartOfDay(),
 )
 
 private val eventSql = """

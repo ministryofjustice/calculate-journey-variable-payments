@@ -16,7 +16,7 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
     isAtPage(Login).login()
 
-    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
+    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
