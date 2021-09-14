@@ -725,6 +725,7 @@
 }
 
 .app-feedback-prompt {
+  font-family:"GDS Transport",arial,sans-serif;
   margin-left: auto;
   margin-right: auto;
   background: #1d70b8;
