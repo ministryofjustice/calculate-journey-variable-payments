@@ -21,20 +21,19 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMont
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.multiMoveMM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.redirectMoveRM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import java.time.LocalDate
 import java.time.Month
 import java.time.Year
 
 internal class ViewAllMoveTypesTest : IntegrationTest() {
 
-  private val defaultSupplierSerco = Supplier.SERCO
-
-  private val date = LocalDate.now()
+  private val currentDate = LocalDate.now()
 
   private val year = Year.now()
 
   @Test
-  fun `view one of each move type for Serco today`() {
+  fun `view one of each move type for Serco in previous month`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -42,10 +41,10 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
     isAtPage(ChooseSupplier).choose(Supplier.SERCO)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(date.month, year)
+      .isAtMonthYear(currentDate.month, year)
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor("${date.previousMonth().name} ${year.value}")
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
 
     listOf(
       standardMoveSM1(),
@@ -54,13 +53,11 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
       lockoutMoveLM1(),
       multiMoveMM1(),
       cancelledMoveCM1()
-    ).forEach { move -> verifyDetailsOf(move, date.previousMonth(), Year.now()) }
+    ).forEach { move -> verifyDetailsOf(move, currentDate.previousMonth(), Year.now()) }
   }
 
-  private fun LocalDate.previousMonth() = this.minusMonths(1).month
-
   @Test
-  fun `view one of each move type for GEOAmey in a previous month (Dec 2020)`() {
+  fun `view one of each move type for GEOAmey in Dec 2020`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -68,10 +65,10 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
     isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
 
     isAtPage(Dashboard)
-      .isAtMonthYear(date.month, year)
+      .isAtMonthYear(currentDate.month, year)
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor("dec 2020")
+    isAtPage(SelectMonthYear).navigateToDashboardFor(Month.DECEMBER, Year.of(2020))
 
     listOf(
       standardMoveM4(),

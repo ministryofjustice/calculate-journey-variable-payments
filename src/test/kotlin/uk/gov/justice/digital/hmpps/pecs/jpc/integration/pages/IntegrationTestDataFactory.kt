@@ -11,7 +11,6 @@ import java.time.LocalDateTime
 /**
  * The integration test data comes from the DEV Spring Profile data loaded via the database migration scripts at startup.
  */
-
 private val billyTheKid =
   Person(
     personId = "_",
@@ -230,10 +229,10 @@ object SercoPreviousMonthMoveData {
       moveType = MoveType.STANDARD,
       status = MoveStatus.completed,
       reference = "STANDARDSM1",
-      fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
-      toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromNomisAgencyId = "PRISON1",
+      fromSiteName = "PRISON ONE",
+      toNomisAgencyId = "PRISON2",
+      toSiteName = "PRISON TWO",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
@@ -250,7 +249,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "REDIRECTIONRM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -269,7 +268,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "LONG_HAULLHM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -288,7 +287,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "LOCKOUTLM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -307,7 +306,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "MULTIMM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -326,7 +325,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "CANCELLEDCM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM_AGENCY", // Test data is not mapped so will default to the agency ID
+      fromSiteName = "FROM AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",

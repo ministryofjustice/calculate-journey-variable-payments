@@ -50,12 +50,12 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       "SM3" to "PR3"
     ).forEach {
       create(
-        move(moveId = it.key, profileId = it.value, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY"),
+        move(moveId = it.key, profileId = it.value, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"),
         template
       ).also { move ->
         create(moveStartEvent(move), template)
         create(moveCompleteEvent(move), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY"), template).also { journey ->
+        create(journey(move, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"), template).also { journey ->
           create(journeyStartEvent(journey), template)
           create(journeyCompleteEvent(journey), template)
         }
