@@ -33,4 +33,19 @@ class JourneysForReviewPage : ApplicationPage() {
 
     return this
   }
+
+  fun isJourneysPresentInOrder(vararg journeys: Journey): JourneysForReviewPage {
+    journeys.forEachIndexed { index, journey ->
+      isRowPresentAtIndex<JourneysForReviewPage>(
+        "journeys",
+        journey.from,
+        journey.to,
+        index = index + 1
+      )
+    }
+
+    return this
+  }
 }
+
+data class Journey(val from: String, val to: String)

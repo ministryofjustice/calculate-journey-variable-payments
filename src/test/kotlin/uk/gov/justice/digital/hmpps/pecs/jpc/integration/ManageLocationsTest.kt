@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
@@ -45,7 +46,18 @@ internal class ManageLocationsTest : IntegrationTest() {
       .isAtMonthYear(currentDate.previousMonth(), year)
       .navigateToJourneysForReview()
 
-    isAtPage(JourneysForReview).chooseLocationToMap("FROM_AGENCY")
+    isAtPage(JourneysForReview)
+      .isJourneysPresentInOrder(
+        Journey("FROM_AGENCY", "LOCKOUT_AGENCY"),
+        Journey("FROM_AGENCY", "STOPOVER_AGENCY"),
+        Journey("FROM_AGENCY", "TO_AGENCY"),
+        Journey("FROM_AGENCY", "TO_AGENCY2"),
+        Journey("FROM_AGENCY2", "TO_AGENCY3"),
+        Journey("FROM_AGENCY2", "TO_AGENCY4"),
+        Journey("LOCKOUT_AGENCY", "TO_AGENCY"),
+        Journey("STOPOVER_AGENCY", "TO_AGENCY")
+      )
+      .chooseLocationToMap("FROM_AGENCY")
 
     isAtPage(MapLocation)
       .isAtMapLocationPageForAgency("FROM_AGENCY")
