@@ -27,6 +27,9 @@ class ManageJourneyPriceCatalogueController(@Autowired val journeyService: Journ
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ModelAttribute("navigation")
+  fun navigation() = "PRICE"
+
   @GetMapping(MANAGE_JOURNEY_PRICE_CATALOGUE)
   fun index(model: ModelMap): Any {
     model.addContractStartAndEndDates()

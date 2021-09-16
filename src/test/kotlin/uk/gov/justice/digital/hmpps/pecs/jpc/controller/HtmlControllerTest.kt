@@ -51,6 +51,16 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   }
 
   @Test
+  internal fun `navigation is correct upon navigation to the dashboard`() {
+    mockSession.setAttribute("date", LocalDate.now())
+    whenever(moveService.moveTypeSummaries(eq(defaultSupplierSerco), any())).thenReturn(MoveTypeSummaries(0, listOf()))
+
+    mockMvc.get("/dashboard") { session = mockSession }
+      .andExpect { model { attribute("navigation", "SUMMARY") } }
+      .andExpect { status { isOk() } }
+  }
+
+  @Test
   internal fun `feedback URL is available upon navigation to the dashboard`() {
     mockSession.setAttribute("date", LocalDate.now())
     whenever(moveService.moveTypeSummaries(eq(defaultSupplierSerco), any())).thenReturn(MoveTypeSummaries(0, listOf()))

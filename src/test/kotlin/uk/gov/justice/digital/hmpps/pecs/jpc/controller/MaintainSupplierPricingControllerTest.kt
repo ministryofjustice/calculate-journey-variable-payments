@@ -95,6 +95,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
+      // including check for the navigation
+      .andExpect { model { attribute("navigation", "PRICE") } }
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 

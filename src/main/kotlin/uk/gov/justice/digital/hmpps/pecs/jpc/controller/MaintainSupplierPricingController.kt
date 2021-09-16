@@ -43,6 +43,9 @@ class MaintainSupplierPricingController(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ModelAttribute("navigation")
+  fun navigation() = "PRICE"
+
   data class PriceForm(
     @get: NotNull(message = "Invalid message id")
     val moveId: String,

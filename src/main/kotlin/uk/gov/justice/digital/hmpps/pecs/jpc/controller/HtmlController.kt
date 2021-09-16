@@ -44,6 +44,9 @@ class HtmlController(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ModelAttribute("navigation")
+  fun navigation() = "SUMMARY"
+
   @RequestMapping("/")
   fun homepage(model: ModelMap): RedirectView {
     logger.info("redirecting to dashboard")

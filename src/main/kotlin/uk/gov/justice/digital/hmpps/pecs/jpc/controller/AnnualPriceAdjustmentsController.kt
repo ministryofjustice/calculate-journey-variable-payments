@@ -36,6 +36,9 @@ class AnnualPriceAdjustmentsController(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ModelAttribute("navigation")
+  fun navigation() = "PRICE"
+
   @GetMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     logger.info("getting annual price adjustment")

@@ -65,6 +65,8 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { model { attributeExists("history") } }
       // including check for the feedback URL
       .andExpect { model { attribute("feedbackUrl", "#") } }
+      // including check for the navigation
+      .andExpect { model { attribute("navigation", "PRICE") } }
       .andExpect { status { isOk() } }
 
     verify(adjustmentsService).adjustmentsHistoryFor(Supplier.SERCO)

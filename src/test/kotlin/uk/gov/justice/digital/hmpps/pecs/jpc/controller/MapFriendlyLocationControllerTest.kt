@@ -59,6 +59,8 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
           )
         }
       }
+      // including check for the navigation
+      .andExpect { model { attribute("navigation", "LOCATION") } }
       .andExpect { view { name("add-location") } }
       .andExpect { status { isOk() } }
 

@@ -30,6 +30,9 @@ class ManageSchedule34LocationsController(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ModelAttribute("navigation")
+  fun navigation() = "LOCATION"
+
   @GetMapping(SEARCH_LOCATIONS)
   fun showSearchLocation(model: ModelMap): Any {
     logger.info("showing location search")
