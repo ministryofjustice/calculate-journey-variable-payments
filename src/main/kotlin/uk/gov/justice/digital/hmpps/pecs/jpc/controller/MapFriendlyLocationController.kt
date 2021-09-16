@@ -36,6 +36,9 @@ class MapFriendlyLocationController(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @ModelAttribute("navigation")
+  fun navigation() = "LOCATION"
+
   @GetMapping("$MAP_LOCATION/{agency-id}")
   fun mapFriendlyLocation(
     @PathVariable("agency-id") agencyId: String,

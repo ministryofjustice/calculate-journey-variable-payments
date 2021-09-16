@@ -46,6 +46,8 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
       .andExpect { model { attribute("form", ManageSchedule34LocationsController.SearchLocationForm()) } }
       .andExpect { view { name("search-locations") } }
       .andExpect { status { isOk() } }
+      // including check for the navigation
+      .andExpect { model { attribute("navigation", "LOCATION") } }
 
     verifyZeroInteractions(service)
   }
