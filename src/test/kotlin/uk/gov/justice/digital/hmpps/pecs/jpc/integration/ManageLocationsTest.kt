@@ -29,7 +29,7 @@ internal class ManageLocationsTest : IntegrationTest() {
 
   @Test
   @Order(1)
-  fun `map missing location name and location type to agency id FROM_AGENCY`() {
+  fun `map missing location name and location type to agency id STOPOVER_AGENCY`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -57,20 +57,20 @@ internal class ManageLocationsTest : IntegrationTest() {
         Journey("LOCKOUT_AGENCY", "TO_AGENCY"),
         Journey("STOPOVER_AGENCY", "TO_AGENCY")
       )
-      .chooseLocationToMap("FROM_AGENCY")
+      .chooseLocationToMap("STOPOVER_AGENCY")
 
     isAtPage(MapLocation)
-      .isAtMapLocationPageForAgency("FROM_AGENCY")
-      .mapLocation("from agenc", LocationType.PR)
+      .isAtMapLocationPageForAgency("STOPOVER_AGENCY")
+      .mapLocation("STOP OVER", LocationType.PR)
 
     isAtPage(JourneysForReview)
-      .isLocationUpdatedMessagePresent("FROM_AGENCY", "FROM AGENC")
-      .isRowPresent<JourneysForReviewPage>("FROM AGENC", LocationType.PR.name)
+      .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
+      .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
   }
 
   @Test
   @Order(2)
-  fun `update location name and type for agency id FROM_AGENCY`() {
+  fun `update location name and type for agency id STOPOVER_AGENCY`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -79,12 +79,12 @@ internal class ManageLocationsTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToManageLocations()
 
-    isAtPage(SearchLocations).searchForLocation("FROM AGENC")
+    isAtPage(SearchLocations).searchForLocation("STOP OVER")
 
     isAtPage(ManageLocation)
-      .isAtManageLocationPageForAgency("FROM_AGENCY")
-      .updateLocation("FROM AGENCY", LocationType.PS)
+      .isAtManageLocationPageForAgency("STOPOVER_AGENCY")
+      .updateLocation("STOP OVER AGENCY", LocationType.PS)
 
-    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("FROM_AGENCY", "FROM AGENCY")
+    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
   }
 }
