@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import java.time.LocalDate
 import java.time.Year
 
+@Disabled
 @TestMethodOrder(OrderAnnotation::class)
 internal class ManageLocationsTest : IntegrationTest() {
 
