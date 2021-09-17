@@ -70,6 +70,11 @@ tasks {
     exclude("**/integration/*", "**/migrations/*")
   }
 
+  withType<JavaCompile> {
+    sourceCompatibility = JavaVersion.VERSION_11.toString()
+    targetCompatibility = JavaVersion.VERSION_11.toString()
+  }
+
   val testIntegration by registering(Test::class) {
     useJUnitPlatform()
     include("uk/gov/justice/digital/hmpps/pecs/jpc/integration/*")
