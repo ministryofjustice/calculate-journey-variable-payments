@@ -50,7 +50,6 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
-  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1")
   testImplementation("org.mockito:mockito-inline:3.11.2")
   testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
