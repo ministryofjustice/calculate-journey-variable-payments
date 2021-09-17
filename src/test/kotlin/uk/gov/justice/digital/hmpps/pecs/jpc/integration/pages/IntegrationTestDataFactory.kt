@@ -249,7 +249,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "REDIRECTIONRM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM AGENCY",
+      fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -268,7 +268,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "LONG_HAULLHM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM AGENCY",
+      fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -287,7 +287,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "LOCKOUTLM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM AGENCY",
+      fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -306,7 +306,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "MULTIMM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM AGENCY",
+      fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
@@ -325,7 +325,7 @@ object SercoPreviousMonthMoveData {
       status = MoveStatus.completed,
       reference = "CANCELLEDCM1",
       fromNomisAgencyId = "FROM_AGENCY",
-      fromSiteName = "FROM AGENCY",
+      fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
       toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",

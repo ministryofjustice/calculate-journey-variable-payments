@@ -41,4 +41,14 @@ abstract class ApplicationPage : FluentPage() {
 
     return this as T
   }
+
+  inline fun <reified T : ApplicationPage> isRowPresentAtIndex(tableId: String, value: Any, vararg values: Any, index: Int): T {
+    val query = values.joinToString(" ") { "and contains(., '$it')" }
+
+    val row = this.find(By.xpath("//table[@id = '$tableId']//tr[$index][contains(.,'$value') $query]")).firstOrNull()
+
+    assertThat(row).isNotNull
+
+    return this as T
+  }
 }

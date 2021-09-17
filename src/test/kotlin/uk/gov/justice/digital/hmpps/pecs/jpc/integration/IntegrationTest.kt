@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 import org.fluentlenium.adapter.junit.jupiter.FluentTest
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ApplicationPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages
 
@@ -12,7 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages
 internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : FluentTest() {
 
   // The custom driver is for testing the spreadsheet download functionality only!
-  private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver()
+  private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver(ChromeOptions().apply { addArguments("--headless") })
 
   override fun newWebDriver(): WebDriver = testDriver
 

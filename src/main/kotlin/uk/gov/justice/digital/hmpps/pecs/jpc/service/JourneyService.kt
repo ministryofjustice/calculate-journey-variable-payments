@@ -13,13 +13,22 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  /**
+   * Returned un-priced journeys are ordered by their from and to locations (pick up and drop off).
+   */
   fun distinctJourneysExcludingPriced(supplier: Supplier, startDate: LocalDate): List<JourneyWithPrice> {
     logger.info("Fetching distinct journeys (excluding priced).")
 
-    return journeyQueryRepository.distinctJourneysAndPriceInDateRange(supplier, startDate, endOfMonth(startDate)).also {
-      logger.info("Retrieved ${it.size} distinct journeys (excluding priced).")
-    }
+    return journeyQueryRepository.distinctJourneysAndPriceInDateRange(supplier, startDate, endOfMonth(startDate))
+      .sortedBy { it.pickUpAndDropOff() }
+      .also { logger.info("Retrieved ${it.size} distinct journeys (excluding priced).") }
   }
+
+  private fun JourneyWithPrice.pickUpAndDropOff() = pickUp() + "-" + dropOff()
+
+  private fun JourneyWithPrice.pickUp() = fromSiteName ?: fromNomisAgencyId
+
+  private fun JourneyWithPrice.dropOff() = toSiteName ?: toNomisAgencyId
 
   fun distinctJourneysIncludingPriced(supplier: Supplier, startDate: LocalDate): List<JourneyWithPrice> {
     logger.info("Fetching distinct journeys (including priced).")

@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
@@ -19,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import java.time.LocalDate
 import java.time.Year
 
+@Disabled
 @TestMethodOrder(OrderAnnotation::class)
 internal class ManageLocationsTest : IntegrationTest() {
 
@@ -28,7 +31,7 @@ internal class ManageLocationsTest : IntegrationTest() {
 
   @Test
   @Order(1)
-  fun `map missing location name and location type to agency id FROM_AGENCY`() {
+  fun `map missing location name and location type to agency id STOPOVER_AGENCY`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -45,20 +48,31 @@ internal class ManageLocationsTest : IntegrationTest() {
       .isAtMonthYear(currentDate.previousMonth(), year)
       .navigateToJourneysForReview()
 
-    isAtPage(JourneysForReview).chooseLocationToMap("FROM_AGENCY")
+    isAtPage(JourneysForReview)
+      .isJourneysPresentInOrder(
+        Journey("FROM_AGENCY", "LOCKOUT_AGENCY"),
+        Journey("FROM_AGENCY", "STOPOVER_AGENCY"),
+        Journey("FROM_AGENCY", "TO_AGENCY"),
+        Journey("FROM_AGENCY", "TO_AGENCY2"),
+        Journey("FROM_AGENCY2", "TO_AGENCY3"),
+        Journey("FROM_AGENCY2", "TO_AGENCY4"),
+        Journey("LOCKOUT_AGENCY", "TO_AGENCY"),
+        Journey("STOPOVER_AGENCY", "TO_AGENCY")
+      )
+      .chooseLocationToMap("STOPOVER_AGENCY")
 
     isAtPage(MapLocation)
-      .isAtMapLocationPageForAgency("FROM_AGENCY")
-      .mapLocation("from agenc", LocationType.PR)
+      .isAtMapLocationPageForAgency("STOPOVER_AGENCY")
+      .mapLocation("STOP OVER", LocationType.PR)
 
     isAtPage(JourneysForReview)
-      .isLocationUpdatedMessagePresent("FROM_AGENCY", "FROM AGENC")
-      .isRowPresent<JourneysForReviewPage>("FROM AGENC", LocationType.PR.name)
+      .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
+      .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
   }
 
   @Test
   @Order(2)
-  fun `update location name and type for agency id FROM_AGENCY`() {
+  fun `update location name and type for agency id STOPOVER_AGENCY`() {
     goToPage(Dashboard)
 
     isAtPage(Login).login()
@@ -67,12 +81,12 @@ internal class ManageLocationsTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToManageLocations()
 
-    isAtPage(SearchLocations).searchForLocation("FROM AGENC")
+    isAtPage(SearchLocations).searchForLocation("STOP OVER")
 
     isAtPage(ManageLocation)
-      .isAtManageLocationPageForAgency("FROM_AGENCY")
-      .updateLocation("FROM AGENCY", LocationType.PS)
+      .isAtManageLocationPageForAgency("STOPOVER_AGENCY")
+      .updateLocation("STOP OVER AGENCY", LocationType.PS)
 
-    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("FROM_AGENCY", "FROM AGENCY")
+    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
   }
 }
