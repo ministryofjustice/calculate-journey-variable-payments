@@ -21,7 +21,7 @@ dependencies {
   implementation("io.sentry:sentry-spring-boot-starter:5.1.2")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.27.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.27.0")
-  implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.5.3")
+  implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
 
   constraints {

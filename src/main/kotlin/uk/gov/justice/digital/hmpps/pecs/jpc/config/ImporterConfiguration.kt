@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -43,4 +44,8 @@ class ImporterConfiguration {
       ReportImporter(reportingProvider, monitoringString)
     }
   }
+
+  // This is now needed for Spring Boot as part of moving from 2.5.3 to 3.0.0 Thymeleaf Layout Dialect
+  @Bean
+  fun thymeleafLayoutDialect() = LayoutDialect()
 }
