@@ -23,6 +23,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri:
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: embedded
 
 server:
   port: 8080
