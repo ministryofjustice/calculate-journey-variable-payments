@@ -5,6 +5,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.Month
+import java.time.Month.DECEMBER
+import java.time.Month.FEBRUARY
+import java.time.Month.JANUARY
 
 internal class PriceTest {
   @Test
@@ -89,5 +93,85 @@ internal class PriceTest {
       )
     }
       .isInstanceOf(IllegalArgumentException::class.java)
+  }
+
+  @Test
+  fun `price exceptions are added`() {
+    val price = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      priceInPence = 1000,
+      effectiveYear = 2021
+    )
+
+    assertThat(price.exceptions()).isEmpty()
+
+    price
+      .addException(JANUARY, Money(1))
+      .addException(DECEMBER, Money(12))
+      .addException(FEBRUARY, Money(2))
+
+    assertThat(price.exceptions().map { Pair(Month.of(it.month), it.priceInPence) }).containsExactlyInAnyOrder(
+      Pair(JANUARY, 1),
+      Pair(FEBRUARY, 2),
+      Pair(DECEMBER, 12)
+    )
+  }
+
+  @Test
+  fun `price exceptions are removed`() {
+    val price = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      priceInPence = 1000,
+      effectiveYear = 2021
+    )
+
+    assertThat(price.exceptions()).isEmpty()
+
+    price
+      .addException(JANUARY, Money(1))
+      .addException(DECEMBER, Money(12))
+      .addException(FEBRUARY, Money(2))
+
+    assertThat(price.exceptions().map { Month.of(it.month) }).containsExactlyInAnyOrder(JANUARY, FEBRUARY, DECEMBER)
+
+    price.removeException(DECEMBER)
+
+    assertThat(price.exceptions().map { Month.of(it.month) }).containsExactlyInAnyOrder(JANUARY, FEBRUARY)
+
+    price.removeException(JANUARY)
+
+    assertThat(price.exceptions().map { Month.of(it.month) }).containsExactly(FEBRUARY)
+
+    price.removeException(FEBRUARY)
+
+    assertThat(price.exceptions()).isEmpty()
+  }
+
+  @Test
+  fun `duplicate price exceptions are ignored`() {
+    val price = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      priceInPence = 1000,
+      effectiveYear = 2021
+    )
+
+    assertThat(price.exceptions()).isEmpty()
+
+    price
+      .addException(JANUARY, Money(1))
+      .addException(JANUARY, Money(1))
+      .addException(JANUARY, Money(1))
+      .addException(FEBRUARY, Money(2))
+
+    assertThat(price.exceptions().map { Pair(Month.of(it.month), it.priceInPence) }).containsExactlyInAnyOrder(
+      Pair(JANUARY, 1),
+      Pair(FEBRUARY, 2)
+    )
   }
 }
