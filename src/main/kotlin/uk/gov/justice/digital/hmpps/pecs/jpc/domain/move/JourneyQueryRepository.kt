@@ -90,9 +90,9 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                    j.to_nomis_agency_id                                       as journey_to_nomis_agency_id,
                    jtl.site_name                                              as journey_to_site_name,
                    jtl.location_type                                          as journey_to_location_type,
-                   p.price_in_pence                                           as unit_price_in_pence,
+                   COALESCE(pe.price_in_pence, p.price_in_pence)              as unit_price_in_pence,
                    count (CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id)) as volume,
-                   sum(case when j.billable then p.price_in_pence else case when p.price_in_pence is null then null else 0 end end) as total_price_in_pence,
+                   sum(case when j.billable then COALESCE(pe.price_in_pence, p.price_in_pence) else case when p.price_in_pence is null then null else 0 end end) as total_price_in_pence,
                    sum(case when jfl.site_name is null then 3 else 0 end + case when jtl.site_name is null then 2 else 0 end + case when p.price_in_pence is null then 1 else 0 end) /
                    count (CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id)) as null_locations_and_prices_sum
             from MOVES m
@@ -100,9 +100,10 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                      left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
                      left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
+                     left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?
                      where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ? 
                         and m.drop_off_or_cancelled < ?
-            GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, p.price_in_pence
+            GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, COALESCE(pe.price_in_pence, p.price_in_pence)
             $havingOnlyUnpriced
             ORDER BY null_locations_and_prices_sum desc, volume desc
       """.trimIndent()
@@ -111,11 +112,14 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       uniqueJourneysSQL,
       journeyWithPricesRowMapper,
       supplier.name,
+      startDate.possiblePriceExceptionMonth(),
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
       Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
     )
   }
+
+  private fun LocalDate.possiblePriceExceptionMonth() = this.month.value
 
   fun journeysSummaryInDateRange(
     supplier: Supplier,
@@ -140,13 +144,14 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
            sum (js.volume_unlocationed) as count_without_locations, sum(js.volume_unpriced) as count_unpriced from(
                 select distinct CONCAT(j.from_nomis_agency_id, ' ', j.to_nomis_agency_id) as journey, 
                 max(case when jfl.location_id is null or jtl.location_id is null then 1 else 0 end) as volume_unlocationed, 
-                sum(case when j.billable then p.price_in_pence else 0 end) as price_in_pence, 
+                sum(case when j.billable then COALESCE(pe.price_in_pence, p.price_in_pence) else 0 end) as price_in_pence, 
                 max(case when p.price_in_pence is null then 1 else 0 end) as volume_unpriced 
              from MOVES m 
              inner join JOURNEYS j on j.move_id = m.move_id  
              left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id 
              left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id 
              left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
+             left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?
              where m.move_type is not null and m.supplier = ? and m.drop_off_or_cancelled >= ?  
              and m.drop_off_or_cancelled < ?
              GROUP BY journey) as js
@@ -156,6 +161,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       journeysSummarySQL,
       journeysSummaryRowMapper,
       supplier.name,
+      startDate.possiblePriceExceptionMonth(),
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
       Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())

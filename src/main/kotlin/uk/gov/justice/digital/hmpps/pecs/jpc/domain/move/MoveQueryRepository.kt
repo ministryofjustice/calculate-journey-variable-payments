@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDate
+import java.time.Month
 
 @Component
 class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
@@ -52,13 +53,14 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       " sum(s.move_unpriced) as count_unpriced " +
       " from MOVES m inner join (" +
       " select sm.move_id, " +
-      " sum(case when j.billable then p.price_in_pence else 0 end) as move_price_in_pence, " +
+      " sum(case when j.billable then COALESCE(pe.price_in_pence, p.price_in_pence) else 0 end) as move_price_in_pence, " +
       " max(case when p.price_in_pence is null then 1 else 0 end) as move_unpriced " +
       " from MOVES sm " +
       " left join JOURNEYS j on j.move_id = sm.move_id " +
       " left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
       " left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
       " left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?" +
+      " left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?" +
       " where sm.move_type is not null and sm.supplier = ? and sm.drop_off_or_cancelled >= ? and sm.drop_off_or_cancelled < ?" +
       " group by sm.move_id) as s on m.move_id = s.move_id " +
       "GROUP BY m.move_type"
@@ -67,11 +69,14 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       movesSummarySQL,
       movesSummaryRowMapper,
       supplier.name,
+      startDate.possiblePriceExceptionMonth(),
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
-      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay()),
     )
   }
+
+  private fun LocalDate.possiblePriceExceptionMonth() = this.month.value
 
   val moveJourneySelectSQL =
     """
@@ -89,7 +94,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         j.pick_up as journey_pick_up, j.drop_off as journey_drop_off, j.notes as journey_notes,  
         jfl.site_name as journey_from_site_name, jfl.location_type as journey_from_location_type,  
         jtl.site_name as journey_to_site_name, jtl.location_type as journey_to_location_type,  
-        CASE WHEN j.billable THEN p.price_in_pence ELSE NULL END as price_in_pence  
+        CASE WHEN j.billable THEN COALESCE(pe.price_in_pence, p.price_in_pence) ELSE NULL END as price_in_pence  
         from MOVES m 
             left join PROFILES pr on m.profile_id = pr.profile_id
             left join PEOPLE pp on pr.person_id = pp.person_id
@@ -99,6 +104,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id  
             left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id  
             left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
+            left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?
     """.trimIndent()
 
   val moveJourneyRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
@@ -175,11 +181,12 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
   /**
    * Excludes moves without a move_type. This is an indication of bad reporting data in the JSON data feeds.
    */
-  fun moveWithPersonAndJourneys(moveId: String, supplier: Supplier): Move? {
+  fun moveWithPersonAndJourneys(moveId: String, supplier: Supplier, inMonth: Month): Move? {
     val movePersonJourney = jdbcTemplate.query(
       "$moveJourneySelectSQL where m.move_id = ? and m.supplier = ? and m.move_type is not null",
       moveJourneyRowMapper,
       supplier.name,
+      inMonth.value,
       moveId,
       supplier.name
     ).groupBy { it.move.moveId }
@@ -202,6 +209,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
       moveJourneyRowMapper,
       supplier.name,
+      startDate.possiblePriceExceptionMonth(),
       supplier.name,
       moveType.name,
       Timestamp.valueOf(startDate.atStartOfDay()),

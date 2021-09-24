@@ -123,7 +123,7 @@ class HtmlController(
   ): ModelAndView {
     logger.info("$supplier move $moveId")
 
-    val maybeMove = moveService.moveWithPersonJourneysAndEvents(moveId, supplier)
+    val maybeMove = moveService.moveWithPersonJourneysAndEvents(moveId, supplier, model.getStartOfMonth().month)
 
     return maybeMove?.let {
       model.addAttribute(MOVE_ATTRIBUTE, maybeMove)

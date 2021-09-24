@@ -27,6 +27,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 import java.time.LocalDate
+import java.time.Month
 import java.util.Optional
 
 @SpringBootTest
@@ -73,25 +74,29 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   @Test
   internal fun `GET move with valid Move ID for supplier`() {
     val move = moveM1()
-    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)).thenReturn(move)
+    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)).thenReturn(move)
+
+    mockSession.setAttribute("date", LocalDate.of(2021, 2, 1))
 
     mockMvc.get("/moves/${move.moveId}") { session = mockSession }
       .andExpect { view { name("move") } }
       .andExpect { status { isOk() } }
 
-    verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)
+    verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)
   }
 
   @Test
   fun `GET move with invalid Move ID for supplier`() {
     val move = moveM1()
-    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)).thenReturn(null)
+    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(null)
+
+    mockSession.setAttribute("date", LocalDate.of(2021, 9, 1))
 
     mockMvc.get("/moves/${move.moveId}") { session = mockSession }
       .andExpect { status { isNotFound() } }
       .andExpect { view { name("error/404") } }
 
-    verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco)
+    verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.SEPTEMBER)
   }
 
   @Test
