@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
+import java.time.Month
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -10,7 +11,12 @@ import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 /**
- * A price within any given effective year can have a maximum of twelve exceptions, one for each month of the year.
+ * A price exception provides the ability to override a price in a given effective year for a period of one month. This
+ * allows for short term price changes if the supplier has to use a different route due to circumstances beyond their
+ * control. An example of this could be road closures due to road works so they have to go via a longer route.
+ *
+ * There can be upto twelve price exceptions (one for each month) for a price in any given year, this is however highly
+ * unlikely.
  */
 @Entity
 @Table(
@@ -41,9 +47,14 @@ data class PriceException(
 
   init {
     failOnZeroOrLessPrice()
+    failOnInvalidMonth()
   }
 
   private fun failOnZeroOrLessPrice() {
-    if (priceInPence < 1) throw IllegalArgumentException("Price in pence must be greater than zero.")
+    if (priceInPence < 1) throw IllegalArgumentException("Price exception amount must be greater than zero.")
+  }
+
+  private fun failOnInvalidMonth() {
+    Month.of(month)
   }
 }

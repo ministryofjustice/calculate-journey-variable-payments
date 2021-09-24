@@ -53,7 +53,7 @@ internal class PriceRepositoryTest {
   }
 
   @Test
-  fun `can add and retrieve price exception`() {
+  fun `can add and retrieve price exceptions for each month of the contractual year`() {
     val priceWithoutException = Price(
       supplier = Supplier.SERCO,
       fromLocation = fromLocation,
@@ -64,9 +64,28 @@ internal class PriceRepositoryTest {
 
     assertThat(priceRepo.saveAndFlush(priceWithoutException).exceptions()).isEmpty()
 
-    val priceWithException = priceWithoutException.copy().apply { addException(Month.JANUARY, Money(1)) }
+    val priceWithExceptions = priceWithoutException.copy().apply {
+      Month.values().forEach {
+        addException(it, Money(it.value))
+      }
+    }
 
-    assertThat(priceRepo.saveAndFlush(priceWithException).exceptions()).isNotEmpty
+    assertThat(
+      priceRepo.saveAndFlush(priceWithExceptions).exceptions().map { Pair(Month.of(it.month), it.priceInPence) }
+    ).containsExactlyInAnyOrder(
+      Pair(Month.SEPTEMBER, 9),
+      Pair(Month.OCTOBER, 10),
+      Pair(Month.NOVEMBER, 11),
+      Pair(Month.DECEMBER, 12),
+      Pair(Month.JANUARY, 1),
+      Pair(Month.FEBRUARY, 2),
+      Pair(Month.MARCH, 3),
+      Pair(Month.APRIL, 4),
+      Pair(Month.MAY, 5),
+      Pair(Month.JUNE, 6),
+      Pair(Month.JULY, 7),
+      Pair(Month.AUGUST, 8)
+    )
   }
 
   @Test

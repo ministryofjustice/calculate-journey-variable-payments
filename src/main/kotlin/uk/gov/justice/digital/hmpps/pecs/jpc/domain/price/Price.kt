@@ -19,6 +19,9 @@ import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
 
+/**
+ * A price represents an agreed contractual amount with a supplier for a given journey (from A to B) in an effective year.
+ */
 @Entity
 @Table(
   name = "PRICES",
@@ -82,7 +85,7 @@ data class Price(
   )
 
   /**
-   * Duplicates months will be ignored. You must remove first.
+   * Duplicate months will be ignored. You must remove first.
    */
   fun addException(month: Month, amount: Money): Price {
     exceptions.putIfAbsent(month.value, PriceException(price = this, month = month.value, priceInPence = amount.pence))
