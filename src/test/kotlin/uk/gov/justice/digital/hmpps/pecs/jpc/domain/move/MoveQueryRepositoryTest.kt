@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultMoveTypeStandard
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 import java.time.LocalDate
+import java.time.Month
 import java.util.UUID
 
 @ActiveProfiles("test")
@@ -105,7 +106,7 @@ internal class MoveQueryRepositoryTest {
 
   @Test
   fun `move with person and journeys with invalid move id for supplier`() {
-    assertThat(moveQueryRepository.moveWithPersonAndJourneys(standardMoveSerco.moveId, Supplier.GEOAMEY)).isNull()
+    assertThat(moveQueryRepository.moveWithPersonAndJourneys(standardMoveSerco.moveId, Supplier.GEOAMEY, Month.SEPTEMBER)).isNull()
   }
 
   @Test
@@ -114,7 +115,8 @@ internal class MoveQueryRepositoryTest {
     assertThat(
       moveQueryRepository.moveWithPersonAndJourneys(
         sercoMoveWithMissingType.moveId,
-        sercoMoveWithMissingType.supplier
+        sercoMoveWithMissingType.supplier,
+        Month.SEPTEMBER
       )
     ).isNull()
   }
@@ -138,7 +140,7 @@ internal class MoveQueryRepositoryTest {
 
     entityManager.flush()
 
-    val move = moveQueryRepository.moveWithPersonAndJourneys(standardMoveSerco.moveId, defaultSupplierSerco)
+    val move = moveQueryRepository.moveWithPersonAndJourneys(standardMoveSerco.moveId, defaultSupplierSerco, Month.SEPTEMBER)
 
     // Move should be priced
     assertThat(move!!.hasPrice()).isTrue
@@ -156,7 +158,7 @@ internal class MoveQueryRepositoryTest {
 
     entityManager.flush()
 
-    val move = moveQueryRepository.moveWithPersonAndJourneys(standardMoveGeoamey.moveId, Supplier.GEOAMEY)
+    val move = moveQueryRepository.moveWithPersonAndJourneys(standardMoveGeoamey.moveId, Supplier.GEOAMEY, Month.SEPTEMBER)
 
     // Move should be priced
     assertThat(move!!.hasPrice()).isTrue

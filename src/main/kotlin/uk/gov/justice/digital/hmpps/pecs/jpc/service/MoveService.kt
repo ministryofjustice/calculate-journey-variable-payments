@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
+import java.time.Month
 
 @Service
 class MoveService(
@@ -17,8 +18,8 @@ class MoveService(
   private val eventRepository: EventRepository
 ) {
 
-  fun moveWithPersonJourneysAndEvents(moveId: String, supplier: Supplier): Move? {
-    val maybeMove = moveQueryRepository.moveWithPersonAndJourneys(moveId, supplier)
+  fun moveWithPersonJourneysAndEvents(moveId: String, supplier: Supplier, inMonth: Month): Move? {
+    val maybeMove = moveQueryRepository.moveWithPersonAndJourneys(moveId, supplier, inMonth)
 
     return maybeMove?.let {
       val moveEvents = eventRepository.findAllByEventableId(it.moveId)

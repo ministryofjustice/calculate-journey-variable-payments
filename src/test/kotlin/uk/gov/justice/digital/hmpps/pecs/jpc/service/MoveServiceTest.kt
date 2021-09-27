@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
+import java.time.Month
 import java.util.Optional
 
 internal class MoveServiceTest {
@@ -33,10 +34,10 @@ internal class MoveServiceTest {
 
     val moveEvent = eventE1()
 
-    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco)).thenReturn(move)
+    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(move)
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(moveEvent))
 
-    val retrievedMove = service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)
+    val retrievedMove = service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco, Month.SEPTEMBER)
     assertThat(retrievedMove).isEqualTo(move)
     assertThat(retrievedMove?.events).containsExactly(moveEvent)
   }
@@ -55,12 +56,12 @@ internal class MoveServiceTest {
 
     val moveWithJourneysOutOfOrder = moveM1(journeys = listOf(journey2, journey1))
 
-    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco)).thenReturn(
+    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(
       moveWithJourneysOutOfOrder
     )
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(eventE1()))
 
-    assertThat(service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco)?.journeys).containsExactly(
+    assertThat(service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco, Month.SEPTEMBER)?.journeys).containsExactly(
       journey1,
       journey2
     )
@@ -80,7 +81,7 @@ internal class MoveServiceTest {
 
     val moveWithJourneyEventsOutOfOrder = moveM1(journeys = listOf(journey))
 
-    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco)).thenReturn(
+    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(
       moveWithJourneyEventsOutOfOrder
     )
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(eventE1()))
@@ -94,7 +95,8 @@ internal class MoveServiceTest {
     assertThat(
       service.moveWithPersonJourneysAndEvents(
         "M1",
-        defaultSupplierSerco
+        defaultSupplierSerco,
+        Month.SEPTEMBER
       )!!.journeys.first().events
     ).containsExactly(journeyStartEvent, journeyCompleteEvent)
   }
