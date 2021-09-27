@@ -51,6 +51,7 @@ abstract class PriceSheet(
     TOTAL_JOURNEY_COUNT("Total journey count", 5000),
     TOTAL_PRICE("Total price"),
     UNIT_PRICE("Unit price"),
+    UNIT_PRICE_EXCEPTION("Unit price exception"),
     VEHICLE_REG("Vehicle reg")
   }
 

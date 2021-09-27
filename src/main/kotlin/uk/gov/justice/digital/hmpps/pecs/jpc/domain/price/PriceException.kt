@@ -57,4 +57,6 @@ data class PriceException(
   private fun failOnInvalidMonth() {
     Month.of(month)
   }
+
+  fun price() = Money(priceInPence)
 }

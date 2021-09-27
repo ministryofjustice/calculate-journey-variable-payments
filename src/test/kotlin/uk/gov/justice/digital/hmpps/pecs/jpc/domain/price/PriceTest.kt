@@ -9,6 +9,7 @@ import java.time.Month
 import java.time.Month.DECEMBER
 import java.time.Month.FEBRUARY
 import java.time.Month.JANUARY
+import java.time.Month.MARCH
 
 internal class PriceTest {
   @Test
@@ -117,6 +118,26 @@ internal class PriceTest {
       Pair(FEBRUARY, 2),
       Pair(DECEMBER, 12)
     )
+  }
+
+  @Test
+  fun `retrieve a price exception from price`() {
+    val price = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      priceInPence = 1000,
+      effectiveYear = 2021
+    ).addException(JANUARY, Money(1))
+      .addException(DECEMBER, Money(12))
+      .addException(FEBRUARY, Money(2))
+
+    with(price) {
+      assertThat(exceptionFor(JANUARY)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(Pair(JANUARY, 1))
+      assertThat(exceptionFor(FEBRUARY)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(Pair(FEBRUARY, 2))
+      assertThat(exceptionFor(DECEMBER)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(Pair(DECEMBER, 12))
+      assertThat(exceptionFor(MARCH)).isNull()
+    }
   }
 
   @Test
