@@ -100,6 +100,8 @@ data class Price(
   }
 
   fun exceptions() = exceptions.values.toSet()
+
+  fun exceptionFor(month: Month) = exceptions[month.value]
 }
 
 enum class Supplier {
