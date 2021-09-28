@@ -58,7 +58,13 @@ class SupplierPricingService(
         from,
         to,
         effectiveYear
-      )?.let { PriceDto(it.fromLocation.siteName, it.toLocation.siteName, it.price()) }
+      )?.let { price ->
+        PriceDto(
+          price.fromLocation.siteName,
+          price.toLocation.siteName,
+          price.price()
+        ).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
+      }
     }
   }
 
@@ -131,7 +137,9 @@ class SupplierPricingService(
       .keys
   }
 
-  data class PriceDto(val fromAgency: String, val toAgency: String, val amount: Money)
+  data class PriceDto(val fromAgency: String, val toAgency: String, val amount: Money) {
+    val exceptions: MutableMap<Int, Money> = mutableMapOf()
+  }
 
   private fun String.sanitised() = this.trim().uppercase()
 }

@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import java.time.Month
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
@@ -67,6 +68,20 @@ class MaintainSupplierPricingController(
         Warning("Making this change will only affect journeys undertaken in the contractual year $effectiveYear to ${effectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
     }
   }
+
+  data class PriceExceptionForm(
+    val moveId: String,
+    val existingExceptions: Map<Int, Money> = emptyMap(),
+    val month: String? = null
+  ) {
+    val months: List<PriceExceptionMonth> = listOf(9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8).map { index ->
+      Month.of(index).let { month ->
+        PriceExceptionMonth(month.name, month.name.lowercase().replaceFirstChar { it.titlecaseChar() }, existingExceptions.containsKey(index))
+      }
+    }
+  }
+
+  data class PriceExceptionMonth(val value: String, val text: String, val disabled: Boolean)
 
   @GetMapping("$ADD_PRICE/{moveId}")
   fun addPrice(
@@ -162,6 +177,7 @@ class MaintainSupplierPricingController(
       addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
+      addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions))
     }
 
     return "update-price"
@@ -214,7 +230,16 @@ class MaintainSupplierPricingController(
   }
 
   @PostMapping(ADD_PRICE_EXCEPTION)
-  fun addPriceException(): Any {
+  fun addPriceException(
+    @Valid @ModelAttribute("exceptionsForm") form: PriceExceptionForm,
+    result: BindingResult,
+    model: ModelMap,
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    redirectAttributes: RedirectAttributes
+
+  ): Any {
+    logger.info("Adding price exception")
+
     TODO()
   }
 

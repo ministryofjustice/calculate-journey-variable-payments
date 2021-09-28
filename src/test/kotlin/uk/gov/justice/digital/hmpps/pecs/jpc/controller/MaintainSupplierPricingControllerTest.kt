@@ -296,7 +296,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
-  internal fun `can initiate update price for Geoamey including price history in current contractual year`() {
+  internal fun `can initiate update price for Geoamey including price history and exceptions in current contractual year`() {
     mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, currentContractualYearDate)
 
     whenever(
@@ -310,8 +310,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       PriceDto(
         "from",
         "to",
-        Money(1000)
-      )
+        Money(1000),
+      ).apply { exceptions[7] = Money(100) }
     )
 
     val priceHistoryDateTime = LocalDateTime.now()
@@ -357,6 +357,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
+      .andExpect { model { attribute("exceptionsForm", MaintainSupplierPricingController.PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)))) } }
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 

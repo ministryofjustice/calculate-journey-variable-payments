@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month.JANUARY
 
 @ExtendWith(FakeAuthentication::class)
 internal class SupplierPricingServiceTest {
@@ -112,7 +113,7 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
-  internal fun `existing site names and price returned`() {
+  internal fun `existing price without exceptions returned`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
@@ -127,6 +128,39 @@ internal class SupplierPricingServiceTest {
     val result = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
 
     assertThat(result).isEqualTo(SupplierPricingService.PriceDto("from site", "to site", Money.valueOf(100.24)))
+    verify(locationRepository).findByNomisAgencyId("FROM")
+    verify(locationRepository).findByNomisAgencyId("TO")
+    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      Supplier.SERCO,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
+  }
+
+  @Test
+  internal fun `existing price with exceptions returned`() {
+    whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
+    whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(price.addException(JANUARY, Money(200)))
+
+    val result = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
+
+    assertThat(result).isEqualTo(
+      SupplierPricingService.PriceDto(
+        "from site",
+        "to site",
+        Money.valueOf(100.24)
+      ).apply { exceptions[1] = Money(200) }
+    )
+
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
