@@ -46,19 +46,19 @@ class SupplierPricingService(
     return Pair(fromLocation.siteName, toLocation.siteName)
   }
 
-  fun getMaybeSiteNamesAndPrice(
+  fun maybePrice(
     supplier: Supplier,
     fromAgencyId: String,
     toAgencyId: String,
     effectiveYear: Int
-  ): Triple<String, String, Money>? {
+  ): PriceDto? {
     return getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
       priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
         supplier,
         from,
         to,
         effectiveYear
-      )?.let { Triple(from.siteName, to.siteName, Money(it.priceInPence)) }
+      )?.let { PriceDto(it.fromLocation.siteName, it.toLocation.siteName, it.price()) }
     }
   }
 
@@ -120,7 +120,7 @@ class SupplierPricingService(
       getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found.")
     )
 
-  private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
+  private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(agencyId.sanitised())
 
   fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
     return auditService.auditEventsByTypeAndMetaKey(
@@ -131,5 +131,7 @@ class SupplierPricingService(
       .keys
   }
 
-  private fun sanitised(value: String) = value.trim().uppercase()
+  data class PriceDto(val fromAgency: String, val toAgency: String, val amount: Money)
+
+  private fun String.sanitised() = this.trim().uppercase()
 }

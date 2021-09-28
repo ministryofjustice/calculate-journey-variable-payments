@@ -150,7 +150,7 @@ class MaintainSupplierPricingController(
 
     val (fromAgencyId, toAgencyId) = agencyIds(moveId)
 
-    val (fromSite, toSite, price) = supplierPricingService.getMaybeSiteNamesAndPrice(
+    val price = supplierPricingService.maybePrice(
       supplier,
       fromAgencyId,
       toAgencyId,
@@ -158,7 +158,7 @@ class MaintainSupplierPricingController(
     ) ?: throw RuntimeException("No matching price found for $supplier")
 
     model.apply {
-      addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
+      addAttribute("form", PriceForm(moveId, price.amount.toString(), price.fromAgency, price.toAgency))
       addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
@@ -213,11 +213,16 @@ class MaintainSupplierPricingController(
     return RedirectView(model.getJourneySearchResultsUrl())
   }
 
+  @PostMapping(ADD_PRICE_EXCEPTION)
+  fun addPriceException(): Any {
+    TODO()
+  }
+
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current())
       return listOf(Warning.standard(supplier, selectedEffectiveYear))
 
-    supplierPricingService.getMaybeSiteNamesAndPrice(supplier, from, to, actualEffectiveYear.current())?.let {
+    supplierPricingService.maybePrice(supplier, from, to, actualEffectiveYear.current())?.let {
       return listOf(
         Warning.beforeWithCurrentPrice(actualEffectiveYear.current()),
         Warning.before(selectedEffectiveYear)
@@ -262,8 +267,9 @@ class MaintainSupplierPricingController(
   companion object Routes {
 
     const val ADD_PRICE = "/add-price"
+    const val ADD_PRICE_EXCEPTION = "/add-price-exception"
     const val UPDATE_PRICE = "/update-price"
 
-    fun routes(): Array<String> = arrayOf(ADD_PRICE, "$ADD_PRICE/*", UPDATE_PRICE, "$UPDATE_PRICE/*")
+    fun routes(): Array<String> = arrayOf(ADD_PRICE, "$ADD_PRICE/*", ADD_PRICE_EXCEPTION, UPDATE_PRICE, "$UPDATE_PRICE/*")
   }
 }

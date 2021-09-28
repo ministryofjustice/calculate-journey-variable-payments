@@ -124,9 +124,9 @@ internal class SupplierPricingServiceTest {
       )
     ).thenReturn(price)
 
-    val result = service.getMaybeSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYear)
+    val result = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
 
-    assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
+    assertThat(result).isEqualTo(SupplierPricingService.PriceDto("from site", "to site", Money.valueOf(100.24)))
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(

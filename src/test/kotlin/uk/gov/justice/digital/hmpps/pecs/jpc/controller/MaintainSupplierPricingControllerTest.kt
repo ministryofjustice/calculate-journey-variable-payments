@@ -28,6 +28,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService.PriceDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -153,13 +154,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     ).thenReturn(Pair("from", "to"))
 
     whenever(
-      service.getMaybeSiteNamesAndPrice(
+      service.maybePrice(
         Supplier.SERCO,
         fromAgencyId,
         toAgencyId,
         actualEffectiveYear.current()
       )
-    ).thenReturn(Triple("a", "b", Money(10)))
+    ).thenReturn(PriceDto("a", "b", Money(10)))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
       .andExpect {
@@ -299,14 +300,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, currentContractualYearDate)
 
     whenever(
-      service.getMaybeSiteNamesAndPrice(
+      service.maybePrice(
         Supplier.GEOAMEY,
         fromAgencyId,
         toAgencyId,
         currentContractualYear
       )
     ).thenReturn(
-      Triple(
+      PriceDto(
         "from",
         "to",
         Money(1000)
@@ -359,7 +360,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getMaybeSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, currentContractualYear)
+    verify(service).maybePrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, currentContractualYear)
   }
 
   @Test
@@ -367,14 +368,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, previousContractualYearDate)
 
     whenever(
-      service.getMaybeSiteNamesAndPrice(
+      service.maybePrice(
         Supplier.GEOAMEY,
         fromAgencyId,
         toAgencyId,
         previousContractualYear
       )
     ).thenReturn(
-      Triple(
+      PriceDto(
         "from",
         "to",
         Money(1000)
@@ -429,7 +430,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getMaybeSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, previousContractualYear)
+    verify(service).maybePrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, previousContractualYear)
   }
 
   @Test
@@ -437,14 +438,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, previousContractualYearDate)
 
     whenever(
-      service.getMaybeSiteNamesAndPrice(
+      service.maybePrice(
         Supplier.GEOAMEY,
         fromAgencyId,
         toAgencyId,
         previousContractualYear
       )
     ).thenReturn(
-      Triple(
+      PriceDto(
         "from",
         "to",
         Money(1000)
@@ -452,14 +453,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     )
 
     whenever(
-      service.getMaybeSiteNamesAndPrice(
+      service.maybePrice(
         Supplier.GEOAMEY,
         fromAgencyId,
         toAgencyId,
         currentContractualYear
       )
     ).thenReturn(
-      Triple(
+      PriceDto(
         "from",
         "to",
         Money(1500)
@@ -515,7 +516,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getMaybeSiteNamesAndPrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, previousContractualYear)
+    verify(service).maybePrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, previousContractualYear)
   }
 
   @Test
