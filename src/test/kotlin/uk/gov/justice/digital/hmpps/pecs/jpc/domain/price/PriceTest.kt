@@ -135,7 +135,12 @@ internal class PriceTest {
     with(price) {
       assertThat(exceptionFor(JANUARY)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(Pair(JANUARY, 1))
       assertThat(exceptionFor(FEBRUARY)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(Pair(FEBRUARY, 2))
-      assertThat(exceptionFor(DECEMBER)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(Pair(DECEMBER, 12))
+      assertThat(exceptionFor(DECEMBER)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(
+        Pair(
+          DECEMBER,
+          12
+        )
+      )
       assertThat(exceptionFor(MARCH)).isNull()
     }
   }
@@ -194,5 +199,20 @@ internal class PriceTest {
       Pair(JANUARY, 1),
       Pair(FEBRUARY, 2)
     )
+  }
+
+  @Test
+  fun `add price exception fails if price is identical to excetpion amount`() {
+    val price = Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      priceInPence = 1000,
+      effectiveYear = 2021
+    )
+
+    assertThat(price.exceptions()).isEmpty()
+
+    assertThatThrownBy { price.addException(JANUARY, Money(1000)) }
   }
 }

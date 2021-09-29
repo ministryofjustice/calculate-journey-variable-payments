@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import java.time.Month
 
 @Service
 @Transactional
@@ -114,6 +115,26 @@ class SupplierPricingService(
       priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
         .let { auditService.create(AuditableEvent.updatePrice(it, oldPrice)) }
     }
+  }
+
+  fun addPriceException(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int,
+    month: Month,
+    amount: Money
+  ) {
+    val existingPrice = getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        supplier,
+        from,
+        to,
+        effectiveYear
+      )
+    }?.apply { addException(month, amount) } ?: throw RuntimeException("No matching price found for $supplier")
+
+    priceRepository.save(existingPrice)
   }
 
   private fun failIfPriceAdjustmentInProgressFor(supplier: Supplier) {
