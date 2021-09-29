@@ -31,6 +31,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService.PriceDto
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -527,6 +528,47 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
       .andExpect { status { isForbidden() } }
+  }
+
+  @Test
+  internal fun `can add a price exception`() {
+    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+
+    mockMvc.post("/add-price-exception") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("exceptionPrice", "50.00")
+      param("exceptionMonth", "SEPTEMBER")
+    }
+      .andExpect { redirectedUrl("/update-price/$fromAgencyId-$toAgencyId") }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(service).addPriceException(Supplier.SERCO, fromAgencyId, toAgencyId, currentContractualYear, Month.SEPTEMBER, Money.valueOf(50.00))
+  }
+
+  @Test
+  internal fun `cannot add an invalid price exception`() {
+    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+
+    whenever(
+      service.maybePrice(
+        Supplier.SERCO,
+        fromAgencyId,
+        toAgencyId,
+        currentContractualYear
+      )
+    ).thenReturn(PriceDto("a", "b", Money(10)))
+
+    mockMvc.post("/add-price-exception") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("exceptionPrice", "5A.00")
+      param("exceptionMonth", "SEPTEMBER")
+    }
+      .andExpect { redirectedUrl("/update-price/$fromAgencyId-$toAgencyId#price-exceptions") }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(service, never()).addPriceException(any(), any(), any(), any(), any(), any())
   }
 
   private fun MockHttpSession.addSupplierAndContractualYear(supplier: Supplier, contractualYearDate: LocalDate) {

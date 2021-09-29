@@ -23,6 +23,11 @@
           Update price
         </a>
       </li>
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+        <a class="govuk-tabs__tab" href="#price-exceptions">
+          Price exceptions
+        </a>
+      </li>
       <li class="govuk-tabs__list-item">
         <a class="govuk-tabs__tab" href="#price-history">
           Price history
@@ -95,6 +100,71 @@
         <div class="flex items-center">
           <button id="confirm-save-price" class="govuk-button mv3 mr3" data-module="govuk-button">
             Confirm and save
+          </button>
+          <a th:href="${cancelLink}" class="govuk-link">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-exceptions">
+      <h2 class="govuk-heading-l">Price exceptions</h2>
+      <form th:action="@{/add-price-exception}" th:object="${exceptionsForm}" method="post">
+        <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
+             data-module="govuk-error-summary" th:if="${#fields.hasErrors('exceptionPrice')}">
+          <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+          </h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+              <li>
+                <a href="#price">Enter a valid price in the correct
+                  format</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <input type="hidden" th:field="*{moveId}" class="dn"/>
+        <ol class="list pl0">
+          <li class="mv1">
+            <label class="govuk-label govuk-body govuk-!-font-weight-bold"
+                   for="exception-month">
+              Month
+            </label>
+            <div class="govuk-form-group">
+              <select class="govuk-select" id="exception-month" th:field="*{exceptionMonth}">
+                <option
+                  th:each="month : *{months}"
+                  th:disabled="${month.disabled}"
+                  th:value="${month.value}"
+                  th:text="${month.text}">
+                </option>
+              </select>
+            </div>
+          </li>
+          <li class="mv1">
+            <label class="govuk-label govuk-body govuk-!-font-weight-bold"
+                   for="price">
+              Price
+            </label>
+            <div id="exception-price-hint" class="govuk-hint">
+              Example £100.00
+            </div>
+            <p th:if="${#fields.hasErrors('exceptionPrice')}" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> Enter a valid price in the correct
+              format
+            </p>
+            <div class="govuk-input__wrapper">
+              <div class="govuk-input__prefix" aria-hidden="true">£</div>
+              <input class="govuk-input govuk-input--width-5" id="exception-price" name="price" type="text"
+                     aria-describedby="price-hint" th:field="*{exceptionPrice}"
+                     th:classappend="${#fields.hasErrors('exceptionPrice')} ? 'govuk-input--error'">
+            </div>
+          </li>
+        </ol>
+        <div class="flex items-center">
+          <button id="confirm-save-exception" class="govuk-button mv3 mr3" data-module="govuk-button">
+            Add exception
           </button>
           <a th:href="${cancelLink}" class="govuk-link">Cancel</a>
         </div>
