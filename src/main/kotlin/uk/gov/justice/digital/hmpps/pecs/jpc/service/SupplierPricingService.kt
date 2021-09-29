@@ -52,21 +52,12 @@ class SupplierPricingService(
     fromAgencyId: String,
     toAgencyId: String,
     effectiveYear: Int
-  ): PriceDto? {
-    return getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
-      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-        supplier,
-        from,
-        to,
-        effectiveYear
-      )?.let { price ->
-        PriceDto(
-          price.fromLocation.siteName,
-          price.toLocation.siteName,
-          price.price()
-        ).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
-      }
-    }
+  ): PriceDto? = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)?.let { price ->
+    PriceDto(
+      price.fromLocation.siteName,
+      price.toLocation.siteName,
+      price.price()
+    ).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
   }
 
   fun addPriceForSupplier(
@@ -100,13 +91,7 @@ class SupplierPricingService(
   ) {
     failIfPriceAdjustmentInProgressFor(supplier)
 
-    val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-      supplier,
-      fromLocation,
-      toLocation,
-      effectiveYear
-    )
+    val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
 
     if (existingPrice.price() != agreedNewPrice) {
@@ -125,16 +110,25 @@ class SupplierPricingService(
     month: Month,
     amount: Money
   ) {
-    val existingPrice = getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
-      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-        supplier,
-        from,
-        to,
-        effectiveYear
-      )
-    }?.apply { addException(month, amount) } ?: throw RuntimeException("No matching price found for $supplier")
+    val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
+      ?.apply { addException(month, amount) } ?: throw RuntimeException("No matching price found for $supplier")
 
     priceRepository.save(existingPrice)
+    auditService.create(AuditableEvent.addPriceException(existingPrice, month, amount))
+  }
+
+  private fun existingPriceOrNull(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int,
+  ) = getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
+    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      from,
+      to,
+      effectiveYear
+    )
   }
 
   private fun failIfPriceAdjustmentInProgressFor(supplier: Supplier) {

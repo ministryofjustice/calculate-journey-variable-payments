@@ -304,6 +304,7 @@ internal class SupplierPricingServiceTest {
     service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf(20.00))
 
     verify(priceRepository).save(sercoPrice.addException(SEPTEMBER, Money.valueOf(20.00)))
+    verify(auditService).create(any())
   }
 
   @Test

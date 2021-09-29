@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDateTime
+import java.time.Month
 
 internal class PriceHistoryDtoTest {
 
@@ -120,6 +121,30 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Price adjusted from £10.00 to £20.00 with blended rate multiplier 2.0. Effective from 2021 to 2022.",
+        "Jane"
+      )
+    )
+  }
+
+  @Test
+  fun `price change via an a price exception`() {
+    val datetime = LocalDateTime.now()
+    val priceMetadata = PriceMetadata(
+      supplier = Supplier.GEOAMEY,
+      fromNomisId = "from_agency_id",
+      toNomisId = "to_agency_id",
+      effectiveYear = 2021,
+      oldPrice = Money(1000).pounds(),
+      newPrice = Money(2000).pounds(),
+      exceptionMonth = Month.SEPTEMBER.toString()
+    )
+    val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
+    val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
+
+    assertThat(history).isEqualTo(
+      PriceHistoryDto(
+        datetime,
+        "Price exception of £20.00 for SEPTEMBER. Effective year 2021 to 2022.",
         "Jane"
       )
     )

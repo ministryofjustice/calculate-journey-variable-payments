@@ -5,6 +5,7 @@ import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import java.time.Month
 
 /**
  * Metadata to capture price changes, both new and updates.
@@ -30,6 +31,9 @@ data class PriceMetadata(
 
   @Json(name = "multiplier", index = 7, serializeNull = false)
   val multiplier: Double? = null,
+
+  @Json(name = "exception_month", index = 8)
+  val exceptionMonth: String? = null,
 ) : Metadata {
   private constructor(price: Price) : this(
     price.supplier,
@@ -39,6 +43,15 @@ data class PriceMetadata(
     newPrice = price.price().pounds()
   )
 
+  private constructor(price: Price, exception: Month, exceptionAmount: Money) : this(
+    price.supplier,
+    price.fromLocation.nomisAgencyId,
+    price.toLocation.nomisAgencyId,
+    price.effectiveYear,
+    oldPrice = price.price().pounds(),
+    newPrice = exceptionAmount.pounds(),
+    exceptionMonth = exception.name
+  )
   private constructor(old: Money, new: Price) : this(
     supplier = new.supplier,
     fromNomisId = new.fromLocation.nomisAgencyId,
@@ -69,6 +82,8 @@ data class PriceMetadata(
 
     fun adjustment(new: Price, old: Money, multiplier: Double) = PriceMetadata(old, new, multiplier)
 
+    fun exception(price: Price, month: Month, amount: Money): PriceMetadata = PriceMetadata(price, month, amount)
+
     fun map(event: AuditEvent): PriceMetadata {
       return if (event.eventType == AuditEventType.JOURNEY_PRICE)
         Klaxon().parse<PriceMetadata>(event.metadata!!)!!
@@ -80,9 +95,11 @@ data class PriceMetadata(
       "$supplier-${fromNomisId.trim().uppercase()}-${toNomisId.trim().uppercase()}"
   }
 
-  fun isUpdate() = oldPrice != null && multiplier == null
+  fun isUpdate() = oldPrice != null && multiplier == null && exceptionMonth == null
 
   fun isAdjustment() = multiplier != null
+
+  fun isException() = exceptionMonth != null
 
   override fun toJsonString(): String = Klaxon().toJsonString(this)
 
