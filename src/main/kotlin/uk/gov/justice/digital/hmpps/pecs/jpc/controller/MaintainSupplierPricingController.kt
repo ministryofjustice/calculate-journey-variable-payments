@@ -270,6 +270,8 @@ class MaintainSupplierPricingController(
       model.getSelectedEffectiveYear()
     )!!
 
+    if (existingPrice.amount == price) result.rejectValue("exceptionPrice", "Invalid price")
+
     if (result.hasErrors()) {
       model.apply {
         addAttribute("form", PriceForm(form.moveId, existingPrice.amount.toString(), existingPrice.fromAgency, existingPrice.toAgency))

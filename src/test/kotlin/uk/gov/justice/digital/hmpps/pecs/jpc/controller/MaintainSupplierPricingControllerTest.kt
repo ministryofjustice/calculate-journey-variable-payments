@@ -587,6 +587,32 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     verify(service, never()).addPriceException(any(), any(), any(), any(), any(), any())
   }
 
+  @Test
+  internal fun `cannot add an the same price for a  price exception`() {
+    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+
+    whenever(
+      service.maybePrice(
+        Supplier.SERCO,
+        fromAgencyId,
+        toAgencyId,
+        currentContractualYear
+      )
+    ).thenReturn(PriceDto("a", "b", Money(100)))
+
+    mockMvc.post("/add-price-exception") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("exceptionPrice", "1.00")
+      param("exceptionMonth", "SEPTEMBER")
+    }
+      .andExpect { redirectedUrl("/update-price/$fromAgencyId-$toAgencyId#price-exceptions") }
+      .andExpect { flash { attribute("flashError", "add-price-exception-error") } }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(service, never()).addPriceException(any(), any(), any(), any(), any(), any())
+  }
+
   private fun MockHttpSession.addSupplierAndContractualYear(supplier: Supplier, contractualYearDate: LocalDate) {
     this.setAttribute("supplier", supplier)
     this.setAttribute("date", contractualYearDate)
