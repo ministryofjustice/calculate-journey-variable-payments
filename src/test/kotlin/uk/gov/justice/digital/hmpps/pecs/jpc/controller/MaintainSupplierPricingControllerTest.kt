@@ -588,7 +588,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
-  internal fun `cannot add an the same price for a  price exception`() {
+  internal fun `cannot add an exception for the same price`() {
     mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
 
     whenever(
