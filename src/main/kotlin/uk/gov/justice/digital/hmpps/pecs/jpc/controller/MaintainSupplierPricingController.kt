@@ -264,13 +264,13 @@ class MaintainSupplierPricingController(
 
     val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
 
-    if (result.hasErrors()) {
-      val existingPrice = supplierPricingService.maybePrice(
-        supplier,
-        fromAgencyId, toAgencyId,
-        model.getSelectedEffectiveYear()
-      )!!
+    val existingPrice = supplierPricingService.maybePrice(
+      supplier,
+      fromAgencyId, toAgencyId,
+      model.getSelectedEffectiveYear()
+    )!!
 
+    if (result.hasErrors()) {
       model.apply {
         addAttribute("form", PriceForm(form.moveId, existingPrice.amount.toString(), existingPrice.fromAgency, existingPrice.toAgency))
         addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
@@ -292,7 +292,15 @@ class MaintainSupplierPricingController(
       price!!
     )
 
-    return RedirectView("$UPDATE_PRICE/${form.moveId}")
+    redirectAttributes.apply {
+      addFlashAttribute("flashMessage", "price-exception-created")
+      addFlashAttribute("flashAttrExceptionPrice", form.exceptionPrice)
+      addFlashAttribute("flashAttrExceptionMonth", form.exceptionMonth)
+      addFlashAttribute("flashAttrLocationFrom", existingPrice.fromAgency)
+      addFlashAttribute("flashAttrLocationTo", existingPrice.toAgency)
+    }
+
+    return RedirectView(model.getJourneySearchResultsUrl())
   }
 
   private fun RedirectAttributes.addFlashErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)

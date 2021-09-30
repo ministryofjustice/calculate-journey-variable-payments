@@ -533,7 +533,16 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `can add a price exception`() {
+
     mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    whenever(
+      service.maybePrice(
+        Supplier.SERCO,
+        fromAgencyId,
+        toAgencyId,
+        currentContractualYear
+      )
+    ).thenReturn(PriceDto("a", "b", Money(10)))
 
     mockMvc.post("/add-price-exception") {
       session = mockSession
@@ -541,7 +550,12 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("exceptionPrice", "50.00")
       param("exceptionMonth", "SEPTEMBER")
     }
-      .andExpect { redirectedUrl("/update-price/$fromAgencyId-$toAgencyId") }
+      .andExpect { flash { attribute("flashMessage", "price-exception-created") } }
+      .andExpect { flash { attribute("flashAttrExceptionPrice", "50.00") } }
+      .andExpect { flash { attribute("flashAttrExceptionMonth", "SEPTEMBER") } }
+      .andExpect { flash { attribute("flashAttrLocationFrom", "a") } }
+      .andExpect { flash { attribute("flashAttrLocationTo", "b") } }
+      .andExpect { redirectedUrl("/journeys-results") }
       .andExpect { status { is3xxRedirection() } }
 
     verify(service).addPriceException(Supplier.SERCO, fromAgencyId, toAgencyId, currentContractualYear, Month.SEPTEMBER, Money.valueOf(50.00))

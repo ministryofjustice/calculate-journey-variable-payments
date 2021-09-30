@@ -40,6 +40,14 @@
                     £[[${#numbers.formatDecimal(flashAttrPrice, 1, 'COMMA', 2, 'POINT')}]]
                 </p>
             </div>
+            <div th:case="'price-exception-created'">
+              <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+                Price exception added
+              </p>
+              <p class="govuk-body ma0" id="app-message__heading" th:inline="text">
+                Journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]] for [[${flashAttrExceptionMonth}]] priced at £[[${flashAttrExceptionPrice}]]
+              </p>
+            </div>
             <div th:case="*"></div>
         </div>
         <a th:href="${dismissFallback}" class="govuk-link" onclick="event.preventDefault();this.parentElement.remove()">Dismiss</a>
