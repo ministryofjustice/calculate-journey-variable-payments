@@ -23,7 +23,7 @@
           Update price
         </a>
       </li>
-      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" th:if="${priceExceptionFeatureEnabled}">
         <a class="govuk-tabs__tab" href="#price-exceptions">
           Price exceptions
         </a>
@@ -106,7 +106,7 @@
       </form>
     </div>
 
-    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-exceptions">
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-exceptions" th:if="${priceExceptionFeatureEnabled}">
       <h2 class="govuk-heading-l">Price exceptions</h2>
       <form th:action="@{/add-price-exception}" th:object="${exceptionsForm}" method="post">
         <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
