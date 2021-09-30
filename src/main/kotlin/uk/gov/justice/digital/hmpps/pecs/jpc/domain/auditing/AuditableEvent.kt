@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
+import java.time.Month
 import java.time.format.DateTimeFormatter
 
 data class AuditableEvent(
@@ -81,6 +82,14 @@ data class AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = authentication().name,
         metadata = PriceMetadata.update(oldPrice, updatedPrice)
+      )
+    }
+
+    fun addPriceException(price: Price, month: Month, amount: Money): AuditableEvent {
+      return AuditableEvent(
+        type = AuditEventType.JOURNEY_PRICE,
+        username = authentication().name,
+        metadata = PriceMetadata.exception(price, month, amount)
       )
     }
 

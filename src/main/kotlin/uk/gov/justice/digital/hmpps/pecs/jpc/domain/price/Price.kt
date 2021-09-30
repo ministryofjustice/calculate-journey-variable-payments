@@ -88,6 +88,8 @@ data class Price(
    * Duplicate months will be ignored. You must remove first.
    */
   fun addException(month: Month, amount: Money): Price {
+    if (amount.pence == priceInPence) throw IllegalArgumentException("Price exception price cannot be the same as the actual price.")
+
     exceptions.putIfAbsent(month.value, PriceException(price = this, month = month.value, priceInPence = amount.pence))
 
     return this

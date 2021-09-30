@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import java.time.Month
 
 internal class PriceMetadataTest {
 
@@ -33,6 +34,7 @@ internal class PriceMetadataTest {
     assertThat(metadata.newPrice).isEqualTo(1.0)
     assertThat(metadata.oldPrice).isNull()
     assertThat(metadata.isUpdate()).isFalse
+    assertThat(metadata.isException()).isFalse
     assertThat(metadata.key()).isEqualTo("SERCO-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
@@ -57,6 +59,7 @@ internal class PriceMetadataTest {
     assertThat(metadata.oldPrice).isEqualTo(2.0)
     assertThat(metadata.isUpdate()).isTrue
     assertThat(metadata.isAdjustment()).isFalse
+    assertThat(metadata.isException()).isFalse
     assertThat(metadata.key()).isEqualTo("GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID")
   }
 
@@ -100,6 +103,33 @@ internal class PriceMetadataTest {
     assertThat(metadata.oldPrice).isEqualTo(1.0)
     assertThat(metadata.multiplier).isEqualTo(2.0)
     assertThat(metadata.isUpdate()).isFalse
+    assertThat(metadata.isException()).isFalse
     assertThat(metadata.isAdjustment()).isTrue
+  }
+
+  @Test
+  fun `price exception`() {
+    val metadata = PriceMetadata.exception(
+      Price(
+        supplier = Supplier.SERCO,
+        fromLocation = fromLocation,
+        toLocation = toLocation,
+        effectiveYear = 2020,
+        priceInPence = 2000
+      ),
+      Month.SEPTEMBER,
+      Money.valueOf(30.00)
+    )
+
+    assertThat(metadata.supplier).isEqualTo(Supplier.SERCO)
+    assertThat(metadata.fromNomisId).isEqualTo("FROM_AGENCY_ID")
+    assertThat(metadata.toNomisId).isEqualTo("TO_AGENCY_ID")
+    assertThat(metadata.effectiveYear).isEqualTo(2020)
+    assertThat(metadata.newPrice).isEqualTo(30.00)
+    assertThat(metadata.oldPrice).isEqualTo(20.00)
+    assertThat(metadata.multiplier).isNull()
+    assertThat(metadata.isUpdate()).isFalse
+    assertThat(metadata.isAdjustment()).isFalse
+    assertThat(metadata.isException()).isTrue
   }
 }

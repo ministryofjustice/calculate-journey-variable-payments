@@ -24,6 +24,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month.JANUARY
+import java.time.Month.SEPTEMBER
 
 @ExtendWith(FakeAuthentication::class)
 internal class SupplierPricingServiceTest {
@@ -37,7 +39,7 @@ internal class SupplierPricingServiceTest {
   private val toLocation: Location =
     Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
   private val priceRepository: PriceRepository = mock()
-  private val price: Price = Price(
+  private val sercoPrice: Price = Price(
     supplier = Supplier.SERCO,
     priceInPence = 10024,
     fromLocation = fromLocation,
@@ -45,8 +47,7 @@ internal class SupplierPricingServiceTest {
     effectiveYear = effectiveYear
   )
   private val priceCaptor = argumentCaptor<Price>()
-  private val service: SupplierPricingService =
-    SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService)
+  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService)
 
   @Test
   internal fun `site names returned for new pricing`() {
@@ -77,7 +78,7 @@ internal class SupplierPricingServiceTest {
   internal fun `add new price for supplier`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
-    whenever(priceRepository.save(any())).thenReturn(price)
+    whenever(priceRepository.save(any())).thenReturn(sercoPrice)
 
     service.addPriceForSupplier(
       Supplier.SERCO,
@@ -112,7 +113,7 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
-  internal fun `existing site names and price returned`() {
+  internal fun `existing price without exceptions returned`() {
     whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
     whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
     whenever(
@@ -122,11 +123,44 @@ internal class SupplierPricingServiceTest {
         toLocation,
         effectiveYear
       )
-    ).thenReturn(price)
+    ).thenReturn(sercoPrice)
 
-    val result = service.getMaybeSiteNamesAndPrice(Supplier.SERCO, "from", "to", effectiveYear)
+    val result = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
 
-    assertThat(result).isEqualTo(Triple("from site", "to site", Money.valueOf(100.24)))
+    assertThat(result).isEqualTo(SupplierPricingService.PriceDto("from site", "to site", Money.valueOf(100.24)))
+    verify(locationRepository).findByNomisAgencyId("FROM")
+    verify(locationRepository).findByNomisAgencyId("TO")
+    verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      Supplier.SERCO,
+      fromLocation,
+      toLocation,
+      effectiveYear
+    )
+  }
+
+  @Test
+  internal fun `existing price with exceptions returned`() {
+    whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
+    whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(sercoPrice.addException(JANUARY, Money(200)))
+
+    val result = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
+
+    assertThat(result).isEqualTo(
+      SupplierPricingService.PriceDto(
+        "from site",
+        "to site",
+        Money.valueOf(100.24)
+      ).apply { exceptions[1] = Money(200) }
+    )
+
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
@@ -148,14 +182,14 @@ internal class SupplierPricingServiceTest {
         toLocation,
         effectiveYear
       )
-    ).thenReturn(price)
-    whenever(priceRepository.save(any())).thenReturn(price)
+    ).thenReturn(sercoPrice)
+    whenever(priceRepository.save(any())).thenReturn(sercoPrice)
 
     service.updatePriceForSupplier(
       Supplier.SERCO,
       "from",
       "to",
-      price.price(),
+      sercoPrice.price(),
       effectiveYear
     )
 
@@ -174,8 +208,8 @@ internal class SupplierPricingServiceTest {
         toLocation,
         effectiveYear
       )
-    ).thenReturn(price)
-    whenever(priceRepository.save(any())).thenReturn(price)
+    ).thenReturn(sercoPrice)
+    whenever(priceRepository.save(any())).thenReturn(sercoPrice)
 
     service.updatePriceForSupplier(
       Supplier.SERCO,
@@ -193,8 +227,8 @@ internal class SupplierPricingServiceTest {
       toLocation,
       effectiveYear
     )
-    verify(priceRepository).save(price)
-    assertThat(price.priceInPence).isEqualTo(20035)
+    verify(priceRepository).save(sercoPrice)
+    assertThat(sercoPrice.priceInPence).isEqualTo(20035)
   }
 
   @Test
@@ -259,5 +293,28 @@ internal class SupplierPricingServiceTest {
       AuditEventType.JOURNEY_PRICE,
       "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID"
     )
+  }
+
+  @Test
+  internal fun `add price exception for existing Serco`() {
+    whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
+    whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
+    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(sercoPrice)
+
+    service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf(20.00))
+
+    verify(priceRepository).save(sercoPrice.addException(SEPTEMBER, Money.valueOf(20.00)))
+    verify(auditService).create(any())
+  }
+
+  @Test
+  internal fun `add price exception fails for Serco when price not found`() {
+    whenever(locationRepository.findByNomisAgencyId("FROM")).thenReturn(fromLocation)
+    whenever(locationRepository.findByNomisAgencyId("TO")).thenReturn(toLocation)
+    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(null)
+
+    assertThatThrownBy {
+      service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf(20.00))
+    }.isInstanceOf(RuntimeException::class.java)
   }
 }

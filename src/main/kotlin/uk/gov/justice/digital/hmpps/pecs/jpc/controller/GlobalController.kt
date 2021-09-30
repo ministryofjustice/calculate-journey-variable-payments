@@ -13,6 +13,12 @@ class GlobalController {
   @Value("\${FEEDBACK_URL:#}")
   private lateinit var feedbackUrl: String
 
+  @Value("\${FEATURE_FLAG_PRICE_EXCEPTIONS:false}")
+  private lateinit var priceExceptionFeatureEnabled: String
+
   @ModelAttribute("feedbackUrl")
   fun feedbackUrl() = feedbackUrl.ifBlank { '#' }
+
+  @ModelAttribute("priceExceptionFeatureEnabled")
+  fun priceExceptionsFeatureEnabled() = priceExceptionFeatureEnabled.toBoolean()
 }

@@ -17,7 +17,9 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveMonthsOrdered
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import java.time.Month
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
@@ -49,10 +51,10 @@ class MaintainSupplierPricingController(
   data class PriceForm(
     @get: NotNull(message = "Invalid message id")
     val moveId: String,
-    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
     val price: String,
     val from: String?,
-    val to: String?
+    val to: String?,
   )
 
   data class Warning(val text: String) {
@@ -66,6 +68,27 @@ class MaintainSupplierPricingController(
       fun before(effectiveYear: Int) =
         Warning("Making this change will only affect journeys undertaken in the contractual year $effectiveYear to ${effectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
     }
+  }
+
+  data class PriceExceptionForm(
+    val moveId: String,
+    val existingExceptions: Map<Int, Money> = emptyMap(),
+    val exceptionMonth: String? = null,
+    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
+    val exceptionPrice: String? = null
+  ) {
+    val months: List<PriceExceptionMonth> = effectiveMonthsOrdered().map { month ->
+      PriceExceptionMonth(Month.of(month), existingExceptions.containsKey(month), existingExceptions[month])
+    }
+  }
+
+  data class PriceExceptionMonth(val value: String, val text: String, val disabled: Boolean, val amount: Money?) {
+    constructor(month: Month, disabled: Boolean, amount: Money?) : this(
+      month.name,
+      month.name.lowercase().replaceFirstChar { it.titlecaseChar() },
+      disabled,
+      amount
+    )
   }
 
   @GetMapping("$ADD_PRICE/{moveId}")
@@ -150,7 +173,7 @@ class MaintainSupplierPricingController(
 
     val (fromAgencyId, toAgencyId) = agencyIds(moveId)
 
-    val (fromSite, toSite, price) = supplierPricingService.getMaybeSiteNamesAndPrice(
+    val price = supplierPricingService.maybePrice(
       supplier,
       fromAgencyId,
       toAgencyId,
@@ -158,10 +181,12 @@ class MaintainSupplierPricingController(
     ) ?: throw RuntimeException("No matching price found for $supplier")
 
     model.apply {
-      addAttribute("form", PriceForm(moveId, price.toString(), fromSite, toSite))
+      addAttribute("form", PriceForm(moveId, price.amount.toString(), price.fromAgency, price.toAgency))
       addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
+      addAttribute("existingExceptions", existingExceptions(price.exceptions))
+      addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions))
     }
 
     return "update-price"
@@ -179,15 +204,17 @@ class MaintainSupplierPricingController(
 
     val price = parseAmount(form.price).also { if (it == null) result.rejectValue("price", "Invalid price") }
 
-    val effectiveYear = model.getSelectedEffectiveYear()
-
     if (result.hasErrors()) {
       val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
 
       model.apply {
+        val existingPrice = supplierPricingService.maybePrice(supplier, fromAgencyId, toAgencyId, getSelectedEffectiveYear())!!
+
         addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
+        addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions))
+        addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
       }
 
       return "update-price"
@@ -199,7 +226,7 @@ class MaintainSupplierPricingController(
         from,
         to,
         price!!,
-        effectiveYear
+        model.getSelectedEffectiveYear()
       )
     }
 
@@ -213,11 +240,76 @@ class MaintainSupplierPricingController(
     return RedirectView(model.getJourneySearchResultsUrl())
   }
 
+  private fun existingExceptions(existingExceptions: Map<Int, Money>) =
+    effectiveMonthsOrdered().mapNotNull { month ->
+      if (existingExceptions.containsKey(month)) PriceExceptionMonth(
+        Month.of(month),
+        existingExceptions.containsKey(month),
+        existingExceptions[month]
+      ) else null
+    }
+
+  @PostMapping(ADD_PRICE_EXCEPTION)
+  fun addPriceException(
+    @Valid @ModelAttribute("exceptionsForm") form: PriceExceptionForm,
+    result: BindingResult,
+    model: ModelMap,
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    redirectAttributes: RedirectAttributes
+
+  ): Any {
+    logger.info("Adding price exception")
+
+    val price = parseAmount(form.exceptionPrice!!).also { if (it == null) result.rejectValue("exceptionPrice", "Invalid price") }
+
+    val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
+
+    val existingPrice = supplierPricingService.maybePrice(
+      supplier,
+      fromAgencyId, toAgencyId,
+      model.getSelectedEffectiveYear()
+    )!!
+
+    if (result.hasErrors()) {
+      model.apply {
+        addAttribute("form", PriceForm(form.moveId, existingPrice.amount.toString(), existingPrice.fromAgency, existingPrice.toAgency))
+        addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
+        addAttribute("cancelLink", getJourneySearchResultsUrl())
+        addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
+        addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
+      }
+
+      redirectAttributes.addFlashErrorOnRedirect("add-price-exception-error")
+
+      return RedirectView("$UPDATE_PRICE/${form.moveId}#price-exceptions")
+    }
+
+    supplierPricingService.addPriceException(
+      supplier,
+      fromAgencyId,
+      toAgencyId,
+      model.getSelectedEffectiveYear(), Month.valueOf(form.exceptionMonth!!),
+      price!!
+    )
+
+    redirectAttributes.apply {
+      addFlashAttribute("flashMessage", "price-exception-created")
+      addFlashAttribute("flashAttrExceptionPrice", form.exceptionPrice)
+      addFlashAttribute("flashAttrExceptionMonth", form.exceptionMonth)
+      addFlashAttribute("flashAttrLocationFrom", existingPrice.fromAgency)
+      addFlashAttribute("flashAttrLocationTo", existingPrice.toAgency)
+    }
+
+    return RedirectView(model.getJourneySearchResultsUrl())
+  }
+
+  private fun RedirectAttributes.addFlashErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
+
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current())
       return listOf(Warning.standard(supplier, selectedEffectiveYear))
 
-    supplierPricingService.getMaybeSiteNamesAndPrice(supplier, from, to, actualEffectiveYear.current())?.let {
+    supplierPricingService.maybePrice(supplier, from, to, actualEffectiveYear.current())?.let {
       return listOf(
         Warning.beforeWithCurrentPrice(actualEffectiveYear.current()),
         Warning.before(selectedEffectiveYear)
@@ -262,8 +354,10 @@ class MaintainSupplierPricingController(
   companion object Routes {
 
     const val ADD_PRICE = "/add-price"
+    const val ADD_PRICE_EXCEPTION = "/add-price-exception"
     const val UPDATE_PRICE = "/update-price"
 
-    fun routes(): Array<String> = arrayOf(ADD_PRICE, "$ADD_PRICE/*", UPDATE_PRICE, "$UPDATE_PRICE/*")
+    fun routes(): Array<String> =
+      arrayOf(ADD_PRICE, "$ADD_PRICE/*", ADD_PRICE_EXCEPTION, UPDATE_PRICE, "$UPDATE_PRICE/*")
   }
 }

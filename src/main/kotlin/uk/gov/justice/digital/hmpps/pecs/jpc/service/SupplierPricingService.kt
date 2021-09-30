@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import java.time.Month
 
 @Service
 @Transactional
@@ -46,20 +47,17 @@ class SupplierPricingService(
     return Pair(fromLocation.siteName, toLocation.siteName)
   }
 
-  fun getMaybeSiteNamesAndPrice(
+  fun maybePrice(
     supplier: Supplier,
     fromAgencyId: String,
     toAgencyId: String,
     effectiveYear: Int
-  ): Triple<String, String, Money>? {
-    return getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
-      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-        supplier,
-        from,
-        to,
-        effectiveYear
-      )?.let { Triple(from.siteName, to.siteName, Money(it.priceInPence)) }
-    }
+  ): PriceDto? = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)?.let { price ->
+    PriceDto(
+      price.fromLocation.siteName,
+      price.toLocation.siteName,
+      price.price()
+    ).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
   }
 
   fun addPriceForSupplier(
@@ -93,13 +91,7 @@ class SupplierPricingService(
   ) {
     failIfPriceAdjustmentInProgressFor(supplier)
 
-    val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
-    val existingPrice = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-      supplier,
-      fromLocation,
-      toLocation,
-      effectiveYear
-    )
+    val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
 
     if (existingPrice.price() != agreedNewPrice) {
@@ -108,6 +100,35 @@ class SupplierPricingService(
       priceRepository.save(existingPrice.apply { this.priceInPence = agreedNewPrice.pence })
         .let { auditService.create(AuditableEvent.updatePrice(it, oldPrice)) }
     }
+  }
+
+  fun addPriceException(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int,
+    month: Month,
+    amount: Money
+  ) {
+    val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
+      ?.apply { addException(month, amount) } ?: throw RuntimeException("No matching price found for $supplier")
+
+    priceRepository.save(existingPrice)
+    auditService.create(AuditableEvent.addPriceException(existingPrice, month, amount))
+  }
+
+  private fun existingPriceOrNull(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int,
+  ) = getFromAndToLocationBy(fromAgencyId, toAgencyId).let { (from, to) ->
+    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+      supplier,
+      from,
+      to,
+      effectiveYear
+    )
   }
 
   private fun failIfPriceAdjustmentInProgressFor(supplier: Supplier) {
@@ -120,7 +141,7 @@ class SupplierPricingService(
       getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found.")
     )
 
-  private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
+  private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(agencyId.sanitised())
 
   fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
     return auditService.auditEventsByTypeAndMetaKey(
@@ -131,5 +152,9 @@ class SupplierPricingService(
       .keys
   }
 
-  private fun sanitised(value: String) = value.trim().uppercase()
+  data class PriceDto(val fromAgency: String, val toAgency: String, val amount: Money) {
+    val exceptions: MutableMap<Int, Money> = mutableMapOf()
+  }
+
+  private fun String.sanitised() = this.trim().uppercase()
 }
