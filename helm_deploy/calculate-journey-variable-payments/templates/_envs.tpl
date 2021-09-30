@@ -136,4 +136,7 @@ env:
         name: "{{ .Values.feedback.secret_name }}"
         key: feedback_url
 
+  - name: FEATURE_FLAG_PRICE_EXCEPTIONS
+    value: "{{ .Values.env.FEATURE_FLAG_PRICE_EXCEPTIONS }}"
+
 {{- end -}}
