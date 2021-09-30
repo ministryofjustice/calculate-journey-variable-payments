@@ -85,6 +85,23 @@
                        th:classappend="${#fields.hasErrors('price')} ? 'govuk-input--error'">
               </div>
             </li>
+            <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
+              <label class="govuk-label govuk-body govuk-!-font-weight-bold">Price exceptions</label>
+              <table class="govuk-table">
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Month</th>
+                  <th scope="col" class="govuk-table__header">Price</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
+                  <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.text}"></td>
+                  <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
+                </tr>
+                </tbody>
+              </table>
+            </li>
           </ol>
         </div>
         <div class="govuk-warning-text mv3">
@@ -110,7 +127,7 @@
       <h2 class="govuk-heading-l">Price exceptions</h2>
       <form th:action="@{/add-price-exception}" th:object="${exceptionsForm}" method="post">
         <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
-             data-module="govuk-error-summary" th:if="${#fields.hasErrors('exceptionPrice')}">
+             data-module="govuk-error-summary" th:if="${flashError == 'add-price-exception-error'}">
           <h2 class="govuk-error-summary__title" id="error-summary-title">
             There is a problem
           </h2>
@@ -150,7 +167,7 @@
             <div id="exception-price-hint" class="govuk-hint">
               Example £100.00
             </div>
-            <p th:if="${#fields.hasErrors('exceptionPrice')}" class="govuk-error-message">
+            <p  th:if="${flashError == 'add-price-exception-error'}" class="govuk-error-message">
               <span class="govuk-visually-hidden">Error:</span> Enter a valid price in the correct
               format
             </p>
@@ -158,8 +175,25 @@
               <div class="govuk-input__prefix" aria-hidden="true">£</div>
               <input class="govuk-input govuk-input--width-5" id="exception-price" name="price" type="text"
                      aria-describedby="price-hint" th:field="*{exceptionPrice}"
-                     th:classappend="${#fields.hasErrors('exceptionPrice')} ? 'govuk-input--error'">
+                     th:classappend="${flashError == 'add-price-exception-error'} ? 'govuk-input--error'">
             </div>
+          </li>
+          <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
+            <label class="govuk-label govuk-body govuk-!-font-weight-bold">Price exceptions</label>
+            <table class="govuk-table">
+              <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Month</th>
+                <th scope="col" class="govuk-table__header">Price</th>
+              </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+              <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
+                <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.text}"></td>
+                <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
+              </tr>
+              </tbody>
+            </table>
           </li>
         </ol>
         <div class="flex items-center">

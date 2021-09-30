@@ -44,6 +44,15 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
   private fun createStandardMoves(template: JdbcTemplate) {
     logger.info("create standard moves")
 
+    fun createMoveEventsAndJourney(move: Move) {
+      create(moveStartEvent(move), template)
+      create(moveCompleteEvent(move), template)
+      create(journey(move, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"), template).also { journey ->
+        create(journeyStartEvent(journey), template)
+        create(journeyCompleteEvent(journey), template)
+      }
+    }
+
     mapOf(
       "SM1" to "PR1",
       "SM2" to "PR2",
@@ -52,15 +61,13 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       create(
         move(moveId = it.key, profileId = it.value, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"),
         template
-      ).also { move ->
-        create(moveStartEvent(move), template)
-        create(moveCompleteEvent(move), template)
-        create(journey(move, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"), template).also { journey ->
-          create(journeyStartEvent(journey), template)
-          create(journeyCompleteEvent(journey), template)
-        }
-      }
+      ).also { move -> createMoveEventsAndJourney(move) }
     }
+
+    create(
+      move(moveId = "SM4", profileId = "PR1", fromAgencyId = "PRISON1", toAgencyId = "PRISON2", date = startOfPreviousMonth.minusMonths(1)),
+      template
+    ).also { move -> createMoveEventsAndJourney(move) }
   }
 
   // TODO need to add the appropriate journey events for the following move types...
@@ -307,15 +314,16 @@ private fun move(
   fromAgencyId: String,
   toAgencyId: String,
   supplier: Supplier = Supplier.SERCO,
-  days: Long = 0
+  days: Long = 0,
+  date: LocalDate = startOfPreviousMonth
 ) = Move(
-  dropOffOrCancelledDateTime = startOfPreviousMonth.plusDays(days).atStartOfDay().plusHours(12),
+  dropOffOrCancelledDateTime = date.plusDays(days).atStartOfDay().plusHours(12),
   fromNomisAgencyId = fromAgencyId,
-  moveDate = startOfPreviousMonth,
+  moveDate = date,
   moveId = moveId,
   moveType = type,
   notes = "some notes",
-  pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(10),
+  pickUpDateTime = date.atStartOfDay().plusHours(10),
   profileId = profileId,
   reference = "${type.name}$moveId",
   reportFromLocationType = "prison",
@@ -323,7 +331,7 @@ private fun move(
   status = MoveStatus.completed,
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
-  updatedAt = startOfPreviousMonth.atStartOfDay()
+  updatedAt = date.atStartOfDay()
 )
 
 private val moveSql = """

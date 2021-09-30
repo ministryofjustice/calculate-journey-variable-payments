@@ -358,6 +358,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
+      .andExpect { model { attribute("existingExceptions", listOf(MaintainSupplierPricingController.PriceExceptionMonth(Month.JULY, true, Money(100)))) } }
       .andExpect { model { attribute("exceptionsForm", MaintainSupplierPricingController.PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)))) } }
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
@@ -566,6 +567,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("exceptionMonth", "SEPTEMBER")
     }
       .andExpect { redirectedUrl("/update-price/$fromAgencyId-$toAgencyId#price-exceptions") }
+      .andExpect { flash { attribute("flashError", "add-price-exception-error") } }
       .andExpect { status { is3xxRedirection() } }
 
     verify(service, never()).addPriceException(any(), any(), any(), any(), any(), any())

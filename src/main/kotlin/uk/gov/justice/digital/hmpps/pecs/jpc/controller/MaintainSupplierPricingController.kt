@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveMonthsOrdered
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.Month
 import javax.validation.Valid
@@ -50,10 +51,10 @@ class MaintainSupplierPricingController(
   data class PriceForm(
     @get: NotNull(message = "Invalid message id")
     val moveId: String,
-    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
     val price: String,
     val from: String?,
-    val to: String?
+    val to: String?,
   )
 
   data class Warning(val text: String) {
@@ -73,19 +74,20 @@ class MaintainSupplierPricingController(
     val moveId: String,
     val existingExceptions: Map<Int, Money> = emptyMap(),
     val exceptionMonth: String? = null,
-    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
     val exceptionPrice: String? = null
   ) {
-    val months: List<PriceExceptionMonth> = listOf(9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8).map { month ->
-      PriceExceptionMonth(Month.of(month), existingExceptions.containsKey(month))
+    val months: List<PriceExceptionMonth> = effectiveMonthsOrdered().map { month ->
+      PriceExceptionMonth(Month.of(month), existingExceptions.containsKey(month), existingExceptions[month])
     }
   }
 
-  data class PriceExceptionMonth(val value: String, val text: String, val disabled: Boolean) {
-    constructor(month: Month, disabled: Boolean) : this(
+  data class PriceExceptionMonth(val value: String, val text: String, val disabled: Boolean, val amount: Money?) {
+    constructor(month: Month, disabled: Boolean, amount: Money?) : this(
       month.name,
       month.name.lowercase().replaceFirstChar { it.titlecaseChar() },
-      disabled
+      disabled,
+      amount
     )
   }
 
@@ -183,6 +185,7 @@ class MaintainSupplierPricingController(
       addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
+      addAttribute("existingExceptions", existingExceptions(price.exceptions))
       addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions))
     }
 
@@ -205,20 +208,13 @@ class MaintainSupplierPricingController(
       val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
 
       model.apply {
+        val existingPrice = supplierPricingService.maybePrice(supplier, fromAgencyId, toAgencyId, getSelectedEffectiveYear())!!
+
         addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
-        addAttribute(
-          "exceptionsForm",
-          PriceExceptionForm(
-            form.moveId,
-            supplierPricingService.maybePrice(
-              supplier,
-              fromAgencyId, toAgencyId,
-              getSelectedEffectiveYear()
-            )!!.exceptions
-          )
-        )
+        addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions))
+        addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
       }
 
       return "update-price"
@@ -243,6 +239,15 @@ class MaintainSupplierPricingController(
 
     return RedirectView(model.getJourneySearchResultsUrl())
   }
+
+  private fun existingExceptions(existingExceptions: Map<Int, Money>) =
+    effectiveMonthsOrdered().mapNotNull { month ->
+      if (existingExceptions.containsKey(month)) PriceExceptionMonth(
+        Month.of(month),
+        existingExceptions.containsKey(month),
+        existingExceptions[month]
+      ) else null
+    }
 
   @PostMapping(ADD_PRICE_EXCEPTION)
   fun addPriceException(
@@ -274,6 +279,8 @@ class MaintainSupplierPricingController(
         addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
       }
 
+      redirectAttributes.addFlashErrorOnRedirect("add-price-exception-error")
+
       return RedirectView("$UPDATE_PRICE/${form.moveId}#price-exceptions")
     }
 
@@ -287,6 +294,8 @@ class MaintainSupplierPricingController(
 
     return RedirectView("$UPDATE_PRICE/${form.moveId}")
   }
+
+  private fun RedirectAttributes.addFlashErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
 
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current())
