@@ -191,6 +191,7 @@ class MaintainSupplierPricingController(
       addAttribute("cancelLink", getJourneySearchResultsUrl())
       addAttribute("existingExceptions", existingExceptions(price.exceptions))
       addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions))
+      addContractStartAndEndDates()
     }
 
     return "update-price"
@@ -219,6 +220,7 @@ class MaintainSupplierPricingController(
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions))
         addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
+        addContractStartAndEndDates()
       }
 
       return "update-price"
@@ -287,6 +289,7 @@ class MaintainSupplierPricingController(
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
+        addContractStartAndEndDates()
       }
 
       redirectAttributes.showErrorOnRedirect("add-price-exception-error")
@@ -310,7 +313,7 @@ class MaintainSupplierPricingController(
       addFlashAttribute("flashAttrLocationTo", existingPrice.toAgency)
     }
 
-    return RedirectView(model.getJourneySearchResultsUrl())
+    return RedirectView("$UPDATE_PRICE/${form.moveId}#price-exceptions")
   }
 
   private fun RedirectAttributes.showErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)

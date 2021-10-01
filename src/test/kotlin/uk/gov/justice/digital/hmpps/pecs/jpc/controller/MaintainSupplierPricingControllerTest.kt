@@ -471,8 +471,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `can add a price exception`() {
-
     mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
+
     whenever(
       service.maybePrice(
         SERCO,
@@ -493,7 +493,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { flash { attribute("flashAttrExceptionMonth", "SEPTEMBER") } }
       .andExpect { flash { attribute("flashAttrLocationFrom", "a") } }
       .andExpect { flash { attribute("flashAttrLocationTo", "b") } }
-      .andExpect { redirectedUrl("/journeys-results") }
+      .andExpect { redirectedUrl("/update-price/AAAAAA-BBBBBB#price-exceptions") }
       .andExpect { status { is3xxRedirection() } }
 
     verify(service).addPriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER, Money.valueOf(50.00))
