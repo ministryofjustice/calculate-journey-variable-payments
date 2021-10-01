@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.PriceForm
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.Warning
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
@@ -26,6 +27,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.GEOAMEY
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.SERCO
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService.PriceDto
@@ -44,13 +47,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   private val mockSession = MockHttpSession(wac.servletContext)
 
-  private val currentContractualYearDate = LocalDate.now()
+  private val currentContractualDate = LocalDate.now()
 
-  private val currentContractualYear = effectiveYearForDate(currentContractualYearDate)
+  private val currentContractualEffectiveYear = effectiveYearForDate(currentContractualDate)
 
-  private val previousContractualYearDate = currentContractualYearDate.minusYears(1)
+  private val previousContractualDate = currentContractualDate.minusYears(1)
 
-  private val previousContractualYear = effectiveYearForDate(previousContractualYearDate)
+  private val previousContractualEffectiveYear = effectiveYearForDate(previousContractualDate)
 
   @MockBean
   private lateinit var actualEffectiveYear: EffectiveYear
@@ -64,36 +67,29 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @BeforeEach
   fun `set up actual effective year fixture`() {
-    whenever(actualEffectiveYear.current()).thenReturn(effectiveYearForDate(currentContractualYearDate))
+    whenever(actualEffectiveYear.current()).thenReturn(effectiveYearForDate(currentContractualDate))
   }
 
   @Test
   internal fun `add price for Serco for current contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     whenever(
       service.getSiteNamesForPricing(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualYear
+        currentContractualEffectiveYear
       )
     ).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
-      .andExpect {
-        model {
-          attribute(
-            "form",
-            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")
-          )
-        }
-      }
+      .andExpect { model { attribute("form", PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")) } }
       .andExpect {
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualYear to ${currentContractualYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
           )
         }
       }
@@ -102,61 +98,54 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId, currentContractualYear)
+    verify(service).getSiteNamesForPricing(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear)
   }
 
   @Test
   internal fun `add price for Serco for previous contractual year without existing price in current contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, previousContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, previousContractualDate)
 
     whenever(
       service.getSiteNamesForPricing(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
-        previousContractualYear
+        previousContractualEffectiveYear
       )
     ).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
-      .andExpect {
-        model {
-          attribute(
-            "form",
-            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")
-          )
-        }
-      }
+      .andExpect { model { attribute("form", PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")) } }
       .andExpect {
         model {
           attribute(
             "warnings",
-            listOf(Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualYear to ${previousContractualYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year."))
+            listOf(Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year."))
           )
         }
       }
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId, previousContractualYear)
+    verify(service).getSiteNamesForPricing(SERCO, fromAgencyId, toAgencyId, previousContractualEffectiveYear)
   }
 
   @Test
   internal fun `add price for Serco for previous contractual year with existing price in current contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, previousContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, previousContractualDate)
 
     whenever(
       service.getSiteNamesForPricing(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
-        previousContractualYear
+        previousContractualEffectiveYear
       )
     ).thenReturn(Pair("from", "to"))
 
     whenever(
       service.maybePrice(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
         actualEffectiveYear.current()
@@ -164,21 +153,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     ).thenReturn(PriceDto("a", "b", Money(10)))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
-      .andExpect {
-        model {
-          attribute(
-            "form",
-            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")
-          )
-        }
-      }
+      .andExpect { model { attribute("form", PriceForm("$fromAgencyId-$toAgencyId", "0.00", "from", "to")) } }
       .andExpect {
         model {
           attribute(
             "warnings",
             listOf(
               Warning("Please note a price for this journey already exists in the current contractual year ${actualEffectiveYear.current()} to ${actualEffectiveYear.current() + 1}."),
-              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualYear to ${previousContractualYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
+              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
             )
           )
         }
@@ -186,20 +168,20 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("add-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).getSiteNamesForPricing(Supplier.SERCO, fromAgencyId, toAgencyId, previousContractualYear)
+    verify(service).getSiteNamesForPricing(SERCO, fromAgencyId, toAgencyId, previousContractualEffectiveYear)
   }
 
   @Test
   @WithMockUser(roles = ["PECS_JPC"])
   internal fun `cannot initiate add price for Serco when insufficient privileges`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.get("/add-price/not-allowed") { session = mockSession }.andExpect { status { isForbidden() } }
   }
 
   @Test
   internal fun `can add up to max price for Serco in current contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
@@ -209,13 +191,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/journeys") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceForSupplier(Supplier.SERCO, fromAgencyId, toAgencyId, Money.valueOf(9999.99), currentContractualYear)
+    verify(service).addPriceForSupplier(SERCO, fromAgencyId, toAgencyId, Money.valueOf(9999.99), currentContractualEffectiveYear)
   }
 
   @Test
   @WithMockUser(roles = ["PECS_JPC"])
   internal fun `cannot add price for Serco when insufficient privileges`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
@@ -226,7 +208,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `cannot add price with characters for Serco`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
@@ -238,7 +220,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualYear to ${currentContractualYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
           )
         }
       }
@@ -250,7 +232,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `cannot add price less than one pence for Serco`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
@@ -262,7 +244,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualYear to ${currentContractualYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
           )
         }
       }
@@ -274,7 +256,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `cannot add negative price for Serco`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
@@ -286,7 +268,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualYear to ${currentContractualYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
           )
         }
       }
@@ -298,49 +280,36 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `can initiate update price for Geoamey including price history and exceptions in current contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(GEOAMEY, currentContractualDate)
 
     whenever(
       service.maybePrice(
-        Supplier.GEOAMEY,
+        GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        currentContractualYear
+        currentContractualEffectiveYear
       )
-    ).thenReturn(
-      PriceDto(
-        "from",
-        "to",
-        Money(1000),
-      ).apply { exceptions[7] = Money(100) }
-    )
+    ).thenReturn(PriceDto("from", "to", Money(1000),).apply { exceptions[7] = Money(100) })
 
     val priceHistoryDateTime = LocalDateTime.now()
     val priceHistory = PriceMetadata(
-      Supplier.GEOAMEY,
+      GEOAMEY,
       fromAgencyId,
       toAgencyId,
-      currentContractualYear,
-      Money(1000).pounds()
+      currentContractualEffectiveYear,
+      Money.valueOf(10.00).pounds()
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
-    whenever(service.priceHistoryForJourney(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
+    whenever(service.priceHistoryForJourney(GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
 
     mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
-      .andExpect {
-        model {
-          attribute(
-            "form",
-            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")
-          )
-        }
-      }
+      .andExpect { model { attribute("form", PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")) } }
       .andExpect {
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by GEOAMEY in the current contractual year $currentContractualYear to ${currentContractualYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by GEOAMEY in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
           )
         }
       }
@@ -351,7 +320,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             listOf(
               PriceHistoryDto(
                 priceHistoryDateTime,
-                "Journey priced at £10.00. Effective from $currentContractualYear to ${currentContractualYear + 1}.",
+                "Journey priced at £10.00. Effective from $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.",
                 "SYSTEM"
               )
             )
@@ -363,55 +332,43 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).maybePrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, currentContractualYear)
+    verify(service).maybePrice(GEOAMEY, fromAgencyId, toAgencyId, currentContractualEffectiveYear)
   }
 
   @Test
   internal fun `can initiate update price for Geoamey including price history for the previous contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, previousContractualYearDate)
+    mockSession.addSupplierAndContractualYear(GEOAMEY, previousContractualDate)
 
     whenever(
       service.maybePrice(
-        Supplier.GEOAMEY,
+        GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        previousContractualYear
+        previousContractualEffectiveYear
       )
-    ).thenReturn(
-      PriceDto(
-        "from",
-        "to",
-        Money(1000)
-      )
+    ).thenReturn(PriceDto("from", "to", Money.valueOf(10.00)))
+
+    val priceHistory = PriceMetadata(
+      GEOAMEY,
+      fromAgencyId,
+      toAgencyId,
+      previousContractualEffectiveYear,
+      Money.valueOf(10.00).pounds()
     )
 
     val priceHistoryDateTime = LocalDateTime.now()
-    val priceHistory = PriceMetadata(
-      Supplier.GEOAMEY,
-      fromAgencyId,
-      toAgencyId,
-      previousContractualYear,
-      Money(1000).pounds()
-    )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
-    whenever(service.priceHistoryForJourney(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
+    whenever(service.priceHistoryForJourney(GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
 
     mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
-      .andExpect {
-        model {
-          attribute(
-            "form",
-            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")
-          )
-        }
-      }
+      .andExpect { model { attribute("form", PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")) } }
       .andExpect {
         model {
           attribute(
             "warnings",
             listOf(
-              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualYear to ${previousContractualYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
+              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
             )
           )
         }
@@ -423,7 +380,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             listOf(
               PriceHistoryDto(
                 priceHistoryDateTime,
-                "Journey priced at £10.00. Effective from $previousContractualYear to ${previousContractualYear + 1}.",
+                "Journey priced at £10.00. Effective from $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}.",
                 "SYSTEM"
               )
             )
@@ -433,71 +390,52 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).maybePrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, previousContractualYear)
+    verify(service).maybePrice(GEOAMEY, fromAgencyId, toAgencyId, previousContractualEffectiveYear)
   }
 
   @Test
   internal fun `can initiate update price for Geoamey including price history for the previous contractual year with existing price in current contractual year`() {
-    mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, previousContractualYearDate)
+    mockSession.addSupplierAndContractualYear(GEOAMEY, previousContractualDate)
 
     whenever(
       service.maybePrice(
-        Supplier.GEOAMEY,
+        GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        previousContractualYear
+        previousContractualEffectiveYear
       )
-    ).thenReturn(
-      PriceDto(
-        "from",
-        "to",
-        Money(1000)
-      )
-    )
+    ).thenReturn(PriceDto("from", "to", Money(1000)))
 
     whenever(
       service.maybePrice(
-        Supplier.GEOAMEY,
+        GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        currentContractualYear
+        currentContractualEffectiveYear
       )
-    ).thenReturn(
-      PriceDto(
-        "from",
-        "to",
-        Money(1500)
-      )
-    )
+    ).thenReturn(PriceDto("from", "to", Money(1500)))
 
     val priceHistoryDateTime = LocalDateTime.now()
     val priceHistory = PriceMetadata(
-      Supplier.GEOAMEY,
+      GEOAMEY,
       fromAgencyId,
       toAgencyId,
-      previousContractualYear,
-      Money(1000).pounds()
+      previousContractualEffectiveYear,
+      Money.valueOf(10.00).pounds()
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
-    whenever(service.priceHistoryForJourney(Supplier.GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
+    whenever(service.priceHistoryForJourney(GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
 
     mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
-      .andExpect {
-        model {
-          attribute(
-            "form",
-            MaintainSupplierPricingController.PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")
-          )
-        }
-      }
+      .andExpect { model { attribute("form", PriceForm("$fromAgencyId-$toAgencyId", "10.00", "from", "to")) } }
       .andExpect {
         model {
           attribute(
             "warnings",
             listOf(
               Warning("Please note a price for this journey already exists in the current contractual year ${actualEffectiveYear.current()} to ${actualEffectiveYear.current() + 1}."),
-              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualYear to ${previousContractualYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
+              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
             )
           )
         }
@@ -509,7 +447,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             listOf(
               PriceHistoryDto(
                 priceHistoryDateTime,
-                "Journey priced at £10.00. Effective from $previousContractualYear to ${previousContractualYear + 1}.",
+                "Journey priced at £10.00. Effective from $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}.",
                 "SYSTEM"
               )
             )
@@ -519,13 +457,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
-    verify(service).maybePrice(Supplier.GEOAMEY, fromAgencyId, toAgencyId, previousContractualYear)
+    verify(service).maybePrice(GEOAMEY, fromAgencyId, toAgencyId, previousContractualEffectiveYear)
   }
 
   @Test
   @WithMockUser(roles = ["PECS_JPC"])
   internal fun `cannot initiate update price for Geoamey when insufficient privileges`() {
-    mockSession.addSupplierAndContractualYear(Supplier.GEOAMEY, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(GEOAMEY, currentContractualDate)
 
     mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
       .andExpect { status { isForbidden() } }
@@ -534,13 +472,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   @Test
   internal fun `can add a price exception`() {
 
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
     whenever(
       service.maybePrice(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualYear
+        currentContractualEffectiveYear
       )
     ).thenReturn(PriceDto("a", "b", Money(10)))
 
@@ -558,19 +496,19 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/journeys-results") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceException(Supplier.SERCO, fromAgencyId, toAgencyId, currentContractualYear, Month.SEPTEMBER, Money.valueOf(50.00))
+    verify(service).addPriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER, Money.valueOf(50.00))
   }
 
   @Test
   internal fun `cannot add an invalid price exception`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     whenever(
       service.maybePrice(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualYear
+        currentContractualEffectiveYear
       )
     ).thenReturn(PriceDto("a", "b", Money(10)))
 
@@ -589,14 +527,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   @Test
   internal fun `cannot add an exception for the same price`() {
-    mockSession.addSupplierAndContractualYear(Supplier.SERCO, currentContractualYearDate)
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     whenever(
       service.maybePrice(
-        Supplier.SERCO,
+        SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualYear
+        currentContractualEffectiveYear
       )
     ).thenReturn(PriceDto("a", "b", Money(100)))
 

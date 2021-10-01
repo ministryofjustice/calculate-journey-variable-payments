@@ -151,14 +151,18 @@ class MaintainSupplierPricingController(
       effectiveYear
     )
 
-    redirectAttributes.apply {
+    redirectAttributes.showPriceCreatedMessageOnRedirect(form)
+
+    return RedirectView(HtmlController.JOURNEYS_URL)
+  }
+
+  private fun RedirectAttributes.showPriceCreatedMessageOnRedirect(form: PriceForm) {
+    this.apply {
       addFlashAttribute("flashMessage", "price-created")
       addFlashAttribute("flashAttrLocationFrom", form.from)
       addFlashAttribute("flashAttrLocationTo", form.to)
       addFlashAttribute("flashAttrPrice", form.price)
     }
-
-    return RedirectView(HtmlController.JOURNEYS_URL)
   }
 
   @GetMapping("$UPDATE_PRICE/{moveId}")
@@ -230,14 +234,18 @@ class MaintainSupplierPricingController(
       )
     }
 
-    redirectAttributes.apply {
+    redirectAttributes.showPriceUpdatedMessageOnRedirect(form)
+
+    return RedirectView(model.getJourneySearchResultsUrl())
+  }
+
+  private fun RedirectAttributes.showPriceUpdatedMessageOnRedirect(form: PriceForm) {
+    this.apply {
       addFlashAttribute("flashMessage", "price-updated")
       addFlashAttribute("flashAttrLocationFrom", form.from)
       addFlashAttribute("flashAttrLocationTo", form.to)
       addFlashAttribute("flashAttrPrice", form.price)
     }
-
-    return RedirectView(model.getJourneySearchResultsUrl())
   }
 
   private fun existingExceptions(existingExceptions: Map<Int, Money>) =
@@ -281,7 +289,7 @@ class MaintainSupplierPricingController(
         addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
       }
 
-      redirectAttributes.addFlashErrorOnRedirect("add-price-exception-error")
+      redirectAttributes.showErrorOnRedirect("add-price-exception-error")
 
       return RedirectView("$UPDATE_PRICE/${form.moveId}#price-exceptions")
     }
@@ -305,7 +313,7 @@ class MaintainSupplierPricingController(
     return RedirectView(model.getJourneySearchResultsUrl())
   }
 
-  private fun RedirectAttributes.addFlashErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
+  private fun RedirectAttributes.showErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
 
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current())
