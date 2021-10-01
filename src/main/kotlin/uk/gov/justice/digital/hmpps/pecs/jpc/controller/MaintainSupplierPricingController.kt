@@ -113,6 +113,7 @@ class MaintainSupplierPricingController(
     model.apply {
       addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
       addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
+      addContractStartAndEndDates()
     }
 
     return "add-price"
@@ -139,6 +140,8 @@ class MaintainSupplierPricingController(
         "warnings",
         getWarningTexts(supplier, model.getSelectedEffectiveYear(), fromAgencyId, toAgencyId)
       )
+
+      model.addContractStartAndEndDates()
 
       return "add-price"
     }
@@ -190,7 +193,7 @@ class MaintainSupplierPricingController(
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
       addAttribute("existingExceptions", existingExceptions(price.exceptions))
-      addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions))
+      addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00"))
       addContractStartAndEndDates()
     }
 
