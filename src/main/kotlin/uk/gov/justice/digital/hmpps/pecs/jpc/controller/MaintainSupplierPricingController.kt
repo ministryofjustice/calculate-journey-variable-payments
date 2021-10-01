@@ -151,14 +151,18 @@ class MaintainSupplierPricingController(
       effectiveYear
     )
 
-    redirectAttributes.apply {
+    redirectAttributes.showPriceCreatedMessageOnRedirect(form)
+
+    return RedirectView(HtmlController.JOURNEYS_URL)
+  }
+
+  private fun RedirectAttributes.showPriceCreatedMessageOnRedirect(form: PriceForm) {
+    this.apply {
       addFlashAttribute("flashMessage", "price-created")
       addFlashAttribute("flashAttrLocationFrom", form.from)
       addFlashAttribute("flashAttrLocationTo", form.to)
       addFlashAttribute("flashAttrPrice", form.price)
     }
-
-    return RedirectView(HtmlController.JOURNEYS_URL)
   }
 
   @GetMapping("$UPDATE_PRICE/{moveId}")
@@ -187,6 +191,7 @@ class MaintainSupplierPricingController(
       addAttribute("cancelLink", getJourneySearchResultsUrl())
       addAttribute("existingExceptions", existingExceptions(price.exceptions))
       addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions))
+      addContractStartAndEndDates()
     }
 
     return "update-price"
@@ -215,6 +220,7 @@ class MaintainSupplierPricingController(
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions))
         addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
+        addContractStartAndEndDates()
       }
 
       return "update-price"
@@ -230,14 +236,18 @@ class MaintainSupplierPricingController(
       )
     }
 
-    redirectAttributes.apply {
+    redirectAttributes.showPriceUpdatedMessageOnRedirect(form)
+
+    return RedirectView(model.getJourneySearchResultsUrl())
+  }
+
+  private fun RedirectAttributes.showPriceUpdatedMessageOnRedirect(form: PriceForm) {
+    this.apply {
       addFlashAttribute("flashMessage", "price-updated")
       addFlashAttribute("flashAttrLocationFrom", form.from)
       addFlashAttribute("flashAttrLocationTo", form.to)
       addFlashAttribute("flashAttrPrice", form.price)
     }
-
-    return RedirectView(model.getJourneySearchResultsUrl())
   }
 
   private fun existingExceptions(existingExceptions: Map<Int, Money>) =
@@ -279,9 +289,10 @@ class MaintainSupplierPricingController(
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
+        addContractStartAndEndDates()
       }
 
-      redirectAttributes.addFlashErrorOnRedirect("add-price-exception-error")
+      redirectAttributes.showErrorOnRedirect("add-price-exception-error")
 
       return RedirectView("$UPDATE_PRICE/${form.moveId}#price-exceptions")
     }
@@ -302,10 +313,10 @@ class MaintainSupplierPricingController(
       addFlashAttribute("flashAttrLocationTo", existingPrice.toAgency)
     }
 
-    return RedirectView(model.getJourneySearchResultsUrl())
+    return RedirectView("$UPDATE_PRICE/${form.moveId}#price-exceptions")
   }
 
-  private fun RedirectAttributes.addFlashErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
+  private fun RedirectAttributes.showErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
 
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current())

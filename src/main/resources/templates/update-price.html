@@ -10,6 +10,9 @@
 <body>
 
 <div class="govuk-width-container" layout:fragment="content">
+  <div th:replace="fragments/flash-messages.html :: flash-messages(dismissFallback='/manage-journey-price-catalogue')"></div>
+
+  <div th:insert="fragments/contractual-year.html :: contractualYear"></div>
 
   <a th:href="${cancelLink}" class="govuk-back-link">Back</a>
 
@@ -86,7 +89,7 @@
               </div>
             </li>
             <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
-              <label class="govuk-label govuk-body govuk-!-font-weight-bold">Price exceptions</label>
+              <label class="govuk-label govuk-body govuk-!-font-weight-bold">Existing price exceptions</label>
               <table class="govuk-table">
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
@@ -126,8 +129,26 @@
     <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-exceptions" th:if="${priceExceptionFeatureEnabled}">
       <div>
         <h2 class="govuk-heading-l">Price exceptions</h2>
-        <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Add an agreed price exception more or less to that of the yearly amount.</p>
       </div>
+      <ol class="list pl0">
+        <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
+          <label class="govuk-label govuk-body govuk-!-font-weight-bold">Existing price exceptions</label>
+          <table class="govuk-table">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Month</th>
+              <th scope="col" class="govuk-table__header">Price</th>
+            </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+            <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
+              <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.text}"></td>
+              <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
+            </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>
       <form th:action="@{/add-price-exception}" th:object="${exceptionsForm}" method="post">
         <div class="govuk-error-summary mv3" aria-labelledby="error-summary-title" role="alert" tabindex="-1"
              data-module="govuk-error-summary" th:if="${flashError == 'add-price-exception-error'}">
@@ -147,6 +168,8 @@
         <input type="hidden" th:field="*{moveId}" class="dn"/>
         <ol class="list pl0">
           <li class="mv1">
+            <label class="govuk-label govuk-body govuk-!-font-weight-bold">Add price exception</label>
+            <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">Add an agreed price exception more or less to that of the yearly amount.</p>
             <label class="govuk-label govuk-body govuk-!-font-weight-bold"
                    for="exception-month">
               Month
@@ -180,23 +203,6 @@
                      aria-describedby="price-hint" th:field="*{exceptionPrice}"
                      th:classappend="${flashError == 'add-price-exception-error'} ? 'govuk-input--error'">
             </div>
-          </li>
-          <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
-            <label class="govuk-label govuk-body govuk-!-font-weight-bold">Price exceptions</label>
-            <table class="govuk-table">
-              <thead class="govuk-table__head">
-              <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header">Month</th>
-                <th scope="col" class="govuk-table__header">Price</th>
-              </tr>
-              </thead>
-              <tbody class="govuk-table__body">
-              <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
-                <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.text}"></td>
-                <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
-              </tr>
-              </tbody>
-            </table>
           </li>
         </ol>
         <div class="flex items-center">
