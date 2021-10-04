@@ -127,7 +127,7 @@ internal class PriceHistoryDtoTest {
   }
 
   @Test
-  fun `price change via an a price exception`() {
+  fun `price change via a price exception`() {
     val datetime = LocalDateTime.now()
     val priceMetadata = PriceMetadata(
       supplier = Supplier.GEOAMEY,
@@ -136,7 +136,8 @@ internal class PriceHistoryDtoTest {
       effectiveYear = 2021,
       oldPrice = Money(1000).pounds(),
       newPrice = Money(2000).pounds(),
-      exceptionMonth = Month.SEPTEMBER.toString()
+      exceptionMonth = Month.SEPTEMBER.toString(),
+      exceptionDeleted = false
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
@@ -145,6 +146,31 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Price exception of £20.00 for SEPTEMBER. Effective year 2021 to 2022.",
+        "Jane"
+      )
+    )
+  }
+
+  @Test
+  fun `price change via a price exception removal`() {
+    val datetime = LocalDateTime.now()
+    val priceMetadata = PriceMetadata(
+      supplier = Supplier.GEOAMEY,
+      fromNomisId = "from_agency_id",
+      toNomisId = "to_agency_id",
+      effectiveYear = 2021,
+      oldPrice = Money(1000).pounds(),
+      newPrice = Money(2000).pounds(),
+      exceptionMonth = Month.SEPTEMBER.toString(),
+      exceptionDeleted = true
+    )
+    val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
+    val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
+
+    assertThat(history).isEqualTo(
+      PriceHistoryDto(
+        datetime,
+        "Price exception of £20.00 for SEPTEMBER removed. Effective year 2021 to 2022.",
         "Jane"
       )
     )
