@@ -250,6 +250,11 @@
   margin-left: 16em;
   margin-right: 16em;
 }
+
+/* Alignement */
+.vam {
+  vertical-align: middle;
+}
 /* </Spacing> */
 
 /* <borders> */

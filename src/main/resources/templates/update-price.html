@@ -143,13 +143,13 @@
             </thead>
             <tbody class="govuk-table__body">
             <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
-              <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.text}"></td>
-              <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
+              <td class="govuk-table__cell vam" scope="row" th:inline="text" th:text="${exception.text}"></td>
+              <td class="govuk-table__cell vam" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
               <td class="govuk-table__cell" scope="row" th:inline="text">
                 <form th:action="@{/remove-price-exception}" method="post">
                   <input type="hidden" th:name="moveId" th:value="${moveId}" class="dn"/>
                   <input type="hidden" th:name="month" th:value="${exception.value}" class="dn"/>
-                  <button id="remove-exception" class="govuk-button govuk-button--secondary mv1 mr1" data-module="govuk-button">Remove</button>
+                  <button id="remove-exception" class="govuk-button govuk-button--secondary mv0 mr0" data-module="govuk-button">Remove</button>
                 </form>
               </td>
             </tr>
