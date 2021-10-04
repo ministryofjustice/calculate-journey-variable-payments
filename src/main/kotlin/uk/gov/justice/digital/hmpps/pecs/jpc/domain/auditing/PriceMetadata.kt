@@ -34,6 +34,9 @@ data class PriceMetadata(
 
   @Json(name = "exception_month", index = 8)
   val exceptionMonth: String? = null,
+
+  @Json(name = "exception_deleted", index = 9)
+  val exceptionDeleted: Boolean? = null,
 ) : Metadata {
   private constructor(price: Price) : this(
     price.supplier,
@@ -43,15 +46,17 @@ data class PriceMetadata(
     newPrice = price.price().pounds()
   )
 
-  private constructor(price: Price, exception: Month, exceptionAmount: Money) : this(
+  private constructor(price: Price, exception: Month, exceptionAmount: Money, deleted: Boolean = false) : this(
     price.supplier,
     price.fromLocation.nomisAgencyId,
     price.toLocation.nomisAgencyId,
     price.effectiveYear,
     oldPrice = price.price().pounds(),
     newPrice = exceptionAmount.pounds(),
-    exceptionMonth = exception.name
+    exceptionMonth = exception.name,
+    exceptionDeleted = deleted
   )
+
   private constructor(old: Money, new: Price) : this(
     supplier = new.supplier,
     fromNomisId = new.fromLocation.nomisAgencyId,
@@ -84,6 +89,8 @@ data class PriceMetadata(
 
     fun exception(price: Price, month: Month, amount: Money): PriceMetadata = PriceMetadata(price, month, amount)
 
+    fun removeException(price: Price, month: Month, amount: Money): PriceMetadata = PriceMetadata(price, month, amount, true)
+
     fun map(event: AuditEvent): PriceMetadata {
       return if (event.eventType == AuditEventType.JOURNEY_PRICE)
         Klaxon().parse<PriceMetadata>(event.metadata!!)!!
@@ -99,7 +106,9 @@ data class PriceMetadata(
 
   fun isAdjustment() = multiplier != null
 
-  fun isException() = exceptionMonth != null
+  fun isAddException() = exceptionMonth != null && exceptionDeleted == false
+
+  fun isRemoveException() = exceptionMonth != null && exceptionDeleted == true
 
   override fun toJsonString(): String = Klaxon().toJsonString(this)
 
