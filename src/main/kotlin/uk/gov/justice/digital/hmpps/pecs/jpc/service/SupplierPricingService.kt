@@ -117,6 +117,25 @@ class SupplierPricingService(
     auditService.create(AuditableEvent.addPriceException(existingPrice, month, amount))
   }
 
+  fun removePriceException(
+    supplier: Supplier,
+    fromAgencyId: String,
+    toAgencyId: String,
+    effectiveYear: Int,
+    month: Month,
+  ) {
+    val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
+      ?: throw RuntimeException("No matching price found for $supplier")
+
+    val exceptionAmount = existingPrice.exceptionFor(month)?.price()
+      ?: throw RuntimeException("No matching price exception found in $month for $supplier")
+
+    existingPrice.removeException(month)
+
+    priceRepository.save(existingPrice)
+    auditService.create(AuditableEvent.removePriceException(existingPrice, month, exceptionAmount))
+  }
+
   private fun existingPriceOrNull(
     supplier: Supplier,
     fromAgencyId: String,
