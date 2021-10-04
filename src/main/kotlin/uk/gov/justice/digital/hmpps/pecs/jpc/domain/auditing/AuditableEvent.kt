@@ -93,6 +93,14 @@ data class AuditableEvent(
       )
     }
 
+    fun removePriceException(price: Price, month: Month, amount: Money): AuditableEvent {
+      return AuditableEvent(
+        type = AuditEventType.JOURNEY_PRICE,
+        username = authentication().name,
+        metadata = PriceMetadata.removeException(price, month, amount)
+      )
+    }
+
     fun adjustPrice(
       price: Price,
       original: Money,

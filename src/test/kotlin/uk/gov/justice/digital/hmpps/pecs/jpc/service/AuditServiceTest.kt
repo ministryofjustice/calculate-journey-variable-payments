@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 
 private class AuditEventMatcher(var auditEvent: AuditEvent) : ArgumentMatcher<AuditEvent> {
   override fun matches(otherAuditEvent: AuditEvent): Boolean {
@@ -409,6 +410,74 @@ internal class AuditServiceTest {
         2.0,
         1.0,
         2.0
+      )
+    )
+  }
+
+  @Test
+  internal fun `add price exception audit event`() {
+    service.create(
+      AuditableEvent.addPriceException(
+        price = Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 200,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        month = Month.OCTOBER,
+        amount = Money(300)
+      )
+    )
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        supplier = Supplier.SERCO,
+        fromNomisId = "TEST2",
+        toNomisId = "TEST21",
+        effectiveYear = effectiveYearForDate(timeSource.date()),
+        newPrice = 3.0,
+        oldPrice = 2.0,
+        exceptionMonth = Month.OCTOBER.name,
+        exceptionDeleted = false
+      )
+    )
+  }
+
+  @Test
+  internal fun `remove price exception audit event`() {
+    service.create(
+      AuditableEvent.removePriceException(
+        price = Price(
+          supplier = Supplier.SERCO,
+          fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
+          toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
+          priceInPence = 200,
+          effectiveYear = effectiveYearForDate(timeSource.date())
+        ),
+        month = Month.OCTOBER,
+        amount = Money(300)
+      )
+    )
+
+    verify(auditEventRepository).save(eventCaptor.capture())
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE)
+    assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
+    assertThatPricesMetadataIsTheSame(
+      eventCaptor.firstValue,
+      PriceMetadata(
+        supplier = Supplier.SERCO,
+        fromNomisId = "TEST2",
+        toNomisId = "TEST21",
+        effectiveYear = effectiveYearForDate(timeSource.date()),
+        newPrice = 3.0,
+        oldPrice = 2.0,
+        exceptionMonth = Month.OCTOBER.name,
+        exceptionDeleted = true
       )
     )
   }

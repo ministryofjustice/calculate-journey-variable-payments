@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.PriceExceptionForm
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.PriceExceptionMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.PriceForm
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController.Warning
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
@@ -289,7 +291,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         toAgencyId,
         currentContractualEffectiveYear
       )
-    ).thenReturn(PriceDto("from", "to", Money(1000),).apply { exceptions[7] = Money(100) })
+    ).thenReturn(PriceDto("from", "to", Money(1000)).apply { exceptions[7] = Money(100) })
 
     val priceHistoryDateTime = LocalDateTime.now()
     val priceHistory = PriceMetadata(
@@ -327,8 +329,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
-      .andExpect { model { attribute("existingExceptions", listOf(MaintainSupplierPricingController.PriceExceptionMonth(Month.JULY, true, Money(100)))) } }
-      .andExpect { model { attribute("exceptionsForm", MaintainSupplierPricingController.PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)))) } }
+      .andExpect { model { attribute("existingExceptions", listOf(PriceExceptionMonth(Month.JULY, true, Money(100)))) } }
+      .andExpect { model { attribute("exceptionsForm", PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)), exceptionPrice = "0.00")) } }
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
@@ -549,6 +551,35 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { status { is3xxRedirection() } }
 
     verify(service, never()).addPriceException(any(), any(), any(), any(), any(), any())
+  }
+
+  @Test
+  internal fun `can remove an existing price exception`() {
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
+
+    whenever(
+      service.removePriceException(
+        SERCO,
+        fromAgencyId,
+        toAgencyId,
+        currentContractualEffectiveYear,
+        Month.SEPTEMBER
+      )
+    ).thenReturn(PriceDto("a", "b", Money(100)))
+
+    mockMvc.post("/remove-price-exception") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("month", "SEPTEMBER")
+    }
+      .andExpect { flash { attribute("flashMessage", "price-exception-removed") } }
+      .andExpect { flash { attribute("flashAttrExceptionMonth", "SEPTEMBER") } }
+      .andExpect { flash { attribute("flashAttrLocationFrom", "a") } }
+      .andExpect { flash { attribute("flashAttrLocationTo", "b") } }
+      .andExpect { redirectedUrl("/update-price/AAAAAA-BBBBBB#price-exceptions") }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(service).removePriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER)
   }
 
   private fun MockHttpSession.addSupplierAndContractualYear(supplier: Supplier, contractualYearDate: LocalDate) {
