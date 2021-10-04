@@ -317,8 +317,9 @@ internal class SupplierPricingServiceTest {
       sercoPrice.addException(JULY, Money.valueOf(500.00))
     )
 
-    service.removePriceException(Supplier.SERCO, "FROM", "TO", sercoPrice.effectiveYear, JULY)
+    val priceWithExceptionRemoved = service.removePriceException(Supplier.SERCO, "FROM", "TO", sercoPrice.effectiveYear, JULY)
 
+    assertThat(priceWithExceptionRemoved.exceptions).isEmpty()
     assertThat(sercoPrice.exceptionFor(JULY)).isNull()
     verify(priceRepository).save(sercoPrice)
     verify(auditService).create(eventCaptor.capture())

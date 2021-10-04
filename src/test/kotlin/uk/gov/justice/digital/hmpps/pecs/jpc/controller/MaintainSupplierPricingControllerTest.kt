@@ -553,6 +553,35 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     verify(service, never()).addPriceException(any(), any(), any(), any(), any(), any())
   }
 
+  @Test
+  internal fun `can remove an existing price exception`() {
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
+
+    whenever(
+      service.removePriceException(
+        SERCO,
+        fromAgencyId,
+        toAgencyId,
+        currentContractualEffectiveYear,
+        Month.SEPTEMBER
+      )
+    ).thenReturn(PriceDto("a", "b", Money(100)))
+
+    mockMvc.post("/remove-price-exception") {
+      session = mockSession
+      param("moveId", "$fromAgencyId-$toAgencyId")
+      param("month", "SEPTEMBER")
+    }
+      .andExpect { flash { attribute("flashMessage", "price-exception-removed") } }
+      .andExpect { flash { attribute("flashAttrExceptionMonth", "SEPTEMBER") } }
+      .andExpect { flash { attribute("flashAttrLocationFrom", "a") } }
+      .andExpect { flash { attribute("flashAttrLocationTo", "b") } }
+      .andExpect { redirectedUrl("/update-price/AAAAAA-BBBBBB#price-exceptions") }
+      .andExpect { status { is3xxRedirection() } }
+
+    verify(service).removePriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER)
+  }
+
   private fun MockHttpSession.addSupplierAndContractualYear(supplier: Supplier, contractualYearDate: LocalDate) {
     this.setAttribute("supplier", supplier)
     this.setAttribute("date", contractualYearDate)

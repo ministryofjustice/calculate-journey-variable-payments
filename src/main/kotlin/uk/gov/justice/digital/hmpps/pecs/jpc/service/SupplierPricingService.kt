@@ -53,11 +53,7 @@ class SupplierPricingService(
     toAgencyId: String,
     effectiveYear: Int
   ): PriceDto? = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)?.let { price ->
-    PriceDto(
-      price.fromLocation.siteName,
-      price.toLocation.siteName,
-      price.price()
-    ).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
+    PriceDto(price).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
   }
 
   fun addPriceForSupplier(
@@ -123,7 +119,7 @@ class SupplierPricingService(
     toAgencyId: String,
     effectiveYear: Int,
     month: Month,
-  ) {
+  ): PriceDto {
     val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
 
@@ -134,6 +130,8 @@ class SupplierPricingService(
 
     priceRepository.save(existingPrice)
     auditService.create(AuditableEvent.removePriceException(existingPrice, month, exceptionAmount))
+
+    return PriceDto(existingPrice).apply { existingPrice.exceptions().forEach { exceptions[it.month] = it.price() } }
   }
 
   private fun existingPriceOrNull(
@@ -173,6 +171,8 @@ class SupplierPricingService(
 
   data class PriceDto(val fromAgency: String, val toAgency: String, val amount: Money) {
     val exceptions: MutableMap<Int, Money> = mutableMapOf()
+
+    internal constructor(price: Price) : this(price.fromLocation.siteName, price.toLocation.siteName, price.price())
   }
 
   private fun String.sanitised() = this.trim().uppercase()

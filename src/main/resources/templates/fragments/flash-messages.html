@@ -45,9 +45,17 @@
                 Price exception added
               </p>
               <p class="govuk-body ma0" id="app-message__heading" th:inline="text">
-                Price exception of £[[${flashAttrExceptionPrice}]] for [[${flashAttrExceptionMonth}]] 2020 added for journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]]
+                Price exception of £[[${flashAttrExceptionPrice}]] for [[${flashAttrExceptionMonth}]] added for journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]]
               </p>
             </div>
+          <div th:case="'price-exception-removed'">
+            <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+              Price exception added
+            </p>
+            <p class="govuk-body ma0" id="app-message__heading" th:inline="text">
+              Price exception for [[${flashAttrExceptionMonth}]] removed for journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]]
+            </p>
+          </div>
             <div th:case="*"></div>
         </div>
         <a th:href="${dismissFallback}" class="govuk-link" onclick="event.preventDefault();this.parentElement.remove()">Dismiss</a>
