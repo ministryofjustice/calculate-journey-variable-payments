@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.8"
-  kotlin("plugin.spring") version "1.5.30"
-  kotlin("plugin.jpa") version "1.5.30"
-  kotlin("plugin.allopen") version "1.5.30"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.9"
+  kotlin("plugin.spring") version "1.5.31"
+  kotlin("plugin.jpa") version "1.5.31"
+  kotlin("plugin.allopen") version "1.5.31"
 }
 
 allOpen {
@@ -17,10 +17,10 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.69")
-  implementation("io.sentry:sentry-spring-boot-starter:5.1.2")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.27.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.27.0")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.80")
+  implementation("io.sentry:sentry-spring-boot-starter:5.2.1")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.28.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.28.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
 
@@ -33,6 +33,9 @@ dependencies {
     }
     implementation("org.apache.commons:commons-compress:1.21") {
       because("previous transitive version 1.20 pulled from Apache POI 5.0.0 has CVE")
+    }
+    implementation("org.apache.santuario:xmlsec:2.2.3") {
+      because("previous transitive version 2.2.1 pulled from Apache POI 5.0.0 has CVE")
     }
   }
 
@@ -54,13 +57,13 @@ dependencies {
   testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
-  testImplementation("com.squareup.okhttp3:okhttp:4.9.1")
+  testImplementation("com.squareup.okhttp3:mockwebserver:4.9.2")
+  testImplementation("com.squareup.okhttp3:okhttp:4.9.2")
   testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
   testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
 
   runtimeOnly("com.h2database:h2")
-  runtimeOnly("org.postgresql:postgresql:42.2.23")
+  runtimeOnly("org.postgresql:postgresql:42.2.24")
 }
 
 tasks {
