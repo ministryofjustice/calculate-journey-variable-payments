@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
@@ -30,6 +31,19 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  companion object {
+    val PRISON1_PRIMARY_KEY: UUID = UUID.fromString("709fbee3-7fe6-4584-a8dc-f12481165bfa")
+    val POLICE1_PRIMARY_KEY: UUID = UUID.fromString("13c46837-c5c9-45a4-83d5-5a0d1438ff3c")
+  }
+
+  private data class Priced(
+    val fromPrimaryKey: UUID,
+    val fromAgencyId: String,
+    val toPrimaryKey: UUID,
+    val toAgencyId: String,
+    val amount: Money
+  )
+
   override fun migrate(context: Context) {
     JdbcTemplate(SingleConnectionDataSource(context.connection, true)).also {
       createStandardMoves(it)
@@ -44,12 +58,28 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
   private fun createStandardMoves(template: JdbcTemplate) {
     logger.info("create standard moves")
 
-    fun createMoveEventsAndJourney(move: Move) {
+    fun createMoveEventsAndJourney(move: Move, priced: Priced? = null) {
       create(moveStartEvent(move), template)
       create(moveCompleteEvent(move), template)
-      create(journey(move, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"), template).also { journey ->
+      create(
+        journey(move, fromAgencyId = priced?.fromAgencyId ?: "PRISON1", priced?.toAgencyId ?: "PRISON2"),
+        template
+      ).also { journey ->
         create(journeyStartEvent(journey), template)
         create(journeyCompleteEvent(journey), template)
+
+        if (priced != null) {
+          template.update(
+            priceSql,
+            UUID.randomUUID(),
+            LocalDateTime.now(),
+            journey.effectiveYear,
+            priced.amount.pence,
+            Supplier.SERCO.name,
+            priced.fromPrimaryKey,
+            priced.toPrimaryKey
+          )
+        }
       }
     }
 
@@ -65,9 +95,26 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     }
 
     create(
-      move(moveId = "SM4", profileId = "PR1", fromAgencyId = "PRISON1", toAgencyId = "PRISON2", date = startOfPreviousMonth.minusMonths(1)),
+      move(
+        moveId = "SM4",
+        profileId = "PR1",
+        fromAgencyId = "PRISON1",
+        toAgencyId = "POLICE1",
+        date = startOfPreviousMonth.minusMonths(1)
+      ),
       template
-    ).also { move -> createMoveEventsAndJourney(move) }
+    ).also { move ->
+      createMoveEventsAndJourney(
+        move,
+        Priced(
+          fromPrimaryKey = PRISON1_PRIMARY_KEY,
+          fromAgencyId = "PRISON1",
+          toPrimaryKey = POLICE1_PRIMARY_KEY,
+          toAgencyId = "POLICE1",
+          amount = Money.valueOf(100.00)
+        )
+      )
+    }
   }
 
   // TODO need to add the appropriate journey events for the following move types...
@@ -359,13 +406,19 @@ private fun moveStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) = mo
 
 private fun moveRedirectEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Redirect")
 
-private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Complete", move.dropOffOrCancelledDateTime)
+private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
+  moveEvent(move, supplier, "Complete", move.dropOffOrCancelledDateTime)
 
 private fun moveAcceptEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Accept")
 
 private fun moveCancelEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Cancel")
 
-private fun moveEvent(move: Move, supplier: Supplier = Supplier.SERCO, type: String, occurredAt: LocalDateTime? = null) = Event(
+private fun moveEvent(
+  move: Move,
+  supplier: Supplier = Supplier.SERCO,
+  type: String,
+  occurredAt: LocalDateTime? = null
+) = Event(
   details = emptyMap(),
   eventId = "ME" + UUID.randomUUID().toString(),
   eventableId = move.moveId,
@@ -388,9 +441,9 @@ private fun journey(
   dropOff: LocalDateTime? = move.dropOffOrCancelledDateTime
 ) = Journey(
   billable = true,
-  clientTimeStamp = startOfPreviousMonth.atStartOfDay(),
+  clientTimeStamp = move.pickUpDateTime?.toLocalDate()?.atStartOfDay() ?: startOfPreviousMonth.atStartOfDay(),
   dropOffDateTime = dropOff,
-  effectiveYear = effectiveYearForDate(startOfPreviousMonth),
+  effectiveYear = effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth),
   fromNomisAgencyId = fromAgencyId,
   journeyId = UUID.randomUUID().toString(),
   moveId = move.moveId,
@@ -399,7 +452,7 @@ private fun journey(
   state = state,
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
-  updatedAt = startOfPreviousMonth.atStartOfDay(),
+  updatedAt = move.pickUpDateTime?.toLocalDate()?.atStartOfDay() ?: startOfPreviousMonth.atStartOfDay(),
   vehicleRegistration = "ABCDEFG"
 )
 
@@ -461,4 +514,16 @@ private val eventSql = """
     event_type,
     updated_at
   ) values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+""".trimIndent()
+
+private val priceSql = """
+  insert into prices (
+    price_id,
+    added_at,
+    effective_year,
+    price_in_pence,
+    supplier,
+    from_location_id,
+    to_location_id
+  ) values (?, ?, ?, ?, ?, ?, ?)
 """.trimIndent()
