@@ -50,16 +50,16 @@ class MoveDetailsPage : ApplicationPage() {
   fun isAtPageFor(move: Move, expectedPrice: Money? = null) {
     this.isAt(move.moveId)
 
-    assertThat(prisonNumber.text()).contains(move.person?.prisonNumber)
-    assertThat(firstNames.text()).contains(move.person?.firstNames)
-    assertThat(lastName.text()).contains(move.person?.lastName)
-    assertThat(dateOfBirth.text()).contains(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
-    assertThat(gender.text()).contains(move.person?.gender)
-    assertThat(movePickupDate.text()).contains(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")) ?: "Not known")
-    assertThat(moveDropoffDate.text()).contains(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
-    assertThat(fromSite.text()).contains(move.fromSiteName)
-    assertThat(toSite.text()).contains(move.toSiteName)
-    assertThat(moveType.text()).contains(move.moveType?.name)
+    assertThat(prisonNumber.text()).isEqualTo(move.person?.prisonNumber)
+    assertThat(firstNames.text()).isEqualTo(move.person?.firstNames)
+    assertThat(lastName.text()).isEqualTo(move.person?.lastName)
+    assertThat(dateOfBirth.text()).isEqualTo(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
+    assertThat(gender.text()).isEqualTo(move.person?.gender)
+    assertThat(movePickupDate.text()).isEqualTo(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")) ?: "Not known")
+    assertThat(moveDropoffDate.text()).isEqualTo(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
+    assertThat(fromSite.text()).isEqualTo(move.fromSiteName)
+    assertThat(toSite.text()).isEqualTo(move.toSiteName)
+    assertThat(moveType.text()).isEqualTo(move.moveType?.name)
 
     if (expectedPrice != null) {
       assertThat(movePrice.text()).isEqualTo("£${moneyFormatter.format(expectedPrice.pounds())}")

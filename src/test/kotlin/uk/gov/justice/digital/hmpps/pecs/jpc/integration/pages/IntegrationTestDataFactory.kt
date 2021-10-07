@@ -307,8 +307,8 @@ object SercoPreviousMonthMoveData {
       reference = "MULTIMM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
-      toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      toNomisAgencyId = "TO_AGENCY4",
+      toSiteName = "TO_AGENCY4", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
