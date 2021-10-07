@@ -307,8 +307,8 @@ object SercoPreviousMonthMoveData {
       reference = "MULTIMM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
-      toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      toNomisAgencyId = "TO_AGENCY4",
+      toSiteName = "TO_AGENCY4", // Test data is not mapped so will default to the agency ID
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
@@ -334,6 +334,29 @@ object SercoPreviousMonthMoveData {
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
       person = professorMoriarty
     )
+
+  fun standardMoveSM4() =
+    startOfPreviousMonth.minusMonths(1).let { moveDate ->
+      Move(
+        moveId = "SM4",
+        updatedAt = moveDate.atStartOfDay(),
+        supplier = Supplier.SERCO,
+        moveType = MoveType.STANDARD,
+        status = MoveStatus.completed,
+        reference = "STANDARDSM4",
+        fromNomisAgencyId = "PRISON1",
+        fromSiteName = "PRISON ONE",
+        toNomisAgencyId = "POLICE1",
+        toSiteName = "POLICE ONE",
+        reportFromLocationType = "prison",
+        reportToLocationType = "police",
+        pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
+        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
+        person = billyTheKid,
+      )
+    }
 }
 
 internal fun LocalDate.previousMonth() = this.minusMonths(1).month
+
+internal fun LocalDate.previousMonthYear() = this.minusMonths(1).year

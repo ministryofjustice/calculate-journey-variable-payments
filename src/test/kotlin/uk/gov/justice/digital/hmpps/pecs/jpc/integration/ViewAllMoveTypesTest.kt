@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.cancelledMoveM60
@@ -26,6 +29,7 @@ import java.time.LocalDate
 import java.time.Month
 import java.time.Year
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class ViewAllMoveTypesTest : IntegrationTest() {
 
   private val currentDate = LocalDate.now()
@@ -33,6 +37,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
   private val year = Year.now()
 
   @Test
+  @Order(1)
   fun `view one of each move type for Serco in previous month`() {
     goToPage(Dashboard)
 
@@ -57,6 +62,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
   }
 
   @Test
+  @Order(2)
   fun `view one of each move type for GEOAmey in Dec 2020`() {
     goToPage(Dashboard)
 

@@ -41,32 +41,32 @@
                         <dt class="govuk-summary-list__key">
                             NOMIS Person ID
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.person?.prisonNumber}?: 'Not set'"></dd>
+                        <dd id="prison-number" class="govuk-summary-list__value" th:text="${move.person?.prisonNumber}?: 'Not set'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             First
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.person?.firstNames}?: 'Not known'"></dd>
+                        <dd id="first-names" class="govuk-summary-list__value" th:text="${move.person?.firstNames}?: 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Last
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.person?.lastName}?: 'Not known'"></dd>
+                        <dd id="last-name" class="govuk-summary-list__value" th:text="${move.person?.lastName}?: 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Date of birth
                         </dt>
-                        <dd class="govuk-summary-list__value"
+                        <dd id="date-of-birth" class="govuk-summary-list__value"
                             th:text="${move.person?.dateOfBirth != null} ? ${#temporals.format(move.person?.dateOfBirth, 'dd MM yyyy')} : 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Gender
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.person?.gender}?: 'Not known'"></dd>
+                        <dd id="gender" class="govuk-summary-list__value" th:text="${move.person?.gender}?: 'Not known'"></dd>
                     </div>
                 </dl>
 
@@ -76,35 +76,35 @@
                         <dt class="govuk-summary-list__key">
                             Move start
                         </dt>
-                        <dd class="govuk-summary-list__value"
+                        <dd id="move-pickup-date" class="govuk-summary-list__value"
                             th:text="${move.pickUpDateTime != null} ? ${#temporals.format(move.pickUpDateTime, 'dd MMM yyyy, HH:mm')} : 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Move end
                         </dt>
-                        <dd class="govuk-summary-list__value"
+                        <dd id="move-dropoff-date" class="govuk-summary-list__value"
                             th:text="${move.dropOffOrCancelledDateTime != null} ? ${#temporals.format(move.dropOffOrCancelledDateTime, 'dd MMM yyyy, HH:mm')} : 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Move from
                         </dt>
-                        <dd class="govuk-summary-list__value"
+                        <dd id="from-site" class="govuk-summary-list__value"
                             th:text="${move.fromSiteName}?: ${move.fromNomisAgencyId}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Move to
                         </dt>
-                        <dd class="govuk-summary-list__value"
+                        <dd id="to-site" class="govuk-summary-list__value"
                             th:text="${move.toSiteName}?: ${move.toNomisAgencyId}"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Move type
                         </dt>
-                        <dd class="govuk-summary-list__value" th:text="${move.moveType}?: 'Not known'"></dd>
+                        <dd id="move-type" class="govuk-summary-list__value" th:text="${move.moveType}?: 'Not known'"></dd>
                     </div>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
@@ -210,7 +210,7 @@
 
             <div class="govuk-grid-column-one-third">
                 <h2 class="govuk-heading-m mb1 bt bw1 b--blue pt2">Move price</h2>
-                <p class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPounds() ?: 0, 1, 'COMMA', 2,
+                <p id="move-price" class="govuk-body">£[[${#numbers.formatDecimal(move.totalInPounds() ?: 0, 1, 'COMMA', 2,
                     'POINT')}]]</p>
             </div>
         </div>
