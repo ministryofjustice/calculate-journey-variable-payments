@@ -30,7 +30,7 @@ $ docker-compose up
 
 In a separate terminal window:
 ```bash
-$ SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
+$ SPRING_PROFILES_ACTIVE=dev SERVER_SERVLET_SESSION_COOKIE_SECURE=false ./gradlew bootRun
 ```
 
 In another separate terminal window:
