@@ -61,6 +61,9 @@ import-files:
 server:
   port: 8080
   servlet:
+    session:
+      cookie:
+        secure: true
     context-path: /
   forward-headers-strategy: native
   tomcat:
