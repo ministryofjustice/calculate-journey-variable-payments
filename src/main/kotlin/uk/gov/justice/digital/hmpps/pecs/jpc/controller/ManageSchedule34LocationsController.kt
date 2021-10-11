@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -141,6 +142,7 @@ class ManageSchedule34LocationsController(
     val agencyId: String,
 
     @get: NotBlank(message = "Please enter a schedule 34 location name")
+    @get: Length(max = 255, message = "Enter details upto 255 characters")
     val locationName: String = "",
 
     @get: NotNull(message = "Please enter a schedule 34 location type")

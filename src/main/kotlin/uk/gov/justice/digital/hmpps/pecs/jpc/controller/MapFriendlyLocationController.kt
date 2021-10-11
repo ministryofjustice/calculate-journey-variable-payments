@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Controller
@@ -191,6 +192,7 @@ class MapFriendlyLocationController(
     val agencyId: String,
 
     @get: NotEmpty(message = "Enter Schedule 34 location")
+    @get: Length(max = 255, message = "Enter details upto 255 characters")
     val locationName: String = "",
 
     @get: NotNull(message = "Enter Schedule 34 location type")

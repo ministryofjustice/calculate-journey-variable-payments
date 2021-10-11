@@ -39,6 +39,8 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
   private val nomisLocationName = "NOMIS Location Name"
 
+  private val maxAllowedCharacters = 255
+
   @MockBean
   lateinit var service: LocationsService
 
@@ -228,19 +230,21 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
   @Test
   internal fun `map new location successful when mandatory criteria supplied`() {
+    val expectedLocationName = "Friendly Location Name".padEnd(maxAllowedCharacters, 'z')
+
     mockMvc.post("/map-location") {
       param("agencyId", "123456")
       param("nomisLocationName", nomisLocationName)
-      param("locationName", "Friendly Location Name")
+      param("locationName", expectedLocationName)
       param("locationType", "CC")
     }
       .andExpect { status { is3xxRedirection() } }
-      .andExpect { flash { attribute("flashAttrMappedLocationName", "FRIENDLY LOCATION NAME") } }
+      .andExpect { flash { attribute("flashAttrMappedLocationName", expectedLocationName.uppercase()) } }
       .andExpect { flash { attribute("flashAttrMappedAgencyId", "123456") } }
       .andExpect { redirectedUrl("/journeys") }
 
-    verify(service).locationAlreadyExists(agencyId, "Friendly Location Name")
-    verify(service).setLocationDetails(agencyId, "Friendly Location Name", LocationType.CC)
+    verify(service).locationAlreadyExists(agencyId, expectedLocationName)
+    verify(service).setLocationDetails(agencyId, expectedLocationName, LocationType.CC)
   }
 
   @Test
@@ -256,6 +260,21 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
       .andExpect { status { isOk() } }
 
     verify(service, never()).locationAlreadyExists(any(), any())
+    verify(service, never()).setLocationDetails(any(), any(), any())
+  }
+
+  @Test
+  internal fun `map new location fails when location name too long`() {
+    mockMvc.post("/map-location") {
+      param("agencyId", "123456")
+      param("nomisLocationName", nomisLocationName)
+      param("locationName", "z".padEnd(maxAllowedCharacters + 1, 'z'))
+      param("locationType", "CC")
+    }
+      .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "Length") } }
+      .andExpect { view { name("add-location") } }
+      .andExpect { status { isOk() } }
+
     verify(service, never()).setLocationDetails(any(), any(), any())
   }
 
