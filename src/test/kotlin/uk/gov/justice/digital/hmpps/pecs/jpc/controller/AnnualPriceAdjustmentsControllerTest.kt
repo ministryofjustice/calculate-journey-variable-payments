@@ -185,6 +185,38 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   }
 
   @Test
+  fun `fails upon submission when details contains potential cross site scripting characters`() {
+    setOf('<', '＜', '〈', '〈', '>', '＞', '〉', '〉').forEach { invalidCharacter ->
+      mockMvc.post("/annual-price-adjustment") {
+        session = mockSession
+        param("rate", "10")
+        param("details", invalidCharacter.toString())
+      }
+        .andExpect { model { attributeHasFieldErrorCode("form", "details", "Pattern") } }
+        .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+        .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+        .andExpect { view { name("annual-price-adjustment") } }
+        .andExpect { status { isOk() } }
+    }
+  }
+
+  @Test
+  fun `annual price adjustment with valid rate and details containing allowed special characters are applied for supplier`() {
+    setOf("special characters @#$%%^&*()_", "special characters `~{}[]:;',./?").forEach { specialCharacters ->
+      mockMvc.post("/annual-price-adjustment") {
+        session = mockSession
+        param("rate", "1.1234")
+        param("details", specialCharacters)
+      }
+        .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
+        .andExpect { status { is3xxRedirection() } }
+
+      verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq(specialCharacters))
+      verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
+    }
+  }
+
+  @Test
   fun `annual price adjustment with valid rate is applied for supplier`() {
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession

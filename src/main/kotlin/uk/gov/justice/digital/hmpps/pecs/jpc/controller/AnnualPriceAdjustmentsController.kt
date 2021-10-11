@@ -103,6 +103,7 @@ class AnnualPriceAdjustmentsController(
 
     @get: NotEmpty(message = "Enter details upto 255 characters")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
+    @get: Pattern(regexp = "^[a-zA-Z]+?[^<＜〈〈>＞〉〉]+\$", message = "Invalid details")
     val details: String? = null
   ) {
     fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }
