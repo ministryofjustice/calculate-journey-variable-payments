@@ -67,8 +67,11 @@ jobs:
           background: true
       - run:
           name: Run the java app.
-          command: env spring.profiles.active=dev java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar
+          command: java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar
           background: true
+          environment:
+            SPRING_PROFILES_ACTIVE: dev
+            SERVER_SERVLET_SESSION_COOKIE_SECURE: false
       - run:
           name: Wait for java app to start
           command: sleep 20
