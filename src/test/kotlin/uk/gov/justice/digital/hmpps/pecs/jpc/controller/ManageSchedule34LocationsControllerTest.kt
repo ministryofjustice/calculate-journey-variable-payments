@@ -34,6 +34,8 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
+  private val maxAllowedCharacters = 255
+
   @MockBean
   lateinit var service: LocationsService
 
@@ -126,16 +128,32 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
   @Test
   internal fun `perform location change succeeds`() {
+    val expectedLocationName = "Friendly Location Name".padEnd(maxAllowedCharacters, 'z')
+
     mockMvc.post("/manage-location") {
       param("agencyId", "AGENCY_ID")
-      param("locationName", "LOCATION NAME")
+      param("locationName", expectedLocationName)
       param("locationType", "PR")
     }
       .andExpect { status { is3xxRedirection() } }
       .andExpect { redirectedUrl("search-locations") }
 
-    verify(service).locationAlreadyExists("AGENCY_ID", "LOCATION NAME")
-    verify(service).setLocationDetails("AGENCY_ID", "LOCATION NAME", LocationType.PR)
+    verify(service).locationAlreadyExists("AGENCY_ID", expectedLocationName)
+    verify(service).setLocationDetails("AGENCY_ID", expectedLocationName, LocationType.PR)
+  }
+
+  @Test
+  internal fun `perform location change fails when location name too long`() {
+    mockMvc.post("/manage-location") {
+      param("agencyId", "AGENCY_ID")
+      param("locationName", "z".padEnd(maxAllowedCharacters + 1, 'z'))
+      param("locationType", "PR")
+    }
+      .andExpect { status { is2xxSuccessful() } }
+      .andExpect { view { name("manage-location") } }
+      .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "Length") } }
+
+    verify(service, never()).setLocationDetails(any(), any(), any())
   }
 
   @Test
@@ -153,6 +171,23 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
 
     verify(service).locationAlreadyExists("AGENCY_ID", "DUPLICATE LOCATION NAME")
     verify(service, never()).setLocationDetails(any(), any(), any())
+  }
+
+  @Test
+  fun `fails upon submission when location name contains potential cross site scripting characters`() {
+    XSS_CHARACTERS.forEach { invalidCharacter ->
+      mockMvc.post("/manage-location") {
+        param("agencyId", "AGENCY_ID")
+        param("locationName", invalidCharacter.toString())
+        param("locationType", "PR")
+      }
+        .andExpect { view { name("manage-location") } }
+        .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "Invalid location") } }
+        .andExpect { status { is2xxSuccessful() } }
+
+      verify(service, never()).locationAlreadyExists(any(), any())
+      verify(service, never()).setLocationDetails(any(), any(), any())
+    }
   }
 
   @Test

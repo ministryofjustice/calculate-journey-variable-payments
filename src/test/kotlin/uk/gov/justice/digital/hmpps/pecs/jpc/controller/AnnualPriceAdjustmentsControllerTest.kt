@@ -153,15 +153,18 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
 
   @Test
   fun `fails upon submission when missing details for price adjustment`() {
-    mockMvc.post("/annual-price-adjustment") {
-      session = mockSession
-      param("rate", "10")
+    setOf("", " ").forEach { emptyOrBlankDetails ->
+      mockMvc.post("/annual-price-adjustment") {
+        session = mockSession
+        param("rate", "10")
+        param("details", emptyOrBlankDetails)
+      }
+        .andExpect { model { attributeHasFieldErrorCode("form", "details", "NotBlank") } }
+        .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+        .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+        .andExpect { view { name("annual-price-adjustment") } }
+        .andExpect { status { isOk() } }
     }
-      .andExpect { model { attributeHasFieldErrorCode("form", "details", "NotEmpty") } }
-      .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
-      .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
-      .andExpect { view { name("annual-price-adjustment") } }
-      .andExpect { status { isOk() } }
   }
 
   @Test
@@ -182,6 +185,38 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   @WithMockUser(roles = ["PECS_JPC"])
   fun `user without the maintain price role cannot navigate to the page`() {
     mockMvc.get("/annual-price-adjustment") { session = mockSession }.andExpect { status { isForbidden() } }
+  }
+
+  @Test
+  fun `fails upon submission when details contains potential cross site scripting characters`() {
+    XSS_CHARACTERS.forEach { invalidCharacter ->
+      mockMvc.post("/annual-price-adjustment") {
+        session = mockSession
+        param("rate", "10")
+        param("details", invalidCharacter.toString())
+      }
+        .andExpect { model { attributeHasFieldErrorCode("form", "details", "Invalid details") } }
+        .andExpect { model { attribute("contractualYearStart", effectiveYearForDate(effectiveDate).toString()) } }
+        .andExpect { model { attribute("contractualYearEnd", (effectiveYearForDate(effectiveDate) + 1).toString()) } }
+        .andExpect { view { name("annual-price-adjustment") } }
+        .andExpect { status { isOk() } }
+    }
+  }
+
+  @Test
+  fun `annual price adjustment with valid rate and details containing allowed characters are applied for supplier`() {
+    setOf("special characters @#$%%^&*()_", "special characters `~{}[]:;',./?", "inflation rate of 1.1234").forEach { allowedCharacters ->
+      mockMvc.post("/annual-price-adjustment") {
+        session = mockSession
+        param("rate", "1.1234")
+        param("details", allowedCharacters)
+      }
+        .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
+        .andExpect { status { is3xxRedirection() } }
+
+      verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq(allowedCharacters))
+      verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
+    }
   }
 
   @Test

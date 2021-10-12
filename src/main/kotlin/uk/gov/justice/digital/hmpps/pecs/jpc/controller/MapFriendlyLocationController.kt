@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import org.hibernate.validator.constraints.Length
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Controller
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 import javax.validation.Valid
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
@@ -101,6 +103,8 @@ class MapFriendlyLocationController(
     logger.info("mapping friendly location for agency id ${form.agencyId}")
 
     val searchResultsUrl = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
+
+    result.rejectIfContainsXssCharacters(form.locationName, "locationName", "Invalid location")
 
     if (result.hasErrors()) {
       if (form.operation == "update") {
@@ -190,7 +194,8 @@ class MapFriendlyLocationController(
     @get: NotEmpty(message = "Enter NOMIS agency id")
     val agencyId: String,
 
-    @get: NotEmpty(message = "Enter Schedule 34 location")
+    @get: NotBlank(message = "Enter Schedule 34 location")
+    @get: Length(max = 255, message = "Enter details upto 255 characters")
     val locationName: String = "",
 
     @get: NotNull(message = "Enter Schedule 34 location type")
