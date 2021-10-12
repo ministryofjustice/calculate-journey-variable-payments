@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
 import java.time.LocalDateTime
 import javax.validation.Valid
-import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
 
 /**
@@ -101,9 +101,9 @@ class AnnualPriceAdjustmentsController(
     @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,4})?\$", message = "Invalid rate")
     val rate: String?,
 
-    @get: NotEmpty(message = "Enter details upto 255 characters")
+    @get: NotBlank(message = "Enter details upto 255 characters")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
-    @get: Pattern(regexp = "^[a-zA-Z]+?[^<＜〈〈>＞〉〉]+\$", message = "Invalid details")
+    @get: Pattern(regexp = "^[a-zA-Z_ ]+?[^<＜〈〈>＞〉〉]*\$", message = "Invalid details")
     val details: String? = null
   ) {
     fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }

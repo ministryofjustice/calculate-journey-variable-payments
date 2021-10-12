@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
 import javax.validation.Valid
+import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
@@ -191,7 +192,7 @@ class MapFriendlyLocationController(
     @get: NotEmpty(message = "Enter NOMIS agency id")
     val agencyId: String,
 
-    @get: NotEmpty(message = "Enter Schedule 34 location")
+    @get: NotBlank(message = "Enter Schedule 34 location")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
     val locationName: String = "",
 

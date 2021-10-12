@@ -249,18 +249,20 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
 
   @Test
   internal fun `map new location fails when mandatory criteria not supplied`() {
-    mockMvc.post("/map-location") {
-      param("agencyId", "123456")
-      param("nomisLocationName", nomisLocationName)
-      param("locationName", "")
-      param("locationType", "CC")
-    }
-      .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "NotEmpty") } }
-      .andExpect { view { name("add-location") } }
-      .andExpect { status { isOk() } }
+    setOf("", " ").forEach { emptyOrBlankLocation ->
+      mockMvc.post("/map-location") {
+        param("agencyId", "123456")
+        param("nomisLocationName", nomisLocationName)
+        param("locationName", emptyOrBlankLocation)
+        param("locationType", "CC")
+      }
+        .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "NotBlank") } }
+        .andExpect { view { name("add-location") } }
+        .andExpect { status { isOk() } }
 
-    verify(service, never()).locationAlreadyExists(any(), any())
-    verify(service, never()).setLocationDetails(any(), any(), any())
+      verify(service, never()).locationAlreadyExists(any(), any())
+      verify(service, never()).setLocationDetails(any(), any(), any())
+    }
   }
 
   @Test
