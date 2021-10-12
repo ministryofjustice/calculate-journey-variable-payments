@@ -174,6 +174,23 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
   }
 
   @Test
+  fun `fails upon submission when location name contains potential cross site scripting characters`() {
+    XSS_CHARACTERS.forEach { invalidCharacter ->
+      mockMvc.post("/manage-location") {
+        param("agencyId", "AGENCY_ID")
+        param("locationName", invalidCharacter.toString())
+        param("locationType", "PR")
+      }
+        .andExpect { view { name("manage-location") } }
+        .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "Invalid location") } }
+        .andExpect { status { is2xxSuccessful() } }
+
+      verify(service, never()).locationAlreadyExists(any(), any())
+      verify(service, never()).setLocationDetails(any(), any(), any())
+    }
+  }
+
+  @Test
   internal fun `search for location location not found returns back to search screen`() {
     whenever(service.findLocationBySiteName(any())).thenReturn(null)
 

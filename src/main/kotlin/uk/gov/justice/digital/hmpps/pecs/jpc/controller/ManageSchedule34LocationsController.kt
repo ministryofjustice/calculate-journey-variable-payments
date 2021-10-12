@@ -95,17 +95,19 @@ class ManageSchedule34LocationsController(
 
   @PostMapping(MANAGE_LOCATION)
   fun performManageLocation(
-    @Valid @ModelAttribute("form") location: LocationForm,
+    @Valid @ModelAttribute("form") form: LocationForm,
     result: BindingResult,
     model: ModelMap,
     redirectAttributes: RedirectAttributes
   ): String {
     logger.info("performing manage location")
 
+    result.rejectIfContainsXssCharacters(form.locationName, "locationName", "Invalid location")
+
     if (result.hasErrors()) {
       model.addAttribute(
         "history",
-        service.locationHistoryForAgencyId(location.agencyId)
+        service.locationHistoryForAgencyId(form.agencyId)
           .map { history -> LocationHistoryDto.valueOf(history) }
           .sortedByDescending { lh -> lh.datetime }
       )
@@ -113,14 +115,14 @@ class ManageSchedule34LocationsController(
       return "manage-location"
     }
 
-    return if (isDuplicate(location)) {
+    return if (isDuplicate(form)) {
       "manage-location".also { result.duplicateLocation() }
     } else {
-      service.setLocationDetails(location.agencyId, location.locationName, location.locationType!!)
+      service.setLocationDetails(form.agencyId, form.locationName, form.locationType!!)
 
       redirectAttributes.addFlashAttribute("flashMessage", "location-updated")
-      redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", location.locationName.uppercase())
-      redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", location.agencyId)
+      redirectAttributes.addFlashAttribute("flashAttrMappedLocationName", form.locationName.uppercase())
+      redirectAttributes.addFlashAttribute("flashAttrMappedAgencyId", form.agencyId)
 
       return "redirect:search-locations"
     }

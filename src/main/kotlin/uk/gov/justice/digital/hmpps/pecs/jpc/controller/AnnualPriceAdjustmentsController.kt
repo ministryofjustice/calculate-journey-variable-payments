@@ -74,6 +74,8 @@ class AnnualPriceAdjustmentsController(
 
     val mayBeRate = form.mayBeRate() ?: result.rejectInvalidAdjustmentRate().let { null }
 
+    form.details?.let { result.rejectIfContainsXssCharacters(it, "details", "Invalid details") }
+
     if (result.hasErrors() || mayBeRate == null) {
       model.apply {
         addContractStartAndEndDates()
@@ -103,7 +105,6 @@ class AnnualPriceAdjustmentsController(
 
     @get: NotBlank(message = "Enter details upto 255 characters")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
-    @get: Pattern(regexp = "^[a-zA-Z_ ]+?[^<＜〈〈>＞〉〉]*\$", message = "Invalid details")
     val details: String? = null
   ) {
     fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }

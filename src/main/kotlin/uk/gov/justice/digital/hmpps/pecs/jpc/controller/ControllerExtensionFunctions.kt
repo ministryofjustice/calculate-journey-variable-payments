@@ -1,13 +1,27 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.springframework.ui.ModelMap
+import org.springframework.validation.BindingResult
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import java.time.LocalDate
 
 /**
- * Decorates the ModalMap with extension functions for the most common calls/needs in the controller classes.
+ * Contains reusable extension functions for the Controllers.
  */
+
+internal val XSS_CHARACTERS = setOf('<', '＜', '〈', '〈', '>', '＞', '〉', '〉')
+
+internal fun BindingResult.rejectIfContainsXssCharacters(value: String, field: String, errorCode: String) {
+  if (value.any(XSS_CHARACTERS::contains)) {
+    this.rejectValue(
+      field,
+      errorCode,
+      "The following characters ${XSS_CHARACTERS.joinToString(separator = "', '", prefix = "'", postfix = "'")} are not allowed."
+    )
+  }
+}
+
 internal fun ModelMap.getEndOfMonth() = endOfMonth(getStartOfMonth())
 
 internal fun ModelMap.addContractStartAndEndDates() {

@@ -296,4 +296,21 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
     verify(service).locationAlreadyExists(agencyId, "Duplicate location")
     verify(service, never()).setLocationDetails(any(), any(), any())
   }
+
+  @Test
+  fun `fails upon submission when location name contains potential cross site scripting characters`() {
+    XSS_CHARACTERS.forEach { invalidCharacter ->
+      mockMvc.post("/map-location") {
+        param("agencyId", "123456")
+        param("nomisLocationName", nomisLocationName)
+        param("locationName", invalidCharacter.toString())
+        param("locationType", "CC")
+      }
+        .andExpect { model { attributeHasFieldErrorCode("form", "locationName", "Invalid location") } }
+        .andExpect { view { name("add-location") } }
+        .andExpect { status { isOk() } }
+
+      verify(service, never()).setLocationDetails(any(), any(), any())
+    }
+  }
 }

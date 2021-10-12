@@ -104,6 +104,8 @@ class MapFriendlyLocationController(
 
     val searchResultsUrl = UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL)
 
+    result.rejectIfContainsXssCharacters(form.locationName, "locationName", "Invalid location")
+
     if (result.hasErrors()) {
       if (form.operation == "update") {
         model.addCancelLinkFor(searchResultsUrl)
