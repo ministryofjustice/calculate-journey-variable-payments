@@ -70,6 +70,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   @BeforeEach
   fun `set up actual effective year fixture`() {
     whenever(actualEffectiveYear.current()).thenReturn(effectiveYearForDate(currentContractualDate))
+    whenever(actualEffectiveYear.canAddOrUpdatePrices(any())).thenReturn(true)
   }
 
   @Test
@@ -179,6 +180,17 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
     mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.get("/add-price/not-allowed") { session = mockSession }.andExpect { status { isForbidden() } }
+  }
+
+  @Test
+  internal fun `cannot initiate add price for Serco when selected year is out of range`() {
+    mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
+    whenever(actualEffectiveYear.canAddOrUpdatePrices(any())).thenReturn(false)
+
+    mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
+      .andExpect { flash { attribute("flashMessage", "information") } }
+      .andExpect { flash { attribute("flashAttrMessage", "You can no longer change the price catalogue for the selected year.") } }
+      .andExpect { redirectedUrl("/dashboard") }
   }
 
   @Test
