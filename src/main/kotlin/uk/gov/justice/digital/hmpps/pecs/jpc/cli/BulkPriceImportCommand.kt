@@ -15,9 +15,12 @@ class BulkPriceImportCommand(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @ShellMethod("Bulk imports prices for the given supplier and effective year from the (latest) supplier prices spreadsheet in S3.")
+  @ShellMethod("Bulk imports prices for the given supplier and effective year from the (latest) supplier prices spreadsheet in S3. ")
   fun bulkImportPricesFor(supplier: Supplier, year: Int) {
-    if (year < 2019 || year > effectiveYear.current()) throw RuntimeException("Year cannot be earlier than 2019 or greater than ${effectiveYear.current()}.")
+    if (!effectiveYear.canAddOrUpdatePrices(year))
+      throw RuntimeException(
+        "Price imports can only take place in the current '${effectiveYear.current()}' or previous effective year '${effectiveYear.current() - 1}'."
+      )
 
     logger.info("Starting import of prices for $supplier for effective year $year.")
 

@@ -12,6 +12,8 @@ import java.time.LocalDate
 @Component
 class EffectiveYear(private val timeSource: TimeSource) {
   fun current(): Int = effectiveYearForDate(timeSource.date())
+
+  fun canAddOrUpdatePrices(year: Int) = year <= current() && current() - year < 2
 }
 
 fun effectiveYearForDate(date: LocalDate) = if (date.monthValue >= 9) date.year else date.year - 1
