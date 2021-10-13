@@ -195,17 +195,27 @@ class MaintainSupplierPricingController(
       effectiveYear
     ) ?: throw RuntimeException("No matching price found for $supplier")
 
+    if (actualEffectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())) {
+      model.apply {
+        addAttribute("form", PriceForm(moveId, price.amount.toString(), price.fromAgency, price.toAgency))
+        addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
+        addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
+        addAttribute("cancelLink", getJourneySearchResultsUrl())
+        addAttribute("existingExceptions", existingExceptions(price.exceptions))
+        addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00"))
+        addContractStartAndEndDates()
+      }
+
+      return "update-price"
+    }
+
     model.apply {
-      addAttribute("form", PriceForm(moveId, price.amount.toString(), price.fromAgency, price.toAgency))
-      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
-      addAttribute("existingExceptions", existingExceptions(price.exceptions))
-      addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00"))
       addContractStartAndEndDates()
     }
 
-    return "update-price"
+    return "update-price-history"
   }
 
   @PostMapping(UPDATE_PRICE)

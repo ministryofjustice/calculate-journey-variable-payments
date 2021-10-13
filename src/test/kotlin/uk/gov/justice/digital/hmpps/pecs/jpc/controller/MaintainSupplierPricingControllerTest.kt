@@ -350,6 +350,53 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
+  internal fun `only shows price history when selected year out of range for updates`() {
+    mockSession.addSupplierAndContractualYear(GEOAMEY, currentContractualDate)
+    whenever(actualEffectiveYear.canAddOrUpdatePrices(currentContractualEffectiveYear)).thenReturn(false)
+
+    whenever(
+      service.maybePrice(
+        GEOAMEY,
+        fromAgencyId,
+        toAgencyId,
+        currentContractualEffectiveYear
+      )
+    ).thenReturn(PriceDto("from", "to", Money(1000)).apply { exceptions[7] = Money(100) })
+
+    val priceHistoryDateTime = LocalDateTime.now()
+    val priceHistory = PriceMetadata(
+      GEOAMEY,
+      fromAgencyId,
+      toAgencyId,
+      currentContractualEffectiveYear,
+      Money.valueOf(10.00).pounds()
+    )
+    val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
+
+    whenever(service.priceHistoryForJourney(GEOAMEY, fromAgencyId, toAgencyId)).thenReturn(setOf(priceEvent))
+
+    mockMvc.get("/update-price/$fromAgencyId-$toAgencyId") { session = mockSession }
+      .andExpect {
+        model {
+          attribute(
+            "history",
+            listOf(
+              PriceHistoryDto(
+                priceHistoryDateTime,
+                "Journey priced at £10.00. Effective from $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.",
+                "SYSTEM"
+              )
+            )
+          )
+        }
+      }
+      .andExpect { view { name("update-price-history") } }
+      .andExpect { status { isOk() } }
+
+    verify(service).maybePrice(GEOAMEY, fromAgencyId, toAgencyId, currentContractualEffectiveYear)
+  }
+
+  @Test
   internal fun `can initiate update price for Geoamey including price history for the previous contractual year`() {
     mockSession.addSupplierAndContractualYear(GEOAMEY, previousContractualDate)
 
