@@ -95,28 +95,36 @@ class MaintainSupplierPricingController(
   fun addPrice(
     @PathVariable moveId: String,
     model: ModelMap,
-    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
+    redirectAttributes: RedirectAttributes
   ): Any {
     logger.info("getting add price for move $moveId")
 
-    val effectiveYear = model.getSelectedEffectiveYear()
-    val (fromAgencyId, toAgencyId) = agencyIds(moveId)
+    if (actualEffectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())) {
+      val effectiveYear = model.getSelectedEffectiveYear()
+      val (fromAgencyId, toAgencyId) = agencyIds(moveId)
 
-    val (fromSite, toSite) =
-      supplierPricingService.getSiteNamesForPricing(
-        supplier,
-        fromAgencyId,
-        toAgencyId,
-        effectiveYear
-      )
+      val (fromSite, toSite) =
+        supplierPricingService.getSiteNamesForPricing(
+          supplier,
+          fromAgencyId,
+          toAgencyId,
+          effectiveYear
+        )
 
-    model.apply {
-      addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
-      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
-      addContractStartAndEndDates()
+      model.apply {
+        addAttribute("form", PriceForm(moveId, "0.00", fromSite, toSite))
+        addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
+        addContractStartAndEndDates()
+      }
+
+      return "add-price"
     }
 
-    return "add-price"
+    redirectAttributes.addFlashAttribute("flashMessage", "information")
+    redirectAttributes.addFlashAttribute("flashAttrMessage", "Prices for the selected price catalogue year ${model.getSelectedEffectiveYear()} can no longer be changed.")
+
+    return RedirectView(HtmlController.DASHBOARD_URL)
   }
 
   @PostMapping(ADD_PRICE)
@@ -125,7 +133,7 @@ class MaintainSupplierPricingController(
     result: BindingResult,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    redirectAttributes: RedirectAttributes,
+    redirectAttributes: RedirectAttributes
   ): Any {
     logger.info("adding price for move $supplier")
 
@@ -187,17 +195,27 @@ class MaintainSupplierPricingController(
       effectiveYear
     ) ?: throw RuntimeException("No matching price found for $supplier")
 
+    if (actualEffectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())) {
+      model.apply {
+        addAttribute("form", PriceForm(moveId, price.amount.toString(), price.fromAgency, price.toAgency))
+        addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
+        addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
+        addAttribute("cancelLink", getJourneySearchResultsUrl())
+        addAttribute("existingExceptions", existingExceptions(price.exceptions))
+        addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00"))
+        addContractStartAndEndDates()
+      }
+
+      return "update-price"
+    }
+
     model.apply {
-      addAttribute("form", PriceForm(moveId, price.amount.toString(), price.fromAgency, price.toAgency))
-      addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
       addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
       addAttribute("cancelLink", getJourneySearchResultsUrl())
-      addAttribute("existingExceptions", existingExceptions(price.exceptions))
-      addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00"))
       addContractStartAndEndDates()
     }
 
-    return "update-price"
+    return "update-price-history"
   }
 
   @PostMapping(UPDATE_PRICE)

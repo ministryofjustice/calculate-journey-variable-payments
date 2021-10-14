@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+  <title>Calculate Journey Variable Payments - GOV.UK</title>
+</head>
+
+<body>
+
+<div class="govuk-width-container" layout:fragment="content">
+  <div th:insert="fragments/contractual-year.html :: contractualYear"></div>
+
+  <a th:href="${cancelLink}" class="govuk-back-link">Back</a>
+
+  <h2 class="govuk-heading-l">Price history</h2>
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Date</th>
+      <th scope="col" class="govuk-table__header">Time</th>
+      <th scope="col" class="govuk-table__header">Action</th>
+      <th scope="col" class="govuk-table__header">By</th>
+    </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    <tr class="govuk-table__row" th:each="event: ${history}">
+      <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'dd MMMM yyyy')}]]</td>
+      <td class="govuk-table__cell" scope="row" th:inline="text">[[${#temporals.format(event.datetime, 'HH:mm a')}]]</td>
+      <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.action}]]</td>
+      <td class="govuk-table__cell" scope="row" th:inline="text">[[${event.by}]]</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+
+</html>

@@ -25,6 +25,8 @@ import java.util.UUID
  *    past and for purposes of testing all moves need to start and end within the same month.
  * 2. As in point one, we use the moves in the integration tests as we have fine control over the move dates.
  *
+ * Note: no audit events are created as part of this migration.
+ *
  */
 @Suppress("ClassName", "unused")
 class R__2_5_Integration_test_data : BaseJavaMigration() {
@@ -33,6 +35,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
 
   companion object {
     val PRISON1_PRIMARY_KEY: UUID = UUID.fromString("709fbee3-7fe6-4584-a8dc-f12481165bfa")
+    val PRISON2_PRIMARY_KEY: UUID = UUID.fromString("612ec4d3-9cfa-4c89-ad39-3f02acc8b41d")
     val POLICE1_PRIMARY_KEY: UUID = UUID.fromString("13c46837-c5c9-45a4-83d5-5a0d1438ff3c")
   }
 
@@ -83,38 +86,84 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       }
     }
 
-    mapOf(
-      "SM1" to "PR1",
-      "SM2" to "PR2",
-      "SM3" to "PR3"
-    ).forEach {
-      create(
-        move(moveId = it.key, profileId = it.value, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"),
-        template
-      ).also { move -> createMoveEventsAndJourney(move) }
+    fun createUnpricedStandardMovesInsideTwoYearChangeWindow() {
+      mapOf(
+        "SM1" to "PR1",
+        "SM2" to "PR2",
+        "SM3" to "PR3"
+      ).forEach {
+        create(
+          move(moveId = it.key, profileId = it.value, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"),
+          template
+        ).also { move -> createMoveEventsAndJourney(move) }
+      }
     }
 
-    create(
-      move(
-        moveId = "SM4",
-        profileId = "PR1",
-        fromAgencyId = "PRISON1",
-        toAgencyId = "POLICE1",
-        date = startOfPreviousMonth.minusMonths(1)
-      ),
-      template
-    ).also { move ->
-      createMoveEventsAndJourney(
-        move,
-        Priced(
-          fromPrimaryKey = PRISON1_PRIMARY_KEY,
+    fun createPricedStandardMoveInsideTwoYearChangeWindow() {
+      create(
+        move(
+          moveId = "SM4",
+          profileId = "PR1",
           fromAgencyId = "PRISON1",
-          toPrimaryKey = POLICE1_PRIMARY_KEY,
           toAgencyId = "POLICE1",
-          amount = Money.valueOf(100.00)
+          date = startOfPreviousMonth.minusMonths(1)
+        ),
+        template
+      ).also { move ->
+        createMoveEventsAndJourney(
+          move,
+          Priced(
+            fromPrimaryKey = PRISON1_PRIMARY_KEY,
+            fromAgencyId = "PRISON1",
+            toPrimaryKey = POLICE1_PRIMARY_KEY,
+            toAgencyId = "POLICE1",
+            amount = Money.valueOf(100.00)
+          )
         )
-      )
+      }
     }
+
+    fun createUnpricedStandardMoveOutsideTwoYearChangeWindow() {
+      create(
+        move(
+          moveId = "SM5",
+          profileId = "PR2",
+          fromAgencyId = "PRISON1",
+          toAgencyId = "PRISON2",
+          date = startOfPreviousMonth.minusYears(2)
+        ),
+        template
+      ).also { createMoveEventsAndJourney(it) }
+    }
+
+    fun createPricedStandardMoveOutsideTwoYearChangeWindow() {
+      create(
+        move(
+          moveId = "SM6",
+          profileId = "PR1",
+          fromAgencyId = "PRISON1",
+          toAgencyId = "POLICE1",
+          date = startOfPreviousMonth.minusYears(2)
+        ),
+        template
+      ).also { move ->
+        createMoveEventsAndJourney(
+          move,
+          Priced(
+            fromPrimaryKey = PRISON1_PRIMARY_KEY,
+            fromAgencyId = "PRISON1",
+            toPrimaryKey = POLICE1_PRIMARY_KEY,
+            toAgencyId = "POLICE1",
+            amount = Money.valueOf(50.00)
+          )
+        )
+      }
+    }
+
+    createUnpricedStandardMovesInsideTwoYearChangeWindow()
+    createPricedStandardMoveInsideTwoYearChangeWindow()
+    createUnpricedStandardMoveOutsideTwoYearChangeWindow()
+    createPricedStandardMoveOutsideTwoYearChangeWindow()
   }
 
   // TODO need to add the appropriate journey events for the following move types...

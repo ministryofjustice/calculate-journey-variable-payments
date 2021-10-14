@@ -44,6 +44,22 @@ internal class EffectiveYearTest {
     assertThat(nextEffectiveYearForDate(august(2020).toLocalDate())).isEqualTo(2020)
   }
 
+  @Test
+  fun `prices changes cannot be applied after the current year`() {
+    assertThat(EffectiveYear { september(2020) }.canAddOrUpdatePrices(2021)).isFalse
+  }
+
+  @Test
+  fun `prices changes can be applied in the current and previous year`() {
+    assertThat(EffectiveYear { september(2020) }.canAddOrUpdatePrices(2020)).isTrue
+    assertThat(EffectiveYear { september(2020) }.canAddOrUpdatePrices(2019)).isTrue
+  }
+
+  @Test
+  fun `prices changes cannot be applied before the previous year`() {
+    assertThat(EffectiveYear { september(2020) }.canAddOrUpdatePrices(2018)).isFalse
+  }
+
   private fun september(year: Int) = LocalDateTime.of(year, 9, 1, 0, 0)
 
   private fun august(year: Int) = LocalDateTime.of(year, 8, 31, 0, 0)

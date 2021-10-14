@@ -56,7 +56,15 @@
               Price exception for [[${flashAttrExceptionMonth}]] removed for journey from [[${flashAttrLocationFrom}]] to [[${flashAttrLocationTo}]]
             </p>
           </div>
-            <div th:case="*"></div>
+          <div th:case="'information'">
+            <p class="govuk-heading-m govuk-!-font-weight-bold ma0">
+              Important
+            </p>
+            <p class="govuk-body ma0" id="app-message__heading" th:inline="text">
+              [[${flashAttrMessage}]]
+            </p>
+          </div>
+          <div th:case="*"></div>
         </div>
         <a th:href="${dismissFallback}" class="govuk-link" onclick="event.preventDefault();this.parentElement.remove()">Dismiss</a>
     </div>
