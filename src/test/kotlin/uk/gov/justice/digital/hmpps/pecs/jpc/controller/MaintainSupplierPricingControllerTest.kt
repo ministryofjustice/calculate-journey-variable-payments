@@ -189,7 +189,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
       .andExpect { flash { attribute("flashMessage", "information") } }
-      .andExpect { flash { attribute("flashAttrMessage", "You can no longer change the price catalogue for the selected year.") } }
+      .andExpect { flash { attribute("flashAttrMessage", "Prices for the selected price catalogue year $currentContractualEffectiveYear can no longer be changed.") } }
       .andExpect { redirectedUrl("/dashboard") }
   }
 

@@ -122,7 +122,7 @@ class MaintainSupplierPricingController(
     }
 
     redirectAttributes.addFlashAttribute("flashMessage", "information")
-    redirectAttributes.addFlashAttribute("flashAttrMessage", "You can no longer change the price catalogue for the selected year.")
+    redirectAttributes.addFlashAttribute("flashAttrMessage", "Prices for the selected price catalogue year ${model.getSelectedEffectiveYear()} can no longer be changed.")
 
     return RedirectView(HtmlController.DASHBOARD_URL)
   }
