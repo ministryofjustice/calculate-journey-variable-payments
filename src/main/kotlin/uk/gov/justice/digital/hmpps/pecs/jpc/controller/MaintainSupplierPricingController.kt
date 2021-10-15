@@ -122,7 +122,10 @@ class MaintainSupplierPricingController(
     }
 
     redirectAttributes.addFlashAttribute("flashMessage", "information")
-    redirectAttributes.addFlashAttribute("flashAttrMessage", "Prices for the selected price catalogue year ${model.getSelectedEffectiveYear()} can no longer be changed.")
+    redirectAttributes.addFlashAttribute(
+      "flashAttrMessage",
+      "Prices for the selected price catalogue ${model.getSelectedYearStart().month()} ${model.getSelectedYearStart().year()} to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} can no longer be changed."
+    )
 
     return RedirectView(HtmlController.DASHBOARD_URL)
   }

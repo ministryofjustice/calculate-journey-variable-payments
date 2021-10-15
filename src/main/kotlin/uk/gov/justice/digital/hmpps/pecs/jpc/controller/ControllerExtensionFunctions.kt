@@ -12,6 +12,13 @@ import java.time.LocalDate
 
 internal val XSS_CHARACTERS = setOf('<', '＜', '〈', '〈', '>', '＞', '〉', '〉')
 
+@JvmInline
+internal value class MonthYear(private val monthYear: Pair<String, Int>) {
+  fun month() = monthYear.first
+
+  fun year() = monthYear.second
+}
+
 internal fun BindingResult.rejectIfContainsXssCharacters(value: String, field: String, errorCode: String) {
   if (value.any(XSS_CHARACTERS::contains)) {
     this.rejectValue(
@@ -30,6 +37,10 @@ internal fun ModelMap.addContractStartAndEndDates() {
     this.addAttribute("contractualYearEnd", "${it + 1}")
   }
 }
+
+internal fun ModelMap.getSelectedYearStart() = MonthYear("September" to getSelectedEffectiveYear())
+
+internal fun ModelMap.getSelectedYearEnd() = MonthYear("August" to getSelectedEffectiveYear() + 1)
 
 internal fun ModelMap.getSelectedEffectiveYear() = effectiveYearForDate(getStartOfMonth())
 
