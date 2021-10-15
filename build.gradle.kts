@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.9"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.10"
   kotlin("plugin.spring") version "1.5.31"
   kotlin("plugin.jpa") version "1.5.31"
   kotlin("plugin.allopen") version "1.5.31"
@@ -17,8 +17,8 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.80")
-  implementation("io.sentry:sentry-spring-boot-starter:5.2.1")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.87")
+  implementation("io.sentry:sentry-spring-boot-starter:5.2.2")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.28.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.28.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
@@ -39,7 +39,7 @@ dependencies {
     }
   }
 
-  implementation("org.flywaydb:flyway-core:7.15.0")
+  implementation("org.flywaydb:flyway-core:8.0.1")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -53,14 +53,12 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
-  testImplementation("org.mockito:mockito-inline:3.12.4")
-  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
+  testImplementation("org.mockito:mockito-inline:4.0.0")
+  testImplementation("org.seleniumhq.selenium:selenium-java:4.0.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.2")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.2")
-  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
-  testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
 
   runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.2.24")
@@ -69,7 +67,7 @@ dependencies {
 tasks {
   test {
     useJUnitPlatform()
-    exclude("**/integration/*", "**/migrations/*")
+    exclude("**/integration/*")
   }
 
   withType<JavaCompile> {
