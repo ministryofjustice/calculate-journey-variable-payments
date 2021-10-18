@@ -104,9 +104,10 @@
                         </div>
                         <div sec:authorize="hasRole('ROLE_PECS_MAINTAIN_PRICE')">
                             <span th:unless="${journey.fromSiteName == null || journey.toSiteName == null}">
-                                <a th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
+                                <a th:if="${canAddPrice}" th:href="@{'/add-price/' + ${journey.fromNomisAgencyId} + '-' + ${journey.toNomisAgencyId}}"
                                    class="ma0 govuk-link">Add price</a>
                             </span>
+                          <span th:unless="${canAddPrice}" th:inline="text">Not priced</span>
                         </div>
                     </td>
                 </tr>

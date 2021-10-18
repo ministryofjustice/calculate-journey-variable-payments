@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MapLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SearchLocations
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import java.time.LocalDate
 import java.time.Year
@@ -113,9 +114,9 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToJourneysForReview()
 
-    isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
-
-    isAtPage(Dashboard)
+    isAtPage(JourneysForReview)
+      .isRowPresent<JourneysForReviewPage>("PRISON ONE", "PR", "PRISON TWO", "PR", 1, "Not priced")
+      .assertTextIsNotPresent<JourneysForReviewPage>("Add price")
   }
 
   @Test
@@ -144,8 +145,8 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(UpdatePrice)
       .isAtPricePageForJourney("PRISON1", "POLICE1")
-      .assertTextIsNotPresent("Update price")
-      .assertTextIsNotPresent("Price exceptions")
+      .assertTextIsNotPresent<UpdatePricePage>("Update price")
+      .assertTextIsNotPresent<UpdatePricePage>("Price exceptions")
       .assertTextIsPresent("Price history")
   }
 
