@@ -20,6 +20,7 @@ import org.springframework.web.servlet.view.RedirectView
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
@@ -39,7 +40,8 @@ data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, v
 class HtmlController(
   @Autowired val moveService: MoveService,
   @Autowired val journeyService: JourneyService,
-  @Autowired val timeSource: TimeSource
+  @Autowired val timeSource: TimeSource,
+  @Autowired val actualEffectiveYear: EffectiveYear
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -146,6 +148,7 @@ class HtmlController(
     model.apply {
       addAttribute("journeysSummary", journeyService.journeysSummary(supplier, startOfMonth))
       addAttribute("journeys", journeyService.distinctJourneysExcludingPriced(supplier, startOfMonth))
+      addAttribute("canAddPrice", actualEffectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear()))
     }
 
     return "journeys"

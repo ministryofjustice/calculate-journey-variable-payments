@@ -32,6 +32,12 @@ abstract class ApplicationPage : FluentPage() {
     find(By.xpath("//p[normalize-space(text())='$text']")).firstOrNull().let { assertThat(it).isNotNull }
   }
 
+  internal inline fun <reified T : ApplicationPage> assertTextIsNotPresent(text: String): T {
+    assertThat(super.pageSource()).doesNotContainIgnoringCase(text)
+
+    return this as T
+  }
+
   inline fun <reified T : ApplicationPage> isRowPresent(value: Any, vararg values: Any): T {
     val query = values.joinToString(" ") { "and contains(., '$it')" }
 

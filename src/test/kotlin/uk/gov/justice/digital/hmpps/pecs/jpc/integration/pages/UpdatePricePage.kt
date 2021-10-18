@@ -41,12 +41,6 @@ class UpdatePricePage : ApplicationPage() {
     submit.click()
   }
 
-  fun assertTextIsNotPresent(text: String): UpdatePricePage {
-    assertThat(super.pageSource()).doesNotContainIgnoringCase(text)
-
-    return this
-  }
-
   fun assertTextIsPresent(text: String): UpdatePricePage {
     assertThat(super.pageSource()).containsIgnoringCase(text)
 
