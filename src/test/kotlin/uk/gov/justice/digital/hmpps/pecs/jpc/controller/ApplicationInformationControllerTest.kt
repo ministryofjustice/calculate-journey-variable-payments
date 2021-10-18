@@ -76,7 +76,7 @@ class ApplicationInformationControllerTest(@Autowired private val wac: WebApplic
   }
 
   @Test
-  internal fun `application info message is not present when outside allowed price change window`() {
+  internal fun `application info message is present when outside allowed price change window`() {
     whenever(annualPriceAdjustmentsService.adjustmentInProgressFor(defaultSupplierSerco)).thenReturn(false)
     whenever(effectiveYear.canAddOrUpdatePrices(any())).thenReturn(false)
 
