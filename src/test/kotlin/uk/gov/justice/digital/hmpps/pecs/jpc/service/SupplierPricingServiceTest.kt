@@ -19,12 +19,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import java.time.Month.JULY
@@ -35,7 +35,8 @@ internal class SupplierPricingServiceTest {
 
   private val annualPriceAdjuster: AnnualPriceAdjuster = mock()
   private val auditService: AuditService = mock()
-  private val effectiveYear = effectiveYearForDate(LocalDate.now())
+  private val effectiveYearDate = LocalDateTime.now()
+  private val effectiveYear = effectiveYearForDate(effectiveYearDate.toLocalDate())
   private val fromLocation: Location = Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
   private val toLocation: Location = Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
   private val locationRepository: LocationRepository = mock {
@@ -52,8 +53,9 @@ internal class SupplierPricingServiceTest {
   )
   private val priceCaptor = argumentCaptor<Price>()
   private val eventCaptor = argumentCaptor<AuditableEvent>()
+  private val actualEffectYear: EffectiveYear = EffectiveYear({ effectiveYearDate })
 
-  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService)
+  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService, actualEffectYear)
 
   @Test
   internal fun `site names returned for new pricing`() {
@@ -112,6 +114,21 @@ internal class SupplierPricingServiceTest {
         effectiveYear
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for SERCO")
+
+    verify(priceRepository, never()).save(any())
+  }
+
+  @Test
+  internal fun `add new price fails for supplier if outside of price change window`() {
+    assertThatThrownBy {
+      service.addPriceForSupplier(
+        Supplier.SERCO,
+        "from",
+        "to",
+        Money.valueOf(100.24),
+        effectiveYear - 2
+      )
+    }.isInstanceOf(RuntimeException::class.java).hasMessage("Price changes can longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -247,6 +264,21 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
+  internal fun `update existing price fails for supplier if outside of price change window`() {
+    assertThatThrownBy {
+      service.updatePriceForSupplier(
+        Supplier.GEOAMEY,
+        "from",
+        "to",
+        Money.Factory.valueOf(200.35),
+        effectiveYear - 2
+      )
+    }.isInstanceOf(RuntimeException::class.java).hasMessage("Price changes can longer be made, change is outside of price change window.")
+
+    verify(priceRepository, never()).save(any())
+  }
+
+  @Test
   internal fun `finds single price history entry for Serco`() {
     val sercoOriginalPrice = PriceMetadata(Supplier.SERCO, "FROM_AGENCY_ID", "TO_AGENCY_ID", 2021, Money(1000).pounds())
     val sercoOriginalPriceEvent =
@@ -302,6 +334,14 @@ internal class SupplierPricingServiceTest {
   }
 
   @Test
+  internal fun `add price exception fails if outside of price change window `() {
+    assertThatThrownBy {
+      service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, SEPTEMBER, Money.valueOf(20.00))
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+  }
+
+  @Test
   internal fun `add price exception fails for Serco when price not found`() {
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(null)
 
@@ -324,6 +364,14 @@ internal class SupplierPricingServiceTest {
     verify(priceRepository).save(sercoPrice)
     verify(auditService).create(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.type).isEqualTo(JOURNEY_PRICE)
+  }
+
+  @Test
+  internal fun `remove price exception fails if outside of price change window`() {
+    assertThatThrownBy {
+      service.removePriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, JULY)
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Price changes can longer be made, change is outside of price change window.")
   }
 
   @Test

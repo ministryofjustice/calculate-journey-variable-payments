@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
@@ -25,6 +26,7 @@ class SupplierPricingService(
   private val priceRepository: PriceRepository,
   private val annualPriceAdjuster: AnnualPriceAdjuster,
   private val auditService: AuditService,
+  private val actualEffectiveYear: EffectiveYear
 ) {
   fun getSiteNamesForPricing(
     supplier: Supplier,
@@ -64,6 +66,7 @@ class SupplierPricingService(
     effectiveYear: Int
   ) {
     failIfPriceAdjustmentInProgressFor(supplier)
+    failIfOutsideOfPriceChangeWindow(effectiveYear)
 
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
@@ -86,6 +89,7 @@ class SupplierPricingService(
     effectiveYear: Int
   ) {
     failIfPriceAdjustmentInProgressFor(supplier)
+    failIfOutsideOfPriceChangeWindow(effectiveYear)
 
     val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
@@ -106,6 +110,8 @@ class SupplierPricingService(
     month: Month,
     amount: Money
   ) {
+    failIfOutsideOfPriceChangeWindow(effectiveYear)
+
     val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?.apply { addException(month, amount) } ?: throw RuntimeException("No matching price found for $supplier")
 
@@ -120,6 +126,8 @@ class SupplierPricingService(
     effectiveYear: Int,
     month: Month,
   ): PriceDto {
+    failIfOutsideOfPriceChangeWindow(effectiveYear)
+
     val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
 
@@ -150,6 +158,10 @@ class SupplierPricingService(
 
   private fun failIfPriceAdjustmentInProgressFor(supplier: Supplier) {
     if (annualPriceAdjuster.isInProgressFor(supplier)) throw RuntimeException("Price adjustment in currently progress for $supplier")
+  }
+
+  private fun failIfOutsideOfPriceChangeWindow(effectiveYear: Int) {
+    if (!actualEffectiveYear.canAddOrUpdatePrices(effectiveYear)) throw RuntimeException("Price changes can longer be made, change is outside of price change window.")
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =
