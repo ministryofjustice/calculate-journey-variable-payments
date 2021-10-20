@@ -7,7 +7,7 @@ import java.time.LocalDate
 /**
  * The effective year represents the start year’s pricing that should be applied. An effective year starts at the
  * beginning of September and runs to the end of August the following year. For example, the 1st Sept 2020 to 31st Aug
- * 2021 would be be 2020.
+ * 2021 would be 2020.
  */
 @Component
 class EffectiveYear(private val timeSource: TimeSource) {
@@ -23,4 +23,10 @@ fun nextEffectiveYearForDate(date: LocalDate) = effectiveYearForDate(date) + 1
 /**
  * Starts from 9-12 then 1-8 representing September to August the following year.
  */
-fun effectiveMonthsOrdered() = listOf(9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8)
+fun ordinalMonthsAndYearForSeptemberToAugust(startingYear: Int) = listOf(9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8).map {
+  if (it >= 9) {
+    it to startingYear
+  } else {
+    it to startingYear + 1
+  }
+}

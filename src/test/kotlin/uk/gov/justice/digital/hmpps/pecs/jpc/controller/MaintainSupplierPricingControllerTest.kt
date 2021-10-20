@@ -339,8 +339,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
-      .andExpect { model { attribute("existingExceptions", listOf(PriceExceptionMonth(Month.JULY, true, Money(100)))) } }
-      .andExpect { model { attribute("exceptionsForm", PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)), exceptionPrice = "0.00")) } }
+      .andExpect { model { attribute("existingExceptions", listOf(PriceExceptionMonth(Month.JULY, true, currentContractualEffectiveYear + 1, Money(100)))) } }
+      .andExpect { model { attribute("exceptionsForm", PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)), effectiveYear = currentContractualEffectiveYear, exceptionPrice = "0.00")) } }
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 

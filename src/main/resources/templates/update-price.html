@@ -94,12 +94,14 @@
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                   <th scope="col" class="govuk-table__header">Month</th>
+                  <th scope="col" class="govuk-table__header">Year</th>
                   <th scope="col" class="govuk-table__header">Price</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                 <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
-                  <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.text}"></td>
+                  <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.month}"></td>
+                  <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${exception.year}"></td>
                   <td class="govuk-table__cell" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
                 </tr>
                 </tbody>
@@ -137,13 +139,15 @@
             <thead class="govuk-table__head">
             <tr class="govuk-table__row">
               <th scope="col" class="govuk-table__header">Month</th>
+              <th scope="col" class="govuk-table__header">Year</th>
               <th scope="col" class="govuk-table__header">Price</th>
               <th scope="col" class="govuk-table__header"></th>
             </tr>
             </thead>
             <tbody class="govuk-table__body">
             <tr class="govuk-table__row" th:each="exception: ${existingExceptions}">
-              <td class="govuk-table__cell vam" scope="row" th:inline="text" th:text="${exception.text}"></td>
+              <td class="govuk-table__cell vam" scope="row" th:inline="text" th:text="${exception.month}"></td>
+              <td class="govuk-table__cell vam" scope="row" th:inline="text" th:text="${exception.year}"></td>
               <td class="govuk-table__cell vam" scope="row" th:inline="text" th:text="${'£' + exception.amount}"></td>
               <td class="govuk-table__cell" scope="row" th:inline="text">
                 <form th:action="@{/remove-price-exception}" method="post">
@@ -185,10 +189,10 @@
             <div class="govuk-form-group">
               <select class="govuk-select" id="exception-month" th:field="*{exceptionMonth}">
                 <option
-                  th:each="month : *{months}"
-                  th:disabled="${month.disabled}"
-                  th:value="${month.value}"
-                  th:text="${month.text}">
+                  th:each="exception : *{months}"
+                  th:disabled="${exception.alreadySelected}"
+                  th:value="${exception.value}"
+                  th:text="${exception.month} + ' ' + ${exception.year}">
                 </option>
               </select>
             </div>
