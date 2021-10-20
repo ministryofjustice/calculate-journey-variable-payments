@@ -17,7 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveMonthsOrdered
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.ordinalMonthsAndYearForSeptemberToAugust
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
 import java.time.Month
 import javax.validation.Valid
@@ -74,19 +74,28 @@ class MaintainSupplierPricingController(
     val moveId: String,
     val existingExceptions: Map<Int, Money> = emptyMap(),
     val exceptionMonth: String? = null,
+    val effectiveYear: Int? = null,
     @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
     val exceptionPrice: String? = null
   ) {
-    val months: List<PriceExceptionMonth> = effectiveMonthsOrdered().map { month ->
-      PriceExceptionMonth(Month.of(month), existingExceptions.containsKey(month), existingExceptions[month])
-    }
+    val months: List<PriceExceptionMonth> = effectiveYear?.let {
+      ordinalMonthsAndYearForSeptemberToAugust(effectiveYear).map { (month, year) ->
+        PriceExceptionMonth(
+          Month.of(month),
+          existingExceptions.containsKey(month),
+          year,
+          existingExceptions[month]
+        )
+      }
+    } ?: listOf()
   }
 
-  data class PriceExceptionMonth(val value: String, val text: String, val disabled: Boolean, val amount: Money?) {
-    constructor(month: Month, disabled: Boolean, amount: Money?) : this(
+  data class PriceExceptionMonth(val value: String, val month: String, val alreadySelected: Boolean, val year: Int, val amount: Money?) {
+    constructor(month: Month, alreadySelected: Boolean, year: Int, amount: Money?) : this(
       month.name,
       month.name.lowercase().replaceFirstChar { it.titlecaseChar() },
-      disabled,
+      alreadySelected,
+      year,
       amount
     )
   }
@@ -198,8 +207,8 @@ class MaintainSupplierPricingController(
         addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("cancelLink", getJourneySearchResultsUrl())
-        addAttribute("existingExceptions", existingExceptions(price.exceptions))
-        addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00"))
+        addAttribute("existingExceptions", existingExceptions(price.exceptions, getSelectedEffectiveYear()))
+        addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00", effectiveYear = getSelectedEffectiveYear()))
         addContractStartAndEndDates()
       }
 
@@ -236,8 +245,8 @@ class MaintainSupplierPricingController(
         addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
-        addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions))
-        addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions))
+        addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions, getSelectedEffectiveYear()))
+        addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions, effectiveYear = getSelectedEffectiveYear()))
         addContractStartAndEndDates()
       }
 
@@ -268,11 +277,12 @@ class MaintainSupplierPricingController(
     }
   }
 
-  private fun existingExceptions(existingExceptions: Map<Int, Money>) =
-    effectiveMonthsOrdered().mapNotNull { month ->
+  private fun existingExceptions(existingExceptions: Map<Int, Money>, effectiveYear: Int) =
+    ordinalMonthsAndYearForSeptemberToAugust(effectiveYear).mapNotNull { (month, year) ->
       if (existingExceptions.containsKey(month)) PriceExceptionMonth(
         Month.of(month),
         existingExceptions.containsKey(month),
+        year,
         existingExceptions[month]
       ) else null
     }
@@ -284,7 +294,6 @@ class MaintainSupplierPricingController(
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes
-
   ): Any {
     logger.info("Adding price exception")
 

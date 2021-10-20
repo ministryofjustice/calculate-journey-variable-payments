@@ -60,6 +60,46 @@ internal class EffectiveYearTest {
     assertThat(EffectiveYear { september(2020) }.canAddOrUpdatePrices(2018)).isFalse
   }
 
+  @Test
+  fun `ordinal month and years are correct for effective year 2020`() {
+    assertThat(ordinalMonthsAndYearForSeptemberToAugust(2020)).isEqualTo(
+      listOf(
+        9 to 2020,
+        10 to 2020,
+        11 to 2020,
+        12 to 2020,
+        1 to 2021,
+        2 to 2021,
+        3 to 2021,
+        4 to 2021,
+        5 to 2021,
+        6 to 2021,
+        7 to 2021,
+        8 to 2021,
+      )
+    )
+  }
+
+  @Test
+  fun `ordinal month and years are correct for effective year 2021`() {
+    assertThat(ordinalMonthsAndYearForSeptemberToAugust(2021)).isEqualTo(
+      listOf(
+        9 to 2021,
+        10 to 2021,
+        11 to 2021,
+        12 to 2021,
+        1 to 2022,
+        2 to 2022,
+        3 to 2022,
+        4 to 2022,
+        5 to 2022,
+        6 to 2022,
+        7 to 2022,
+        8 to 2022,
+      )
+    )
+  }
+
   private fun september(year: Int) = LocalDateTime.of(year, 9, 1, 0, 0)
 
   private fun august(year: Int) = LocalDateTime.of(year, 8, 31, 0, 0)
