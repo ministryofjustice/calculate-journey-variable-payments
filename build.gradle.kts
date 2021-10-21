@@ -24,6 +24,11 @@ dependencies {
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
 
+  // These can be removed when (and only when) the dependencies have been updated in Spring 2.5.6. 9.0.53 has CVE's.
+  // There are still being overridden if add to the constraints below.
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:9.0.54")
+  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:9.0.54")
+
   constraints {
     implementation("org.apache.xmlgraphics:batik-all:1.14") {
       because("previous transitive version 1.13 pulled from Apache POI 5.0.0 has CVE")
@@ -49,6 +54,21 @@ dependencies {
   implementation("org.springframework.shell:spring-shell-starter:2.0.1.RELEASE")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
+
+  constraints {
+    implementation("org.apache.xmlgraphics:batik-all:1.14") {
+      because("previous transitive version 1.13 pulled from Apache POI 5.0.0 has CVE")
+    }
+    implementation("org.apache.pdfbox:pdfbox:2.0.24") {
+      because("previous transitive version 2.0.23 pulled from Apache POI 5.0.0 has CVE")
+    }
+    implementation("org.apache.commons:commons-compress:1.21") {
+      because("previous transitive version 1.20 pulled from Apache POI 5.0.0 has CVE")
+    }
+    implementation("org.apache.santuario:xmlsec:2.2.3") {
+      because("previous transitive version 2.2.1 pulled from Apache POI 5.0.0 has CVE")
+    }
+  }
 
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
