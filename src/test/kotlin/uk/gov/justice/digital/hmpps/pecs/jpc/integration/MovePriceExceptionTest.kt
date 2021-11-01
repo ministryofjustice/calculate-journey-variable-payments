@@ -4,6 +4,7 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -29,6 +30,8 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
   private val date = currentDate.minusMonths(2)
 
+  private val month = date.month
+
   private val year = Year.of(date.year)
 
   @Test
@@ -42,7 +45,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(date.month, year)
+    isAtPage(SelectMonthYear).navigateToDashboardFor(month, year)
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
@@ -64,7 +67,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(UpdatePrice)
       .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>("August", year.value, "£3000.00")
+      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
 
     goToPage(Dashboard)
 
@@ -91,7 +94,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(date.month, year)
+    isAtPage(SelectMonthYear).navigateToDashboardFor(month, year)
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
@@ -107,7 +110,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
     isAtPage(UpdatePrice)
       .isAtPricePageForJourney("PRISON1", "POLICE1")
       .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>("August", year.value, "£3000.00")
+      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
       .showPriceExceptionsTab()
       .removePriceException(date.month)
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
