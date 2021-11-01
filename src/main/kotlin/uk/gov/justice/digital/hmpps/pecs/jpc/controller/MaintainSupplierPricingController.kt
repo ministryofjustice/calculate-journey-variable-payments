@@ -93,7 +93,7 @@ class MaintainSupplierPricingController(
   data class PriceExceptionMonth(val value: String, val month: String, val alreadySelected: Boolean, val year: Int, val amount: Money?) {
     constructor(month: Month, alreadySelected: Boolean, year: Int, amount: Money?) : this(
       month.name,
-      month.name.lowercase().replaceFirstChar { it.titlecaseChar() },
+      month.name.titleCased(),
       alreadySelected,
       year,
       amount

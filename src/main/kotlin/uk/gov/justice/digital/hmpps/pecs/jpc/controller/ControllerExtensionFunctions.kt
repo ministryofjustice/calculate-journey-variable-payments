@@ -52,3 +52,5 @@ internal fun ModelMap.removeAnyPreviousSearchHistory() {
   this.addAttribute(PICK_UP_ATTRIBUTE, "")
   this.addAttribute(DROP_OFF_ATTRIBUTE, "")
 }
+
+internal fun String.titleCased() = this.lowercase().replaceFirstChar { it.titlecaseChar() }

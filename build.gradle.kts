@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.12"
   kotlin("plugin.spring") version "1.5.31"
   kotlin("plugin.jpa") version "1.5.31"
   kotlin("plugin.allopen") version "1.5.31"
@@ -17,17 +17,12 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.87")
-  implementation("io.sentry:sentry-spring-boot-starter:5.2.2")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.28.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.28.0")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.99")
+  implementation("io.sentry:sentry-spring-boot-starter:5.3.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.29.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.29.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
   implementation("org.apache.poi:poi-ooxml:5.0.0")
-
-  // These can be removed when (and only when) the dependencies have been updated in Spring 2.5.6. 9.0.53 has CVE's.
-  // There are still being overridden if add to the constraints below.
-  implementation("org.apache.tomcat.embed:tomcat-embed-core:9.0.54")
-  implementation("org.apache.tomcat.embed:tomcat-embed-websocket:9.0.54")
 
   constraints {
     implementation("org.apache.xmlgraphics:batik-all:1.14") {
@@ -44,13 +39,13 @@ dependencies {
     }
   }
 
-  implementation("org.flywaydb:flyway-core:8.0.1")
+  implementation("org.flywaydb:flyway-core:8.0.2")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springframework.session:spring-session-jdbc:2.5.2")
+  implementation("org.springframework.session:spring-session-jdbc:2.5.3")
   implementation("org.springframework.shell:spring-shell-starter:2.0.1.RELEASE")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
@@ -81,7 +76,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:okhttp:4.9.2")
 
   runtimeOnly("com.h2database:h2")
-  runtimeOnly("org.postgresql:postgresql:42.2.24")
+  runtimeOnly("org.postgresql:postgresql:42.3.1")
 }
 
 tasks {
