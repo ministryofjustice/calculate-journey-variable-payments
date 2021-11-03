@@ -26,7 +26,7 @@
           Update price
         </a>
       </li>
-      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected" th:if="${priceExceptionFeatureEnabled}">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
         <a class="govuk-tabs__tab" href="#price-exceptions">
           Price exceptions
         </a>
@@ -88,7 +88,7 @@
                        th:classappend="${#fields.hasErrors('price')} ? 'govuk-input--error'">
               </div>
             </li>
-            <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
+            <li class="mv3" th:if="${existingExceptions.size > 0}">
               <label class="govuk-label govuk-body govuk-!-font-weight-bold">Existing price exceptions</label>
               <table class="govuk-table">
                 <thead class="govuk-table__head">
@@ -128,12 +128,12 @@
       </form>
     </div>
 
-    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-exceptions" th:if="${priceExceptionFeatureEnabled}">
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="price-exceptions">
       <div>
         <h2 class="govuk-heading-l">Price exceptions</h2>
       </div>
       <ol class="list pl0">
-        <li class="mv3" th:if="${priceExceptionFeatureEnabled && existingExceptions.size > 0}">
+        <li class="mv3" th:if="${existingExceptions.size > 0}">
           <label class="govuk-label govuk-body govuk-!-font-weight-bold">Existing price exceptions</label>
           <table class="govuk-table">
             <thead class="govuk-table__head">
