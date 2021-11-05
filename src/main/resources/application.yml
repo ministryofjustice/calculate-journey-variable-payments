@@ -21,6 +21,7 @@ spring:
     store-type: jdbc
     jdbc:
       initialize-schema: never
+    timeout: 20M
   shell:
     interactive:
       enabled: false
@@ -64,6 +65,8 @@ server:
     session:
       cookie:
         secure: true
+        max-age: 20M
+        http-only: true
     context-path: /
   forward-headers-strategy: native
   tomcat:

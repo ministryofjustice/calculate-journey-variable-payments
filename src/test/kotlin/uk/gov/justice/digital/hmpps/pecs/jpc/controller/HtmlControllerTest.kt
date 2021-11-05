@@ -6,6 +6,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,9 +27,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
+import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
 import java.util.Optional
+import javax.servlet.http.Cookie
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,6 +41,7 @@ import java.util.Optional
 class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
+  private val sessionCookie = Cookie("SESSION", "")
   private val mockSession = MockHttpSession(wac.servletContext)
 
   @MockBean
@@ -49,6 +53,56 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   @BeforeEach
   fun beforeEach() {
     mockSession.setAttribute("supplier", defaultSupplierSerco)
+  }
+
+  @Test
+  internal fun `session cookie attributes are applied when present on a secure request`() {
+    whenever(moveService.moveTypeSummaries(any(), any())).thenReturn(MoveTypeSummaries(0, listOf()))
+
+    with(sessionCookie) {
+      path = null
+      secure = false
+      isHttpOnly = false
+      maxAge = -1
+    }
+
+    mockMvc.get("/dashboard") {
+      session = mockSession.apply { setAttribute("date", LocalDate.now()) }
+      secure = true
+      cookie(sessionCookie)
+    }
+
+    with(sessionCookie) {
+      assertThat(path).isEqualTo("/") // applied in interceptor
+      assertThat(secure).isTrue // taken from request and applied in interceptor
+      assertThat(isHttpOnly).isTrue // taken from properties file and applied in interceptor
+      assertThat(maxAge).isEqualTo(Duration.ofMinutes(20).seconds.toInt()) // taken from properties file and applied in interceptor
+    }
+  }
+
+  @Test
+  internal fun `session cookie attributes are applied when present on an insecure request`() {
+    whenever(moveService.moveTypeSummaries(any(), any())).thenReturn(MoveTypeSummaries(0, listOf()))
+
+    with(sessionCookie) {
+      path = null
+      secure = false
+      isHttpOnly = false
+      maxAge = -1
+    }
+
+    mockMvc.get("/dashboard") {
+      session = mockSession.apply { setAttribute("date", LocalDate.now()) }
+      secure = false
+      cookie(sessionCookie)
+    }
+
+    with(sessionCookie) {
+      assertThat(path).isEqualTo("/") // applied in interceptor
+      assertThat(secure).isFalse // taken from request and applied in interceptor
+      assertThat(isHttpOnly).isTrue // taken from properties file and applied in interceptor
+      assertThat(maxAge).isEqualTo(Duration.ofMinutes(20).seconds.toInt()) // taken from properties file and applied in interceptor
+    }
   }
 
   @Test
