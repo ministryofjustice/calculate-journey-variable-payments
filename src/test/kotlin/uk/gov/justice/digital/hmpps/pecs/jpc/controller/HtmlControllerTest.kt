@@ -56,7 +56,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   }
 
   @Test
-  internal fun `session cookie attributes are applied when present on a secure request`() {
+  internal fun `session cookie attributes are applied when present on an request`() {
     whenever(moveService.moveTypeSummaries(any(), any())).thenReturn(MoveTypeSummaries(0, listOf()))
 
     with(sessionCookie) {
@@ -68,38 +68,12 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
 
     mockMvc.get("/dashboard") {
       session = mockSession.apply { setAttribute("date", LocalDate.now()) }
-      secure = true
       cookie(sessionCookie)
     }
 
     with(sessionCookie) {
       assertThat(path).isEqualTo("/") // applied in interceptor
-      assertThat(secure).isTrue // taken from request and applied in interceptor
-      assertThat(isHttpOnly).isTrue // taken from properties file and applied in interceptor
-      assertThat(maxAge).isEqualTo(Duration.ofMinutes(20).seconds.toInt()) // taken from properties file and applied in interceptor
-    }
-  }
-
-  @Test
-  internal fun `session cookie attributes are applied when present on an insecure request`() {
-    whenever(moveService.moveTypeSummaries(any(), any())).thenReturn(MoveTypeSummaries(0, listOf()))
-
-    with(sessionCookie) {
-      path = null
-      secure = false
-      isHttpOnly = false
-      maxAge = -1
-    }
-
-    mockMvc.get("/dashboard") {
-      session = mockSession.apply { setAttribute("date", LocalDate.now()) }
-      secure = false
-      cookie(sessionCookie)
-    }
-
-    with(sessionCookie) {
-      assertThat(path).isEqualTo("/") // applied in interceptor
-      assertThat(secure).isFalse // taken from request and applied in interceptor
+      assertThat(secure).isTrue // taken from properties file and applied in interceptor
       assertThat(isHttpOnly).isTrue // taken from properties file and applied in interceptor
       assertThat(maxAge).isEqualTo(Duration.ofMinutes(20).seconds.toInt()) // taken from properties file and applied in interceptor
     }
