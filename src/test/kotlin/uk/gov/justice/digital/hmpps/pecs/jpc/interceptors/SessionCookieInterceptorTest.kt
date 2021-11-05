@@ -18,9 +18,9 @@ class SessionCookieInterceptorTest {
 
   @Test
   fun `insecure session cookie values are set when intercepted`() {
-    val inSecureRequest = requestWith(sessionCookie).apply { isSecure = false }
+    val inSecureRequest = requestWith(sessionCookie)
 
-    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(1), true)).postHandle(
+    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(1), httpOnly = true, secure = false)).postHandle(
       inSecureRequest,
       response,
       mock(),
@@ -36,9 +36,9 @@ class SessionCookieInterceptorTest {
 
   @Test
   fun `secure session cookie values are set when intercepted`() {
-    val secureRequest = requestWith(sessionCookie).apply { isSecure = true }
+    val secureRequest = requestWith(sessionCookie)
 
-    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(2), false)).postHandle(
+    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(2), httpOnly = false, secure = true)).postHandle(
       secureRequest,
       response,
       mock(),
@@ -54,7 +54,7 @@ class SessionCookieInterceptorTest {
 
   @Test
   fun `non-session cookie is not intercepted`() {
-    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(1), true)).postHandle(
+    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(1), httpOnly = true, secure = true)).postHandle(
       requestWith(
         nonSessionCookie
       ),

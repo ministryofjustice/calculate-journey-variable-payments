@@ -6,4 +6,4 @@ import java.time.Duration
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "server.servlet.session.cookie")
-data class SessionCookieProperties(val maxAge: Duration, val httpOnly: Boolean)
+data class SessionCookieProperties(val maxAge: Duration, val httpOnly: Boolean, val secure: Boolean)

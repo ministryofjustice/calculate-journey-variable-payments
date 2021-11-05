@@ -22,7 +22,7 @@ class SessionCookieInterceptor(private val properties: SessionCookieProperties) 
     request.cookies?.firstOrNull { it.name == SPRING_SESSION_COOKIE }?.apply {
       this.maxAge = properties.maxAge.toSeconds().toInt()
       this.path = ANY_PATH_STARTING_AT_ROOT
-      this.secure = request.isSecure
+      this.secure = properties.secure
       this.isHttpOnly = properties.httpOnly
     }?.also { response.addCookie(it) }
   }
