@@ -28,7 +28,6 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogInAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogOutAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
-import kotlin.streams.toList
 
 @EnableWebSecurity
 @ConditionalOnWebApplication
@@ -59,8 +58,8 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
         authorize(anyRequest, hasRole("PECS_JPC"))
       }
       sessionManagement {
-        invalidSessionUrl = authLogoutSuccessUri
-        sessionAuthenticationErrorUrl = authLogoutSuccessUri
+        invalidSessionUrl = ssologoutUri()
+        sessionAuthenticationErrorUrl = ssologoutUri()
         sessionConcurrency {
           sessionRegistry = clusteredConcurrentSessionRegistry()
           maximumSessions = 1
@@ -71,11 +70,11 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
       }
       oauth2Login {
         userInfoEndpoint { userService = oAuth2UserService() }
-        failureUrl = authLogoutSuccessUri
+        failureUrl = ssologoutUri()
         authenticationSuccessHandler = logInHandler()
       }
       logout {
-        logoutSuccessUrl = authLogoutSuccessUri
+        logoutSuccessUrl = ssologoutUri()
         logoutSuccessHandler = logOutHandler()
       }
     }
@@ -85,7 +84,7 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   fun logInHandler() = LogInAuditHandler(auditService)
 
   @Bean
-  fun logOutHandler() = LogOutAuditHandler(auditService, authLogoutSuccessUri)
+  fun logOutHandler() = LogOutAuditHandler(auditService, ssologoutUri())
 
   @Bean
   fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =
@@ -117,9 +116,11 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
 
       request.session.invalidate()
 
-      response.sendRedirect(authLogoutSuccessUri)
+      response.sendRedirect(ssologoutUri())
     }
   }
+
+  private fun ssologoutUri() = authLogoutSuccessUri.plus("/sign-out")
 
   @Bean
   fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? {

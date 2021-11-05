@@ -22,7 +22,7 @@
             <div sec:authorize="isAuthenticated()" class="govuk-header__content tr mt1">
                 <form id="logoutForm" method="POST" th:action="@{/logout}">
                     <span class="govuk-!-font-weight-bold pr3" th:text="${#authentication.name}"></span>
-                    <button class="govuk-header__link govuk-!-font-weight-bold dib ph3 bg-transparent white bn button-fix">Sign out</button>
+                    <button id="sign-out" class="govuk-header__link govuk-!-font-weight-bold dib ph3 bg-transparent white bn button-fix">Sign out</button>
                 </form>
             </div>
         </div>
