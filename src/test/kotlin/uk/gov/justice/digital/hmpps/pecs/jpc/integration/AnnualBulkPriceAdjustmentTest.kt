@@ -3,20 +3,14 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AnnualPriceAdjustment
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 
 internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
   @Test
   fun `apply annual price adjustment`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 

@@ -13,6 +13,12 @@ class GlobalController {
   @Value("\${FEEDBACK_URL:#}")
   private lateinit var feedbackUrl: String
 
+  @Value("\${HMPPS_AUTH_BASE_URI}")
+  private lateinit var hmppsUri: String
+
   @ModelAttribute("feedbackUrl")
   fun feedbackUrl() = feedbackUrl.ifBlank { '#' }
+
+  @ModelAttribute("hmppsUrl")
+  fun hmppsUrl() = hmppsUri.ifBlank { '#' }
 }

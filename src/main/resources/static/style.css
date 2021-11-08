@@ -749,3 +749,95 @@
 .app-feedback-prompt__content a:visited {
   color:#fff
 }
+
+.app-header__content {
+  align-self:stretch;
+  display:flex;
+  flex-direction:row
+}
+
+@media(min-width: 40.0625em) {
+  .app-header__title__organisation-name {
+    margin-right:10px
+  }
+}
+
+@media print {
+  .app-header__title__organisation-name {
+    font-family: sans-serif
+  }
+}
+
+@media(min-width: 40.0625em) {
+  .app-header__title__organisation-name {
+    font-size:24px;
+    font-size: 1.5rem;
+    line-height: 1.25
+  }
+}
+
+@media print {
+  .app-header__title__organisation-name {
+    font-size: 18pt;
+    line-height: 1.15
+  }
+}
+
+.app-header__title__service-name {
+  display: none;
+  font-family: "GDS Transport",arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 18px;
+  font-size: 1.125rem;
+  line-height: 1.1111111111
+}
+
+@media print {
+  .app-header__title__service-name {
+    font-family: sans-serif
+  }
+}
+
+@media(min-width: 40.0625em) {
+  .app-header__title__service-name {
+    font-size:24px;
+    font-size: 1.5rem;
+    line-height: 1.25
+  }
+}
+
+@media print {
+  .app-header__title__service-name {
+    font-size: 18pt;
+    line-height: 1.15
+  }
+}
+
+@media(min-width: 48.0625em) {
+  .app-header__title__service-name {
+    display:inline-block
+  }
+}
+
+.app-header__rw {
+  width: unset;
+}
+
+.app-header__right {
+  float: right;
+  font-weight: 400;
+  font-size: 1.1875rem;
+  line-height: 1.3157894737;
+}
+
+.app-header__separator {
+  border-right: 1px solid #fff;
+  padding-right: 20px;
+  margin-right: 20px;
+}
+
+.app-header__mouse {
+  cursor: pointer;
+}

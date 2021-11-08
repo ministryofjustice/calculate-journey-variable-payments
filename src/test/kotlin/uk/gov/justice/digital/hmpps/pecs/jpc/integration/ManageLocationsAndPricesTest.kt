@@ -10,11 +10,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.JourneysForReviewPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AddPrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneyResults
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneysForReview
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageLocation
@@ -40,11 +38,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(1)
   fun `missing price is added for Serco journey from Prison One to Prison Two`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard)
       .isAtMonthYear(currentDate.month, Year.now())
@@ -68,11 +62,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(2)
   fun `price is updated for Serco journey from Prison One to Prison Two`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
@@ -102,11 +92,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(3)
   fun `price book cannot be changed with journey two years old or more missing price`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
@@ -122,11 +108,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(4)
   fun `price book cannot be changed when journey price two years old or more`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
@@ -153,11 +135,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(5)
   fun `map missing location name and location type to agency id STOPOVER_AGENCY`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard)
       .isAtMonthYear(currentDate.month, year)
@@ -194,11 +172,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(6)
   fun `update location name and type for agency id STOPOVER_AGENCY`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToManageLocations()
 

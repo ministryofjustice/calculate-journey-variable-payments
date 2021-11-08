@@ -8,10 +8,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.JourneyResults
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
@@ -37,11 +35,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
   @Test
   @Order(1)
   fun `add a price exception and verify the move price matches the exception price`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
@@ -85,12 +79,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
   @Test
   @Order(2)
   fun `remove a price exception and verify the move price is back to its original price`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login)
-      .login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 

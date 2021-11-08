@@ -12,9 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.l
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.multiMoveM50
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.redirectMoveM20
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.standardMoveM4
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ChooseSupplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MovesByType
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
@@ -39,11 +37,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
   @Test
   @Order(1)
   fun `view one of each move type for Serco in previous month`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.SERCO)
+    loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard)
       .isAtMonthYear(currentDate.month, year)
@@ -64,11 +58,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
   @Test
   @Order(2)
   fun `view one of each move type for GEOAmey in Dec 2020`() {
-    goToPage(Dashboard)
-
-    isAtPage(Login).login()
-
-    isAtPage(ChooseSupplier).choose(Supplier.GEOAMEY)
+    loginAndGotoDashboardFor(Supplier.GEOAMEY)
 
     isAtPage(Dashboard)
       .isAtMonthYear(currentDate.month, year)
