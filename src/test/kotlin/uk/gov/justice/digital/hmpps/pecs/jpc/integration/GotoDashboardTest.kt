@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
