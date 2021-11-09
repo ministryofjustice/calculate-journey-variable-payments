@@ -58,8 +58,8 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
         authorize(anyRequest, hasRole("PECS_JPC"))
       }
       sessionManagement {
-        invalidSessionUrl = ssologoutUri()
-        sessionAuthenticationErrorUrl = ssologoutUri()
+        invalidSessionUrl = ssoLogoutUri()
+        sessionAuthenticationErrorUrl = ssoLogoutUri()
         sessionConcurrency {
           sessionRegistry = clusteredConcurrentSessionRegistry()
           maximumSessions = 1
@@ -70,11 +70,11 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
       }
       oauth2Login {
         userInfoEndpoint { userService = oAuth2UserService() }
-        failureUrl = ssologoutUri()
+        failureUrl = ssoLogoutUri()
         authenticationSuccessHandler = logInHandler()
       }
       logout {
-        logoutSuccessUrl = ssologoutUri()
+        logoutSuccessUrl = ssoLogoutUri()
         logoutSuccessHandler = logOutHandler()
       }
     }
@@ -84,7 +84,7 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   fun logInHandler() = LogInAuditHandler(auditService)
 
   @Bean
-  fun logOutHandler() = LogOutAuditHandler(auditService, ssologoutUri())
+  fun logOutHandler() = LogOutAuditHandler(auditService, ssoLogoutUri())
 
   @Bean
   fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =
@@ -116,11 +116,11 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
 
       request.session.invalidate()
 
-      response.sendRedirect(ssologoutUri())
+      response.sendRedirect(ssoLogoutUri())
     }
   }
 
-  private fun ssologoutUri() = authLogoutSuccessUri.plus("/sign-out")
+  private fun ssoLogoutUri() = authLogoutSuccessUri.plus("/sign-out")
 
   @Bean
   fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? {

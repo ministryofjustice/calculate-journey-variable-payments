@@ -830,6 +830,7 @@
   font-weight: 400;
   font-size: 1.1875rem;
   line-height: 1.3157894737;
+  text-align: right;
 }
 
 .app-header__separator {
@@ -840,4 +841,9 @@
 
 .app-header__mouse {
   cursor: pointer;
+}
+
+.js-enabled .govuk-header__navigation.flex {
+  display: flex;
+  align-items: start;
 }

@@ -17,8 +17,14 @@ class GlobalController {
   private lateinit var hmppsUri: String
 
   @ModelAttribute("feedbackUrl")
-  fun feedbackUrl() = feedbackUrl.ifBlank { '#' }
+  fun feedbackUrl() = feedbackUrl.ifBlankStayOrElseGet()
 
   @ModelAttribute("hmppsUrl")
-  fun hmppsUrl() = hmppsUri.ifBlank { '#' }
+  fun hmppsUrl() = hmppsUri.ifBlankStayOrElseGet()
+
+  @ModelAttribute("manageYourDetailsUrl")
+  fun manageYourDetailsUrl() = hmppsUri.ifBlankStayOrElseGet("/account-details")
+
+  fun String.ifBlankStayOrElseGet(suffix: String? = null) =
+    if (this.isBlank()) '#' else suffix?.let { this.plus(suffix) } ?: this
 }
