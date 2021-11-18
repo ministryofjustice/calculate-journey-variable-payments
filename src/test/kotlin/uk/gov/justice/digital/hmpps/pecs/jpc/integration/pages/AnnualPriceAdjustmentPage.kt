@@ -32,7 +32,7 @@ class AnnualPriceAdjustmentPage : ApplicationPage() {
     return this
   }
 
-  fun isPriceHistoryRowPresent(rate: Double) {
-    isRowPresent<AnnualPriceAdjustmentPage>("Prices adjusted by blended rate of $rate")
+  fun isPriceHistoryRowPresent(rate: Double, notes: String) {
+    isRowPresent<AnnualPriceAdjustmentPage>("Prices adjusted by blended rate of $rate", notes)
   }
 }

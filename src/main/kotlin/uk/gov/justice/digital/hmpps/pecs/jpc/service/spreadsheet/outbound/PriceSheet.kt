@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound
 
-import org.apache.pdfbox.util.Hex
+import org.apache.commons.codec.binary.Hex
 import org.apache.poi.ss.usermodel.BuiltinFormats
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.FillPatternType
