@@ -16,8 +16,10 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
-    isAtPage(AnnualPriceAdjustment).applyAdjustment(1.6, "Indexation rate of 1.6.")
+    isAtPage(AnnualPriceAdjustment).applyAdjustment(1.123456789012345, "Indexation rate of 1.123456789012345.")
 
-    isAtPage(ManageJourneyPriceCatalogue)
+    isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
+
+    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(1.123456789012345, "Indexation rate of 1.123456789012345.")
   }
 }

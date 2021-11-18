@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.12"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.13"
   kotlin("plugin.spring") version "1.5.31"
   kotlin("plugin.jpa") version "1.5.31"
   kotlin("plugin.allopen") version "1.5.31"
@@ -17,53 +17,22 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.99")
-  implementation("io.sentry:sentry-spring-boot-starter:5.3.0")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.112")
+  implementation("io.sentry:sentry-spring-boot-starter:5.4.0")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.29.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.29.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
-  implementation("org.apache.poi:poi-ooxml:5.0.0")
-
-  constraints {
-    implementation("org.apache.xmlgraphics:batik-all:1.14") {
-      because("previous transitive version 1.13 pulled from Apache POI 5.0.0 has CVE")
-    }
-    implementation("org.apache.pdfbox:pdfbox:2.0.24") {
-      because("previous transitive version 2.0.23 pulled from Apache POI 5.0.0 has CVE")
-    }
-    implementation("org.apache.commons:commons-compress:1.21") {
-      because("previous transitive version 1.20 pulled from Apache POI 5.0.0 has CVE")
-    }
-    implementation("org.apache.santuario:xmlsec:2.2.3") {
-      because("previous transitive version 2.2.1 pulled from Apache POI 5.0.0 has CVE")
-    }
-  }
-
-  implementation("org.flywaydb:flyway-core:8.0.2")
+  implementation("org.apache.poi:poi-ooxml:5.1.0")
+  implementation("org.flywaydb:flyway-core:8.0.4")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springframework.session:spring-session-jdbc:2.5.3")
+  implementation("org.springframework.session:spring-session-jdbc:2.6.0")
   implementation("org.springframework.shell:spring-shell-starter:2.0.1.RELEASE")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
-
-  constraints {
-    implementation("org.apache.xmlgraphics:batik-all:1.14") {
-      because("previous transitive version 1.13 pulled from Apache POI 5.0.0 has CVE")
-    }
-    implementation("org.apache.pdfbox:pdfbox:2.0.24") {
-      because("previous transitive version 2.0.23 pulled from Apache POI 5.0.0 has CVE")
-    }
-    implementation("org.apache.commons:commons-compress:1.21") {
-      because("previous transitive version 1.20 pulled from Apache POI 5.0.0 has CVE")
-    }
-    implementation("org.apache.santuario:xmlsec:2.2.3") {
-      because("previous transitive version 2.2.1 pulled from Apache POI 5.0.0 has CVE")
-    }
-  }
 
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")

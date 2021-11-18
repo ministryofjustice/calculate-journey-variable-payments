@@ -80,7 +80,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         model {
           attribute(
             "form",
-            AnnualPriceAdjustmentsController.AnnualPriceAdjustmentForm("0.0000")
+            AnnualPriceAdjustmentsController.AnnualPriceAdjustmentForm("0.0")
           )
         }
       }
@@ -124,10 +124,10 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   }
 
   @Test
-  fun `fails upon submission of an rate with more than 4 decimal places`() {
+  fun `fails upon submission of an rate with more than 15 decimal places`() {
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
-      param("rate", "1.12345")
+      param("rate", "1.12345678901234501")
       param("details", "some details")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
@@ -205,16 +205,16 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
 
   @Test
   fun `annual price adjustment with valid rate and details containing allowed characters are applied for supplier`() {
-    setOf("special characters @#$%%^&*()_", "special characters `~{}[]:;',./?", "inflation rate of 1.1234").forEach { allowedCharacters ->
+    setOf("special characters @#$%%^&*()_", "special characters `~{}[]:;',./?", "inflation rate of 1.123456789012345").forEach { allowedCharacters ->
       mockMvc.post("/annual-price-adjustment") {
         session = mockSession
-        param("rate", "1.1234")
+        param("rate", "1.123456789012345")
         param("details", allowedCharacters)
       }
         .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
         .andExpect { status { is3xxRedirection() } }
 
-      verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq(allowedCharacters))
+      verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.123456789012345), anyOrNull(), eq(allowedCharacters))
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
     }
   }
