@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.13"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.14"
   kotlin("plugin.spring") version "1.5.31"
   kotlin("plugin.jpa") version "1.5.31"
   kotlin("plugin.allopen") version "1.5.31"
@@ -17,9 +17,6 @@ dependencyCheck {
 
 // added specifically due to thymeleaf@3.0.12.RELEASE and CVE-2021-43466 - remove when update included in spring-boot
 ext["thymeleaf.version"] = "3.0.13.RELEASE"
-
-// added specifically due to org.apache.logging.log4j:log4j-api and CVE-2021-44228 - remove when no longer needed
-ext["log4j.version"] = "2.15.0"
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
