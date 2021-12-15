@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.15"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "3.3.16"
   kotlin("plugin.spring") version "1.5.31"
   kotlin("plugin.jpa") version "1.5.31"
   kotlin("plugin.allopen") version "1.5.31"
@@ -46,8 +46,8 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.2")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.2")
+  testImplementation("com.h2database:h2")
 
-  runtimeOnly("com.h2database:h2")
   runtimeOnly("org.postgresql:postgresql:42.3.1")
 }
 
