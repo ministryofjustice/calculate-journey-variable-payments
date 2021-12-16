@@ -102,7 +102,7 @@ class AnnualPriceAdjustmentsController(
       .sortedByDescending { lh -> lh.datetime }
 
   data class AnnualPriceAdjustmentForm(
-    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,15})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid rate")
     val rate: String?,
 
     @get: NotBlank(message = "Enter details upto 255 characters")

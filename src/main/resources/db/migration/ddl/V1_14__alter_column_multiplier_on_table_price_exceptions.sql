@@ -1,0 +1,1 @@
+alter table price_adjustments alter column multiplier type numeric;

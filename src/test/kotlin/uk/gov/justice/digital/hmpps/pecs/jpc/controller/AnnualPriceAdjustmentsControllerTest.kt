@@ -125,10 +125,10 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   }
 
   @Test
-  fun `fails upon submission of an rate with more than 15 decimal places`() {
+  fun `fails upon submission of an rate with more than 40 decimal places`() {
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
-      param("rate", "1.12345678901234501")
+      param("rate", "1.99999999999999999999999999999999999999999")
       param("details", "some details")
     }
       .andExpect { model { attributeHasFieldErrorCode("form", "rate", "Pattern") } }
@@ -250,7 +250,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   fun `annual price adjustment succeeds upto max rate for supplier`() {
     mockMvc.post("/annual-price-adjustment") {
       session = mockSession
-      param("rate", "9.9999")
+      param("rate", "9.9999999999999999999999999999999999999999")
       param("details", "some details")
     }
       .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
@@ -259,7 +259,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
     verify(adjustmentsService).adjust(
       eq(Supplier.SERCO),
       eq(effectiveYearForDate(effectiveDate)),
-      eq(AdjustmentMultiplier(9.9999.toBigDecimal())),
+      eq(AdjustmentMultiplier("9.9999999999999999999999999999999999999999".toBigDecimal())),
       anyOrNull(),
       eq("some details")
     )
