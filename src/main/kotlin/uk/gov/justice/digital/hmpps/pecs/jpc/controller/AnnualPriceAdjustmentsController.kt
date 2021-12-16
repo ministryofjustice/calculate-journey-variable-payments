@@ -107,6 +107,7 @@ class AnnualPriceAdjustmentsController(
     @get: Length(max = 255, message = "Enter details upto 255 characters")
     val details: String? = null
   ) {
+    // TODO multiplier needs to be changed to a BigDecimal
     fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }
   }
 

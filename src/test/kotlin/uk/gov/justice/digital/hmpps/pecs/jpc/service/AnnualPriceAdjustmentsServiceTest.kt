@@ -152,7 +152,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
       AuditableEvent(
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         authentication.name,
-        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0, "some audit details")
+        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "some audit details")
       )
     )
   }

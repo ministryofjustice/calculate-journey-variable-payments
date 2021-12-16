@@ -27,6 +27,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.json.BigDecimalParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.json.bigDecimalConverter
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
@@ -294,7 +296,7 @@ internal class AuditServiceTest {
     assertThat(jsonTo<PriceMetadata>(auditEvent.metadata!!)).isEqualTo(priceMetadata)
   }
 
-  private inline fun <reified T> jsonTo(json: String): T = Klaxon().parse<T>(json)!!
+  private inline fun <reified T> jsonTo(json: String): T = Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<T>(json)!!
 
   @Test
   internal fun `create journey price bulk adjustment audit event`() {
@@ -322,13 +324,13 @@ internal class AuditServiceTest {
     assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
     assertPriceAdjustmentIsSame(
       eventCaptor.firstValue,
-      AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2020, 1.5, "serco details")
+      AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2020, 1.5.toBigDecimal(), "serco details")
     )
     assertThat(eventCaptor.secondValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT)
     assertThat(eventCaptor.secondValue.username).isEqualTo("_TERMINAL_")
     assertPriceAdjustmentIsSame(
       eventCaptor.secondValue,
-      AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0, "geo details")
+      AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "geo details")
     )
   }
 

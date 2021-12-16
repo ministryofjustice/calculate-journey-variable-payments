@@ -87,24 +87,28 @@ class AnnualPriceAdjuster(
     val existingAdjustedPrice = maybeExistingAdjustedPrice(previousYearPrice, effectiveYear)
 
     if (existingAdjustedPrice != null) {
+      val calculatedAdjustmentAmount = previousYearPrice.price() * multiplier.toBigDecimal()
+
       return existingAdjustedPrice
-        .takeUnless { priceIsTheSame(it, previousYearPrice.price().times(multiplier)) }
-        ?.apply { priceInPence = previousYearPrice.price().times(multiplier).pence }
-        ?.also {
-          auditService.create(AuditableEvent.adjustPrice(it, previousYearPrice.price(), multiplier))
-        }
+        .takeExistingPriceUnlessTheSameAs(calculatedAdjustmentAmount)
+        ?.adjustPriceTo(calculatedAdjustmentAmount)
+        ?.auditedAdjustment(previousYearPrice, multiplier)
     }
 
-    return newPriceAdjustmentFor(previousYearPrice, effectiveYear, multiplier).also {
-      auditService.create(AuditableEvent.adjustPrice(it, previousYearPrice.price(), multiplier))
-    }
+    return newPriceAdjustmentFor(previousYearPrice, effectiveYear, multiplier)
+      .auditedAdjustment(previousYearPrice, multiplier)
   }
 
-  private fun priceIsTheSame(price: Price, amount: Money) = price.price() == amount
+  private fun Price.takeExistingPriceUnlessTheSameAs(amount: Money) = this.takeUnless { it.price() == amount }
+
+  private fun Price.adjustPriceTo(money: Money) = this.apply { priceInPence = money.pence }
+
+  private fun Price.auditedAdjustment(previousPrice: Price, multiplier: Double) =
+    this.also { auditService.create(AuditableEvent.adjustPrice(this, previousPrice.price(), multiplier)) }
 
   private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: Double) =
     price.adjusted(
-      amount = price.price().times(multiplier),
+      amount = price.price() * multiplier.toBigDecimal(),
       effectiveYear = effectiveYear,
       addedAt = timeSource.dateTime()
     )

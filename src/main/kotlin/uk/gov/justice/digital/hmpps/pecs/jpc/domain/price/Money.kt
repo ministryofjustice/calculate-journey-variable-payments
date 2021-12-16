@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
+import java.math.BigDecimal
 import kotlin.math.roundToInt
 
 /**
@@ -15,7 +16,9 @@ data class Money(val pence: Int) {
 
   override fun toString(): String = "%.2f".format(pounds())
 
-  operator fun times(multiplier: Double) = valueOf(pounds() * multiplier)
+  operator fun times(multiplier: BigDecimal) = valueOf(pounds().toBigDecimal().times(multiplier).toDouble())
+
+  operator fun times(multiplier: AdjustmentMultiplier) = valueOf(pounds().toBigDecimal().times(multiplier.value).toDouble())
 
   companion object Factory {
     /**

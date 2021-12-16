@@ -123,7 +123,7 @@ data class AuditableEvent(
     ) = AuditableEvent(
       type = AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
       username = authentication?.name ?: terminal,
-      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier, details)
+      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier.toBigDecimal(), details)
     )
 
     fun mapLocation(location: Location) =
