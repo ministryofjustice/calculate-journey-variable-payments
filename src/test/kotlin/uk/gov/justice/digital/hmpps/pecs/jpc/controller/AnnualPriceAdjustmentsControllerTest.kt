@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
@@ -214,7 +215,13 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
         .andExpect { status { is3xxRedirection() } }
 
-      verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.123456789012345), anyOrNull(), eq(allowedCharacters))
+      verify(adjustmentsService).adjust(
+        eq(Supplier.SERCO),
+        eq(effectiveYearForDate(effectiveDate)),
+        eq(AdjustmentMultiplier(1.123456789012345.toBigDecimal())),
+        anyOrNull(),
+        eq(allowedCharacters)
+      )
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
     }
   }
@@ -229,7 +236,13 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(1.1234), anyOrNull(), eq("some details"))
+    verify(adjustmentsService).adjust(
+      eq(Supplier.SERCO),
+      eq(effectiveYearForDate(effectiveDate)),
+      eq(AdjustmentMultiplier("1.1234".toBigDecimal())),
+      anyOrNull(),
+      eq("some details")
+    )
     verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
   }
 
@@ -243,7 +256,13 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(adjustmentsService).adjust(eq(Supplier.SERCO), eq(effectiveYearForDate(effectiveDate)), eq(9.9999), anyOrNull(), eq("some details"))
+    verify(adjustmentsService).adjust(
+      eq(Supplier.SERCO),
+      eq(effectiveYearForDate(effectiveDate)),
+      eq(AdjustmentMultiplier(9.9999.toBigDecimal())),
+      anyOrNull(),
+      eq("some details")
+    )
     verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
   }
 }

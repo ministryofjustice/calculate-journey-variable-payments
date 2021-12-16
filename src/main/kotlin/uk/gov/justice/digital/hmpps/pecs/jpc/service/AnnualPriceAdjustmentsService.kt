@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -34,8 +35,7 @@ class AnnualPriceAdjustmentsService(
   fun adjust(
     supplier: Supplier,
     suppliedEffective: Int,
-    // TODO multiplier needs to be changed to a value object
-    multiplier: Double,
+    multiplier: AdjustmentMultiplier,
     authentication: Authentication?,
     details: String
   ) {
@@ -43,19 +43,17 @@ class AnnualPriceAdjustmentsService(
       throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
     }
 
-    if (multiplier >= 10) throw RuntimeException("Max allowed multiplier exceeded.")
-
-    logger.info("Starting price adjustment for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
+    logger.info("Starting price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
 
     doAdjustment(supplier, suppliedEffective, multiplier, authentication, details)
 
-    logger.info("Running price adjustment for $supplier for effective year $suppliedEffective using multiplier $multiplier.")
+    logger.info("Running price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
   }
 
   private fun doAdjustment(
     supplier: Supplier,
     effectiveYear: Int,
-    multiplier: Double,
+    multiplier: AdjustmentMultiplier,
     authentication: Authentication?,
     details: String
   ) {
@@ -73,13 +71,13 @@ class AnnualPriceAdjustmentsService(
         }
       }.onFailure {
         logger.error(
-          "Failed price adjustment for $supplier for effective year $effectiveYear and multiplier $multiplier.",
+          "Failed price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.",
           it
         )
 
-        monitoringService.capture("Failed price adjustment for $supplier for effective year $effectiveYear and multiplier $multiplier.")
+        monitoringService.capture("Failed price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.")
       }.onSuccess {
-        logger.info("Succeeded price adjustment for $supplier for effective year $effectiveYear and multiplier $multiplier. Total prices adjusted $it.")
+        logger.info("Succeeded price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}. Total prices adjusted $it.")
         auditService.create(
           AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
             supplier,

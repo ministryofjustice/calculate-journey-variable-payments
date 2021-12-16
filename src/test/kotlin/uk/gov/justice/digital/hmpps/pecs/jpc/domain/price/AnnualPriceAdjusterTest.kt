@@ -44,17 +44,17 @@ internal class AnnualPriceAdjusterTest {
 
   @Test
   fun `attempted lock for GEOAmey adjustment is successful`() {
-    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.GEOAMEY, addedAt = timeSource.dateTime(), multiplier = 1.5, effectiveYear = 2020)
+    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.GEOAMEY, addedAt = timeSource.dateTime(), multiplier = 1.5.toBigDecimal(), effectiveYear = 2020)
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
-    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.GEOAMEY, 1.5, 2020)
+    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.GEOAMEY, AdjustmentMultiplier(1.5.toBigDecimal()), 2020)
 
     verify(priceAdjustmentRepository).saveAndFlush(priceAdjusterCaptor.capture())
 
     with(priceAdjusterCaptor.firstValue) {
-      assertThat(supplier).isEqualTo(uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.GEOAMEY)
+      assertThat(supplier).isEqualTo(Supplier.GEOAMEY)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
-      assertThat(multiplier).isEqualTo(1.5)
+      assertThat(multiplier).isEqualTo(1.5.toBigDecimal())
       assertThat(effectiveYear).isEqualTo(2020)
     }
 
@@ -63,17 +63,17 @@ internal class AnnualPriceAdjusterTest {
 
   @Test
   fun `attempted lock required for Serco adjustment is successful`() {
-    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.SERCO, addedAt = timeSource.dateTime(), multiplier = 2.0, effectiveYear = 2021)
+    val expectedPriceAdjustment = PriceAdjustment(supplier = Supplier.SERCO, addedAt = timeSource.dateTime(), multiplier = 2.0.toBigDecimal(), effectiveYear = 2021)
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
-    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.SERCO, 2.0, 2021)
+    val actualLockId = priceAdjuster.attemptLockForPriceAdjustment(Supplier.SERCO, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)
 
     verify(priceAdjustmentRepository).saveAndFlush(priceAdjusterCaptor.capture())
 
     with(priceAdjusterCaptor.firstValue) {
-      assertThat(supplier).isEqualTo(uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.SERCO)
+      assertThat(supplier).isEqualTo(Supplier.SERCO)
       assertThat(addedAt).isEqualTo(timeSource.dateTime())
-      assertThat(multiplier).isEqualTo(2.0)
+      assertThat(multiplier).isEqualTo(2.0.toBigDecimal())
       assertThat(effectiveYear).isEqualTo(2021)
     }
 
@@ -89,7 +89,7 @@ internal class AnnualPriceAdjusterTest {
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2019)).thenReturn(Stream.of(previousYearPrice))
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(any(), any(), any(), any())).thenReturn(null)
 
-    val adjusted = priceAdjuster.adjust(lockId, Supplier.SERCO, 2020, 1.5)
+    val adjusted = priceAdjuster.adjust(lockId, Supplier.SERCO, 2020, AdjustmentMultiplier(1.5.toBigDecimal()))
 
     assertThat(adjusted).isEqualTo(1)
 
@@ -100,7 +100,7 @@ internal class AnnualPriceAdjusterTest {
   fun `failed adjustment for Serco due to price adjustment lock not being in place`() {
     val lockId = fakeLock(false)
 
-    assertThatThrownBy { priceAdjuster.adjust(lockId, Supplier.SERCO, 2020, 1.0) }
+    assertThatThrownBy { priceAdjuster.adjust(lockId, Supplier.SERCO, 2020, AdjustmentMultiplier(1.0.toBigDecimal())) }
       .isInstanceOf(RuntimeException::class.java)
       .hasMessage("Unable to upflift lock is not present for SERCO.")
 
@@ -115,7 +115,7 @@ internal class AnnualPriceAdjusterTest {
 
     whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2020)).thenReturn(Stream.of(previousYearPrice))
 
-    val adjusted = priceAdjuster.adjust(lockId, Supplier.GEOAMEY, 2021, 2.0)
+    val adjusted = priceAdjuster.adjust(lockId, Supplier.GEOAMEY, 2021, AdjustmentMultiplier(2.0.toBigDecimal()))
 
     assertThat(adjusted).isEqualTo(1)
 
@@ -126,7 +126,7 @@ internal class AnnualPriceAdjusterTest {
   fun `failed adjustment for GEOAmey due to price adjustment lock not being in place`() {
     val lockId = fakeLock(false)
 
-    assertThatThrownBy { priceAdjuster.adjust(lockId, Supplier.GEOAMEY, 2020, 1.0) }
+    assertThatThrownBy { priceAdjuster.adjust(lockId, Supplier.GEOAMEY, 2020, AdjustmentMultiplier(1.0.toBigDecimal())) }
       .isInstanceOf(RuntimeException::class.java)
       .hasMessage("Unable to upflift lock is not present for GEOAMEY.")
 

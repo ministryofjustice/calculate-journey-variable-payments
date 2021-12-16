@@ -32,7 +32,7 @@ class AnnualPriceAdjuster(
     id: UUID,
     supplier: Supplier,
     effectiveYear: Int,
-    multiplier: Double,
+    multiplier: AdjustmentMultiplier,
   ): Int {
     priceAdjustmentRepository.failIfLockNotPresent(id, supplier)
 
@@ -48,12 +48,12 @@ class AnnualPriceAdjuster(
    *
    * Returns the ID of the lock (if successfully created).
    */
-  internal fun attemptLockForPriceAdjustment(supplier: Supplier, multiplier: Double, effectiveYear: Int) =
+  internal fun attemptLockForPriceAdjustment(supplier: Supplier, multiplier: AdjustmentMultiplier, effectiveYear: Int) =
     priceAdjustmentRepository.saveAndFlush(
       PriceAdjustment(
         supplier = supplier,
         addedAt = timeSource.dateTime(),
-        multiplier = multiplier,
+        multiplier = multiplier.value,
         effectiveYear = effectiveYear
       )
     ).id
@@ -61,7 +61,7 @@ class AnnualPriceAdjuster(
   private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(
     supplier: Supplier,
     effectiveYear: Int,
-    multiplier: Double
+    multiplier: AdjustmentMultiplier
   ): Int {
     var adjustments = 0
 
@@ -83,11 +83,11 @@ class AnnualPriceAdjuster(
   private fun PriceRepository.possiblePricesForAdjustment(supplier: Supplier, effectiveYear: Int) =
     this.findBySupplierAndEffectiveYear(supplier, effectiveYear - 1).asSequence()
 
-  private fun maybePriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: Double): Price? {
+  private fun maybePriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier): Price? {
     val existingAdjustedPrice = maybeExistingAdjustedPrice(previousYearPrice, effectiveYear)
 
     if (existingAdjustedPrice != null) {
-      val calculatedAdjustmentAmount = previousYearPrice.price() * multiplier.toBigDecimal()
+      val calculatedAdjustmentAmount = previousYearPrice.price() * multiplier
 
       return existingAdjustedPrice
         .takeExistingPriceUnlessTheSameAs(calculatedAdjustmentAmount)
@@ -103,12 +103,12 @@ class AnnualPriceAdjuster(
 
   private fun Price.adjustPriceTo(money: Money) = this.apply { priceInPence = money.pence }
 
-  private fun Price.auditedAdjustment(previousPrice: Price, multiplier: Double) =
+  private fun Price.auditedAdjustment(previousPrice: Price, multiplier: AdjustmentMultiplier) =
     this.also { auditService.create(AuditableEvent.adjustPrice(this, previousPrice.price(), multiplier)) }
 
-  private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: Double) =
+  private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier) =
     price.adjusted(
-      amount = price.price() * multiplier.toBigDecimal(),
+      amount = price.price() * multiplier,
       effectiveYear = effectiveYear,
       addedAt = timeSource.dateTime()
     )

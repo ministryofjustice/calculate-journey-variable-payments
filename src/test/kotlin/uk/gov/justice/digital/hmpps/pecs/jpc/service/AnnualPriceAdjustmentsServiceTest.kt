@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceAdjustment
@@ -47,7 +48,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
   @Test
   internal fun `price adjustment for Serco`() {
-    val lockId = fakeLockForFor(Supplier.SERCO, 1.0, 2020)
+    val lockId = fakeLockForFor(Supplier.SERCO, AdjustmentMultiplier(1.0.toBigDecimal()), 2020)
 
     AnnualPriceAdjustmentsService(
       annualPriceAdjusterSpy,
@@ -58,17 +59,17 @@ internal class AnnualPriceAdjustmentsServiceTest {
     ).adjust(
       Supplier.SERCO,
       2020,
-      1.0,
+      AdjustmentMultiplier(1.0.toBigDecimal()),
       authentication,
       "some details"
     )
 
-    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(1.0))
+    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(AdjustmentMultiplier(1.0.toBigDecimal())))
   }
 
   @Test
   internal fun `price adjustment for GEOAmey`() {
-    val lockId = fakeLockForFor(Supplier.GEOAMEY, 2.0, 2021)
+    val lockId = fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)
 
     AnnualPriceAdjustmentsService(
       annualPriceAdjusterSpy,
@@ -79,12 +80,12 @@ internal class AnnualPriceAdjustmentsServiceTest {
     ).adjust(
       Supplier.GEOAMEY,
       2021,
-      2.0,
+      AdjustmentMultiplier(2.0.toBigDecimal()),
       authentication,
       "some details"
     )
 
-    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(2.0))
+    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
   }
 
   @Test
@@ -92,7 +93,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
       PriceAdjustment(
         supplier = Supplier.GEOAMEY,
-        multiplier = 1.0,
+        multiplier = 1.0.toBigDecimal(),
         effectiveYear = 2021
       )
     )
@@ -101,7 +102,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
         any(),
         eq(Supplier.GEOAMEY),
         eq(2021),
-        eq(2.0)
+        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
       )
     ).thenThrow(RuntimeException("something went wrong"))
 
@@ -114,7 +115,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     ).adjust(
       Supplier.GEOAMEY,
       2021,
-      2.0,
+      AdjustmentMultiplier(2.0.toBigDecimal()),
       authentication,
       "some details"
     )
@@ -124,11 +125,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
   @Test
   internal fun `auditing service captures successful price adjustment`() {
-    fakeLockForFor(Supplier.GEOAMEY, 2.0, 2021)
+    fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)
     whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
       PriceAdjustment(
         supplier = Supplier.GEOAMEY,
-        multiplier = 2.0,
+        multiplier = 2.0.toBigDecimal(),
         effectiveYear = 2021
       )
     )
@@ -143,7 +144,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     ).adjust(
       Supplier.GEOAMEY,
       2021,
-      2.0,
+      AdjustmentMultiplier(2.0.toBigDecimal()),
       authentication,
       "some audit details"
     )
@@ -169,7 +170,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
       ).adjust(
         Supplier.GEOAMEY,
         effectiveYear.current() - 1,
-        2.0,
+        AdjustmentMultiplier(2.0.toBigDecimal()),
         authentication,
         "some details"
       )
@@ -178,28 +179,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
   }
 
   @Test
-  internal fun `adjustment cannot exceed 9_9999`() {
-    assertThatThrownBy {
-      AnnualPriceAdjustmentsService(
-        annualPriceAdjuster,
-        monitoringService,
-        auditService,
-        effectiveYear,
-        jobRunner
-      ).adjust(
-        Supplier.GEOAMEY,
-        effectiveYear.current(),
-        10.0,
-        authentication,
-        "some details"
-      )
-    }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Max allowed multiplier exceeded.")
-  }
-
-  @Test
   internal fun `max allowed price adjustment for GEOAmey`() {
-    val lockId = fakeLockForFor(Supplier.GEOAMEY, 9.99, 2021)
+    val lockId = fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(9.99.toBigDecimal()), 2021)
 
     AnnualPriceAdjustmentsService(
       annualPriceAdjusterSpy,
@@ -210,15 +191,15 @@ internal class AnnualPriceAdjustmentsServiceTest {
     ).adjust(
       Supplier.GEOAMEY,
       2021,
-      9.99,
+      AdjustmentMultiplier(9.99.toBigDecimal()),
       authentication,
       "some details"
     )
 
-    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(9.99))
+    verify(annualPriceAdjusterSpy).adjust(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(9.99.toBigDecimal())))
   }
 
-  private fun fakeLockForFor(supplier: Supplier, multiplier: Double, effectiveYear: Int): UUID {
+  private fun fakeLockForFor(supplier: Supplier, multiplier: AdjustmentMultiplier, effectiveYear: Int): UUID {
     val lockId = UUID.randomUUID()
 
     whenever(annualPriceAdjusterSpy.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)).thenReturn(

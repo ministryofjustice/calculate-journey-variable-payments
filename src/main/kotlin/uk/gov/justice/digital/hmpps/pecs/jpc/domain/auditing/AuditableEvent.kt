@@ -4,6 +4,7 @@ import com.beust.klaxon.Klaxon
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -104,7 +105,7 @@ data class AuditableEvent(
     fun adjustPrice(
       price: Price,
       original: Money,
-      multiplier: Double,
+      multiplier: AdjustmentMultiplier,
       authentication: Authentication? = null,
     ): AuditableEvent {
       return AuditableEvent(
@@ -117,13 +118,13 @@ data class AuditableEvent(
     fun journeyPriceBulkPriceAdjustmentEvent(
       supplier: Supplier,
       effectiveYear: Int,
-      multiplier: Double,
+      multiplier: AdjustmentMultiplier,
       authentication: Authentication? = null,
       details: String
     ) = AuditableEvent(
       type = AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
       username = authentication?.name ?: terminal,
-      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier.toBigDecimal(), details)
+      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier.value, details)
     )
 
     fun mapLocation(location: Location) =

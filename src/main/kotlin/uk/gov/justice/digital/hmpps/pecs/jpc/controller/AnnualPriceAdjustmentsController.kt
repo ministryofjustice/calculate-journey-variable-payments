@@ -15,9 +15,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -107,8 +109,7 @@ class AnnualPriceAdjustmentsController(
     @get: Length(max = 255, message = "Enter details upto 255 characters")
     val details: String? = null
   ) {
-    // TODO multiplier needs to be changed to a BigDecimal
-    fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }
+    fun mayBeRate() = rate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
   }
 
   companion object {

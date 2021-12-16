@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.PriceMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -304,7 +305,7 @@ internal class AuditServiceTest {
       AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
         Supplier.SERCO,
         2020,
-        1.5,
+        AdjustmentMultiplier(1.5.toBigDecimal()),
         null,
         "serco details"
       )
@@ -313,7 +314,7 @@ internal class AuditServiceTest {
       AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
         Supplier.GEOAMEY,
         2021,
-        2.0,
+        AdjustmentMultiplier(2.0.toBigDecimal()),
         null,
         "geo details"
       )
@@ -361,7 +362,7 @@ internal class AuditServiceTest {
           effectiveYear = effectiveYearForDate(timeSource.date())
         ),
         original = Money(100),
-        multiplier = 2.0,
+        multiplier = AdjustmentMultiplier(2.0.toBigDecimal()),
         authentication = authentication
       )
     )
@@ -378,7 +379,7 @@ internal class AuditServiceTest {
         effectiveYearForDate(timeSource.date()),
         2.0,
         1.0,
-        2.0
+        2.0.toBigDecimal()
       )
     )
   }
@@ -395,7 +396,7 @@ internal class AuditServiceTest {
           effectiveYear = effectiveYearForDate(timeSource.date())
         ),
         original = Money(100),
-        multiplier = 2.0,
+        multiplier = AdjustmentMultiplier(2.0.toBigDecimal()),
       )
     )
 
@@ -411,7 +412,7 @@ internal class AuditServiceTest {
         effectiveYearForDate(timeSource.date()),
         2.0,
         1.0,
-        2.0
+        2.0.toBigDecimal()
       )
     )
   }
