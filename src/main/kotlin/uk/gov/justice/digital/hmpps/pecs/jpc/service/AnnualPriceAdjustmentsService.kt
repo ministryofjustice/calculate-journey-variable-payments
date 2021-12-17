@@ -11,9 +11,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 /**
- * Service to handle annual price adjustments for suppliers.
+ * Service to handle annual price adjustments for supplier prices. There are two types of adjustments, inflationary and
+ * volumetric. The inflationary adjustment comes first followed by the volumetric normally later in the month.
  *
- * Generally speaking (but not always) annual adjustments take place at the start of a new effective year e.g. September.
+ * Annual adjustments take place at the start of a new effective (financial) year. This starts in September and ends in
+ * August the following year.
  */
 @Service
 class AnnualPriceAdjustmentsService(
@@ -26,13 +28,18 @@ class AnnualPriceAdjustmentsService(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  private enum class AdjustmentType {
+    INFLATION,
+    VOLUME
+  }
+
   /**
    * Price adjustments cannot be before the current effective year, if the supplied effective year is before it then an
    * exception will be thrown.
    *
-   * An adjustment normally takes place at the start of the effective year is based around inflationary price rises.
+   * An inflationary based adjustment takes place at the start of the effective year.
    */
-  fun adjust(
+  fun inflationary(
     supplier: Supplier,
     suppliedEffective: Int,
     multiplier: AdjustmentMultiplier,
@@ -43,11 +50,35 @@ class AnnualPriceAdjustmentsService(
       throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
     }
 
-    logger.info("Starting price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Starting inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
 
-    doAdjustment(supplier, suppliedEffective, multiplier, authentication, details)
+    doAdjustment(supplier, suppliedEffective, multiplier, authentication, details, AdjustmentType.INFLATION)
 
-    logger.info("Running price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Running inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+  }
+
+  /**
+   * Price adjustments cannot be before the current effective year, if the supplied effective year is before it then an
+   * exception will be thrown.
+   *
+   * A volumetric based adjustment takes place at the start of the effective year after the inflationary adjustment.
+   */
+  fun volumetric(
+    supplier: Supplier,
+    suppliedEffective: Int,
+    multiplier: AdjustmentMultiplier,
+    authentication: Authentication?,
+    details: String
+  ) {
+    if (suppliedEffective < actualEffectiveYear.current()) {
+      throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
+    }
+
+    logger.info("Starting volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+
+    doAdjustment(supplier, suppliedEffective, multiplier, authentication, details, AdjustmentType.VOLUME)
+
+    logger.info("Running volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
   }
 
   private fun doAdjustment(
@@ -55,29 +86,40 @@ class AnnualPriceAdjustmentsService(
     effectiveYear: Int,
     multiplier: AdjustmentMultiplier,
     authentication: Authentication?,
-    details: String
+    details: String,
+    type: AdjustmentType
   ) {
     val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)
 
-    jobRunner.run("annual price adjustment") {
+    jobRunner.run("$type price adjustment") {
       Result.runCatching {
-        annualPriceAdjuster.adjust(
-          lockId,
-          supplier,
-          effectiveYear,
-          multiplier
-        ).also {
-          annualPriceAdjuster.releaseLockForPriceAdjustment(lockId)
-        }
+        if (type == AdjustmentType.INFLATION)
+          annualPriceAdjuster.inflationary(
+            lockId,
+            supplier,
+            effectiveYear,
+            multiplier
+          ).also {
+            annualPriceAdjuster.releaseLockForPriceAdjustment(lockId)
+          }
+        else
+          annualPriceAdjuster.volumetric(
+            lockId,
+            supplier,
+            effectiveYear,
+            multiplier
+          ).also {
+            annualPriceAdjuster.releaseLockForPriceAdjustment(lockId)
+          }
       }.onFailure {
         logger.error(
-          "Failed price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.",
+          "Failed $type price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.",
           it
         )
 
-        monitoringService.capture("Failed price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.")
+        monitoringService.capture("Failed $type price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.")
       }.onSuccess {
-        logger.info("Succeeded price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}. Total prices adjusted $it.")
+        logger.info("Succeeded $type price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}. Total prices adjusted $it.")
         auditService.create(
           AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
             supplier,
