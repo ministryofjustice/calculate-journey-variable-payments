@@ -15,14 +15,14 @@ internal class AnnualPriceAdjustmentMetadataTest {
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         LocalDateTime.now(),
         "username",
-        AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5, "serco details")
+        AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5.toBigDecimal(), "serco details")
       )
     )
 
     with(metadata) {
       assertThat(supplier).isEqualTo(Supplier.SERCO)
       assertThat(effectiveYear).isEqualTo(2019)
-      assertThat(multiplier).isEqualTo(1.5)
+      assertThat(multiplier).isEqualTo(1.5.toBigDecimal())
       assertThat(details).isEqualTo("serco details")
     }
   }
@@ -34,14 +34,14 @@ internal class AnnualPriceAdjustmentMetadataTest {
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         LocalDateTime.now(),
         "username",
-        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2020, 2.0, "geo details")
+        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2020, 2.0.toBigDecimal(), "geo details")
       )
     )
 
     with(metadata) {
       assertThat(supplier).isEqualTo(Supplier.GEOAMEY)
       assertThat(effectiveYear).isEqualTo(2020)
-      assertThat(multiplier).isEqualTo(2.0)
+      assertThat(multiplier).isEqualTo(2.0.toBigDecimal())
       assertThat(details).isEqualTo("geo details")
     }
   }
@@ -54,7 +54,7 @@ internal class AnnualPriceAdjustmentMetadataTest {
           AuditEventType.JOURNEY_PRICE,
           LocalDateTime.now(),
           "username",
-          AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5, "serco details")
+          AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5.toBigDecimal(), "serco details")
         )
       )
     }.isInstanceOf(IllegalArgumentException::class.java)

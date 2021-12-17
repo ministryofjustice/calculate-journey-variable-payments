@@ -112,7 +112,7 @@ internal class PriceHistoryDtoTest {
       effectiveYear = 2021,
       oldPrice = Money(1000).pounds(),
       newPrice = Money(2000).pounds(),
-      multiplier = 2.0
+      multiplier = 2.0.toBigDecimal()
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)

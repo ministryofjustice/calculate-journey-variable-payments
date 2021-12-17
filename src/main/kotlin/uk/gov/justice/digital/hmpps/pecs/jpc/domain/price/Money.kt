@@ -15,7 +15,7 @@ data class Money(val pence: Int) {
 
   override fun toString(): String = "%.2f".format(pounds())
 
-  operator fun times(multiplier: Double) = valueOf(pounds() * multiplier)
+  operator fun times(multiplier: AdjustmentMultiplier) = valueOf(pounds().toBigDecimal().times(multiplier.value).toDouble())
 
   companion object Factory {
     /**

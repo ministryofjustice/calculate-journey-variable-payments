@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -58,7 +59,7 @@ internal class PriceMetadataTest {
 
   @Test
   fun `price adjustment`() {
-    val metadata = PriceMetadata.adjustment(price, old = Money(100), multiplier = 2.0)
+    val metadata = PriceMetadata.adjustment(price, old = Money(100), multiplier = AdjustmentMultiplier(2.0.toBigDecimal()))
 
     assertThat(metadata.supplier).isEqualTo(Supplier.SERCO)
     assertThat(metadata.fromNomisId).isEqualTo("FROM_AGENCY_ID")
@@ -66,7 +67,7 @@ internal class PriceMetadataTest {
     assertThat(metadata.effectiveYear).isEqualTo(2020)
     assertThat(metadata.newPrice).isEqualTo(20.00)
     assertThat(metadata.oldPrice).isEqualTo(1.0)
-    assertThat(metadata.multiplier).isEqualTo(2.0)
+    assertThat(metadata.multiplier).isEqualTo(2.0.toBigDecimal())
     assertThat(metadata.exceptionDeleted).isNull()
     assertThat(metadata.isUpdate()).isFalse
     assertThat(metadata.isAddException()).isFalse

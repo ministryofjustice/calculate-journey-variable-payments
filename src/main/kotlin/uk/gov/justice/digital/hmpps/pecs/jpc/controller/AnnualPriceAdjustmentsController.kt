@@ -15,9 +15,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AnnualPriceAdjustmentMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -100,14 +102,14 @@ class AnnualPriceAdjustmentsController(
       .sortedByDescending { lh -> lh.datetime }
 
   data class AnnualPriceAdjustmentForm(
-    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,15})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid rate")
     val rate: String?,
 
     @get: NotBlank(message = "Enter details upto 255 characters")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
     val details: String? = null
   ) {
-    fun mayBeRate() = rate?.toDoubleOrNull()?.takeIf { it > 0 }
+    fun mayBeRate() = rate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
   }
 
   companion object {

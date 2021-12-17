@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column
@@ -44,5 +45,5 @@ data class PriceAdjustment(
   val effectiveYear: Int,
 
   @Column(name = "multiplier", nullable = false)
-  val multiplier: Double
+  val multiplier: BigDecimal
 )
