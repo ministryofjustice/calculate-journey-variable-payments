@@ -18,7 +18,13 @@ dependencyCheck {
 // added specifically due to thymeleaf@3.0.12.RELEASE and CVE-2021-43466 - remove when update included in spring-boot
 ext["thymeleaf.version"] = "3.0.13.RELEASE"
 
+// added specifically due to org.apache.logging.log4j and CVE-2021-44832, CVE-2021-45105, CVE-2021-42550 - remove when update included in spring boot gradle plugin
+ext["log4j2.version"] = "2.17.1"
+
 dependencies {
+  implementation("ch.qos.logback:logback-classic:1.2.10") // resolves CVE-2021-42550, remove when update included in spring boot gradle plugin
+  implementation("ch.qos.logback:logback-core:1.2.10") // resolves CVE-2021-42550 remove when update included in spring boot gradle plugin
+
   implementation("com.beust:klaxon:5.5")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.129")
   implementation("io.sentry:sentry-spring-boot-starter:5.5.0")
