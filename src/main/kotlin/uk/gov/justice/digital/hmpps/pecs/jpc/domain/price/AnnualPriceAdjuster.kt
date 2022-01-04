@@ -26,17 +26,37 @@ class AnnualPriceAdjuster(
   internal fun isInProgressFor(supplier: Supplier) = priceAdjustmentRepository.existsPriceAdjustmentBySupplier(supplier)
 
   /**
-   * Price adjustments for the supplied effective year are calculated based on prices for the previous year with the supplied multiplier.
+   * Inflationary adjustments for the supplied effective year are calculated based on prices for the previous year with
+   * the supplied multiplier.
    */
-  internal fun adjust(
+  internal fun inflationary(
     id: UUID,
     supplier: Supplier,
     effectiveYear: Int,
     multiplier: AdjustmentMultiplier,
+  ) = adjust(id, supplier, effectiveYear, multiplier, true)
+
+  /**
+   * Volumetric adjustments for the supplied effective year are calculated based on prices for the current year with
+   * the supplied multiplier.
+   */
+  internal fun volumetric(
+    id: UUID,
+    supplier: Supplier,
+    effectiveYear: Int,
+    multiplier: AdjustmentMultiplier,
+  ) = adjust(id, supplier, effectiveYear, multiplier, false)
+
+  private fun adjust(
+    id: UUID,
+    supplier: Supplier,
+    effectiveYear: Int,
+    multiplier: AdjustmentMultiplier,
+    basedOnPreviousYearsPrices: Boolean
   ): Int {
     priceAdjustmentRepository.failIfLockNotPresent(id, supplier)
 
-    return applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier, effectiveYear, multiplier)
+    return applyPriceAdjustmentsForSupplierAndEffectiveYear(supplier, effectiveYear, multiplier, basedOnPreviousYearsPrices)
   }
 
   fun PriceAdjustmentRepository.failIfLockNotPresent(id: UUID, supplier: Supplier) {
@@ -61,12 +81,13 @@ class AnnualPriceAdjuster(
   private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(
     supplier: Supplier,
     effectiveYear: Int,
-    multiplier: AdjustmentMultiplier
+    multiplier: AdjustmentMultiplier,
+    basedOnPreviousYearsPrices: Boolean
   ): Int {
     var adjustments = 0
 
     return priceRepository
-      .possiblePricesForAdjustment(supplier, effectiveYear)
+      .possiblePricesForAdjustment(supplier, if (basedOnPreviousYearsPrices) effectiveYear - 1 else effectiveYear)
       .map { maybePriceAdjustment(it, effectiveYear, multiplier) }
       .filterNotNull()
       .map {
@@ -81,7 +102,7 @@ class AnnualPriceAdjuster(
   }
 
   private fun PriceRepository.possiblePricesForAdjustment(supplier: Supplier, effectiveYear: Int) =
-    this.findBySupplierAndEffectiveYear(supplier, effectiveYear - 1).asSequence()
+    this.findBySupplierAndEffectiveYear(supplier, effectiveYear).asSequence()
 
   private fun maybePriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier): Price? {
     val existingAdjustedPrice = maybeExistingAdjustedPrice(previousYearPrice, effectiveYear)

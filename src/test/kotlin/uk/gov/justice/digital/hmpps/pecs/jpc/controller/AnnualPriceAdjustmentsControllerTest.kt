@@ -215,7 +215,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
         .andExpect { status { is3xxRedirection() } }
 
-      verify(adjustmentsService).adjust(
+      verify(adjustmentsService).inflationary(
         eq(Supplier.SERCO),
         eq(effectiveYearForDate(effectiveDate)),
         eq(AdjustmentMultiplier(1.123456789012345.toBigDecimal())),
@@ -236,7 +236,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(adjustmentsService).adjust(
+    verify(adjustmentsService).inflationary(
       eq(Supplier.SERCO),
       eq(effectiveYearForDate(effectiveDate)),
       eq(AdjustmentMultiplier("1.1234".toBigDecimal())),
@@ -256,7 +256,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(adjustmentsService).adjust(
+    verify(adjustmentsService).inflationary(
       eq(Supplier.SERCO),
       eq(effectiveYearForDate(effectiveDate)),
       eq(AdjustmentMultiplier("9.9999999999999999999999999999999999999999".toBigDecimal())),

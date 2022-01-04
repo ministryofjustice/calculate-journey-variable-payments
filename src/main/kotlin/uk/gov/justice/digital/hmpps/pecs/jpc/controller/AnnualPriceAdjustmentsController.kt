@@ -87,7 +87,7 @@ class AnnualPriceAdjustmentsController(
       return "annual-price-adjustment"
     }
 
-    annualPriceAdjustmentsService.adjust(supplier, model.getSelectedEffectiveYear(), mayBeRate, authentication, form.details!!)
+    annualPriceAdjustmentsService.inflationary(supplier, model.getSelectedEffectiveYear(), mayBeRate, authentication, form.details!!)
 
     return "redirect:/manage-journey-price-catalogue"
   }
