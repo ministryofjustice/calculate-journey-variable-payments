@@ -5,8 +5,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Year
 
 /**
  * The integration test data comes from the DEV Spring Profile data loaded via the database migration scripts at startup.
@@ -359,4 +361,4 @@ object SercoPreviousMonthMoveData {
 
 internal fun LocalDate.previousMonth() = this.minusMonths(1).month
 
-internal fun LocalDate.previousMonthYear() = this.minusMonths(1).year
+internal fun LocalDate.previousMonthYear() = Year.of(effectiveYearForDate(this.minusMonths(1)))

@@ -52,7 +52,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
 
   @BeforeEach
   fun before() {
-    whenever(effectiveYear.current()).thenReturn(effectiveDate.year)
+    whenever(effectiveYear.current()).thenReturn(effectiveYearForDate(effectiveDate))
   }
 
   @Test
