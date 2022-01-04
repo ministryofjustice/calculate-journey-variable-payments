@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMont
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.redirectMoveRM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonthYear
 import java.time.LocalDate
 import java.time.Month
 import java.time.Year
@@ -43,7 +44,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
       .isAtMonthYear(currentDate.month, year)
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear())
 
     listOf(
       standardMoveSM1(),
@@ -52,7 +53,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
       lockoutMoveLM1(),
       multiMoveMM1(),
       cancelledMoveCM1()
-    ).forEach { move -> verifyDetailsOf(move, currentDate.previousMonth(), Year.now()) }
+    ).forEach { move -> verifyDetailsOf(move, currentDate.previousMonth(), currentDate.previousMonthYear()) }
   }
 
   @Test

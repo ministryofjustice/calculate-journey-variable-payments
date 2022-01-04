@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonthYear
 import java.time.LocalDate
 import java.time.Year
 
@@ -44,10 +45,10 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .isAtMonthYear(currentDate.month, Year.now())
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear())
 
     isAtPage(Dashboard)
-      .isAtMonthYear(currentDate.previousMonth(), year)
+      .isAtMonthYear(currentDate.previousMonth(), currentDate.previousMonthYear())
       .navigateToJourneysForReview()
 
     isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
@@ -66,7 +67,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear())
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
@@ -96,7 +97,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year.minusYears(2))
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear().minusYears(2))
 
     isAtPage(Dashboard).navigateToJourneysForReview()
 
@@ -112,7 +113,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year.minusYears(2))
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear().minusYears(2))
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
@@ -141,10 +142,10 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .isAtMonthYear(currentDate.month, year)
       .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), year)
+    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear())
 
     isAtPage(Dashboard)
-      .isAtMonthYear(currentDate.previousMonth(), year)
+      .isAtMonthYear(currentDate.previousMonth(), currentDate.previousMonthYear())
       .navigateToJourneysForReview()
 
     isAtPage(JourneysForReview)
