@@ -45,17 +45,15 @@ class AnnualPriceAdjustmentsController(
   fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     logger.info("getting annual price adjustment")
 
-    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
-      model.addContractStartAndEndDates()
-      model.addAttribute("history", priceAdjustmentHistoryFor(supplier))
+    model.addContractStartAndEndDates()
+    model.addAdjustmentHistoryFor(supplier)
 
+    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
       return "annual-price-adjustment-history"
     }
 
     model.apply {
-      addContractStartAndEndDates()
       addAttribute("form", AnnualPriceAdjustmentForm("0.0"))
-      addAttribute("history", priceAdjustmentHistoryFor(supplier))
     }
 
     return "annual-price-adjustment"
@@ -76,12 +74,12 @@ class AnnualPriceAdjustmentsController(
 
     val mayBeRate = form.mayBeRate() ?: result.rejectInvalidAdjustmentRate().let { null }
 
-    form.details?.let { result.rejectIfContainsXssCharacters(it, "details", "Invalid details") }
+    form.details?.let { result.rejectIfContainsInvalidCharacters(it, "details", "Invalid details") }
 
     if (result.hasErrors() || mayBeRate == null) {
       model.apply {
         addContractStartAndEndDates()
-        addAttribute("history", priceAdjustmentHistoryFor(supplier))
+        addAdjustmentHistoryFor(supplier)
       }
 
       return "annual-price-adjustment"
@@ -100,6 +98,10 @@ class AnnualPriceAdjustmentsController(
     annualPriceAdjustmentsService.adjustmentsHistoryFor(supplier)
       .map { history -> PriceAdjustmentHistoryDto.valueOf(supplier, history) }
       .sortedByDescending { lh -> lh.datetime }
+
+  private fun ModelMap.addAdjustmentHistoryFor(supplier: Supplier) {
+    this.addAttribute("history", priceAdjustmentHistoryFor(supplier))
+  }
 
   data class AnnualPriceAdjustmentForm(
     @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid rate")

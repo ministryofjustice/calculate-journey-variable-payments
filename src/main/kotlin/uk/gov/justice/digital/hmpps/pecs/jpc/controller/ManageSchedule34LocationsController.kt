@@ -102,7 +102,7 @@ class ManageSchedule34LocationsController(
   ): String {
     logger.info("performing manage location")
 
-    result.rejectIfContainsXssCharacters(form.locationName, "locationName", "Invalid location")
+    result.rejectIfContainsInvalidCharacters(form.locationName, "locationName", "Invalid location")
 
     if (result.hasErrors()) {
       model.addAttribute(
