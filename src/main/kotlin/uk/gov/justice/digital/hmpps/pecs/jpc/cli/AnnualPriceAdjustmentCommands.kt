@@ -14,15 +14,15 @@ class AnnualPriceAdjustmentCommands(
   @ShellMethod("Performs an inflationary price adjustment for the given supplier, effective year and the supplied multiplier.")
   fun inflationary(supplier: Supplier, effectiveYear: Int, multiplier: BigDecimal, details: String, force: Boolean = false) {
     if (force)
-      annualPriceAdjustmentsService.inflationary(supplier, effectiveYear, AdjustmentMultiplier(multiplier), null, details)
+      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, AdjustmentMultiplier(multiplier), null, null, details)
     else
       throw RuntimeException("Force is required for this operation to complete.")
   }
 
-  @ShellMethod("Performs a volumetric price adjustment for the given supplier, effective year and the supplied multiplier.")
-  fun volumetric(supplier: Supplier, effectiveYear: Int, multiplier: BigDecimal, details: String, force: Boolean = false) {
+  @ShellMethod("Performs a volumetric price adjustment for the given supplier, effective year and the supplied multipliers.")
+  fun volumetric(supplier: Supplier, effectiveYear: Int, inflation: BigDecimal, volume: BigDecimal, details: String, force: Boolean = false) {
     if (force)
-      annualPriceAdjustmentsService.volumetric(supplier, effectiveYear, AdjustmentMultiplier(multiplier), null, details)
+      annualPriceAdjustmentsService.adjust(supplier, effectiveYear, AdjustmentMultiplier(inflation), AdjustmentMultiplier(volume), null, details)
     else
       throw RuntimeException("Force is required for this operation to complete.")
   }

@@ -33,22 +33,35 @@
         <div>
           <h2 class="govuk-heading-l" th:inline="text">Apply bulk price adjustment</h2>
           <p class="govuk-heading-s govuk-body govuk-!-font-weight-regular">
-            Enter blended adjustment rate to calculate journey prices for the current contractual year.
+            Enter adjustment rates to calculate journey prices for the current contractual year.
           </p>
         </div>
-        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('rate')} ? 'govuk-form-group--error'">
+        <div class="govuk-form-group" th:classappend="${#fields.hasAnyErrors()} ? 'govuk-form-group--error'">
           <ol class="list pl0">
             <li class="mv3">
-              <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="rate">Rate</label>
-              <div id="rate-hint" class="govuk-hint">Example 1.5</div>
-              <p th:if="${#fields.hasErrors('rate')}" class="govuk-error-message">
+              <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="inflationary-rate">Inflationary Rate</label>
+              <div id="irate-hint" class="govuk-hint">Example - for a 0.67% increase you would enter 1.0067</div>
+              <p th:if="${#fields.hasErrors('inflationaryRate')}" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span>
-                Enter a valid price adjustment greater than zero in the correct format #.###############
+                Enter a valid inflationary rate greater than zero in the correct format #.###############
               </p>
               <div class="govuk-input__wrapper">
-                <input class="govuk-input govuk-input--width-10" id="rate" name="rate" type="text"
-                       aria-describedby="rate-hint" th:field="*{rate}"
-                       th:classappend="${#fields.hasErrors('rate')} ? 'govuk-input--error'">
+                <input class="govuk-input govuk-input--width-10" id="inflationary-rate" name="inflationary-rate" type="text"
+                       aria-describedby="rate-hint" th:field="*{inflationaryRate}"
+                       th:classappend="${#fields.hasErrors('inflationaryRate')} ? 'govuk-input--error'">
+              </div>
+            </li>
+            <li class="mv3">
+              <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="volumetric-rate">Volumetric Rate</label>
+              <div id="vrate-hint" class="govuk-hint">Example - for an 8.58% increase you would enter 1.0858 (or leave as 0.0 to bypass)</div>
+              <p th:if="${#fields.hasErrors('volumetricRate')}" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
+                Enter a valid volumetric rate greater than zero in the correct format #.###############
+              </p>
+              <div class="govuk-input__wrapper">
+                <input class="govuk-input govuk-input--width-10" id="volumetric-rate" name="volumetric-rate" type="text"
+                       aria-describedby="rate-hint" th:field="*{volumetricRate}"
+                       th:classappend="${#fields.hasErrors('volumetricRate')} ? 'govuk-input--error'">
               </div>
             </li>
             <li class="mv3">

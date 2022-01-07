@@ -59,10 +59,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).inflationary(
+      ).adjust(
         Supplier.SERCO,
         2020,
         AdjustmentMultiplier(1.0.toBigDecimal()),
+        null,
         authentication,
         "some details"
       )
@@ -80,10 +81,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).inflationary(
+      ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
+        null,
         authentication,
         "some details"
       )
@@ -93,13 +95,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
     @Test
     internal fun `monitoring service captures failed price adjustment`() {
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
-        PriceAdjustment(
-          supplier = Supplier.GEOAMEY,
-          multiplier = 1.0.toBigDecimal(),
-          effectiveYear = 2021
-        )
-      )
+      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(mock())
+
       whenever(
         annualPriceAdjusterSpy.inflationary(
           any(),
@@ -115,10 +112,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).inflationary(
+      ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
+        null,
         authentication,
         "some details"
       )
@@ -136,6 +134,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
           effectiveYear = 2021
         )
       )
+
       whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
 
       AnnualPriceAdjustmentsService(
@@ -144,10 +143,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).inflationary(
+      ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
+        null,
         authentication,
         "some audit details"
       )
@@ -170,10 +170,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
           auditService,
           effectiveYear,
           jobRunner
-        ).inflationary(
+        ).adjust(
           Supplier.GEOAMEY,
           effectiveYear.current() - 1,
           AdjustmentMultiplier(2.0.toBigDecimal()),
+          null,
           authentication,
           "some details"
         )
@@ -186,7 +187,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
   inner class VolumetricAdjustments {
     @Test
     internal fun `price adjustment for Serco`() {
-      val lockId = fakeLockForFor(Supplier.SERCO, AdjustmentMultiplier(1.0.toBigDecimal()), 2020)
+      val lockId = fakeLockForFor(Supplier.SERCO, AdjustmentMultiplier(2.0.toBigDecimal()), 2020)
 
       AnnualPriceAdjustmentsService(
         annualPriceAdjusterSpy,
@@ -194,15 +195,16 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).volumetric(
+      ).adjust(
         Supplier.SERCO,
         2020,
         AdjustmentMultiplier(1.0.toBigDecimal()),
+        AdjustmentMultiplier(2.0.toBigDecimal()),
         authentication,
         "some details"
       )
 
-      verify(annualPriceAdjusterSpy).volumetric(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(AdjustmentMultiplier(1.0.toBigDecimal())))
+      verify(annualPriceAdjusterSpy).volumetric(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
     }
 
     @Test
@@ -215,50 +217,16 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).volumetric(
+      ).adjust(
         Supplier.GEOAMEY,
         2021,
+        AdjustmentMultiplier(1.0.toBigDecimal()),
         AdjustmentMultiplier(2.0.toBigDecimal()),
         authentication,
         "some details"
       )
 
       verify(annualPriceAdjusterSpy).volumetric(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
-    }
-
-    @Test
-    internal fun `monitoring service captures failed price adjustment`() {
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
-        PriceAdjustment(
-          supplier = Supplier.GEOAMEY,
-          multiplier = 1.0.toBigDecimal(),
-          effectiveYear = 2021
-        )
-      )
-      whenever(
-        annualPriceAdjusterSpy.volumetric(
-          any(),
-          eq(Supplier.GEOAMEY),
-          eq(2021),
-          eq(AdjustmentMultiplier(2.0.toBigDecimal()))
-        )
-      ).thenThrow(RuntimeException("something went wrong"))
-
-      AnnualPriceAdjustmentsService(
-        annualPriceAdjuster,
-        monitoringService,
-        auditService,
-        effectiveYear,
-        jobRunner
-      ).volumetric(
-        Supplier.GEOAMEY,
-        2021,
-        AdjustmentMultiplier(2.0.toBigDecimal()),
-        authentication,
-        "some details"
-      )
-
-      verify(monitoringService).capture("Failed VOLUME price adjustment for GEOAMEY for effective year 2021 and multiplier 2.0.")
     }
 
     @Test
@@ -279,10 +247,11 @@ internal class AnnualPriceAdjustmentsServiceTest {
         auditService,
         effectiveYear,
         jobRunner
-      ).volumetric(
+      ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
+        null,
         authentication,
         "some audit details"
       )
@@ -305,16 +274,41 @@ internal class AnnualPriceAdjustmentsServiceTest {
           auditService,
           effectiveYear,
           jobRunner
-        ).volumetric(
+        ).adjust(
           Supplier.GEOAMEY,
           effectiveYear.current() - 1,
           AdjustmentMultiplier(2.0.toBigDecimal()),
+          null,
           authentication,
           "some details"
         )
       }.isInstanceOf(RuntimeException::class.java)
         .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")
     }
+  }
+
+  @Test
+  internal fun `price adjustments for GEOAmey`() {
+    val inflationLockId = fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)
+    val volumetricLockId = fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(3.0.toBigDecimal()), 2021)
+
+    AnnualPriceAdjustmentsService(
+      annualPriceAdjusterSpy,
+      monitoringService,
+      auditService,
+      effectiveYear,
+      jobRunner
+    ).adjust(
+      Supplier.GEOAMEY,
+      2021,
+      AdjustmentMultiplier(2.0.toBigDecimal()),
+      AdjustmentMultiplier(3.0.toBigDecimal()),
+      authentication,
+      "some details"
+    )
+
+    verify(annualPriceAdjusterSpy).inflationary(eq(inflationLockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
+    verify(annualPriceAdjusterSpy).volumetric(eq(volumetricLockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(3.0.toBigDecimal())))
   }
 
   private fun fakeLockForFor(supplier: Supplier, multiplier: AdjustmentMultiplier, effectiveYear: Int): UUID {

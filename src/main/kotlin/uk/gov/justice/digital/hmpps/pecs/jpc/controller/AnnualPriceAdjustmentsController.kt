@@ -45,17 +45,15 @@ class AnnualPriceAdjustmentsController(
   fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {
     logger.info("getting annual price adjustment")
 
-    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
-      model.addContractStartAndEndDates()
-      model.addAttribute("history", priceAdjustmentHistoryFor(supplier))
+    model.addContractStartAndEndDates()
+    model.addAdjustmentHistoryFor(supplier)
 
+    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
       return "annual-price-adjustment-history"
     }
 
     model.apply {
-      addContractStartAndEndDates()
-      addAttribute("form", AnnualPriceAdjustmentForm("0.0"))
-      addAttribute("history", priceAdjustmentHistoryFor(supplier))
+      addAttribute("form", AnnualPriceAdjustmentForm("0.0", "0.0"))
     }
 
     return "annual-price-adjustment"
@@ -74,26 +72,34 @@ class AnnualPriceAdjustmentsController(
   ): Any {
     logger.info("posting annual price adjustment")
 
-    val mayBeRate = form.mayBeRate() ?: result.rejectInvalidAdjustmentRate().let { null }
+    val mayBeInflationaryRate = form.mayBeInflationaryRate() ?: result.rejectInvalidAdjustmentRate().let { null }
+    val mayBeVolumetricRate = form.mayBeVolumetricRate() ?: result.rejectInvalidAdjustmentRate().let { null }
 
-    form.details?.let { result.rejectIfContainsXssCharacters(it, "details", "Invalid details") }
+    form.details?.let { result.rejectIfContainsInvalidCharacters(it, "details", "Invalid details") }
 
-    if (result.hasErrors() || mayBeRate == null) {
+    if (result.hasErrors() || form.details == null || mayBeInflationaryRate == null || mayBeVolumetricRate == null) {
       model.apply {
         addContractStartAndEndDates()
-        addAttribute("history", priceAdjustmentHistoryFor(supplier))
+        addAdjustmentHistoryFor(supplier)
       }
 
       return "annual-price-adjustment"
     }
 
-    annualPriceAdjustmentsService.inflationary(supplier, model.getSelectedEffectiveYear(), mayBeRate, authentication, form.details!!)
+    annualPriceAdjustmentsService.adjust(
+      supplier = supplier,
+      suppliedEffective = model.getSelectedEffectiveYear(),
+      inflationary = mayBeInflationaryRate,
+      volumetric = mayBeVolumetricRate.takeIf { it.value > BigDecimal.ZERO },
+      authentication = authentication,
+      details = form.details
+    )
 
     return "redirect:/manage-journey-price-catalogue"
   }
 
   private fun BindingResult.rejectInvalidAdjustmentRate() {
-    this.rejectValue("rate", "rate", "Invalid rate")
+    this.rejectValue("inflationaryRate", "rate", "Invalid rate")
   }
 
   private fun priceAdjustmentHistoryFor(supplier: Supplier): List<PriceAdjustmentHistoryDto> =
@@ -101,15 +107,26 @@ class AnnualPriceAdjustmentsController(
       .map { history -> PriceAdjustmentHistoryDto.valueOf(supplier, history) }
       .sortedByDescending { lh -> lh.datetime }
 
+  private fun ModelMap.addAdjustmentHistoryFor(supplier: Supplier) {
+    this.addAttribute("history", priceAdjustmentHistoryFor(supplier))
+  }
+
   data class AnnualPriceAdjustmentForm(
     @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid rate")
-    val rate: String?,
+    val inflationaryRate: String?,
+
+    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid volumetric rate")
+    val volumetricRate: String?,
 
     @get: NotBlank(message = "Enter details upto 255 characters")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
     val details: String? = null
   ) {
-    fun mayBeRate() = rate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
+    fun mayBeInflationaryRate() =
+      inflationaryRate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
+
+    fun mayBeVolumetricRate() =
+      volumetricRate?.toBigDecimalOrNull()?.takeIf { it >= BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
   }
 
   companion object {
@@ -136,7 +153,7 @@ data class PriceAdjustmentHistoryDto(
 
       return PriceAdjustmentHistoryDto(
         event.createdAt,
-        "Prices adjusted by blended rate of ${data.multiplier}",
+        "Prices adjusted by rate of ${data.multiplier}",
         if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username,
         data.details
       )

@@ -19,7 +19,7 @@ internal value class MonthYear(private val monthYear: Pair<String, Int>) {
   fun year() = monthYear.second
 }
 
-internal fun BindingResult.rejectIfContainsXssCharacters(value: String, field: String, errorCode: String) {
+internal fun BindingResult.rejectIfContainsInvalidCharacters(value: String, field: String, errorCode: String) {
   if (value.any(XSS_CHARACTERS::contains)) {
     this.rejectValue(
       field,
