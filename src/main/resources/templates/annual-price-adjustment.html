@@ -40,7 +40,7 @@
           <ol class="list pl0">
             <li class="mv3">
               <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="inflationary-rate">Inflationary Rate</label>
-              <div id="irate-hint" class="govuk-hint">Example 1.5</div>
+              <div id="irate-hint" class="govuk-hint">Example - for a 0.67% increase you would enter 1.0067</div>
               <p th:if="${#fields.hasErrors('inflationaryRate')}" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span>
                 Enter a valid inflationary rate greater than zero in the correct format #.###############
@@ -53,7 +53,7 @@
             </li>
             <li class="mv3">
               <label class="govuk-label govuk-body govuk-!-font-weight-bold" for="volumetric-rate">Volumetric Rate</label>
-              <div id="vrate-hint" class="govuk-hint">Example 2.0 (or leave as 0.0 to bypass)</div>
+              <div id="vrate-hint" class="govuk-hint">Example - for an 8.58% increase you would enter 1.0858 (or leave as 0.0 to bypass)</div>
               <p th:if="${#fields.hasErrors('volumetricRate')}" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span>
                 Enter a valid volumetric rate greater than zero in the correct format #.###############

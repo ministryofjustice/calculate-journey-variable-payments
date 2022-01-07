@@ -56,9 +56,6 @@ dependencies {
 
   runtimeOnly("org.postgresql:postgresql:42.3.1")
 }
-repositories {
-  mavenCentral()
-}
 
 tasks {
   test {

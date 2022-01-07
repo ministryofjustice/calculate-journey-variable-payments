@@ -73,9 +73,6 @@ class AnnualPriceAdjustmentsService(
   }
 
   /**
-   * Price adjustments cannot be before the current effective year, if the supplied effective year is before it then an
-   * exception will be thrown.
-   *
    * An inflationary based adjustment takes place at the start of the effective year.
    */
   private fun inflationary(
@@ -102,9 +99,6 @@ class AnnualPriceAdjustmentsService(
   }
 
   /**
-   * Price adjustments cannot be before the current effective year, if the supplied effective year is before it then an
-   * exception will be thrown.
-   *
    * A volumetric based adjustment takes place at the start of the effective year after the inflationary adjustment.
    */
   private fun volumetric(

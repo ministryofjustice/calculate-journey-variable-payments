@@ -153,7 +153,7 @@ data class PriceAdjustmentHistoryDto(
 
       return PriceAdjustmentHistoryDto(
         event.createdAt,
-        "Prices adjusted by blended rate of ${data.multiplier}",
+        "Prices adjusted by rate of ${data.multiplier}",
         if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username,
         data.details
       )
