@@ -222,7 +222,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
   }
 
   fun movesInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) =
-    MoveType.values().map { movesForMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) }
+    MoveType.values().associateBy({ it }, { movesForMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) })
 
   class MovePersonJourney(val move: Move, val person: Person?, val journey: Journey?)
 

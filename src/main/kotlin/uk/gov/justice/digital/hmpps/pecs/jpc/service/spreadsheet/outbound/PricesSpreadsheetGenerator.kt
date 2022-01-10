@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
@@ -39,21 +40,22 @@ class PricesSpreadsheetGenerator(
         .apply { writeSummaries(moveService.moveTypeSummaries(supplier, startDate)) }
 
       StandardMovesSheet(workbook, header).also { logger.info("Adding standard prices.") }
-        .apply { writeMoves(moves[0]) }
+        .apply { moves[MoveType.STANDARD]?.let { writeMoves(it) } }
 
       RedirectionMovesSheet(workbook, header).also { logger.info("Adding redirect prices.") }
-        .apply { writeMoves(moves[1]) }
+        .apply { moves[MoveType.REDIRECTION]?.let { writeMoves(it) } }
 
       LongHaulMovesSheet(workbook, header).also { logger.info("Adding long haul prices.") }
-        .apply { writeMoves(moves[2]) }
+        .apply { moves[MoveType.LONG_HAUL]?.let { writeMoves(it) } }
 
-      LockoutMovesSheet(workbook, header).also { logger.info("Adding lockout prices.") }.apply { writeMoves(moves[3]) }
+      LockoutMovesSheet(workbook, header).also { logger.info("Adding lockout prices.") }
+        .apply { moves[MoveType.LOCKOUT]?.let { writeMoves(it) } }
 
       MultiTypeMovesSheet(workbook, header).also { logger.info("Adding multi-type prices.") }
-        .apply { writeMoves(moves[4]) }
+        .apply { moves[MoveType.MULTI]?.let { writeMoves(it) } }
 
       CancelledMovesSheet(workbook, header).also { logger.info("Adding cancelled moves.") }
-        .apply { writeMoves(moves[5]) }
+        .apply { moves[MoveType.CANCELLED]?.let { writeMoves(it) } }
 
       JourneysSheet(workbook, header).also { logger.info("Adding journeys.") }
         .apply { writeJourneys(journeyService.distinctJourneysIncludingPriced(supplier, startDate)) }

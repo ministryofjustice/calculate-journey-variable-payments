@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import org.apache.poi.xssf.usermodel.XSSFRow
+import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -31,13 +33,13 @@ internal class PricesSpreadsheetGeneratorTest {
 
   private fun createMoveList(id: Int, moveType: MoveType) = listOf(
     Move(
-      "MOVE$id",
+      "Move$id",
       null,
       timeSource.dateTime(),
       Supplier.GEOAMEY,
       moveType,
       MoveStatus.completed,
-      "Move$id",
+      "$moveType", // this is used to verify the correct move type is put into the correct spreadsheet tab
       timeSource.date(),
       "FROM$id",
       "PR"
@@ -45,13 +47,13 @@ internal class PricesSpreadsheetGeneratorTest {
   )
 
   private val moveService: MoveService = mock {
-    on { it.moves(any(), any()) } doReturn listOf(
-      createMoveList(1, MoveType.STANDARD),
-      createMoveList(2, MoveType.REDIRECTION),
-      createMoveList(3, MoveType.LONG_HAUL),
-      createMoveList(4, MoveType.LOCKOUT),
-      createMoveList(5, MoveType.MULTI),
-      createMoveList(6, MoveType.CANCELLED)
+    on { it.moves(any(), any()) } doReturn mapOf(
+      MoveType.STANDARD to createMoveList(1, MoveType.STANDARD),
+      MoveType.REDIRECTION to createMoveList(2, MoveType.REDIRECTION),
+      MoveType.LONG_HAUL to createMoveList(3, MoveType.LONG_HAUL),
+      MoveType.LOCKOUT to createMoveList(4, MoveType.LOCKOUT),
+      MoveType.MULTI to createMoveList(5, MoveType.MULTI),
+      MoveType.CANCELLED to createMoveList(6, MoveType.CANCELLED)
     )
     on { it.moveTypeSummaries(any(), any()) } doReturn MoveTypeSummaries(
       1,
@@ -102,19 +104,31 @@ internal class PricesSpreadsheetGeneratorTest {
   @Test
   internal fun `check tabs`() {
     val sheetFile = pricesSpreadsheetGenerator.generate(Supplier.GEOAMEY, timeSource.date())
-    val sheet = XSSFWorkbook(FileInputStream(sheetFile))
+    val workbook = XSSFWorkbook(FileInputStream(sheetFile))
 
-    listOf(
-      "Summary",
-      "Standard",
-      "Lockouts",
-      "Long haul",
-      "Redirections",
-      "Multi-type",
-      "Cancelled",
-      "Journeys",
-      "JPC Price book",
-      "Locations"
-    ).forEachIndexed { index, s -> assertThat(sheet.getSheetName(index) == s) }
+    mapOf(
+      "Summary" to null,
+      "Standard" to MoveType.STANDARD.toString(),
+      "Lockouts" to MoveType.LOCKOUT.toString(),
+      "Long haul" to MoveType.LONG_HAUL.toString(),
+      "Redirections" to MoveType.REDIRECTION.toString(),
+      "Multi-type" to MoveType.MULTI.toString(),
+      "Cancelled" to MoveType.CANCELLED.toString(),
+      "Journeys" to null,
+      "JPC Price book" to null,
+      "Locations" to null
+    ).forEach { (sheetName, maybeMoveRef) ->
+      val sheet = workbook.getSheet(sheetName)
+
+      assertThat(sheet).isNotNull
+
+      maybeMoveRef?.let { expectedMoveReference ->
+        assertThat(sheet.firstRowOfData().moveReference()).isEqualTo(expectedMoveReference)
+      }
+    }
   }
+
+  private fun XSSFSheet.firstRowOfData() = this.getRow(9)
+
+  private fun XSSFRow.moveReference() = this.getCell(0).toString()
 }
