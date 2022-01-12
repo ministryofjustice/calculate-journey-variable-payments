@@ -90,13 +90,15 @@ class AnnualPriceAdjustmentsController(
       supplier = supplier,
       suppliedEffective = model.getSelectedEffectiveYear(),
       inflationary = mayBeInflationaryRate,
-      volumetric = mayBeVolumetricRate.takeIf { it.value != BigDecimal.ZERO },
+      volumetric = mayBeVolumetricRate.takeIfNotNullOrZero(),
       authentication = authentication,
       details = form.details
     )
 
     return "redirect:/manage-journey-price-catalogue"
   }
+
+  private fun AdjustmentMultiplier.takeIfNotNullOrZero() = this.takeIf { it.value < BigDecimal.ZERO || it.value > BigDecimal.ZERO }
 
   private fun BindingResult.rejectInvalidAdjustmentRate(field: String) {
     this.rejectValue(field, "rate", "Invalid rate")

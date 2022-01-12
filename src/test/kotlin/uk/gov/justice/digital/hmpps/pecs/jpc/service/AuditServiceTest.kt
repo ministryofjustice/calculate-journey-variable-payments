@@ -227,7 +227,7 @@ internal class AuditServiceTest {
         "TEST2",
         "TEST21",
         effectiveYearForDate(timeSource.date()),
-        2.34,
+        2.34.toBigDecimal(),
       )
     )
   }
@@ -257,7 +257,7 @@ internal class AuditServiceTest {
         "TEST2",
         "TEST21",
         effectiveYearForDate(timeSource.date()),
-        2.34,
+        2.34.toBigDecimal(),
       )
     )
   }
@@ -287,8 +287,8 @@ internal class AuditServiceTest {
         "TEST2",
         "TEST21",
         effectiveYearForDate(timeSource.date()),
-        23.4,
-        2.34
+        "23.40".toBigDecimal(),
+        "2.34".toBigDecimal()
       )
     )
   }
@@ -377,9 +377,9 @@ internal class AuditServiceTest {
         "TEST2",
         "TEST21",
         effectiveYearForDate(timeSource.date()),
-        2.0,
-        1.0,
-        2.0.toBigDecimal()
+        "2.00".toBigDecimal(),
+        "1.00".toBigDecimal(),
+        "2.0".toBigDecimal()
       )
     )
   }
@@ -410,9 +410,9 @@ internal class AuditServiceTest {
         "TEST2",
         "TEST21",
         effectiveYearForDate(timeSource.date()),
-        2.0,
-        1.0,
-        2.0.toBigDecimal()
+        "2.00".toBigDecimal(),
+        "1.00".toBigDecimal(),
+        "2.0".toBigDecimal()
       )
     )
   }
@@ -443,8 +443,8 @@ internal class AuditServiceTest {
         fromNomisId = "TEST2",
         toNomisId = "TEST21",
         effectiveYear = effectiveYearForDate(timeSource.date()),
-        newPrice = 3.0,
-        oldPrice = 2.0,
+        newPrice = "3.00".toBigDecimal(),
+        oldPrice = "2.00".toBigDecimal(),
         exceptionMonth = Month.OCTOBER.name,
         exceptionDeleted = false
       )
@@ -477,8 +477,8 @@ internal class AuditServiceTest {
         fromNomisId = "TEST2",
         toNomisId = "TEST21",
         effectiveYear = effectiveYearForDate(timeSource.date()),
-        newPrice = 3.0,
-        oldPrice = 2.0,
+        newPrice = "3.00".toBigDecimal(),
+        oldPrice = "2.00".toBigDecimal(),
         exceptionMonth = Month.OCTOBER.name,
         exceptionDeleted = true
       )

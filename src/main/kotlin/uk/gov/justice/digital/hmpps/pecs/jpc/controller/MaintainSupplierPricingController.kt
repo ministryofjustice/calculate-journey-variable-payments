@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.ordinalMonthsAndYearForSeptemberToAugust
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import java.math.BigDecimal
 import java.time.Month
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
@@ -389,7 +390,7 @@ class MaintainSupplierPricingController(
   private fun agencyIds(combined: String) =
     Pair(combined.split("-")[0].trim().uppercase(), combined.split("-")[1].trim().uppercase())
 
-  private fun parseAmount(value: String) = value.toDoubleOrNull()?.takeIf { it > 0 }?.let { Money.valueOf(it) }
+  private fun parseAmount(value: String) = value.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { Money.valueOf(it) }
 
   private fun ModelMap.getFromLocation() = this.getAttribute(PICK_UP_ATTRIBUTE).takeUnless { it == "" }
 

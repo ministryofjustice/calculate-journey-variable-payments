@@ -88,7 +88,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       "from",
       "to",
-      Money.valueOf(100.24),
+      Money.valueOf("100.24"),
       effectiveYear
     )
 
@@ -110,7 +110,7 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         "from",
         "to",
-        Money.valueOf(100.24),
+        Money.valueOf("100.24"),
         effectiveYear
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for SERCO")
@@ -125,7 +125,7 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         "from",
         "to",
-        Money.valueOf(100.24),
+        Money.valueOf("100.24"),
         effectiveYear - 2
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price changes can longer be made, change is outside of price change window.")
@@ -146,7 +146,7 @@ internal class SupplierPricingServiceTest {
 
     val existingPrice = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
 
-    assertThat(existingPrice).isEqualTo(SupplierPricingService.PriceDto("from site", "to site", Money.valueOf(100.24)))
+    assertThat(existingPrice).isEqualTo(SupplierPricingService.PriceDto("from site", "to site", Money.valueOf("100.24")))
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
@@ -174,7 +174,7 @@ internal class SupplierPricingServiceTest {
       SupplierPricingService.PriceDto(
         "from site",
         "to site",
-        Money.valueOf(100.24)
+        Money.valueOf("100.24")
       ).apply { exceptions[1] = Money(200) }
     )
 
@@ -228,7 +228,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       "from",
       "to",
-      Money.Factory.valueOf(200.35),
+      Money.valueOf("200.35"),
       effectiveYear
     )
 
@@ -255,7 +255,7 @@ internal class SupplierPricingServiceTest {
         Supplier.GEOAMEY,
         "from",
         "to",
-        Money.Factory.valueOf(200.35),
+        Money.valueOf("200.35"),
         effectiveYear
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for GEOAMEY")
@@ -270,7 +270,7 @@ internal class SupplierPricingServiceTest {
         Supplier.GEOAMEY,
         "from",
         "to",
-        Money.Factory.valueOf(200.35),
+        Money.valueOf("200.35"),
         effectiveYear - 2
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price changes can longer be made, change is outside of price change window.")
@@ -326,9 +326,9 @@ internal class SupplierPricingServiceTest {
   internal fun `add price exception for existing price for Serco`() {
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(sercoPrice)
 
-    service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf(20.00))
+    service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf("20.00"))
 
-    verify(priceRepository).save(sercoPrice.addException(SEPTEMBER, Money.valueOf(20.00)))
+    verify(priceRepository).save(sercoPrice.addException(SEPTEMBER, Money.valueOf("20.00")))
     verify(auditService).create(eventCaptor.capture())
     assertThat(eventCaptor.firstValue.type).isEqualTo(JOURNEY_PRICE)
   }
@@ -336,7 +336,7 @@ internal class SupplierPricingServiceTest {
   @Test
   internal fun `add price exception fails if outside of price change window `() {
     assertThatThrownBy {
-      service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, SEPTEMBER, Money.valueOf(20.00))
+      service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, SEPTEMBER, Money.valueOf("20.00"))
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Price changes can longer be made, change is outside of price change window.")
   }
@@ -346,7 +346,7 @@ internal class SupplierPricingServiceTest {
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(null)
 
     assertThatThrownBy {
-      service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf(20.00))
+      service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf("20.00"))
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("No matching price found for SERCO")
   }
@@ -354,7 +354,7 @@ internal class SupplierPricingServiceTest {
   @Test
   internal fun `remove price exception`() {
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(
-      sercoPrice.addException(JULY, Money.valueOf(500.00))
+      sercoPrice.addException(JULY, Money.valueOf("500.00"))
     )
 
     val priceWithExceptionRemoved = service.removePriceException(Supplier.SERCO, "FROM", "TO", sercoPrice.effectiveYear, JULY)
@@ -387,7 +387,7 @@ internal class SupplierPricingServiceTest {
   @Test
   internal fun `remove price exception fails when no matching exception`() {
     whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(
-      sercoPrice.addException(JULY, Money.valueOf(500.00))
+      sercoPrice.addException(JULY, Money.valueOf("500.00"))
     )
 
     assertThatThrownBy {

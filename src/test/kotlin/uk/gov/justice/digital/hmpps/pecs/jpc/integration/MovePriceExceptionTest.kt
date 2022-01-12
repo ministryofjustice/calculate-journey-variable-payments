@@ -49,7 +49,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf(101.00))
+      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("101.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
 
     isAtPage(UpdatePrice)
@@ -57,7 +57,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .showPriceExceptionsTab()
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .addPriceException(date.month, Money.valueOf(3000.00))
+      .addPriceException(date.month, Money.valueOf("3000.00"))
 
     isAtPage(UpdatePrice)
       .assertTextIsPresent("Existing price exceptions")
@@ -73,7 +73,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .navigateToDetailsFor(standardMoveSM4())
 
     isAtPage(MoveDetails)
-      .isAtPageFor(standardMoveSM4(), Money.valueOf(3000.00))
+      .isAtPageFor(standardMoveSM4(), Money.valueOf("3000.00"))
   }
 
   @Test
@@ -93,7 +93,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf(101.00))
+      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("101.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
 
     isAtPage(UpdatePrice)
@@ -114,6 +114,6 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .navigateToDetailsFor(standardMoveSM4())
 
     isAtPage(MoveDetails)
-      .isAtPageFor(standardMoveSM4(), Money.valueOf(101.00))
+      .isAtPageFor(standardMoveSM4(), Money.valueOf("101.00"))
   }
 }

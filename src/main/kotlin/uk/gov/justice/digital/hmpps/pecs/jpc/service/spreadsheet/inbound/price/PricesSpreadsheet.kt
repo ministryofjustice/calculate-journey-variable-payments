@@ -49,7 +49,7 @@ class PricesSpreadsheet(
     val toLocationName =
       row.getFormattedStringCell(TO_LOCATION) ?: throw RuntimeException("To location name cannot be blank")
 
-    val price = Result.runCatching { Money.valueOf(row.getCell(PRICE).numericCellValue).pence }
+    val price = Result.runCatching { Money.valueOf(row.getCell(PRICE).numericCellValue.toBigDecimal()).pence }
       .onSuccess { if (it == 0) throw RuntimeException("Price must be greater than zero") }
       .getOrElse { throw RuntimeException("Error retrieving price for supplier '$supplier'", it) }
 

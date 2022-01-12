@@ -117,7 +117,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             fromAgencyId = "PRISON1",
             toPrimaryKey = POLICE1_PRIMARY_KEY,
             toAgencyId = "POLICE1",
-            amount = Money.valueOf(100.00)
+            amount = Money.valueOf("100.00")
           )
         )
       }
@@ -154,7 +154,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             fromAgencyId = "PRISON1",
             toPrimaryKey = POLICE1_PRIMARY_KEY,
             toAgencyId = "POLICE1",
-            amount = Money.valueOf(50.00)
+            amount = Money.valueOf("50.00")
           )
         )
       }

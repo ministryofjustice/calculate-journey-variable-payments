@@ -2,10 +2,9 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.roundToInt
 
 /**
- * Simple value object to encapsulate a monetary amount in pence. Negative amounts are not allowed.
+ * Simple value object to encapsulate a monetary amount in pence. Zero or less are not allowed.
  */
 data class Money(val pence: Int) {
 
@@ -13,22 +12,24 @@ data class Money(val pence: Int) {
     if (pence < 0) throw IllegalArgumentException("money cannot be less than zero")
   }
 
-  fun pounds() = pence.toDouble() / 100
+  fun pounds(): BigDecimal = pence.toBigDecimal().divide(BigDecimal("100")).setScale(2)
 
   override fun toString(): String = "%.2f".format(pounds())
 
-  operator fun times(multiplier: BigDecimal) = valueOf(pounds().toBigDecimal().multiply(multiplier).toDouble())
+  operator fun times(multiplier: BigDecimal) = valueOf(pounds().multiply(multiplier))
 
-  companion object Factory {
+  companion object {
+
     /**
-     * This rounds the amount towards positive infinity, e.g. 10.004 would be rounded to 1000 pence and 10.005 would be
-     * rounded to 1001 pence.
+     * This half up, e.g. 10.004 would be rounded to 1000 pence and 10.005 would be rounded to 1001 pence.
      */
-    fun valueOf(pounds: Double) = Money((pounds * 100).roundToInt())
+    fun valueOf(pounds: String) = valueOf(pounds.toBigDecimal())
 
-    fun valueOf(pounds: String) = Money(
+    /**
+     * This half up, e.g. 10.004 would be rounded to 1000 pence and 10.005 would be rounded to 1001 pence.
+     */
+    fun valueOf(pounds: BigDecimal) = Money(
       pounds
-        .toBigDecimal()
         .setScale(2, RoundingMode.HALF_UP)
         .multiply(BigDecimal("100"))
         .toInt()

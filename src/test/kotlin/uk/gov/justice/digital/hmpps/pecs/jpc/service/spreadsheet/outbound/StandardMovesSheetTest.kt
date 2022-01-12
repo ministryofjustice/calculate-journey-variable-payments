@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep202
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -95,6 +96,7 @@ fun <T> assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?)
   val actualValue = when (expectedVal) {
     is String -> sheet.getRow(row).getCell(col).stringCellValue
     is Double -> sheet.getRow(row).getCell(col).numericCellValue
+    is BigDecimal -> sheet.getRow(row).getCell(col).numericCellValue.toBigDecimal().setScale(2)
     is Int -> sheet.getRow(row).getCell(col).numericCellValue.toInt()
     is LocalDate -> LocalDate.parse(
       sheet.getRow(row).getCell(col).stringCellValue,
