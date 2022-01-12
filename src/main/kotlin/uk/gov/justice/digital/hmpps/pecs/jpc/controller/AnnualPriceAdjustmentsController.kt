@@ -72,8 +72,8 @@ class AnnualPriceAdjustmentsController(
   ): Any {
     logger.info("posting annual price adjustment")
 
-    val mayBeInflationaryRate = form.mayBeInflationaryRate() ?: result.rejectInvalidAdjustmentRate().let { null }
-    val mayBeVolumetricRate = form.mayBeVolumetricRate() ?: result.rejectInvalidAdjustmentRate().let { null }
+    val mayBeInflationaryRate = form.mayBeInflationaryRate() ?: result.rejectInvalidAdjustmentRate("inflationaryRate").let { null }
+    val mayBeVolumetricRate = form.mayBeVolumetricRate() ?: result.rejectInvalidAdjustmentRate("volumetricRate").let { null }
 
     form.details?.let { result.rejectIfContainsInvalidCharacters(it, "details", "Invalid details") }
 
@@ -90,7 +90,7 @@ class AnnualPriceAdjustmentsController(
       supplier = supplier,
       suppliedEffective = model.getSelectedEffectiveYear(),
       inflationary = mayBeInflationaryRate,
-      volumetric = mayBeVolumetricRate.takeIf { it.value > BigDecimal.ZERO },
+      volumetric = mayBeVolumetricRate.takeIf { it.value != BigDecimal.ZERO },
       authentication = authentication,
       details = form.details
     )
@@ -98,8 +98,8 @@ class AnnualPriceAdjustmentsController(
     return "redirect:/manage-journey-price-catalogue"
   }
 
-  private fun BindingResult.rejectInvalidAdjustmentRate() {
-    this.rejectValue("inflationaryRate", "rate", "Invalid rate")
+  private fun BindingResult.rejectInvalidAdjustmentRate(field: String) {
+    this.rejectValue(field, "rate", "Invalid rate")
   }
 
   private fun priceAdjustmentHistoryFor(supplier: Supplier): List<PriceAdjustmentHistoryDto> =
@@ -112,10 +112,10 @@ class AnnualPriceAdjustmentsController(
   }
 
   data class AnnualPriceAdjustmentForm(
-    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid rate")
+    @get: Pattern(regexp = "^[0-9]{0,2}(\\.[0-9]{0,40})?\$", message = "Invalid rate")
     val inflationaryRate: String?,
 
-    @get: Pattern(regexp = "^[0-9](\\.[0-9]{0,40})?\$", message = "Invalid volumetric rate")
+    @get: Pattern(regexp = "^-?[0-9]{0,2}(\\.[0-9]{0,40})?\$", message = "Invalid volumetric rate")
     val volumetricRate: String?,
 
     @get: NotBlank(message = "Enter details upto 255 characters")
@@ -126,7 +126,7 @@ class AnnualPriceAdjustmentsController(
       inflationaryRate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
 
     fun mayBeVolumetricRate() =
-      volumetricRate?.toBigDecimalOrNull()?.takeIf { it >= BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
+      volumetricRate?.toBigDecimalOrNull()?.let { AdjustmentMultiplier(it) }
   }
 
   companion object {

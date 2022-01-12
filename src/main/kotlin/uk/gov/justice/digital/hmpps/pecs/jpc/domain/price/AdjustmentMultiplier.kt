@@ -8,6 +8,10 @@ import java.math.BigDecimal
  */
 data class AdjustmentMultiplier(val value: BigDecimal) {
 
+  init {
+    if (value == BigDecimal.ZERO) throw RuntimeException("Multiplier cannot be zero.")
+  }
+
   private val multiplier: BigDecimal = value.divide(BigDecimal(100)).plus(BigDecimal.ONE).also { println(it) }
 
   /**

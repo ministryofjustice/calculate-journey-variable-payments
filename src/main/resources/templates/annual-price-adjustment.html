@@ -43,7 +43,7 @@
               <div id="irate-hint" class="govuk-hint">Example - for a 0.67% price increase you would enter 0.67</div>
               <p th:if="${#fields.hasErrors('inflationaryRate')}" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span>
-                Enter a valid inflationary rate greater than zero in the correct format #.###############
+                Enter a valid inflationary rate greater than zero in the correct format ##.##############
               </p>
               <div class="govuk-input__wrapper">
                 <input class="govuk-input govuk-input--width-10" id="inflationary-rate" name="inflationary-rate" type="text"
@@ -56,7 +56,7 @@
               <div id="vrate-hint" class="govuk-hint">Example - for an 8.58% price increase you would enter 8.58 (or leave as 0.0 to bypass)</div>
               <p th:if="${#fields.hasErrors('volumetricRate')}" class="govuk-error-message">
                 <span class="govuk-visually-hidden">Error:</span>
-                Enter a valid volumetric rate greater than zero in the correct format #.###############
+                Enter a valid volumetric rate less than or greater than zero in the correct format ##.##############
               </p>
               <div class="govuk-input__wrapper">
                 <input class="govuk-input govuk-input--width-10" id="volumetric-rate" name="volumetric-rate" type="text"
