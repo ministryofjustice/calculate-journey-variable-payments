@@ -108,7 +108,7 @@ class AnnualPriceAdjuster(
     val existingAdjustedPrice = maybeExistingAdjustedPrice(previousYearPrice, effectiveYear)
 
     if (existingAdjustedPrice != null) {
-      val calculatedAdjustmentAmount = previousYearPrice.price() * multiplier
+      val calculatedAdjustmentAmount = multiplier * previousYearPrice.price()
 
       return existingAdjustedPrice
         .takeExistingPriceUnlessTheSameAs(calculatedAdjustmentAmount)
@@ -129,7 +129,7 @@ class AnnualPriceAdjuster(
 
   private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier) =
     price.adjusted(
-      amount = price.price() * multiplier,
+      amount = multiplier * price.price(),
       effectiveYear = effectiveYear,
       addedAt = timeSource.dateTime()
     )

@@ -14,6 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFColor
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
@@ -236,7 +237,7 @@ abstract class PriceSheet(
   /**
    * Write the value to the cell for the given col index
    * @param col - index of the column to create the cell for this row
-   * @param value - String, Double, Int or LocalDate value to write to the cell
+   * @param value - String, Double, Int, BigDecimal or LocalDate value to write to the cell
    * @param cellStyle - optional CellStyle to set on the cell
    */
   protected fun <T> Row.addCell(col: Int, value: T?, cellStyle: CellStyle? = null) {
@@ -248,6 +249,7 @@ abstract class PriceSheet(
       is Double -> cell.setCellValue(value)
       is Int -> cell.setCellValue(value.toDouble())
       is LocalDate -> cell.setCellValue(value)
+      is BigDecimal -> cell.setCellValue(value.toDouble())
     }
   }
 

@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
+import java.math.BigDecimal
 
 internal class ReportMoveTest {
 
@@ -20,6 +21,6 @@ internal class ReportMoveTest {
     val move = moveM1(journeys = listOf(journeyJ1()))
     assertThat(move.hasPrice()).isTrue
     assertThat(move.totalInPence()).isEqualTo(100)
-    assertThat(move.totalInPounds()).isEqualTo(1.0)
+    assertThat(move.totalInPounds()).isEqualTo(BigDecimal("1.00"))
   }
 }

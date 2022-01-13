@@ -28,10 +28,12 @@ data class PriceMetadata(
   val effectiveYear: Int,
 
   @Json(name = "new_price", index = 5)
-  val newPrice: Double,
+  @BigDecimalParser
+  val newPrice: BigDecimal,
 
   @Json(name = "old_price", index = 6, serializeNull = false)
-  val oldPrice: Double? = null,
+  @BigDecimalParser
+  val oldPrice: BigDecimal? = null,
 
   @Json(name = "multiplier", index = 7, serializeNull = false)
   @BigDecimalParser

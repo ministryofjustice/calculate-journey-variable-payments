@@ -50,8 +50,8 @@ internal class SupplierPricingServiceIntegrationTest(
   @WithMockUser(roles = ["PECS_MAINTAIN_PRICE"])
   fun `can maintain price with maintenance role`() {
     assertDoesNotThrow {
-      service.addPriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf(10.00), 2021)
-      service.updatePriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf(11.00), 2021)
+      service.addPriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf("10.00"), 2021)
+      service.updatePriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf("11.00"), 2021)
     }
   }
 
@@ -59,11 +59,11 @@ internal class SupplierPricingServiceIntegrationTest(
   @WithMockUser(roles = ["PECS_JPC"])
   fun `cannot maintain price without maintenance role`() {
     assertThatThrownBy {
-      service.addPriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf(10.00), 2021)
+      service.addPriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf("10.00"), 2021)
     }.isInstanceOf(AccessDeniedException::class.java)
 
     assertThatThrownBy {
-      service.updatePriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf(10.00), 2021)
+      service.updatePriceForSupplier(Supplier.SERCO, "PRISON1", "PRISON2", Money.valueOf("10.00"), 2021)
     }.isInstanceOf(AccessDeniedException::class.java)
   }
 }

@@ -142,10 +142,10 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
     }
 
     @Test
-    fun `when rate greater than max rate of 9_9999`() {
+    fun `when rate greater than max rate of 99_9999`() {
       mockMvc.post("/annual-price-adjustment") {
         session = mockSession
-        param("inflationaryRate", "10.00")
+        param("inflationaryRate", "100.00")
         param("details", "some details")
       }
         .andExpect { model { attributeHasFieldErrorCode("form", "inflationaryRate", "Pattern") } }
@@ -286,7 +286,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   @Nested
   inner class SuccessfulInflationaryAndVolumetricAdjustments {
     @Test
-    fun `both rates applied for supplier`() {
+    fun `both price increases applied for supplier`() {
       mockMvc.post("/annual-price-adjustment") {
         session = mockSession
         param("inflationaryRate", "1.5")
@@ -301,6 +301,29 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         eq(effectiveYearForDate(effectiveDate)),
         eq(AdjustmentMultiplier("1.5".toBigDecimal())),
         eq(AdjustmentMultiplier("2.0".toBigDecimal())),
+        anyOrNull(),
+        eq("some details"),
+      )
+
+      verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
+    }
+
+    @Test
+    fun `volumetric price decrease can be applied for supplier`() {
+      mockMvc.post("/annual-price-adjustment") {
+        session = mockSession
+        param("inflationaryRate", "1.5")
+        param("volumetricRate", "-2.0")
+        param("details", "some details")
+      }
+        .andExpect { redirectedUrl("/manage-journey-price-catalogue") }
+        .andExpect { status { is3xxRedirection() } }
+
+      verify(adjustmentsService).adjust(
+        eq(Supplier.SERCO),
+        eq(effectiveYearForDate(effectiveDate)),
+        eq(AdjustmentMultiplier("1.5".toBigDecimal())),
+        eq(AdjustmentMultiplier("-2.0".toBigDecimal())),
         anyOrNull(),
         eq("some details"),
       )

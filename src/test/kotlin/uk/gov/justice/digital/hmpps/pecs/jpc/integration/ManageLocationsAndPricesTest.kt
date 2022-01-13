@@ -123,7 +123,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf(50.00))
+      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("50.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
 
     isAtPage(UpdatePrice)

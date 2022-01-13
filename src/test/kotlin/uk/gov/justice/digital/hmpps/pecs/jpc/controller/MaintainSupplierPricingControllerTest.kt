@@ -203,7 +203,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/journeys") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceForSupplier(SERCO, fromAgencyId, toAgencyId, Money.valueOf(9999.99), currentContractualEffectiveYear)
+    verify(service).addPriceForSupplier(SERCO, fromAgencyId, toAgencyId, Money.valueOf("9999.99"), currentContractualEffectiveYear)
   }
 
   @Test
@@ -309,7 +309,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       currentContractualEffectiveYear,
-      Money.valueOf(10.00).pounds()
+      Money.valueOf("10.00").pounds()
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
@@ -367,7 +367,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       currentContractualEffectiveYear,
-      Money.valueOf(10.00).pounds()
+      Money.valueOf("10.00").pounds()
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
@@ -405,14 +405,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         toAgencyId,
         previousContractualEffectiveYear
       )
-    ).thenReturn(PriceDto("from", "to", Money.valueOf(10.00)))
+    ).thenReturn(PriceDto("from", "to", Money.valueOf("10.00")))
 
     val priceHistory = PriceMetadata(
       GEOAMEY,
       fromAgencyId,
       toAgencyId,
       previousContractualEffectiveYear,
-      Money.valueOf(10.00).pounds()
+      Money.valueOf("10.00").pounds()
     )
 
     val priceHistoryDateTime = LocalDateTime.now()
@@ -480,7 +480,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       previousContractualEffectiveYear,
-      Money.valueOf(10.00).pounds()
+      Money.valueOf("10.00").pounds()
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
@@ -555,7 +555,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/update-price/AAAAAA-BBBBBB#price-exceptions") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER, Money.valueOf(50.00))
+    verify(service).addPriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER, Money.valueOf("50.00"))
   }
 
   @Test
