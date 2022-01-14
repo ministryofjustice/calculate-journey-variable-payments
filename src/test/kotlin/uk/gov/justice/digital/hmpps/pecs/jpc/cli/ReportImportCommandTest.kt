@@ -1,19 +1,19 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import java.time.LocalDate
 
-internal class ImportCommandsTest {
+internal class ReportImportCommandTest {
 
   private val importService: ImportService = mock()
   private val date: LocalDate = LocalDate.of(2020, 9, 30)
 
-  private val commands: ImportCommands = ImportCommands(importService)
+  private val commands: ReportImportCommand = ReportImportCommand(importService)
 
   @Test
   internal fun `import one days reporting data`() {

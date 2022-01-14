@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest

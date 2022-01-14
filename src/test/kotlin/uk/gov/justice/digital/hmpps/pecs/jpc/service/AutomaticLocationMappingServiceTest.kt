@@ -1,15 +1,15 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
@@ -41,9 +41,9 @@ internal class AutomaticLocationMappingServiceTest {
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
     verify(basmClientApiService).findNomisAgenciesCreatedOn(fixedTime.toLocalDate())
-    verifyZeroInteractions(locationRepository)
-    verifyZeroInteractions(auditService)
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(locationRepository)
+    verifyNoInteractions(auditService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -66,7 +66,7 @@ internal class AutomaticLocationMappingServiceTest {
     assertThat(newLocation.addedAt).isEqualTo(fixedTime)
 
     verify(auditService).create(AuditableEvent.autoMapLocation(newLocation))
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -106,7 +106,7 @@ internal class AutomaticLocationMappingServiceTest {
 
     verify(auditService).create(AuditableEvent.autoMapLocation(newLocationOne))
     verify(auditService).create(AuditableEvent.autoMapLocation(newLocationTwo))
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -132,8 +132,8 @@ internal class AutomaticLocationMappingServiceTest {
     verify(basmClientApiService).findNomisAgenciesCreatedOn(fixedTime.toLocalDate())
     verify(locationRepository).findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")
     verify(locationRepository, never()).save(any())
-    verifyZeroInteractions(auditService)
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(auditService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -155,7 +155,7 @@ internal class AutomaticLocationMappingServiceTest {
     verify(basmClientApiService).findNomisAgenciesCreatedOn(fixedTime.toLocalDate())
     verify(locationRepository).findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")
     verify(locationRepository, never()).save(any())
-    verifyZeroInteractions(auditService)
+    verifyNoInteractions(auditService)
     verify(monitoringService).capture(any())
   }
 }

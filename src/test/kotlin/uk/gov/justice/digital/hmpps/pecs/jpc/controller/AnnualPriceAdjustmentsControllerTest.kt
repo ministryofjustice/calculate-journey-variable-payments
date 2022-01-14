@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -213,7 +213,11 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   inner class SuccessfulInflationaryAdjustments {
     @Test
     fun `rate and details containing allowed characters are applied for supplier`() {
-      setOf("special characters @#$%%^&*()_", "special characters `~{}[]:;',./?", "inflation rate of 1.123456789012345").forEach { allowedCharacters ->
+      setOf(
+        "special characters @#$%%^&*()_",
+        "special characters `~{}[]:;',./?",
+        "inflation rate of 1.123456789012345"
+      ).forEach { allowedCharacters ->
         mockMvc.post("/annual-price-adjustment") {
           session = mockSession
           param("inflationaryRate", "1.123456789012345")

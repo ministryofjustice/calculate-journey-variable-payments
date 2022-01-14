@@ -22,9 +22,6 @@ spring:
     jdbc:
       initialize-schema: never
     timeout: 20M
-  shell:
-    interactive:
-      enabled: false
   security:
     oauth2:
       client:

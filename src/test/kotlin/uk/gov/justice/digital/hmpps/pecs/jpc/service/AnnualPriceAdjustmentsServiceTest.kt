@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -68,7 +68,12 @@ internal class AnnualPriceAdjustmentsServiceTest {
         "some details"
       )
 
-      verify(annualPriceAdjusterSpy).inflationary(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(AdjustmentMultiplier(1.0.toBigDecimal())))
+      verify(annualPriceAdjusterSpy).inflationary(
+        eq(lockId),
+        eq(Supplier.SERCO),
+        eq(2020),
+        eq(AdjustmentMultiplier(1.0.toBigDecimal()))
+      )
     }
 
     @Test
@@ -90,7 +95,12 @@ internal class AnnualPriceAdjustmentsServiceTest {
         "some details"
       )
 
-      verify(annualPriceAdjusterSpy).inflationary(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
+      verify(annualPriceAdjusterSpy).inflationary(
+        eq(lockId),
+        eq(Supplier.GEOAMEY),
+        eq(2021),
+        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+      )
     }
 
     @Test
@@ -204,7 +214,12 @@ internal class AnnualPriceAdjustmentsServiceTest {
         "some details"
       )
 
-      verify(annualPriceAdjusterSpy).volumetric(eq(lockId), eq(Supplier.SERCO), eq(2020), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
+      verify(annualPriceAdjusterSpy).volumetric(
+        eq(lockId),
+        eq(Supplier.SERCO),
+        eq(2020),
+        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+      )
     }
 
     @Test
@@ -226,7 +241,12 @@ internal class AnnualPriceAdjustmentsServiceTest {
         "some details"
       )
 
-      verify(annualPriceAdjusterSpy).volumetric(eq(lockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
+      verify(annualPriceAdjusterSpy).volumetric(
+        eq(lockId),
+        eq(Supplier.GEOAMEY),
+        eq(2021),
+        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+      )
     }
 
     @Test
@@ -307,8 +327,18 @@ internal class AnnualPriceAdjustmentsServiceTest {
       "some details"
     )
 
-    verify(annualPriceAdjusterSpy).inflationary(eq(inflationLockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(2.0.toBigDecimal())))
-    verify(annualPriceAdjusterSpy).volumetric(eq(volumetricLockId), eq(Supplier.GEOAMEY), eq(2021), eq(AdjustmentMultiplier(3.0.toBigDecimal())))
+    verify(annualPriceAdjusterSpy).inflationary(
+      eq(inflationLockId),
+      eq(Supplier.GEOAMEY),
+      eq(2021),
+      eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+    )
+    verify(annualPriceAdjusterSpy).volumetric(
+      eq(volumetricLockId),
+      eq(Supplier.GEOAMEY),
+      eq(2021),
+      eq(AdjustmentMultiplier(3.0.toBigDecimal()))
+    )
   }
 
   private fun fakeLockForFor(supplier: Supplier, multiplier: AdjustmentMultiplier, effectiveYear: Int): UUID {

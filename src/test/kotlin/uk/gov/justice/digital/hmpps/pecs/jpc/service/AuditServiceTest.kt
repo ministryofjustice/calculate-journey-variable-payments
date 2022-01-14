@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import com.beust.klaxon.Klaxon
-import com.nhaarman.mockitokotlin2.argThat
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatcher
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -297,7 +297,8 @@ internal class AuditServiceTest {
     assertThat(jsonTo<PriceMetadata>(auditEvent.metadata!!)).isEqualTo(priceMetadata)
   }
 
-  private inline fun <reified T> jsonTo(json: String): T = Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<T>(json)!!
+  private inline fun <reified T> jsonTo(json: String): T =
+    Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<T>(json)!!
 
   @Test
   internal fun `create journey price bulk adjustment audit event`() {

@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.tasks
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import net.javacrumbs.shedlock.core.LockAssert
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
@@ -24,7 +24,7 @@ internal class PreviousDaysReportsTaskTest {
     task.execute()
 
     verify(importService).importReportsOn(timeSource.date().minusDays(1))
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -33,7 +33,7 @@ internal class PreviousDaysReportsTaskTest {
 
     task.execute()
 
-    verifyZeroInteractions(importService)
+    verifyNoInteractions(importService)
     verify(monitoringService).capture("Unable to lock task 'Previous Days Reports' for execution")
   }
 }

@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
@@ -34,7 +34,13 @@ internal class MoveServiceTest {
 
     val moveEvent = eventE1()
 
-    whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(move)
+    whenever(
+      moveQueryRepository.moveWithPersonAndJourneys(
+        "M1",
+        defaultSupplierSerco,
+        Month.SEPTEMBER
+      )
+    ).thenReturn(move)
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(moveEvent))
 
     val retrievedMove = service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco, Month.SEPTEMBER)
@@ -61,7 +67,13 @@ internal class MoveServiceTest {
     )
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(eventE1()))
 
-    assertThat(service.moveWithPersonJourneysAndEvents("M1", defaultSupplierSerco, Month.SEPTEMBER)?.journeys).containsExactly(
+    assertThat(
+      service.moveWithPersonJourneysAndEvents(
+        "M1",
+        defaultSupplierSerco,
+        Month.SEPTEMBER
+      )?.journeys
+    ).containsExactly(
       journey1,
       journey2
     )

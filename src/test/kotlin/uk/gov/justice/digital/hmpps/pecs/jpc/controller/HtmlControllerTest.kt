@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -102,7 +102,9 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   @Test
   internal fun `GET move with valid Move ID for supplier`() {
     val move = moveM1()
-    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)).thenReturn(move)
+    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)).thenReturn(
+      move
+    )
 
     mockSession.setAttribute("date", LocalDate.of(2021, 2, 1))
 
@@ -116,7 +118,13 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
   @Test
   fun `GET move with invalid Move ID for supplier`() {
     val move = moveM1()
-    whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(null)
+    whenever(
+      moveService.moveWithPersonJourneysAndEvents(
+        move.moveId,
+        defaultSupplierSerco,
+        Month.SEPTEMBER
+      )
+    ).thenReturn(null)
 
     mockSession.setAttribute("date", LocalDate.of(2021, 9, 1))
 
@@ -185,7 +193,7 @@ class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
       .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
