@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
@@ -76,11 +76,21 @@ internal class BulkPriceImportCommandTest {
 
   @Test
   internal fun `import prices for Geoamey for the effective year in the future fails`() {
-    assertThatThrownBy { command.bulkImportPricesFor(Supplier.GEOAMEY, 2021) }.isInstanceOf(RuntimeException::class.java)
+    assertThatThrownBy {
+      command.bulkImportPricesFor(
+        Supplier.GEOAMEY,
+        2021
+      )
+    }.isInstanceOf(RuntimeException::class.java)
   }
 
   @Test
   internal fun `import prices for Unknown for any valid year fails`() {
-    assertThatThrownBy { command.bulkImportPricesFor(Supplier.UNKNOWN, 2019) }.isInstanceOf(RuntimeException::class.java)
+    assertThatThrownBy {
+      command.bulkImportPricesFor(
+        Supplier.UNKNOWN,
+        2019
+      )
+    }.isInstanceOf(RuntimeException::class.java)
   }
 }

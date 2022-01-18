@@ -102,25 +102,20 @@ The data itself falls into three distinct types:
 - EXTREME CARE SHOULD BE TAKEN WHEN RUNNING PRICING IMPORTS IN PRODUCTION. PRICES ARE ADDED IF NOT ALREADY PRESENT.
 - TO MANUALLY IMPORT DATA IN PRODUCTION YOU WILL NEED TO GO DIRECTLY ONTO ONE OF THE KUBE PODS.
 - MANUALLY IMPORTING REPORTING DATA IS MAINLY TO SUPPORT LOADING OF BACK-FILLED SUPPLIER REPORTING DATA. IT CAN BE SLOW, 
-  IF YOU HAVE TO IMPORT A LOT OF DATA. ALLOW PLENTY OF TIME AND ALSO CONSIDER TIME OF EXECUTION I.E OUT OF HOURS.
-
-Start by running the following from the command line to take you into the Spring shell.
+  IF YOU HAVE TO IMPORT A LOT OF DATA ALLOW PLENTY OF TIME AND ALSO CONSIDER TIME OF EXECUTION I.E OUT OF HOURS.
 
 ```bash
 export $(cat .env | xargs) # Only run this if you want to set or update the current local environment
-
-java -jar app.jar --spring.shell.interactive.enabled=true --spring.main.web-application-type=none
 ```
-Once in the Spring shell the following commands for importing and generating pricing data are available:
 ```
 # Import the supplier price spreadsheet that has been uploaded to S3
 
-import-prices --supplier SERCO/GEOAMEY --year 2020
+java -jar app.jar --spring.main.web-application-type=none --price-import --supplier SERCO/GEOAMEY --year 2020
 ```
 ```
 # Import the reporting data for the supplied dates from S3
 
-import-reports --from YYYY-MM-DD --to YYYY-MM-DD
+java -jar app.jar --spring.main.web-application-type=none --report-import --from YYYY-MM-DD --to YYYY-MM-DD
 ```
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 

@@ -1,9 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
@@ -11,6 +7,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import java.time.Duration
@@ -36,7 +36,7 @@ internal class BasmClientApiServiceTest {
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=COURT1")
     assertThat(location).isEqualTo("COURT ONE")
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -48,7 +48,7 @@ internal class BasmClientApiServiceTest {
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=COURT2")
     assertThat(location).isEqualTo("COURT TWO")
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -60,7 +60,7 @@ internal class BasmClientApiServiceTest {
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON1")
     assertThat(location).isEqualTo("PRISON ONE")
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -72,7 +72,7 @@ internal class BasmClientApiServiceTest {
 
     assertThat(request.path).isEqualTo("/api/reference/locations?filter%5Bnomis_agency_id%5D=PRISON2")
     assertThat(location).isEqualTo("PRISON TWO")
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -99,7 +99,7 @@ internal class BasmClientApiServiceTest {
     val mappedLocation = service.findNomisAgenciesCreatedOn(input.createdAt)
 
     assertThat(mappedLocation).containsExactly(expected)
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -107,7 +107,7 @@ internal class BasmClientApiServiceTest {
     basmApiServer.enqueue(locationResponse(" unknown ", " court_agency_ID ", "unknown_type", LocalDate.of(2021, 5, 14)))
 
     assertThat(service.findNomisAgenciesCreatedOn(LocalDate.of(2021, 5, 14))).isEmpty()
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -142,11 +142,21 @@ internal class BasmClientApiServiceTest {
         BasmNomisLocation("PROBATION", "PROBATION_AGENCY_ID", LocationType.PB)
       ),
       Arguments.of(
-        FakeNomisLocation(" Immigration ", " immigration_agency_ID ", "immigration_detention_centre", LocalDate.of(2021, 5, 6)),
+        FakeNomisLocation(
+          " Immigration ",
+          " immigration_agency_ID ",
+          "immigration_detention_centre",
+          LocalDate.of(2021, 5, 6)
+        ),
         BasmNomisLocation("IMMIGRATION", "IMMIGRATION_AGENCY_ID", LocationType.IM)
       ),
       Arguments.of(
-        FakeNomisLocation(" High Security Hospital ", " high_security_hospital_agency_ID ", "high_security_hospital", LocalDate.of(2021, 5, 7)),
+        FakeNomisLocation(
+          " High Security Hospital ",
+          " high_security_hospital_agency_ID ",
+          "high_security_hospital",
+          LocalDate.of(2021, 5, 7)
+        ),
         BasmNomisLocation("HIGH SECURITY HOSPITAL", "HIGH_SECURITY_HOSPITAL_AGENCY_ID", LocationType.HP)
       ),
       Arguments.of(
@@ -180,7 +190,12 @@ internal class BasmClientApiServiceTest {
     )
   }
 
-  data class FakeNomisLocation(val title: String, val nomisAgencyId: String, val locationType: String, val createdAt: LocalDate)
+  data class FakeNomisLocation(
+    val title: String,
+    val nomisAgencyId: String,
+    val locationType: String,
+    val createdAt: LocalDate
+  )
 
   private fun locationResponse(
     title: String = "",

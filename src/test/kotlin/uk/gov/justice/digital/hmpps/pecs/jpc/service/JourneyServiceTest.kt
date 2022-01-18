@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier

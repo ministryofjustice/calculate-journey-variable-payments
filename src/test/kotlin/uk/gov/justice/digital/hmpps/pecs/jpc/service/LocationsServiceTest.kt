@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
@@ -86,7 +86,12 @@ internal class LocationsServiceTest {
     val existingLocation = Location(LocationType.PR, "AGENCY_ID", "SITE NAME")
 
     whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(existingLocation)
-    whenever(locationRepository.save(any())).thenReturn(existingLocation.copy(locationType = LocationType.MC, siteName = "SITE NAME"))
+    whenever(locationRepository.save(any())).thenReturn(
+      existingLocation.copy(
+        locationType = LocationType.MC,
+        siteName = "SITE NAME"
+      )
+    )
 
     service.setLocationDetails("agency_iD ", "site name", LocationType.MC)
 
@@ -103,7 +108,13 @@ internal class LocationsServiceTest {
 
   @Test
   internal fun `attempt to update an existing location with the same details has no effect`() {
-    whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(Location(LocationType.PR, "AGENCY_ID", "SITE NAME"))
+    whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(
+      Location(
+        LocationType.PR,
+        "AGENCY_ID",
+        "SITE NAME"
+      )
+    )
 
     service.setLocationDetails("agency_iD ", "site name", LocationType.PR)
 

@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -203,7 +203,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/journeys") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceForSupplier(SERCO, fromAgencyId, toAgencyId, Money.valueOf("9999.99"), currentContractualEffectiveYear)
+    verify(service).addPriceForSupplier(
+      SERCO,
+      fromAgencyId,
+      toAgencyId,
+      Money.valueOf("9999.99"),
+      currentContractualEffectiveYear
+    )
   }
 
   @Test
@@ -339,8 +345,27 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           )
         }
       }
-      .andExpect { model { attribute("existingExceptions", listOf(PriceExceptionMonth(Month.JULY, true, currentContractualEffectiveYear + 1, Money(100)))) } }
-      .andExpect { model { attribute("exceptionsForm", PriceExceptionForm("$fromAgencyId-$toAgencyId", mapOf(7 to Money(100)), effectiveYear = currentContractualEffectiveYear, exceptionPrice = "0.00")) } }
+      .andExpect {
+        model {
+          attribute(
+            "existingExceptions",
+            listOf(PriceExceptionMonth(Month.JULY, true, currentContractualEffectiveYear + 1, Money(100)))
+          )
+        }
+      }
+      .andExpect {
+        model {
+          attribute(
+            "exceptionsForm",
+            PriceExceptionForm(
+              "$fromAgencyId-$toAgencyId",
+              mapOf(7 to Money(100)),
+              effectiveYear = currentContractualEffectiveYear,
+              exceptionPrice = "0.00"
+            )
+          )
+        }
+      }
       .andExpect { view { name("update-price") } }
       .andExpect { status { isOk() } }
 
@@ -555,7 +580,14 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/update-price/AAAAAA-BBBBBB#price-exceptions") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).addPriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER, Money.valueOf("50.00"))
+    verify(service).addPriceException(
+      SERCO,
+      fromAgencyId,
+      toAgencyId,
+      currentContractualEffectiveYear,
+      Month.SEPTEMBER,
+      Money.valueOf("50.00")
+    )
   }
 
   @Test
@@ -636,7 +668,13 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       .andExpect { redirectedUrl("/update-price/AAAAAA-BBBBBB#price-exceptions") }
       .andExpect { status { is3xxRedirection() } }
 
-    verify(service).removePriceException(SERCO, fromAgencyId, toAgencyId, currentContractualEffectiveYear, Month.SEPTEMBER)
+    verify(service).removePriceException(
+      SERCO,
+      fromAgencyId,
+      toAgencyId,
+      currentContractualEffectiveYear,
+      Month.SEPTEMBER
+    )
   }
 
   private fun MockHttpSession.addSupplierAndContractualYear(supplier: Supplier, contractualYearDate: LocalDate) {

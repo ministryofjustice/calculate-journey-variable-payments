@@ -1,10 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
@@ -33,6 +33,6 @@ internal class ExceptionHandlerTest {
     assertThat(response.viewName).isEqualTo("error/403")
     assertThat(response.status).isEqualTo(HttpStatus.FORBIDDEN)
 
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 }

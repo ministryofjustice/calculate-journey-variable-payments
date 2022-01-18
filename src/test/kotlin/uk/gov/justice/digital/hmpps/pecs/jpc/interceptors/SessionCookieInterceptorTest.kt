@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.interceptors
 
-import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import java.time.Duration
@@ -20,7 +20,13 @@ class SessionCookieInterceptorTest {
   fun `insecure session cookie values are set when intercepted`() {
     val inSecureRequest = requestWith(sessionCookie)
 
-    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(1), httpOnly = true, secure = false)).postHandle(
+    SessionCookieInterceptor(
+      SessionCookieProperties(
+        Duration.ofMinutes(1),
+        httpOnly = true,
+        secure = false
+      )
+    ).postHandle(
       inSecureRequest,
       response,
       mock(),
@@ -38,7 +44,13 @@ class SessionCookieInterceptorTest {
   fun `secure session cookie values are set when intercepted`() {
     val secureRequest = requestWith(sessionCookie)
 
-    SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(2), httpOnly = false, secure = true)).postHandle(
+    SessionCookieInterceptor(
+      SessionCookieProperties(
+        Duration.ofMinutes(2),
+        httpOnly = false,
+        secure = true
+      )
+    ).postHandle(
       secureRequest,
       response,
       mock(),

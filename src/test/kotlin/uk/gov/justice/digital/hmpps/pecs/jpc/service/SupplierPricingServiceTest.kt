@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType.JOURNEY_PRICE
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
@@ -37,8 +37,10 @@ internal class SupplierPricingServiceTest {
   private val auditService: AuditService = mock()
   private val effectiveYearDate = LocalDateTime.now()
   private val effectiveYear = effectiveYearForDate(effectiveYearDate.toLocalDate())
-  private val fromLocation: Location = Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
-  private val toLocation: Location = Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
+  private val fromLocation: Location =
+    Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
+  private val toLocation: Location =
+    Location(locationType = LocationType.MC, nomisAgencyId = "COURT", siteName = "to site")
   private val locationRepository: LocationRepository = mock {
     on { findByNomisAgencyId("FROM") } doReturn fromLocation
     on { findByNomisAgencyId("TO") } doReturn toLocation
@@ -55,7 +57,8 @@ internal class SupplierPricingServiceTest {
   private val eventCaptor = argumentCaptor<AuditableEvent>()
   private val actualEffectYear: EffectiveYear = EffectiveYear({ effectiveYearDate })
 
-  private val service: SupplierPricingService = SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService, actualEffectYear)
+  private val service: SupplierPricingService =
+    SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService, actualEffectYear)
 
   @Test
   internal fun `site names returned for new pricing`() {
@@ -128,7 +131,8 @@ internal class SupplierPricingServiceTest {
         Money.valueOf("100.24"),
         effectiveYear - 2
       )
-    }.isInstanceOf(RuntimeException::class.java).hasMessage("Price changes can longer be made, change is outside of price change window.")
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Price changes can longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -146,7 +150,13 @@ internal class SupplierPricingServiceTest {
 
     val existingPrice = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
 
-    assertThat(existingPrice).isEqualTo(SupplierPricingService.PriceDto("from site", "to site", Money.valueOf("100.24")))
+    assertThat(existingPrice).isEqualTo(
+      SupplierPricingService.PriceDto(
+        "from site",
+        "to site",
+        Money.valueOf("100.24")
+      )
+    )
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
     verify(priceRepository).findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
@@ -273,7 +283,8 @@ internal class SupplierPricingServiceTest {
         Money.valueOf("200.35"),
         effectiveYear - 2
       )
-    }.isInstanceOf(RuntimeException::class.java).hasMessage("Price changes can longer be made, change is outside of price change window.")
+    }.isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Price changes can longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -324,7 +335,14 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `add price exception for existing price for Serco`() {
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(sercoPrice)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(sercoPrice)
 
     service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf("20.00"))
 
@@ -343,7 +361,14 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `add price exception fails for Serco when price not found`() {
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(null)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(null)
 
     assertThatThrownBy {
       service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf("20.00"))
@@ -353,11 +378,19 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `remove price exception`() {
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(
       sercoPrice.addException(JULY, Money.valueOf("500.00"))
     )
 
-    val priceWithExceptionRemoved = service.removePriceException(Supplier.SERCO, "FROM", "TO", sercoPrice.effectiveYear, JULY)
+    val priceWithExceptionRemoved =
+      service.removePriceException(Supplier.SERCO, "FROM", "TO", sercoPrice.effectiveYear, JULY)
 
     assertThat(priceWithExceptionRemoved.exceptions).isEmpty()
     assertThat(sercoPrice.exceptionFor(JULY)).isNull()
@@ -376,7 +409,14 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `remove price exception fails for Serco when price not found`() {
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(null)
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(null)
 
     assertThatThrownBy {
       service.removePriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER)
@@ -386,7 +426,14 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `remove price exception fails when no matching exception`() {
-    whenever(priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.SERCO, fromLocation, toLocation, effectiveYear)).thenReturn(
+    whenever(
+      priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+        Supplier.SERCO,
+        fromLocation,
+        toLocation,
+        effectiveYear
+      )
+    ).thenReturn(
       sercoPrice.addException(JULY, Money.valueOf("500.00"))
     )
 

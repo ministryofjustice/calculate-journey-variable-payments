@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
-import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
 import java.time.LocalDate
 import java.time.Month
 import java.time.Month.DECEMBER

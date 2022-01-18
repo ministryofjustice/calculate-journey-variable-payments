@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -51,7 +51,7 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
       // including check for the navigation
       .andExpect { model { attribute("navigation", "LOCATION") } }
 
-    verifyZeroInteractions(service)
+    verifyNoInteractions(service)
   }
 
   @Test
@@ -210,7 +210,7 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
       .andExpect { status { is2xxSuccessful() } }
       .andExpect { view { name("search-locations") } }
 
-    verifyZeroInteractions(service)
+    verifyNoInteractions(service)
   }
 
   @Test
@@ -221,6 +221,6 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
       .andExpect { status { is2xxSuccessful() } }
       .andExpect { view { name("search-locations") } }
 
-    verifyZeroInteractions(service)
+    verifyNoInteractions(service)
   }
 }

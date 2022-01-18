@@ -1,21 +1,22 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
 import org.slf4j.LoggerFactory
-import org.springframework.shell.standard.ShellComponent
-import org.springframework.shell.standard.ShellMethod
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
+import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 
-@ShellComponent
-class BulkPriceImportCommand(
-  private val importService: ImportService,
-  private val effectiveYear: EffectiveYear,
-) {
+/**
+ * Allows manual running the bulk import of supplier journey prices. Note it will base the prices on the Schedule 34
+ * spreadsheets uploaded to S3 in the environment this is being run.
+ */
+@ConditionalOnNotWebApplication
+@Component
+class BulkPriceImportCommand(private val importService: ImportService, private val effectiveYear: EffectiveYear) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @ShellMethod("Bulk imports prices for the given supplier and effective year from the (latest) supplier prices spreadsheet in S3. ")
   fun bulkImportPricesFor(supplier: Supplier, year: Int) {
     if (!effectiveYear.canAddOrUpdatePrices(year))
       throw RuntimeException(

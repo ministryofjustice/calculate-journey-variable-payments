@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
@@ -50,7 +50,7 @@ internal class ImportServiceTest {
     importService.importPrices(Supplier.SERCO, 2020)
 
     verify(priceImporter).import(Supplier.SERCO, 2020)
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -58,7 +58,7 @@ internal class ImportServiceTest {
     importService.importPrices(Supplier.GEOAMEY, 2020)
 
     verify(priceImporter).import(Supplier.GEOAMEY, 2020)
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
@@ -81,7 +81,7 @@ internal class ImportServiceTest {
     verify(auditService).create(AuditableEvent.importReportEvent("moves", timeSourceWithFixedDate.date(), 1, 1))
     verify(auditService).create(AuditableEvent.importReportEvent("people", timeSourceWithFixedDate.date(), 1, 1))
     verify(auditService).create(AuditableEvent.importReportEvent("profiles", timeSourceWithFixedDate.date(), 1, 1))
-    verifyZeroInteractions(monitoringService)
+    verifyNoInteractions(monitoringService)
   }
 
   @Test
