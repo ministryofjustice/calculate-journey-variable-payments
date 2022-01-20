@@ -1,0 +1,1 @@
+Contains a move that is booked on the 7th to take place on the 27th but is then cancelled in time on the 26th and as a result is a billable cancelled move.

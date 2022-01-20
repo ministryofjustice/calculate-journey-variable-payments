@@ -80,6 +80,8 @@ class MovePersister(
 
           val moveToSave = newMove.copy(
             moveType = moveWithJourneysAndEvents.moveType(),
+            events = moveEvents,
+            journeys = journeysWithEvents,
             pickUpDateTime = pickUp,
             dropOffOrCancelledDateTime = dropOff ?: cancelled,
             vehicleRegistration = journeys.withIndex().joinToString(separator = ", ") {
