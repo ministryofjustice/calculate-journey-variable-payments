@@ -110,12 +110,12 @@ export $(cat .env | xargs) # Only run this if you want to set or update the curr
 ```
 # Import the supplier price spreadsheet that has been uploaded to S3
 
-java -jar app.jar --spring.main.web-application-type=none --price-import --supplier SERCO/GEOAMEY --year 2020
+java -jar app.jar --spring.main.web-application-type=none --price-import --supplier=SERCO/GEOAMEY --year=2020
 ```
 ```
 # Import the reporting data for the supplied dates from S3
 
-java -jar app.jar --spring.main.web-application-type=none --report-import --from YYYY-MM-DD --to YYYY-MM-DD
+java -jar app.jar --spring.main.web-application-type=none --report-import --from=YYYY-MM-DD --to=YYYY-MM-DD
 ```
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 
