@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.time.Month
 
 internal class PriceMetadataTest {
@@ -107,5 +108,27 @@ internal class PriceMetadataTest {
     assertThat(metadata.isUpdate()).isFalse
     assertThat(metadata.isAdjustment()).isFalse
     assertThat(metadata.isRemoveException()).isTrue
+  }
+
+  @Test
+  fun `can map audit event with unquoted new price`() {
+    val auditEvent = AuditEvent(
+      AuditEventType.JOURNEY_PRICE, LocalDateTime.now(),
+      "some user",
+      "{\"supplier\" : \"SERCO\", \"from_nomis_id\" : \"SNAACC\", \"to_nomis_id\" : \"PVI\", \"effective_year\" : 2020, \"new_price\" : 5000.01}"
+    )
+
+    assertThat(PriceMetadata.map(auditEvent)).isEqualTo(PriceMetadata(Supplier.SERCO, "SNAACC", "PVI", 2020, BigDecimal("5000.01")))
+  }
+
+  @Test
+  fun `can map new audit event with quoted new price`() {
+    val auditEvent = AuditEvent(
+      AuditEventType.JOURNEY_PRICE, LocalDateTime.now(),
+      "some user",
+      "{\"supplier\" : \"SERCO\", \"from_nomis_id\" : \"SNAACC\", \"to_nomis_id\" : \"PVI\", \"effective_year\" : 2020, \"new_price\" : \"5000.01\"}"
+    )
+
+    assertThat(PriceMetadata.map(auditEvent)).isEqualTo(PriceMetadata(Supplier.SERCO, "SNAACC", "PVI", 2020, BigDecimal("5000.01")))
   }
 }
