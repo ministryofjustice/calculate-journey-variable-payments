@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.ui.ModelMap
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,12 +11,14 @@ import org.springframework.web.bind.annotation.SessionAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+
+private val logger = loggerFor<ApplicationInformationController>()
 
 @RestController
 @RequestMapping(name = "Supplier information", path = ["/app"], produces = [MediaType.APPLICATION_JSON_VALUE])
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
 class ApplicationInformationController(val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService, val effectiveYear: EffectiveYear) {
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @GetMapping(path = ["/info"])
   fun info(@ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): ApplicationInformation {

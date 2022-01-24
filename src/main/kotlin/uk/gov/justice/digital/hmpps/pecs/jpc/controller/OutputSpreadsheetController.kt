@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import org.slf4j.LoggerFactory
 import org.springframework.core.io.InputStreamResource
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpHeaders
@@ -15,11 +14,14 @@ import org.springframework.web.bind.annotation.SessionAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SpreadsheetService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.FileInputStream
 import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
+
+private val logger = loggerFor<OutputSpreadsheetController>()
 
 @RestController
 @SessionAttributes(SUPPLIER_ATTRIBUTE)
@@ -27,8 +29,6 @@ class OutputSpreadsheetController(
   private val spreadsheetService: SpreadsheetService,
   private val timeSource: TimeSource
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @GetMapping("/generate-prices-spreadsheet/{supplier}")
   @Throws(IOException::class)

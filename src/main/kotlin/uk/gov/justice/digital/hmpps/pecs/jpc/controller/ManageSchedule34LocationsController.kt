@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.hibernate.validator.constraints.Length
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -15,6 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.ResourceNotFoundException
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
@@ -22,14 +22,14 @@ import javax.validation.constraints.NotNull
 /**
  * Controller to support searching and maintenance of existing Schedule 34 locations.
  */
+private val logger = loggerFor<ManageSchedule34LocationsController>()
+
 @SessionAttributes(SUPPLIER_ATTRIBUTE)
 @Controller
 class ManageSchedule34LocationsController(
   private val service: LocationsService,
   private val basmClientApiService: BasmClientApiService
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @ModelAttribute("navigation")
   fun navigation() = "LOCATION"

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.hibernate.validator.constraints.Length
-import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -20,6 +19,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidDuplica
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotEmpty
@@ -28,6 +28,8 @@ import javax.validation.constraints.NotNull
 /**
  * Controller to help with mapping a user friendly location name to (missing) Schedule 34 locations names.
  */
+private val logger = loggerFor<MapFriendlyLocationController>()
+
 @Controller
 @SessionAttributes(SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE, LOCATION_ORIGIN_SESSION_ATTRIBUTE)
 @ConditionalOnWebApplication
@@ -35,8 +37,6 @@ class MapFriendlyLocationController(
   private val service: LocationsService,
   private val basmClientApiService: BasmClientApiService
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @ModelAttribute("navigation")
   fun navigation() = "LOCATION"

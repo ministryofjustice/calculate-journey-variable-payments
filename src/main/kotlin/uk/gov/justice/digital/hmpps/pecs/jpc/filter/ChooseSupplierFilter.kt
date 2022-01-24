@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.filter
 
-import org.slf4j.LoggerFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.SUPPLIER_ATTRIBUTE
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.IOException
 import javax.servlet.Filter
 import javax.servlet.FilterChain
@@ -13,9 +13,9 @@ import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class ChooseSupplierFilter : Filter {
+private val logger = loggerFor<ChooseSupplierFilter>()
 
-  private val logger = LoggerFactory.getLogger(javaClass)
+class ChooseSupplierFilter : Filter {
 
   @Throws(ServletException::class)
   override fun init(filterConfig: FilterConfig?) {

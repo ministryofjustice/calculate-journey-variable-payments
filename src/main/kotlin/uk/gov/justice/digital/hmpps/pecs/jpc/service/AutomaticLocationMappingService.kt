@@ -1,13 +1,15 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
+
+private val logger = loggerFor<AutomaticLocationMappingService>()
 
 @Service
 @Transactional
@@ -18,8 +20,6 @@ class AutomaticLocationMappingService(
   private val auditService: AuditService,
   private val monitoringService: MonitoringService
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   fun mapIfNotPresentLocationsCreatedOn(date: LocalDate) {
     basmClientApi.findNomisAgenciesCreatedOn(date).forEach {

@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -10,9 +9,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+
+private val logger = loggerFor<ImportService>()
 
 @Service
 class ImportService(
@@ -24,8 +26,6 @@ class ImportService(
   private val auditService: AuditService,
   private val monitoringService: MonitoringService
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @Transactional
   fun importPrices(supplier: Supplier, year: Int) = import { priceImporter.import(supplier, year) }

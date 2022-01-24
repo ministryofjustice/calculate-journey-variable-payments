@@ -1,25 +1,25 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
-import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 
 /**
  * This enables commands to be executed within the context of a running application (but not in WEB mode). Once a
  * command has completed the application will terminate.
  */
+private val logger = loggerFor<CommandRunner>()
+
 @ConditionalOnNotWebApplication
 @Component
 class CommandRunner(
   private val bulkPriceImportCommand: BulkPriceImportCommand,
   private val reportImportCommand: ReportImportCommand
 ) : ApplicationRunner {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   override fun run(arguments: ApplicationArguments) {
     logger.info("running sample application runner {}", arguments.optionNames)

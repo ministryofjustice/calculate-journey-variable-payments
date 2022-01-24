@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
@@ -28,13 +27,14 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogInAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogOutAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+
+private val logger = loggerFor<SecurityConfiguration<*>>()
 
 @EnableWebSecurity
 @ConditionalOnWebApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
   private lateinit var issuer: String

@@ -7,13 +7,15 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
 import java.time.LocalDate
+
+private val logger = loggerFor<BasmClientApiService>()
 
 @Service
 class BasmClientApiService(
@@ -21,8 +23,6 @@ class BasmClientApiService(
   private val monitoringService: MonitoringService,
   @Value("\${BASM_API_TIMEOUT:10s}") val basmApiTimeout: Duration
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   fun findNomisAgencyLocationNameBy(agencyId: String): String? {
     logger.info("Looking up location name for agency ID '${agencyId.trim().uppercase()}'.")

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
@@ -14,9 +13,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
+
+private val logger = loggerFor<PricesSpreadsheetGenerator>()
 
 @Component
 class PricesSpreadsheetGenerator(
@@ -26,8 +28,6 @@ class PricesSpreadsheetGenerator(
   @Autowired private val locationRepository: LocationRepository,
   @Autowired private val supplierPrices: SupplierPrices
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   internal fun generate(supplier: Supplier, startDate: LocalDate): File {
     val dateGenerated = timeSource.date()

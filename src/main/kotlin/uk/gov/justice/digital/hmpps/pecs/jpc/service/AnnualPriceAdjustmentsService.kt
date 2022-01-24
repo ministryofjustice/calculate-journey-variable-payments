@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
@@ -9,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AnnualPriceAdjuster
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
  * Service to handle annual price adjustments for supplier prices.
@@ -20,6 +20,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
  * at different times. It is important when we do know the volumetric rate we re-apply the inflationary rate as there
  * will highly likely be prices that have been added since then but not had the inflationary rate applied.
  */
+private val logger = loggerFor<AnnualPriceAdjustmentsService>()
+
 @Service
 class AnnualPriceAdjustmentsService(
   private val annualPriceAdjuster: AnnualPriceAdjuster,
@@ -28,8 +30,6 @@ class AnnualPriceAdjustmentsService(
   private val actualEffectiveYear: EffectiveYear,
   private val jobRunner: JobRunner
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   private enum class AdjustmentType {
     INFLATION,
