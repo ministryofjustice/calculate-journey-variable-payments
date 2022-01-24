@@ -10,4 +10,6 @@ fun interface TimeSource {
   fun dateTime(): LocalDateTime
 
   fun date(): LocalDate = dateTime().toLocalDate()
+
+  fun yesterday(): LocalDate = date().minusDays(1)
 }
