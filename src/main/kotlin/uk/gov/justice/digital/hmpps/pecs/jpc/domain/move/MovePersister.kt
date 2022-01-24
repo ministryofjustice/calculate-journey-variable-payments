@@ -123,7 +123,7 @@ class MovePersister(
 
   fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {
     return if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty())
-      listOf(fakeCancelledJourney(move)) // add a fake cancelled journey
+      listOf(fakeCancelledJourneyForPricing(move)) // add a fake cancelled journey
     else
       journeys.map { journey ->
         val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
@@ -141,7 +141,11 @@ class MovePersister(
       }
   }
 
-  internal fun fakeCancelledJourney(move: Move): Journey {
+  /**
+   * There ane no actual supplier journey/journey events for billable cancelled moves so to price a cancelled a move we
+   * create a fake journey.
+   */
+  internal fun fakeCancelledJourneyForPricing(move: Move): Journey {
     return Journey(
       journeyId = UUID.randomUUID().toString(),
       updatedAt = LocalDateTime.now(),

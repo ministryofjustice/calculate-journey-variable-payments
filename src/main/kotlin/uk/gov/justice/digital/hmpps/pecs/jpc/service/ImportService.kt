@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.P
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
 import java.time.Duration
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Service
 class ImportService(
@@ -28,6 +29,12 @@ class ImportService(
 
   @Transactional
   fun importPrices(supplier: Supplier, year: Int) = import { priceImporter.import(supplier, year) }
+
+  fun importReportsOn(range: ClosedRange<LocalDate>) {
+    for (i in 0..ChronoUnit.DAYS.between(range.start, range.endInclusive)) {
+      importReportsOn(range.start.plusDays(i))
+    }
+  }
 
   // The transaction boundary for this method is being set in the underlying persistence classes on purpose.
   fun importReportsOn(date: LocalDate) {

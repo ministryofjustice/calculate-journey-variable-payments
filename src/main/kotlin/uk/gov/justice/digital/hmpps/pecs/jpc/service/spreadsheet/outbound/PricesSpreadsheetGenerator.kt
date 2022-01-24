@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate

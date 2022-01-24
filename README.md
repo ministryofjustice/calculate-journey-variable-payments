@@ -115,7 +115,7 @@ java -jar app.jar --spring.main.web-application-type=none --price-import --suppl
 ```
 # Import the reporting data for the supplied dates from S3
 
-java -jar app.jar --spring.main.web-application-type=none --report-import --from=YYYY-MM-DD --to=YYYY-MM-DD
+java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --report-import --from=YYYY-MM-DD --to=YYYY-MM-DD
 ```
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 
