@@ -118,6 +118,9 @@ env:
   - name: CRON_IMPORT_REPORTS
     value: "{{ .Values.env.CRON_IMPORT_REPORTS }}"
 
+  - name: CRON_BACKFILL_REPORTS
+    value: "{{ .Values.env.CRON_BACKFILL_REPORTS }}"
+
   - name: SENTRY_DSN
     valueFrom:
       secretKeyRef:
