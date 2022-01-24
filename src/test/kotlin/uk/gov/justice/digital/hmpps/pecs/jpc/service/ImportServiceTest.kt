@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 import java.time.LocalDateTime
 
 internal class ImportServiceTest {
@@ -62,7 +63,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `report importer interactions`() {
+  internal fun `expected report importer interactions`() {
     importService.importReportsOn(timeSourceWithFixedDate.date())
 
     verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
@@ -71,7 +72,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `auditing interactions`() {
+  internal fun `expected audit interactions for moves, people and profiles `() {
     whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf(move))
     whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf(person))
     whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf(profile))
@@ -85,7 +86,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `monitoring interactions when failure to persist moves`() {
+  internal fun `expected monitoring interactions when failure to persist moves`() {
     whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf(move))
     whenever(movePersister.persist(any())).thenReturn(0)
 
@@ -94,7 +95,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `monitoring interactions when failure to persist people`() {
+  internal fun `expected monitoring interactions when failure to persist people`() {
     whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf(person))
     whenever(personPersister.persistPeople(any())).thenReturn(0)
 
@@ -103,7 +104,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `monitoring interactions when failure to persist profiles`() {
+  internal fun `expected monitoring interactions when failure to persist profiles`() {
     whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf(profile))
     whenever(personPersister.persistProfiles(any())).thenReturn(0)
 
@@ -112,7 +113,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `monitoring interactions when no moves to persist`() {
+  internal fun `expected monitoring interactions when no moves to persist`() {
     whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf())
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
@@ -120,7 +121,7 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `monitoring interactions when no people to persist`() {
+  internal fun `expected monitoring interactions when no people to persist`() {
     whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf())
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
@@ -128,10 +129,31 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `monitoring interactions when no profiles to persist`() {
+  internal fun `expected monitoring interactions when no profiles to persist`() {
     whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf())
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
     verify(monitoringService).capture("There were no profiles to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
+  }
+
+  @Test
+  fun `given an import date range one day ensure only one call is made`() {
+    importService.importReportsOn(ClosedRangeLocalDate(timeSourceWithFixedDate.date(), timeSourceWithFixedDate.date()))
+
+    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
+    verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date())
+    verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.date())
+  }
+
+  @Test
+  fun `given an import date range of two days ensure multiple calls are made`() {
+    importService.importReportsOn(ClosedRangeLocalDate(timeSourceWithFixedDate.date(), timeSourceWithFixedDate.date().plusDays(1)))
+
+    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
+    verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date())
+    verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.date())
+    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date().plusDays(1))
+    verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date().plusDays(1))
+    verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.date().plusDays(1))
   }
 }

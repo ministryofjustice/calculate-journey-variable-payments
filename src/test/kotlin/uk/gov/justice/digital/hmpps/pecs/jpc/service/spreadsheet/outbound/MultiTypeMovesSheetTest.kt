@@ -4,6 +4,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 
 internal class MultiTypeMovesSheetTest {
 

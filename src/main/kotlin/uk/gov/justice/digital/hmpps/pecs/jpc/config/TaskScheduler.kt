@@ -4,6 +4,7 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.BackfillReportsTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysLocationMappingTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysReportsTask
 
@@ -11,7 +12,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysReportsTask
 @Component
 class TaskScheduler(
   val previousDaysReportsTask: PreviousDaysReportsTask,
-  val previousDaysLocationMappingTask: PreviousDaysLocationMappingTask
+  val previousDaysLocationMappingTask: PreviousDaysLocationMappingTask,
+  val backfillReportsTask: BackfillReportsTask
 ) {
 
   @Scheduled(cron = "\${CRON_IMPORT_REPORTS}")
@@ -24,5 +26,11 @@ class TaskScheduler(
   @SchedulerLock(name = "automaticLocationMapping")
   fun automaticLocationMapping() {
     previousDaysLocationMappingTask.execute()
+  }
+
+  @Scheduled(cron = "\${CRON_BACKFILL_REPORTS}")
+  @SchedulerLock(name = "backfillReports")
+  fun backfillReports() {
+    backfillReportsTask.execute()
   }
 }

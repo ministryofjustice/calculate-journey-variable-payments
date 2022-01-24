@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 
 internal class MovesSummarySheetTest {
 

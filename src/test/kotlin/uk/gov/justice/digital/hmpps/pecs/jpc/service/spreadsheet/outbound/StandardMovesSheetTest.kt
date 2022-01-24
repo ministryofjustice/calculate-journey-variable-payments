@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep202
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime

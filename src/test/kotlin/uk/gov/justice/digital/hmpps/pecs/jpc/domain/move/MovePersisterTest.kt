@@ -464,14 +464,14 @@ internal class MovePersisterTest {
   @Test
   fun `fake journey effective year taken from time move date when present`() {
     val move = moveM1()
-    val fake = movePersister.fakeCancelledJourney(move)
+    val fake = movePersister.fakeCancelledJourneyForPricing(move)
 
     assertThat(fake.effectiveYear).isEqualTo(effectiveYearForDate(move.moveDate!!))
   }
 
   @Test
   fun `fake journey effective year taken defaults when move date is not present`() {
-    val fake = movePersister.fakeCancelledJourney(moveM1().copy(moveDate = null))
+    val fake = movePersister.fakeCancelledJourneyForPricing(moveM1().copy(moveDate = null))
 
     assertThat(fake.effectiveYear).isEqualTo(effectiveYearForDate(timeSource.date()))
   }
