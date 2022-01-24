@@ -1,13 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.tasks
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 /**
  * This enables us to backfill all the move data from the start of the actual contract (September 2020) to the day prior
@@ -16,6 +15,8 @@ import java.time.temporal.ChronoUnit
  * Caution: this task should only be enabled when needed and set to run on a specific day and month and out of hours.
  * Once complete the task should be disabled.
  */
+private val logger = loggerFor<BackfillReportsTask>()
+
 @Component
 class BackfillReportsTask(
   private val importService: ImportService,
@@ -23,21 +24,17 @@ class BackfillReportsTask(
   monitoringService: MonitoringService
 ) : Task("Backfill reports", monitoringService) {
 
-  private val logger = LoggerFactory.getLogger(javaClass)
-
   private val contractStartDate = LocalDate.of(2020, 9, 1)
 
   override fun performTask() {
-    val now = timeSource.dateTime()
+    ClosedRangeLocalDate(contractStartDate, timeSource.yesterday()).run {
+      val startTime = timeSource.dateTime()
 
-    val yesterday = timeSource.yesterday()
+      logger.info("Starting the reports backfill for the period ${this.start} to ${this.endInclusive} at $startTime.")
 
-    logger.info("Starting the reports backfill for the date range $contractStartDate to $yesterday")
+      importService.importReportsOn(this)
 
-    importService.importReportsOn(ClosedRangeLocalDate(contractStartDate, timeSource.date().minusDays(1)))
-
-    logger.info("Completed the reports backfill for the date range $contractStartDate to ${now.until(timeSource.dateTime(), ChronoUnit.SECONDS)}")
+      logger.info("Completed the reports backfill for the period ${this.start} to ${this.endInclusive}. Started at $startTime and finished at ${timeSource.dateTime()}")
+    }
   }
-
-  private fun TimeSource.yesterday() = this.date().minusDays(1)
 }
