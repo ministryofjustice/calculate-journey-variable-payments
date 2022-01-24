@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+
+private val logger = loggerFor<PersonPersister>()
 
 @Component
 class PersonPersister(
   private val personRepository: PersonRepository,
   private val profileRepository: ProfileRepository
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
    * Returns the total number of successfully persisted people.

@@ -1,14 +1,16 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDateTime
 import java.util.UUID
+
+private val logger = loggerFor<MovePersister>()
 
 @Component
 class MovePersister(
@@ -17,8 +19,6 @@ class MovePersister(
   private val eventRepository: EventRepository,
   private val timeSource: TimeSource
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
    * Returns the total number of successfully persisted moves.

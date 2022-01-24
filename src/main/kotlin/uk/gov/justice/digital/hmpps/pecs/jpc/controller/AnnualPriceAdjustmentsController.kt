@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.hibernate.validator.constraints.Length
-import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Controller
@@ -19,6 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AnnualPriceAdjustmentsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import javax.validation.Valid
@@ -28,6 +28,8 @@ import javax.validation.constraints.Pattern
 /**
  * Controller to handle the flows around 'Annual Price Adjustments' carried out by the commercial team.
  */
+private val logger = loggerFor<AnnualPriceAdjustmentsController>()
+
 @Controller
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
@@ -35,8 +37,6 @@ class AnnualPriceAdjustmentsController(
   private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
   private val actualEffectiveYear: EffectiveYear
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @ModelAttribute("navigation")
   fun navigation() = "PRICE"

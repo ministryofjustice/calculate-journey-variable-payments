@@ -1,17 +1,17 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+
+private val logger = loggerFor<ReportParser>()
 
 @Component
 object ReportParser {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
    * Takes a list of files content, and for each line in each file convert from JSON to entity of type T

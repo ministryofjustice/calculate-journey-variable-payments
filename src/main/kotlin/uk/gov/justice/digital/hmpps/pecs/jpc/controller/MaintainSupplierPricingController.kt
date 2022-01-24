@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Controller
@@ -19,6 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.ordinalMonthsAndYearForSeptemberToAugust
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.math.BigDecimal
 import java.time.Month
 import javax.validation.Valid
@@ -31,6 +31,8 @@ import javax.validation.constraints.Pattern
  *
  * Only users with the price maintenance role can interact with this controller.
  */
+private val logger = loggerFor<MaintainSupplierPricingController>()
+
 @Controller
 @SessionAttributes(
   SUPPLIER_ATTRIBUTE,
@@ -43,8 +45,6 @@ class MaintainSupplierPricingController(
   @Autowired val supplierPricingService: SupplierPricingService,
   @Autowired val actualEffectiveYear: EffectiveYear
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @ModelAttribute("navigation")
   fun navigation() = "PRICE"

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -10,13 +9,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ObfuscatingReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Clock
 import java.time.LocalDateTime
 
+private val logger = loggerFor<ImporterConfiguration>()
+
 @Configuration
 class ImporterConfiguration {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @Autowired
   private lateinit var priceRepository: PriceRepository

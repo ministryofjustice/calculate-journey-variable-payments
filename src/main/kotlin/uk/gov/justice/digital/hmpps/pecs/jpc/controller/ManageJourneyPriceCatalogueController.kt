@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -16,16 +15,17 @@ import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.validation.Valid
 
 /**
  * Controller to manage flows around journey pricing. This is accessed from the main menu link 'Manage Journey Price Catalogue'.
  */
+private val logger = loggerFor<ManageJourneyPriceCatalogueController>()
+
 @Controller
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
 class ManageJourneyPriceCatalogueController(@Autowired val journeyService: JourneyService) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @ModelAttribute("navigation")
   fun navigation() = "PRICE"

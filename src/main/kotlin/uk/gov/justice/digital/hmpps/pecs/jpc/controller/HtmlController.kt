@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -25,10 +24,13 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 import javax.validation.Valid
 
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
+
+private val logger = loggerFor<HtmlController>()
 
 @Controller
 @SessionAttributes(
@@ -43,8 +45,6 @@ class HtmlController(
   @Autowired val timeSource: TimeSource,
   @Autowired val actualEffectiveYear: EffectiveYear
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   @ModelAttribute("navigation")
   fun navigation() = "SUMMARY"

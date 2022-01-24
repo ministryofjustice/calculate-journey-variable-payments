@@ -1,14 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+private val logger = loggerFor<BackgroundJobRunner>()
+
 @Component
 class BackgroundJobRunner : JobRunner {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
 

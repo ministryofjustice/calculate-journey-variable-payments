@@ -1,17 +1,19 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.util.UUID
 import kotlin.streams.asSequence
 
 /**
  * Domain level service to perform the annual price adjustments for a supplier.
  */
+private val logger = loggerFor<AnnualPriceAdjuster>()
+
 @Component
 @Transactional
 class AnnualPriceAdjuster(
@@ -20,8 +22,6 @@ class AnnualPriceAdjuster(
   private val auditService: AuditService,
   private val timeSource: TimeSource
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   internal fun isInProgressFor(supplier: Supplier) = priceAdjustmentRepository.existsPriceAdjustmentBySupplier(supplier)
 

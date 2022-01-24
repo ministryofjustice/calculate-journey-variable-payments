@@ -1,17 +1,17 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneysSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
+
+private val logger = loggerFor<JourneyService>()
 
 @Service
 class JourneyService(private val journeyQueryRepository: JourneyQueryRepository) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
    * Returned un-priced journeys are ordered by their from and to locations (pick up and drop off).

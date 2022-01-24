@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
@@ -10,7 +9,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.InputStream
+
+private val logger = loggerFor<PriceImporter>()
 
 @Component
 class PriceImporter(
@@ -20,8 +22,6 @@ class PriceImporter(
   private val locationRepository: LocationRepository,
   private val auditService: AuditService
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   fun import(supplier: Supplier, effectiveYear: Int) {
     val start = System.currentTimeMillis()

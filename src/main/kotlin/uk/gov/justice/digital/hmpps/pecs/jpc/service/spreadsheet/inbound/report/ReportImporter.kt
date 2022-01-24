@@ -1,21 +1,20 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
-import kotlin.streams.toList
+
+private val logger = loggerFor<ReportImporter>()
 
 open class ReportImporter(
   @Autowired private val provider: ReportingProvider,
   @Autowired private val monitoringService: MonitoringService
 ) {
-
-  private val logger = LoggerFactory.getLogger(javaClass)
 
   fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)
 
