@@ -10,6 +10,9 @@ import java.sql.ResultSet
 import java.sql.Timestamp
 import java.time.LocalDate
 
+/**
+ * This repository exists due to the query performance and standard Spring JPA one's being too slow.
+ */
 @Component
 class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
