@@ -11,6 +11,9 @@ import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.Month
 
+/**
+ * This repository exists due to the query performance and standard Spring JPA one's being too slow.
+ */
 @Component
 class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
@@ -83,7 +86,8 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         select  
         m.move_id, m.profile_id, m.updated_at, m.supplier, m.status, m.move_type,  
         m.reference, m.move_date, m.from_nomis_agency_id, m.to_nomis_agency_id, m.pick_up, m.drop_off_or_cancelled, m.notes,  
-        m.vehicle_registration, m.report_from_location_type, m.report_to_location_type,  
+        m.vehicle_registration, m.report_from_location_type, m.report_to_location_type,
+        m.cancellation_reason, m.cancellation_reason_comment,
         pp.person_id, pp.updated_at as person_updated_at, pp.prison_number,
         pp.first_names, pp.last_name, pp.date_of_birth, pp.latest_nomis_booking_id, pp.gender, pp.ethnicity,  
         fl.site_name as from_site_name, fl.location_type as from_location_type,  
@@ -129,7 +133,9 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         notes = getString("notes"),
         vehicleRegistration = getString("vehicle_registration"),
         reportFromLocationType = getString("report_from_location_type"),
-        reportToLocationType = getString("report_to_location_type")
+        reportToLocationType = getString("report_to_location_type"),
+        cancellationReason = getString("cancellation_reason"),
+        cancellationReasonComment = getString("cancellation_reason_comment")
       )
 
       val personId = getString("person_id")

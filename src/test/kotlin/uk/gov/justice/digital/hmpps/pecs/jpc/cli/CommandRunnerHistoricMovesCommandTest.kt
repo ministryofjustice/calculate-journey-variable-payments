@@ -9,15 +9,16 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 
-@SpringBootTest(args = ["--report-import", "--from=2022-01-13", "--to=2022-01-14"], webEnvironment = WebEnvironment.NONE)
+@SpringBootTest(
+  args = ["--process-historic-moves", "--supplier=serco", "--from=2021-01-01", "--to=2021-01-01"],
+  webEnvironment = WebEnvironment.NONE
+)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class CommandRunnerImporterCommandsTest {
-
-  @MockBean
-  private lateinit var historicMovesCommand: HistoricMovesCommand
+class CommandRunnerHistoricMovesCommandTest {
 
   @MockBean
   private lateinit var bulkPriceImportCommand: BulkPriceImportCommand
@@ -25,11 +26,18 @@ class CommandRunnerImporterCommandsTest {
   @MockBean
   private lateinit var reportImportCommand: ReportImportCommand
 
+  @MockBean
+  private lateinit var historicMovesCommand: HistoricMovesCommand
+
   @Test
-  fun `report importer command is invoked for dates 2022-01-13 and 2022-01-14`() {
-    verify(reportImportCommand).importReports(LocalDate.of(2022, 1, 13), LocalDate.of(2022, 1, 14))
+  fun `price importer command is invoked for supplier Serco with year 2021`() {
+    verify(historicMovesCommand).process(
+      LocalDate.of(2021, 1, 1),
+      LocalDate.of(2021, 1, 1),
+      Supplier.SERCO
+    )
 
     verifyNoInteractions(bulkPriceImportCommand)
-    verifyNoInteractions(historicMovesCommand)
+    verifyNoInteractions(reportImportCommand)
   }
 }

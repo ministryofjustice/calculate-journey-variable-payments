@@ -17,6 +17,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 class CommandRunnerPriceImporterTest {
 
   @MockBean
+  private lateinit var historicMovesCommand: HistoricMovesCommand
+
+  @MockBean
   private lateinit var bulkPriceImportCommand: BulkPriceImportCommand
 
   @MockBean
@@ -27,5 +30,6 @@ class CommandRunnerPriceImporterTest {
     verify(bulkPriceImportCommand).bulkImportPricesFor(Supplier.SERCO, 2021)
 
     verifyNoInteractions(reportImportCommand)
+    verifyNoInteractions(historicMovesCommand)
   }
 }

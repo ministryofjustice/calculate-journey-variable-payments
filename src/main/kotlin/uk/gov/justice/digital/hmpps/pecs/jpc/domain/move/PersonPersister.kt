@@ -26,7 +26,7 @@ class PersonPersister(
     people.forEach { person ->
       Result.runCatching { persistPerson(person) }.onSuccess {
         saveCounter++
-        if (saveCounter % 50 == 0) logger.info("Persisted $saveCounter people out of ${people.size}.")
+        if (saveCounter % 500 == 0) logger.info("Persisted $saveCounter people out of ${people.size}.")
       }.onFailure {
         errorCounter++
         logger.warn("Error persisting person ${person.personId} - ${it.message}")
@@ -50,7 +50,7 @@ class PersonPersister(
         profileRepository.saveAndFlush(profile)
       }.onSuccess {
         saveCounter++
-        if (saveCounter % 50 == 0) logger.info("Persisted $saveCounter profiles out of ${profiles.size}.")
+        if (saveCounter % 500 == 0) logger.info("Persisted $saveCounter profiles out of ${profiles.size}.")
       }.onFailure {
         errorCounter++
         logger.warn("Error persisting profile ${profile.profileId} - ${it.message}")

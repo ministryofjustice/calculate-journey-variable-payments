@@ -12,7 +12,7 @@ data class AdjustmentMultiplier(val value: BigDecimal) {
     if (value == BigDecimal.ZERO) throw RuntimeException("Multiplier cannot be zero.")
   }
 
-  private val multiplier: BigDecimal = value.divide(BigDecimal(100)).plus(BigDecimal.ONE).also { println(it) }
+  private val multiplier: BigDecimal = value.divide(BigDecimal(100)).plus(BigDecimal.ONE)
 
   /**
    * Returns the amount plus the calculated adjustment multiplier.
