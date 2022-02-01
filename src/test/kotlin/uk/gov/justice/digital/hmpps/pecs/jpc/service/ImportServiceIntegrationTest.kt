@@ -65,12 +65,17 @@ class ImportServiceIntegrationTest(
   }
 
   @Test
-  fun `given GEOAmey moves imported for Dec 2020 when processed the moves should be unchanged`() {
+  fun `given GEOAmey moves imported for Dec 2020 when processed the moves and journeys should be unchanged`() {
     assertThat(moveRepository.findAll()).isEmpty()
+    assertThat(journeyRepository.findAll()).isEmpty()
 
     importService.importReportsOn(ClosedRangeLocalDate(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)))
 
-    assertThat(moveRepository.findAll()).hasSize(9)
+    val createdMoves = moveRepository.findAll()
+    val createdJourneys = journeyRepository.findAll()
+
+    assertThat(createdMoves).hasSize(9)
+    assertThat(createdJourneys).hasSize(13)
 
     val importedDecemberMoves = geoMovesDec2020()
       .map { moveRepository.findByReferenceAndSupplier(it.moveRef, it.supplier).orElseThrow() to it.moveType }.toList()
@@ -86,7 +91,11 @@ class ImportServiceIntegrationTest(
     // Note out of the 9 moves one is never assigned a move type hence. The processor ignores these moves, so there are 8 and not 9 in this case.
     assertThat(processedMoveCount).isEqualTo(8)
 
-    assertThat(importedDecemberMoves.map { it.first }).containsExactlyInAnyOrder(*moveRepository.findAll().toTypedArray())
+    // Check moves have not changed
+    assertThat(importedDecemberMoves.map { it.first }).hasSameElementsAs(createdMoves)
+
+    // Check journeys have not changed
+    assertThat(journeyRepository.findAll()).hasSameElementsAs(createdJourneys)
   }
 
   private fun assertMovesHaveExpectedMoveTypeOrNull(moves: List<Pair<Move, MoveType?>>) {

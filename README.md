@@ -117,6 +117,12 @@ java -jar app.jar --spring.main.web-application-type=none --price-import --suppl
 
 java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --report-import --from=YYYY-MM-DD --to=YYYY-MM-DD
 ```
+```
+# Historic moves processing to adjust/fix moves in the past. This is done at the supplier level.
+
+java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --process-historic-moves --supplier=SERCO --from=YYYY-MM-DD --to=YYYY-MM-DD
+```
+
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 
 To exit from the shell simply type: exit
