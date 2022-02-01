@@ -44,7 +44,6 @@ class HistoricMovesProcessingService(
     ).values.flatten()
       .also { existingMoves ->
         logger.info("Processing ${existingMoves.size} historic moves in range ${dateRange.start} to ${dateRange.endInclusive}")
-        logger.info("Processing moves ${existingMoves.joinToString(separator = ", ") { it.moveId }}")
       }
       .let(this::processExisting)
       .also {
