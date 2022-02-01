@@ -5,7 +5,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -361,4 +360,4 @@ object SercoPreviousMonthMoveData {
 
 internal fun LocalDate.previousMonth() = this.minusMonths(1).month
 
-internal fun LocalDate.previousMonthYear() = Year.of(effectiveYearForDate(this.minusMonths(1)))
+internal fun LocalDate.previousMonthYear() = Year.of(this.minusMonths(1).year)
