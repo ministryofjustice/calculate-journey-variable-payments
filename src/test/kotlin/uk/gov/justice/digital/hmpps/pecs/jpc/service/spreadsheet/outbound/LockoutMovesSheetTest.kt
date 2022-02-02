@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 
 internal class LockoutMovesSheetTest {
   private val journey1 = journeyJ1()
-  private val journey2 = journeyJ1(journeyId = "J2")
+  private val journey2 = journeyJ1(journeyId = "J2", vehicleRegistration = "REG200")
   private val move = moveM1(journeys = listOf(journey1, journey2)).copy(moveType = MoveType.LOCKOUT, notes = "lockout")
   private val lockoutMovesSheet = LockoutMovesSheet(
     SXSSFWorkbook(),
@@ -60,7 +60,7 @@ internal class LockoutMovesSheetTest {
     assertCellEquals(lockoutMovesSheet, 9, 6, move.pickUpDateTime?.toLocalTime())
     assertCellEquals(lockoutMovesSheet, 9, 7, move.dropOffOrCancelledDateTime?.toLocalDate())
     assertCellEquals(lockoutMovesSheet, 9, 8, move.dropOffOrCancelledDateTime?.toLocalTime())
-    assertCellEquals(lockoutMovesSheet, 9, 9, move.vehicleRegistration)
+    assertCellEquals(lockoutMovesSheet, 9, 9, "REG100, REG200")
     assertCellEquals(lockoutMovesSheet, 9, 10, move.person?.prisonNumber)
     assertCellEquals(lockoutMovesSheet, 9, 11, move.totalInPounds())
     assertCellEquals(lockoutMovesSheet, 9, 12, "")

@@ -58,7 +58,7 @@ fun moveM1(
   notes = "some notes",
   vehicleRegistration = "reg100",
   person = person,
-  journeys = journeys
+  journeys = journeys,
 )
 
 fun journeyJ1(
@@ -70,7 +70,8 @@ fun journeyJ1(
   billable: Boolean = true,
   pickUpDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay(),
   dropOffDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
-  events: List<Event> = listOf()
+  events: List<Event> = listOf(),
+  vehicleRegistration: String = "REG100"
 ) = Journey(
   journeyId = journeyId,
   supplier = moveM1().supplier,
@@ -88,7 +89,7 @@ fun journeyJ1(
   dropOffDateTime = dropOffDateTime,
   billable = billable,
   priceInPence = 100,
-  vehicleRegistration = "REG200",
+  vehicleRegistration = vehicleRegistration,
   notes = "some notes",
   events = events,
   effectiveYear = effectiveYearForDate(

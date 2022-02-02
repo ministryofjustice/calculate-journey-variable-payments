@@ -60,7 +60,7 @@ internal class LongHaulMovesSheetTest {
     assertCellEquals(longHaulSheet, 9, 6, move.pickUpDateTime?.toLocalTime())
     assertCellEquals(longHaulSheet, 9, 7, move.dropOffOrCancelledDateTime?.toLocalDate())
     assertCellEquals(longHaulSheet, 9, 8, move.dropOffOrCancelledDateTime?.toLocalTime())
-    assertCellEquals(longHaulSheet, 9, 9, move.vehicleRegistration)
+    assertCellEquals(longHaulSheet, 9, 9, move.registration())
     assertCellEquals(longHaulSheet, 9, 10, move.person?.prisonNumber)
     assertCellEquals(longHaulSheet, 9, 11, move.totalInPounds())
     assertCellEquals(longHaulSheet, 9, 12, "")

@@ -151,6 +151,7 @@ data class Move(
   fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
   fun toSiteName() = toSiteName ?: toNomisAgencyId
   fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
+  fun registration() = journeys.map { it.vehicleRegistration }.distinct().joinToString(separator = ", ")
 
   companion object {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")

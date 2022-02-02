@@ -197,7 +197,7 @@ abstract class PriceSheet(
       add(6, pickUpTime())
       add(7, dropOffOrCancelledDate())
       add(8, dropOffOrCancelledTime())
-      add(9, vehicleRegistration)
+      add(9, registration())
       add(10, person?.prisonNumber)
       if (hasPrice()) row.addCell(11, totalInPounds(), fillShadedPound) else add(11, "NOT PRESENT")
       if (dataColumns.contains(DataColumn.CONTRACTOR_BILLABLE)) add(12, "") // billable is empty for a move
