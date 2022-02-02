@@ -56,7 +56,6 @@ fun moveM1(
   reportFromLocationType = "prison",
   reportToLocationType = null,
   notes = "some notes",
-  vehicleRegistration = "reg100",
   person = person,
   journeys = journeys,
 )

@@ -84,7 +84,6 @@ class MovePersister(
             journeys = journeysWithEvents,
             pickUpDateTime = pickUp,
             dropOffOrCancelledDateTime = dropOff ?: cancelled,
-            vehicleRegistration = journeys.map { it.vehicleRegistration }.joinToString(separator = ", "),
             notes = moveEvents.notes(),
           )
 

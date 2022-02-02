@@ -60,7 +60,7 @@ internal class LockoutMovesSheetTest {
     assertCellEquals(lockoutMovesSheet, 9, 6, move.pickUpDateTime?.toLocalTime())
     assertCellEquals(lockoutMovesSheet, 9, 7, move.dropOffOrCancelledDateTime?.toLocalDate())
     assertCellEquals(lockoutMovesSheet, 9, 8, move.dropOffOrCancelledDateTime?.toLocalTime())
-    assertCellEquals(lockoutMovesSheet, 9, 9, "REG100, REG200")
+    assertCellEquals(lockoutMovesSheet, 9, 9, move.registration())
     assertCellEquals(lockoutMovesSheet, 9, 10, move.person?.prisonNumber)
     assertCellEquals(lockoutMovesSheet, 9, 11, move.totalInPounds())
     assertCellEquals(lockoutMovesSheet, 9, 12, "")
