@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.temporal.ChronoUnit
 
@@ -32,7 +32,7 @@ class HistoricMovesProcessingService(
    *
    * Note: if a move does not have a move type and needs to be processed as well this will need to be changed.
    */
-  fun process(dateRange: ClosedRangeLocalDate, supplier: Supplier): Int {
+  fun process(dateRange: DateRange, supplier: Supplier): Int {
     if (dateRange.notInPast()) throw RuntimeException("Date range must be in the past")
 
     val start = timeSource.dateTime()
@@ -52,7 +52,7 @@ class HistoricMovesProcessingService(
       }
   }
 
-  private fun ClosedRangeLocalDate.notInPast() = this.start.isAfter(timeSource.yesterday()) || this.endInclusive.isAfter(timeSource.yesterday())
+  private fun DateRange.notInPast() = this.start.isAfter(timeSource.yesterday()) || this.endInclusive.isAfter(timeSource.yesterday())
 
   private fun processExisting(moves: List<Move>) = movePersister.persist(moves)
 }

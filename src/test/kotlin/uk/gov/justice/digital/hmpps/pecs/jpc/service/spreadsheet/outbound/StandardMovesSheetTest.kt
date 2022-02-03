@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep202
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalTime
@@ -28,7 +28,7 @@ internal class StandardMovesSheetTest {
   }
 
   private fun assertOnHeadingsFor(date: LocalDate, supplier: Supplier) {
-    val sms = StandardMovesSheet(SXSSFWorkbook(), PriceSheet.Header(date, ClosedRangeLocalDate(date, date), supplier))
+    val sms = StandardMovesSheet(SXSSFWorkbook(), PriceSheet.Header(date, DateRange(date, date), supplier))
 
     assertOnSheetName(sms, "Standard")
     assertThat(sms.sheet.getRow(4).getCell(2).localDateTimeCellValue.toLocalDate()).isEqualTo(date)
@@ -60,7 +60,7 @@ internal class StandardMovesSheetTest {
       SXSSFWorkbook(),
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
-        ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+        DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
         Supplier.SERCO
       )
     )

@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDateTime
 
 class HistoricMovesProcessingServiceTest {
@@ -29,7 +29,7 @@ class HistoricMovesProcessingServiceTest {
 
   @Test
   fun `given an invalid start date when process historic moves is called an exception is thrown`() {
-    val invalidDteRange = ClosedRangeLocalDate(timeSource.date(), timeSource.date())
+    val invalidDteRange = DateRange(timeSource.date(), timeSource.date())
 
     assertThatThrownBy {
       service.process(invalidDteRange, Supplier.SERCO)
@@ -41,7 +41,7 @@ class HistoricMovesProcessingServiceTest {
 
   @Test
   fun `given an invalid end date when process historic moves is called an exception is thrown`() {
-    val invalidDteRange = ClosedRangeLocalDate(timeSource.yesterday(), timeSource.date())
+    val invalidDteRange = DateRange(timeSource.yesterday(), timeSource.date())
 
     assertThatThrownBy {
       service.process(invalidDteRange, Supplier.SERCO)
@@ -53,13 +53,13 @@ class HistoricMovesProcessingServiceTest {
 
   @Test
   fun `given a valid date range when process historic moves is called the expected invocations are made`() {
-    val dateRange = ClosedRangeLocalDate(timeSource.yesterday(), timeSource.yesterday())
+    val dateRange = DateRange(timeSource.yesterday(), timeSource.yesterday())
 
     whenever(moveQueryRepository.movesInDateRange(Supplier.SERCO, dateRange.start, dateRange.endInclusive)).thenReturn(
       mapOf(MoveType.STANDARD to listOf(move))
     )
 
-    service.process(ClosedRangeLocalDate(dateRange.start, dateRange.endInclusive), Supplier.SERCO)
+    service.process(DateRange(dateRange.start, dateRange.endInclusive), Supplier.SERCO)
 
     verify(moveQueryRepository).movesInDateRange(Supplier.SERCO, dateRange.start, dateRange.endInclusive)
     verify(movePersister).persist(listOf(move))

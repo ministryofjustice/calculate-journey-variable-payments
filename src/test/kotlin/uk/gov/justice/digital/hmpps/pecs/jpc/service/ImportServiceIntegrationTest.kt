@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDate
 
 /**
@@ -69,7 +69,7 @@ class ImportServiceIntegrationTest(
     assertThat(moveRepository.findAll()).isEmpty()
     assertThat(journeyRepository.findAll()).isEmpty()
 
-    importService.importReportsOn(ClosedRangeLocalDate(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)))
+    importService.importReportsOn(DateRange(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)))
 
     val createdMoves = moveRepository.findAll()
     val createdJourneys = journeyRepository.findAll()
@@ -84,7 +84,7 @@ class ImportServiceIntegrationTest(
     assertMovesHaveExpectedMoveTypeOrNull(importedDecemberMoves)
 
     val processedMoveCount = historicMovesProcessingService.process(
-      ClosedRangeLocalDate(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)),
+      DateRange(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)),
       Supplier.GEOAMEY
     )
 

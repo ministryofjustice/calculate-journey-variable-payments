@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 
@@ -22,7 +22,7 @@ class ReportImportCommand(private val importService: ImportService) {
   fun importReports(from: LocalDate, to: LocalDate) {
     logger.info("Starting import of reports from $from to $to.")
 
-    importService.importReportsOn(ClosedRangeLocalDate(from, to))
+    importService.importReportsOn(DateRange(from, to))
 
     logger.info("Finished import of reports from $from to $to.")
   }

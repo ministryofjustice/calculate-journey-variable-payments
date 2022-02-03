@@ -8,7 +8,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDate
 
 internal class BackfillReportsTaskTest {
@@ -27,7 +27,7 @@ internal class BackfillReportsTaskTest {
 
     task.execute()
 
-    verify(importService).importReportsOn(ClosedRangeLocalDate(LocalDate.of(2020, 9, 1), timeSource.date().minusDays(1)))
+    verify(importService).importReportsOn(DateRange(LocalDate.of(2020, 9, 1), timeSource.date().minusDays(1)))
   }
 
   @Test

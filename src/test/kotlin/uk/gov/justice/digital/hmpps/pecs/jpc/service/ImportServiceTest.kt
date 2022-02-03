@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDateTime
 
 internal class ImportServiceTest {
@@ -138,7 +138,7 @@ internal class ImportServiceTest {
 
   @Test
   fun `given an import date range one day ensure only one call is made`() {
-    importService.importReportsOn(ClosedRangeLocalDate(timeSourceWithFixedDate.date(), timeSourceWithFixedDate.date()))
+    importService.importReportsOn(DateRange(timeSourceWithFixedDate.date(), timeSourceWithFixedDate.date()))
 
     verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
     verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date())
@@ -147,7 +147,7 @@ internal class ImportServiceTest {
 
   @Test
   fun `given an import date range of two days ensure multiple calls are made`() {
-    importService.importReportsOn(ClosedRangeLocalDate(timeSourceWithFixedDate.date(), timeSourceWithFixedDate.date().plusDays(1)))
+    importService.importReportsOn(DateRange(timeSourceWithFixedDate.date(), timeSourceWithFixedDate.date().plusDays(1)))
 
     verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
     verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date())
