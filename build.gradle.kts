@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.2"
   kotlin("plugin.spring") version "1.6.10"
   kotlin("plugin.jpa") version "1.6.10"
   kotlin("plugin.allopen") version "1.6.10"
@@ -11,19 +11,22 @@ allOpen {
   annotation("javax.persistence.MappedSuperclass")
 }
 
+// Temporary override of version 9.0.56 for OWASP CVE's CVE-2022-23181, CVE-2022-23181 (this will come via the hmpps.gradle-spring-boot plugin eventually)
+ext["tomcat.version"] = "9.0.58"
+
 dependencyCheck {
   suppressionFiles.add("calculate-journey-variable-payments-suppressions.xml")
 }
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.139")
-  implementation("io.sentry:sentry-spring-boot-starter:5.5.2")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.31.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.31.0")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.151")
+  implementation("io.sentry:sentry-spring-boot-starter:5.6.1")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.33.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.33.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
-  implementation("org.apache.poi:poi-ooxml:5.1.0")
-  implementation("org.flywaydb:flyway-core:8.4.1")
+  implementation("org.apache.poi:poi-ooxml:5.2.0")
+  implementation("org.flywaydb:flyway-core:8.4.4")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -37,14 +40,14 @@ dependencies {
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
   testImplementation("org.mockito:mockito-inline:4.2.0")
-  testImplementation("org.seleniumhq.selenium:selenium-java:4.1.1")
+  testImplementation("org.seleniumhq.selenium:selenium-java:4.1.2")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
   testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
   testRuntimeOnly("com.h2database:h2")
 
-  runtimeOnly("org.postgresql:postgresql:42.3.1")
+  runtimeOnly("org.postgresql:postgresql:42.3.2")
 }
 
 java {
