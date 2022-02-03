@@ -152,7 +152,6 @@ internal class MovePersisterTest {
     val retrievedRedirectMove = moveRepository.findById(redirectMove.moveId).get()
 
     assertThat(retrievedRedirectMove.notes).isEqualTo("MoveRedirect: This was redirected.")
-    assertThat(retrievedRedirectMove.vehicleRegistration).isEqualTo("REG1, REG2")
 
     // This move should have the 3 move events
     assertThat(moveEvents(retrievedRedirectMove.moveId).map { it.eventId }).containsExactlyInAnyOrder("E1", "E2", "E3")

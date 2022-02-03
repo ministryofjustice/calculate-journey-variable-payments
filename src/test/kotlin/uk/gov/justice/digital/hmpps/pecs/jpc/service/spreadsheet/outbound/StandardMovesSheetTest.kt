@@ -82,7 +82,7 @@ internal class StandardMovesSheetTest {
     assertCellEquals(sms, 9, 7, "10/09/2020") // Drop off date
     assertCellEquals(sms, 9, 8, "10:00") // Drop off time
 
-    assertCellEquals(sms, 9, 9, "reg100") // vehicle reg
+    assertCellEquals(sms, 9, 9, "REG100") // vehicle reg
 
     assertCellEquals(sms, 9, 10, "PR101") // prison number
 

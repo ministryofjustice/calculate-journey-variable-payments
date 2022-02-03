@@ -66,7 +66,6 @@ fun reportMoveFactory(
     reportToLocationType = toLocationType,
     cancellationReason = cancellationReason,
     notes = "",
-    vehicleRegistration = null,
     dropOffOrCancelledDateTime = null,
     moveType = null,
     events = events,

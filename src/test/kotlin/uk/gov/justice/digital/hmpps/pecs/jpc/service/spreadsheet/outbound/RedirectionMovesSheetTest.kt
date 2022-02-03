@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
 internal class RedirectionMovesSheetTest {
 
   private val journey1 = journeyJ1()
-  private val journey2 = journeyJ1(journeyId = "J2")
+  private val journey2 = journeyJ1(journeyId = "J2", vehicleRegistration = "REG200")
   private val move = moveM1(journeys = listOf(journey1, journey2))
   private val moves = listOf(move)
   private val redirectionMovesSheet = RedirectionMovesSheet(
@@ -59,7 +59,7 @@ internal class RedirectionMovesSheetTest {
     assertCellEquals(redirectionMovesSheet, 9, 7, "10/09/2020") // Drop off date
     assertCellEquals(redirectionMovesSheet, 9, 8, "10:00") // Drop off time
 
-    assertCellEquals(redirectionMovesSheet, 9, 9, "reg100") // vehicle reg
+    assertCellEquals(redirectionMovesSheet, 9, 9, "REG100, REG200") // vehicle reg
     assertCellEquals(redirectionMovesSheet, 9, 10, "PR101") // prison number
     assertCellEquals(redirectionMovesSheet, 9, 11, 2.0) // price
     assertCellEquals(redirectionMovesSheet, 9, 12, "") // billable shouldn't be shown
@@ -78,7 +78,7 @@ internal class RedirectionMovesSheetTest {
     assertCellEquals(redirectionMovesSheet, 10, 7, "10/09/2020") // Drop off date
     assertCellEquals(redirectionMovesSheet, 10, 8, "10:00") // Drop off time
 
-    assertCellEquals(redirectionMovesSheet, 10, 9, "REG200") // vehicle reg
+    assertCellEquals(redirectionMovesSheet, 10, 9, "REG100") // vehicle reg
     assertCellEquals(redirectionMovesSheet, 10, 10, "") // no prison number for journeys
     assertCellEquals(redirectionMovesSheet, 10, 11, 1.0) // price
     assertCellEquals(redirectionMovesSheet, 10, 12, "YES") // contractor billable
@@ -86,5 +86,6 @@ internal class RedirectionMovesSheetTest {
 
     // Journey 2
     assertCellEquals(redirectionMovesSheet, 11, 0, "Journey 2")
+    assertCellEquals(redirectionMovesSheet, 11, 9, "REG200") // vehicle reg
   }
 }

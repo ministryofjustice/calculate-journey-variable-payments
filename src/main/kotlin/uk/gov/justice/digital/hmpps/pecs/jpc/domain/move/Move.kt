@@ -120,10 +120,6 @@ data class Move(
   var notes: String = "",
 
   @Json(ignored = true)
-  @Column(name = "vehicle_registration")
-  val vehicleRegistration: String? = null,
-
-  @Json(ignored = true)
   @Transient
   val journeys: List<Journey> = listOf(),
 
@@ -151,6 +147,7 @@ data class Move(
   fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
   fun toSiteName() = toSiteName ?: toNomisAgencyId
   fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
+  fun registration() = journeys.map { it.vehicleRegistration }.distinct().joinToString(separator = ", ")
 
   companion object {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -171,7 +168,7 @@ data class Move(
   }
 
   override fun toString(): String {
-    return "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes', vehicleRegistration=$vehicleRegistration)"
+    return "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes')"
   }
 
   override fun equals(other: Any?): Boolean {
@@ -197,7 +194,6 @@ data class Move(
     if (cancellationReason != other.cancellationReason) return false
     if (cancellationReasonComment != other.cancellationReasonComment) return false
     if (notes != other.notes) return false
-    if (vehicleRegistration != other.vehicleRegistration) return false
 
     return true
   }
@@ -220,7 +216,6 @@ data class Move(
     result = 31 * result + (cancellationReason?.hashCode() ?: 0)
     result = 31 * result + (cancellationReasonComment?.hashCode() ?: 0)
     result = 31 * result + notes.hashCode()
-    result = 31 * result + (vehicleRegistration?.hashCode() ?: 0)
     return result
   }
 
