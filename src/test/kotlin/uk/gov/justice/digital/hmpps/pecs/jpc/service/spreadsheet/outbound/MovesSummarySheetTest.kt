@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 
 internal class MovesSummarySheetTest {
 
@@ -26,7 +26,7 @@ internal class MovesSummarySheetTest {
     SXSSFWorkbook(),
     PriceSheet.Header(
       defaultMoveDate10Sep2020,
-      ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+      DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
       Supplier.SERCO
     )
   )

@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 
 internal class JourneysSheetTest {
 
@@ -29,7 +29,7 @@ internal class JourneysSheetTest {
       SXSSFWorkbook(),
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
-        ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+        DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
         Supplier.SERCO
       )
     )
@@ -73,7 +73,7 @@ internal class JourneysSheetTest {
       SXSSFWorkbook(),
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
-        ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+        DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
         Supplier.SERCO
       )
     )

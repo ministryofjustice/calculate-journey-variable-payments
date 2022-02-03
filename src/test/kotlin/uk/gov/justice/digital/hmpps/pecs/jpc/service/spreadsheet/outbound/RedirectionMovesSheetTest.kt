@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep202
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 
 internal class RedirectionMovesSheetTest {
 
@@ -18,7 +18,7 @@ internal class RedirectionMovesSheetTest {
     SXSSFWorkbook(),
     PriceSheet.Header(
       defaultMoveDate10Sep2020,
-      ClosedRangeLocalDate(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
+      DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
       Supplier.SERCO
     )
   )

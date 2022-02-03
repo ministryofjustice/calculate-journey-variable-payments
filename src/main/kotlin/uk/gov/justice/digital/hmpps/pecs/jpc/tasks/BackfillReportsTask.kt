@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 
@@ -27,7 +27,7 @@ class BackfillReportsTask(
   private val contractStartDate = LocalDate.of(2020, 9, 1)
 
   override fun performTask() {
-    ClosedRangeLocalDate(contractStartDate, timeSource.yesterday()).run {
+    DateRange(contractStartDate, timeSource.yesterday()).run {
       val startTime = timeSource.dateTime()
 
       logger.info("Starting the reports backfill for the period ${this.start} to ${this.endInclusive} at $startTime.")

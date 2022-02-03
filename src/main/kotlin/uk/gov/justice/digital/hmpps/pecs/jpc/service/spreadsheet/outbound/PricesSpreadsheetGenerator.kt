@@ -12,7 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.ClosedRangeLocalDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.File
 import java.io.FileOutputStream
@@ -33,7 +33,7 @@ class PricesSpreadsheetGenerator(
     val dateGenerated = timeSource.date()
 
     SXSSFWorkbook().use { workbook ->
-      val header = PriceSheet.Header(dateGenerated, ClosedRangeLocalDate(startDate, endOfMonth(startDate)), supplier)
+      val header = PriceSheet.Header(dateGenerated, DateRange(startDate, endOfMonth(startDate)), supplier)
 
       val moves = moveService.moves(supplier, startDate)
 
