@@ -7,6 +7,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.HistoricMovesProcessingServ
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDate
 
+/**
+ * This command does not pull in any (new) data. It goes through the existing move data within the service.
+ */
 @ConditionalOnNotWebApplication
 @Component
 class HistoricMovesCommand(private val historicMovesProcessingService: HistoricMovesProcessingService) {
