@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
 import java.time.LocalDate
@@ -56,6 +57,18 @@ class ImportService(
         )
 
         raiseMonitoringAlertIf(moves.isEmpty(), "There were no moves to persist for reporting feed date $date.")
+      }
+    }
+  }
+
+  /**
+   * This will import all people and profiles starting from the date supplied upto the current date minus one day. This
+   * is needed to ensure the data is as up-to-date as possible.
+   */
+  fun importPeopleProfiles(from: LocalDate) {
+    DateRange(from, timeSource.yesterday()).run {
+      for (i in 0..ChronoUnit.DAYS.between(this.start, this.endInclusive)) {
+        importPeopleProfilesOn(this.start.plusDays(i))
       }
     }
   }

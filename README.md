@@ -122,6 +122,11 @@ java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --report-imp
 
 java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --process-historic-moves --supplier=SERCO --from=YYYY-MM-DD --to=YYYY-MM-DD
 ```
+```
+# Backfill people and profiles. This will backfill from the date specified to the current day - 1
+
+java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --import-people-profiles --from=YYYY-MM-DD
+```
 
 Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
 

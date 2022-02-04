@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -155,5 +156,34 @@ internal class ImportServiceTest {
     verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date().plusDays(1))
     verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.date().plusDays(1))
     verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.date().plusDays(1))
+  }
+
+  @Test
+  fun `given an import date of yesterday ensure only one call is made when importing people and profiles`() {
+    importService.importPeopleProfiles(timeSourceWithFixedDate.yesterday())
+
+    verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.yesterday())
+    verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.yesterday())
+  }
+
+  @Test
+  fun `given an import date of two days ago ensure two calls are made when importing people and profiles`() {
+    importService.importPeopleProfiles(timeSourceWithFixedDate.yesterday().minusDays(1))
+
+    verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.yesterday().minusDays(1))
+    verify(reportImporter).importPeopleOn(timeSourceWithFixedDate.yesterday())
+    verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.yesterday().minusDays(1))
+    verify(reportImporter).importProfilesOn(timeSourceWithFixedDate.yesterday())
+  }
+
+  @Test
+  fun `given an import date of current or future date an exception is thrown when importing people and profiles`() {
+    assertThatThrownBy {
+      importService.importPeopleProfiles(timeSourceWithFixedDate.date())
+    }.isInstanceOf(RuntimeException::class.java)
+
+    assertThatThrownBy {
+      importService.importPeopleProfiles(timeSourceWithFixedDate.date().plusDays(1))
+    }.isInstanceOf(RuntimeException::class.java)
   }
 }
