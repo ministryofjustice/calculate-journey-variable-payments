@@ -6,31 +6,34 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.BackfillReportsTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysLocationMappingTask
-import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysReportsTask
+import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysMovesTask
+import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysPeopleAndProfilesTask
 
 @ConditionalOnWebApplication
 @Component
 class TaskScheduler(
-  val previousDaysReportsTask: PreviousDaysReportsTask,
-  val previousDaysLocationMappingTask: PreviousDaysLocationMappingTask,
-  val backfillReportsTask: BackfillReportsTask
+  val previousDaysMoves: PreviousDaysMovesTask,
+  val previousDaysPeopleAndProfiles: PreviousDaysPeopleAndProfilesTask,
+  val previousDaysLocationMapping: PreviousDaysLocationMappingTask,
+  val backfillReports: BackfillReportsTask
 ) {
 
   @Scheduled(cron = "\${CRON_IMPORT_REPORTS}")
   @SchedulerLock(name = "importReports")
   fun previousDaysReportsTask() {
-    previousDaysReportsTask.execute()
+    previousDaysMoves.execute()
+    previousDaysPeopleAndProfiles.execute()
   }
 
   @Scheduled(cron = "\${CRON_AUTOMATIC_LOCATION_MAPPING}")
   @SchedulerLock(name = "automaticLocationMapping")
   fun automaticLocationMapping() {
-    previousDaysLocationMappingTask.execute()
+    previousDaysLocationMapping.execute()
   }
 
   @Scheduled(cron = "\${CRON_BACKFILL_REPORTS}")
   @SchedulerLock(name = "backfillReports")
   fun backfillReports() {
-    backfillReportsTask.execute()
+    backfillReports.execute()
   }
 }

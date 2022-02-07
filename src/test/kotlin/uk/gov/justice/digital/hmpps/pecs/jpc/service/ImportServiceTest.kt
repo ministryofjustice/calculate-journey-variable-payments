@@ -159,6 +159,13 @@ internal class ImportServiceTest {
   }
 
   @Test
+  fun `given an import date of yesterday ensure only one call is made when importing moves`() {
+    importService.importMoves(timeSourceWithFixedDate.yesterday())
+
+    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.yesterday())
+  }
+
+  @Test
   fun `given an import date of yesterday ensure only one call is made when importing people and profiles`() {
     importService.importPeopleProfiles(timeSourceWithFixedDate.yesterday())
 

@@ -43,6 +43,10 @@ class ImportService(
     importPeopleProfilesOn(date)
   }
 
+  fun importMoves(date: LocalDate) {
+    importMovesJourneysEventsOn(date)
+  }
+
   private fun importMovesJourneysEventsOn(date: LocalDate) {
     logger.info("Importing moves, journeys and events for date: $date.")
 

@@ -6,25 +6,25 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.AutomaticLocationMappingService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class PreviousDaysLocationMappingTaskTest {
+internal class PreviousDaysMovesTaskTest {
 
-  private val mappingService: AutomaticLocationMappingService = mock()
+  private val importService: ImportService = mock()
   private val monitoringService: MonitoringService = mock()
   private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 11, 30, 12, 0) }
-  private val task = PreviousDaysLocationMappingTask(mappingService, timeSource, monitoringService)
+  private val task = PreviousDaysMovesTask(importService, timeSource, monitoringService)
 
   @Test
-  internal fun `locations mapping invoked with previous days date`() {
+  internal fun `move data import invoked with previous days date`() {
     LockAssert.TestHelper.makeAllAssertsPass(true)
 
     task.execute()
 
-    verify(mappingService).mapIfNotPresentLocationsCreatedOn(LocalDate.of(2020, 11, 29))
+    verify(importService).importMoves(LocalDate.of(2020, 11, 29))
     verifyNoInteractions(monitoringService)
   }
 
@@ -34,7 +34,7 @@ internal class PreviousDaysLocationMappingTaskTest {
 
     task.execute()
 
-    verifyNoInteractions(mappingService)
-    verify(monitoringService).capture("Unable to lock task 'Previous days locations' for execution")
+    verifyNoInteractions(importService)
+    verify(monitoringService).capture("Unable to lock task 'Previous days moves' for execution")
   }
 }

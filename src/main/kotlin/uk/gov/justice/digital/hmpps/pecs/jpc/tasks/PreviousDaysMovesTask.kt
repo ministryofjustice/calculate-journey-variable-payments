@@ -7,23 +7,24 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
- * This task is designed in such a way it will always import reporting data for the previous day. This is based on the
- * current date - 1 day at time of execution.
+ * This task imports moves for the previous day to that of the date of execution.
  */
-private val logger = loggerFor<PreviousDaysReportsTask>()
+private val logger = loggerFor<PreviousDaysMovesTask>()
 
 @Component
-class PreviousDaysReportsTask(
+class PreviousDaysMovesTask(
   private val service: ImportService,
   private val timeSource: TimeSource,
   monitoringService: MonitoringService
-) : Task("Previous Days Reports", monitoringService) {
+) : Task("Previous days moves", monitoringService) {
 
   override fun performTask() {
-    val yesterday = timeSource.date().minusDays(1)
+    timeSource.yesterday().run {
+      logger.info("Importing previous days moves for date $this.")
 
-    logger.info("Importing previous days reporting data: $yesterday.")
+      service.importMoves(this)
 
-    service.importReportsOn(yesterday)
+      logger.info("Finished importing previous days moves for date $this.")
+    }
   }
 }

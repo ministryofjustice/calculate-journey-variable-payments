@@ -15,7 +15,7 @@ internal class BackfillReportsTaskTest {
 
   private val importService: ImportService = mock()
 
-  private val timeSource: TimeSource = TimeSource { LocalDate.now().atStartOfDay() }
+  private val timeSource: TimeSource = TimeSource { LocalDate.of(2022, 2, 7).atStartOfDay() }
 
   private val monitoringService: MonitoringService = mock()
 
@@ -27,7 +27,7 @@ internal class BackfillReportsTaskTest {
 
     task.execute()
 
-    verify(importService).importReportsOn(DateRange(LocalDate.of(2020, 9, 1), timeSource.date().minusDays(1)))
+    verify(importService).importReportsOn(DateRange(LocalDate.of(2020, 9, 1), LocalDate.of(2022, 2, 6)))
   }
 
   @Test
