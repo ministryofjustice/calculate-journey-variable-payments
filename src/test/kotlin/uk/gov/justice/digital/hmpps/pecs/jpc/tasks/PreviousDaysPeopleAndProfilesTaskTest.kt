@@ -8,22 +8,23 @@ import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
+import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class PreviousDaysReportsTaskTest {
+internal class PreviousDaysPeopleAndProfilesTaskTest {
 
   private val importService: ImportService = mock()
   private val monitoringService: MonitoringService = mock()
   private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 11, 30, 12, 0) }
-  private val task = PreviousDaysReportsTask(importService, timeSource, monitoringService)
+  private val task = PreviousDaysPeopleAndProfilesTask(importService, timeSource, monitoringService)
 
   @Test
-  internal fun `reports data import invoked with previous days date`() {
+  internal fun `people and profile data import invoked with previous days date`() {
     LockAssert.TestHelper.makeAllAssertsPass(true)
 
     task.execute()
 
-    verify(importService).importReportsOn(timeSource.date().minusDays(1))
+    verify(importService).importPeopleProfiles(LocalDate.of(2020, 11, 29))
     verifyNoInteractions(monitoringService)
   }
 
@@ -34,6 +35,6 @@ internal class PreviousDaysReportsTaskTest {
     task.execute()
 
     verifyNoInteractions(importService)
-    verify(monitoringService).capture("Unable to lock task 'Previous Days Reports' for execution")
+    verify(monitoringService).capture("Unable to lock task 'Previous days people and profiles' for execution")
   }
 }

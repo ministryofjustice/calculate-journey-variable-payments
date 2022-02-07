@@ -7,8 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
- * This task is designed in such a way it will always attempt to map new locations added to BaSM for the previous day.
- * This is based on the current date - 1 day at time of execution.
+ * This task maps new locations added to BaSM for the previous day to that of the date of execution.
  */
 private val logger = loggerFor<PreviousDaysLocationMappingTask>()
 
@@ -17,13 +16,15 @@ class PreviousDaysLocationMappingTask(
   private val service: AutomaticLocationMappingService,
   private val timeSource: TimeSource,
   monitoringService: MonitoringService
-) : Task("Previous Days Locations", monitoringService) {
+) : Task("Previous days locations", monitoringService) {
 
   override fun performTask() {
-    val yesterday = timeSource.date().minusDays(1)
+    timeSource.yesterday().run {
+      logger.info("Mapping previous days locations added to BaSM (if any): $this.")
 
-    logger.info("Mapping previous days locations added to BaSM (if any): $yesterday.")
+      service.mapIfNotPresentLocationsCreatedOn(this)
 
-    service.mapIfNotPresentLocationsCreatedOn(yesterday)
+      logger.info("Finished mapping previous days locations added to BaSM (if any): $this.")
+    }
   }
 }
