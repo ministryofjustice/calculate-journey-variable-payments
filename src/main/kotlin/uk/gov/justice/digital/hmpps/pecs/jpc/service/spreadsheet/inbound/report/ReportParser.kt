@@ -21,7 +21,7 @@ object ReportParser {
    */
   fun <T> read(files: List<String>, f: (j: String) -> T?): Sequence<T> {
     return files.asSequence().flatMap {
-      it.split("\n").filter { it.isNotEmpty() }.map { json ->
+      it.splitToSequence("\n").filter { it.isNotEmpty() }.map { json ->
         try {
           f(json)
         } catch (e: Exception) {

@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersistenceResult
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
@@ -28,8 +29,8 @@ internal class ImportServiceTest {
   private val reportImporter: ReportImporter = mock()
   private val movePersister: MovePersister = mock { on { persist(any()) } doReturn 1 }
   private val personPersister: PersonPersister = mock {
-    on { persistPeople(any()) } doReturn 1
-    on { persistProfiles(any()) } doReturn 1
+    on { persistPeople(any()) } doReturn PersistenceResult(1, 0)
+    on { persistProfiles(any()) } doReturn PersistenceResult(1, 0)
   }
   private val move: Move = mock()
   private val person: Person = mock()
@@ -96,45 +97,47 @@ internal class ImportServiceTest {
   }
 
   @Test
-  internal fun `expected monitoring interactions when failure to persist people`() {
-    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf(person))
-    whenever(personPersister.persistPeople(any())).thenReturn(0)
+  fun `expected monitoring interactions when failure to persist people`() {
+    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.yesterday())).thenReturn(sequenceOf(person))
+    whenever(personPersister.persistPeople(any())).thenReturn(PersistenceResult(0, 1))
 
-    importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("people: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
+    importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+    verify(monitoringService).capture("people: persisted 0 and 1 errors for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
-  internal fun `expected monitoring interactions when failure to persist profiles`() {
-    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf(profile))
-    whenever(personPersister.persistProfiles(any())).thenReturn(0)
+  fun `expected monitoring interactions when failure to persist profiles`() {
+    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.yesterday())).thenReturn(sequenceOf(profile))
+    whenever(personPersister.persistProfiles(any())).thenReturn(PersistenceResult(0, 1))
 
-    importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("profiles: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
+    importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+    verify(monitoringService).capture("profiles: persisted 0 and 1 errors for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
   internal fun `expected monitoring interactions when no moves to persist`() {
-    whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf())
+    whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(emptyList())
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
     verify(monitoringService).capture("There were no moves to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
   }
 
   @Test
-  internal fun `expected monitoring interactions when no people to persist`() {
-    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf())
+  fun `expected monitoring interactions when no people to persist`() {
+    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.yesterday())).thenReturn(emptySequence())
+    whenever(personPersister.persistPeople(any())).thenReturn(PersistenceResult(0, 0))
 
-    importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("There were no people to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
+    importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+    verify(monitoringService).capture("There were no people to persist for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
-  internal fun `expected monitoring interactions when no profiles to persist`() {
-    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.date())).thenReturn(sequenceOf())
+  fun `expected monitoring interactions when no profiles to persist`() {
+    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.yesterday())).thenReturn(emptySequence())
+    whenever(personPersister.persistProfiles(any())).thenReturn(PersistenceResult(0, 0))
 
-    importService.importReportsOn(timeSourceWithFixedDate.date())
-    verify(monitoringService).capture("There were no profiles to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
+    importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+    verify(monitoringService).capture("There were no profiles to persist for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
