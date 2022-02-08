@@ -81,32 +81,30 @@ class ImportService(
     logger.info("Importing people for date: $date.")
 
     import { reportImporter.importPeopleOn(date) }?.let {
-      val people = it.toList()
-      personPersister.persistPeople(people).let { persisted ->
-        auditService.create(AuditableEvent.importReportEvent("people", date, people.size, persisted))
+      personPersister.persistPeople(it).let { result ->
+        auditService.create(AuditableEvent.importReportEvent("people", date, result.processed(), result.persisted))
 
         raiseMonitoringAlertIf(
-          people.isNotEmpty() && people.size > persisted,
-          "people: persisted $persisted out of ${people.size} for reporting feed date $date."
+          result.errors > 0,
+          "people: persisted ${result.persisted} and ${result.errors} errors for reporting feed date $date."
         )
 
-        raiseMonitoringAlertIf(people.isEmpty(), "There were no people to persist for reporting feed date $date.")
+        raiseMonitoringAlertIf(result.processed() == 0, "There were no people to persist for reporting feed date $date.")
       }
     }
 
     logger.info("Importing profiles for date: $date.")
 
     import { reportImporter.importProfilesOn(date) }?.let {
-      val profiles = it.toList()
-      personPersister.persistProfiles(profiles).let { persisted ->
-        auditService.create(AuditableEvent.importReportEvent("profiles", date, profiles.size, persisted))
+      personPersister.persistProfiles(it).let { result ->
+        auditService.create(AuditableEvent.importReportEvent("profiles", date, result.processed(), result.persisted))
 
         raiseMonitoringAlertIf(
-          profiles.isNotEmpty() && profiles.size > persisted,
-          "profiles: persisted $persisted out of ${profiles.size} for reporting feed date $date."
+          result.errors > 0,
+          "profiles: persisted ${result.persisted} and ${result.errors} errors for reporting feed date $date."
         )
 
-        raiseMonitoringAlertIf(profiles.isEmpty(), "There were no profiles to persist for reporting feed date $date.")
+        raiseMonitoringAlertIf(result.processed() == 0, "There were no profiles to persist for reporting feed date $date.")
       }
     }
   }

@@ -45,7 +45,7 @@ internal class PersonPersisterTest(
   @Test
   fun `Persist PII data`() {
     val reportPerson = reportPersonFactory()
-    PersonPersister(personRepository, profileRepository).persistPeople(listOf(reportPerson))
+    PersonPersister(personRepository, profileRepository).persistPeople(sequenceOf(reportPerson))
 
     entityManager.flush()
 
@@ -115,7 +115,7 @@ internal class PersonPersisterTest(
         entities(2) { reportPersonFactory().copy(personId = "invalid") } +
           entities(4) { id -> reportPersonFactory().copy(personId = id) }
       )
-    ).isEqualTo(4)
+    ).isEqualTo(PersistenceResult(persisted = 4, errors = 2))
 
     verify(personRepositorySpy, times(6)).saveAndFlush(any())
   }
@@ -176,11 +176,11 @@ internal class PersonPersisterTest(
         entities(2) { profileFactory().copy(profileId = "invalid", personId = "invalid") } +
           entities(4) { id -> profileFactory().copy(profileId = id, personId = id) }
       )
-    ).isEqualTo(4)
+    ).isEqualTo(PersistenceResult(persisted = 4, errors = 2))
 
     verify(profileRepositorySpy, times(6)).saveAndFlush(any())
   }
 
-  fun <T> entities(numberOf: Int, f: (id: String) -> T): List<T> =
-    MutableList(numberOf) { index -> f(index.toString()) }
+  fun <T> entities(numberOf: Int, f: (id: String) -> T): Sequence<T> =
+    MutableList(numberOf) { index -> f(index.toString()) }.asSequence()
 }

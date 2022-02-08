@@ -45,7 +45,7 @@ class ImportServiceIntegrationTest(
   fun `given some report files contain errors the import should still complete successfully and not fail`() {
     importService.importReportsOn(LocalDate.of(2020, 12, 1))
 
-    verify(monitoringService).capture("people: persisted 3 out of 4 for reporting feed date 2020-12-01.")
+    verify(monitoringService).capture("people: persisted 3 and 1 errors for reporting feed date 2020-12-01.")
     verifyNoMoreInteractions(monitoringService)
   }
 

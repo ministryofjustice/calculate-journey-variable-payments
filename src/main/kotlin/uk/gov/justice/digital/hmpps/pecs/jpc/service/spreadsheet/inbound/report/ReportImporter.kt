@@ -20,8 +20,11 @@ open class ReportImporter(
 
   private fun importMovesJourneysEvents(from: LocalDate, to: LocalDate): Collection<Move> {
     val movesContent = getContents("moves", from, to)
+
     val journeysContent = getContents("journeys", from, to)
+
     val eventsContent = getContents("events", from, to)
+
     return ReportParser.parseMovesJourneysEvents(
       moveFiles = movesContent,
       journeyFiles = journeysContent,
@@ -33,6 +36,7 @@ open class ReportImporter(
 
   private fun importPeople(from: LocalDate, to: LocalDate): Sequence<Person> {
     val peopleContent = getContents("people", from, to)
+
     return ReportParser.parseAsPerson(peopleFiles = peopleContent)
   }
 
@@ -40,6 +44,7 @@ open class ReportImporter(
 
   private fun importProfiles(from: LocalDate, to: LocalDate): Sequence<Profile> {
     val profilesContent = getContents("profiles", from, to)
+
     return ReportParser.parseAsProfile(profileFiles = profilesContent)
   }
 
