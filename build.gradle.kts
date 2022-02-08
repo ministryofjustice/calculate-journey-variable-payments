@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.3"
   kotlin("plugin.spring") version "1.6.10"
   kotlin("plugin.jpa") version "1.6.10"
   kotlin("plugin.allopen") version "1.6.10"
@@ -11,16 +11,13 @@ allOpen {
   annotation("javax.persistence.MappedSuperclass")
 }
 
-// Temporary override of version 9.0.56 for OWASP CVE's CVE-2022-23181, CVE-2022-23181 (this will come via the hmpps.gradle-spring-boot plugin eventually)
-ext["tomcat.version"] = "9.0.58"
-
 dependencyCheck {
   suppressionFiles.add("calculate-journey-variable-payments-suppressions.xml")
 }
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.151")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.154")
   implementation("io.sentry:sentry-spring-boot-starter:5.6.1")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.33.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.33.0")
