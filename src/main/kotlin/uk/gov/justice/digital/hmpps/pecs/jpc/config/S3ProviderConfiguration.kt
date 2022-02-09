@@ -12,7 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.io.InputStreamReader
 
 private val logger = loggerFor<S3ProviderConfiguration>()
 
@@ -121,5 +123,15 @@ class S3ProviderConfiguration {
       logger.debug("Using bucket $bucketName")
       client.getObjectAsString(bucketName, it)
     }
+  }
+
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun reportReaderParser(
+    @Qualifier("basmAmazonS3") client: AmazonS3,
+    @Value("\${BASM_BUCKET_NAME}") bucketName: String
+  ): ReportReaderParser {
+    logger.info("Using AWS S3 for report reader parser.")
+    return ReportReaderParser { InputStreamReader(client.getObject(GetObjectRequest(bucketName, it)).objectContent) }
   }
 }

@@ -14,6 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 private val logger = loggerFor<ImportService>()
 
@@ -40,7 +41,8 @@ class ImportService(
   // The transaction boundary for this method is being set in the underlying persistence classes on purpose.
   fun importReportsOn(date: LocalDate) {
     importMovesJourneysEventsOn(date)
-    importPeopleProfilesOn(date)
+    importPeopleOn(date)
+    importProfilesOn(date)
   }
 
   fun importMoves(date: LocalDate) {
@@ -72,40 +74,75 @@ class ImportService(
   fun importPeopleProfiles(from: LocalDate) {
     DateRange(from, timeSource.yesterday()).run {
       for (i in 0..ChronoUnit.DAYS.between(this.start, this.endInclusive)) {
-        importPeopleProfilesOn(this.start.plusDays(i))
+        importPeopleOn(this.start.plusDays(i))
+        importProfilesOn(this.start.plusDays(i))
       }
     }
   }
 
-  private fun importPeopleProfilesOn(date: LocalDate) {
+  private fun importPeopleOn(date: LocalDate) {
     logger.info("Importing people for date: $date.")
 
-    import { reportImporter.importPeopleOn(date) }?.let {
-      personPersister.persistPeople(it).let { result ->
-        auditService.create(AuditableEvent.importReportEvent("people", date, result.processed(), result.persisted))
+    import {
+      val (saved, errors) = AtomicInteger(0) to AtomicInteger(0)
 
-        raiseMonitoringAlertIf(
-          result.errors > 0,
-          "people: persisted ${result.persisted} and ${result.errors} errors for reporting feed date $date."
+      reportImporter.importPeople(date) { person ->
+        personPersister.persistPerson(
+          person,
+          {
+            saved.incrementAndGet()
+            if (saved.get() % 500 == 0) logger.info("Persisted ${saved.get()} people...")
+          },
+          {
+            errors.incrementAndGet()
+            logger.warn("Error persisting person ${person.personId} - ${it.message}")
+          }
         )
-
-        raiseMonitoringAlertIf(result.processed() == 0, "There were no people to persist for reporting feed date $date.")
       }
-    }
 
+      auditService.create(AuditableEvent.importReportEvent("people", date, saved.get() + errors.get(), saved.get()))
+
+      raiseMonitoringAlertIf(
+        errors.get() > 0,
+        "people: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date."
+      )
+
+      raiseMonitoringAlertIf(saved.get() == 0, "There were no people to persist for reporting feed date $date.")
+
+      logger.info("Imported ${saved.get()} people with ${errors.get()} errors.")
+    }
+  }
+
+  private fun importProfilesOn(date: LocalDate) {
     logger.info("Importing profiles for date: $date.")
 
-    import { reportImporter.importProfilesOn(date) }?.let {
-      personPersister.persistProfiles(it).let { result ->
-        auditService.create(AuditableEvent.importReportEvent("profiles", date, result.processed(), result.persisted))
+    import {
+      val (saved, errors) = AtomicInteger(0) to AtomicInteger(0)
 
-        raiseMonitoringAlertIf(
-          result.errors > 0,
-          "profiles: persisted ${result.persisted} and ${result.errors} errors for reporting feed date $date."
+      reportImporter.importProfiles(date) { profile ->
+        personPersister.persistProfile(
+          profile,
+          {
+            saved.incrementAndGet()
+            if (saved.get() % 500 == 0) logger.info("Persisted ${saved.get()} profiles...")
+          },
+          {
+            errors.incrementAndGet()
+            logger.warn("Error persisting profile ${profile.profileId} - ${it.message}")
+          }
         )
-
-        raiseMonitoringAlertIf(result.processed() == 0, "There were no profiles to persist for reporting feed date $date.")
       }
+
+      auditService.create(AuditableEvent.importReportEvent("profiles", date, saved.get() + errors.get(), saved.get()))
+
+      raiseMonitoringAlertIf(
+        errors.get() > 0,
+        "profiles: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date."
+      )
+
+      raiseMonitoringAlertIf(saved.get() == 0, "There were no profiles to persist for reporting feed date $date.")
+
+      logger.info("Imported ${saved.get()} profiles with ${errors.get()} errors.")
     }
   }
 

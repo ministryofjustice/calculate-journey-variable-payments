@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ObfuscatingReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Clock
 import java.time.LocalDateTime
@@ -25,6 +26,9 @@ class ImporterConfiguration {
   private lateinit var reportingProvider: ReportingProvider
 
   @Autowired
+  private lateinit var reportReaderParser: ReportReaderParser
+
+  @Autowired
   private lateinit var monitoringString: MonitoringService
 
   @Bean
@@ -38,10 +42,10 @@ class ImporterConfiguration {
   fun reportImporter(@Value("\${SENTRY_ENVIRONMENT:}") env: String): ReportImporter {
     return if (env.trim().uppercase() == "LOCAL") {
       logger.warn("Running importer in PII obfuscation mode")
-      ObfuscatingReportImporter(reportingProvider, monitoringString)
+      ObfuscatingReportImporter(reportingProvider, monitoringString, reportReaderParser)
     } else {
       logger.warn("Running importer in PII mode")
-      ReportImporter(reportingProvider, monitoringString)
+      ReportImporter(reportingProvider, monitoringString, reportReaderParser)
     }
   }
 

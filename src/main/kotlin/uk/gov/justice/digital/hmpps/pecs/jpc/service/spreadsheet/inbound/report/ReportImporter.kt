@@ -13,7 +13,8 @@ private val logger = loggerFor<ReportImporter>()
 
 open class ReportImporter(
   @Autowired private val provider: ReportingProvider,
-  @Autowired private val monitoringService: MonitoringService
+  @Autowired private val monitoringService: MonitoringService,
+  @Autowired private val reportingReaderParser: ReportReaderParser
 ) {
 
   fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)
@@ -40,7 +41,19 @@ open class ReportImporter(
     return ReportParser.parseAsPerson(peopleFiles = peopleContent)
   }
 
+  fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
+    val fileNameForDate = fileNamesForDate("people", date, date).first()
+
+    reportingReaderParser.forEach(fileNameForDate, { Person.fromJson(it) }) { consumer(it) }
+  }
+
   fun importProfilesOn(date: LocalDate) = importProfiles(date, date)
+
+  fun importProfiles(date: LocalDate, consumer: (Profile) -> Unit) {
+    val fileNameForDate = fileNamesForDate("profiles", date, date).first()
+
+    reportingReaderParser.forEach(fileNameForDate, { Profile.fromJson(it) }) { consumer(it) }
+  }
 
   private fun importProfiles(from: LocalDate, to: LocalDate): Sequence<Profile> {
     val profilesContent = getContents("profiles", from, to)

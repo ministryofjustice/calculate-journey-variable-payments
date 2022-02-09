@@ -16,6 +16,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.ProfileRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDate
@@ -29,7 +30,9 @@ import java.time.LocalDate
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ImportServiceIntegrationTest(
   @Autowired private val moveRepository: MoveRepository,
-  @Autowired private val journeyRepository: JourneyRepository
+  @Autowired private val journeyRepository: JourneyRepository,
+  @Autowired private val peopleRepository: ProfileRepository,
+  @Autowired private val profileRepository: ProfileRepository
 ) {
 
   @MockBean
@@ -96,6 +99,14 @@ class ImportServiceIntegrationTest(
 
     // Check journeys have not changed
     assertThat(journeyRepository.findAll()).hasSameElementsAs(createdJourneys)
+  }
+
+  @Test
+  fun `given people and profiles reports files when we import then people and profiles are created`() {
+    importService.importReportsOn(LocalDate.of(2022, 1, 2))
+
+    assertThat(profileRepository.findAll()).hasSize(3)
+    assertThat(peopleRepository.findAll()).hasSize(3)
   }
 
   private fun assertMovesHaveExpectedMoveTypeOrNull(moves: List<Pair<Move, MoveType?>>) {
