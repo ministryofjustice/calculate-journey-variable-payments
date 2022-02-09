@@ -11,8 +11,9 @@ import java.util.Random
  */
 class ObfuscatingReportImporter(
   provider: ReportingProvider,
-  monitoringService: MonitoringService
-) : ReportImporter(provider, monitoringService) {
+  monitoringService: MonitoringService,
+  reportReaderParser: ReportReaderParser
+) : ReportImporter(provider, monitoringService, reportReaderParser) {
 
   override fun importPeopleOn(date: LocalDate): Sequence<Person> {
     return super.importPeopleOn(date).map { person ->

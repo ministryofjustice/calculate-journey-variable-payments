@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
@@ -15,7 +16,7 @@ import java.time.LocalDate
 @ExtendWith(SpringExtension::class)
 @Import(TestConfig::class)
 @ActiveProfiles("test")
-internal class ObfuscatingReportImporterTest() {
+internal class ObfuscatingReportImporterTest(@Autowired val reportReaderParser: ReportReaderParser) {
 
   @MockBean
   private lateinit var monitoringService: MonitoringService
@@ -34,7 +35,8 @@ internal class ObfuscatingReportImporterTest() {
         lastName = lastName,
         ethnicity = ethnicity
       ),
-      monitoringService
+      monitoringService,
+      reportReaderParser
     ).importPeopleOn(LocalDate.now()).toList().first()
 
     assertThat(obfuscatedPerson.dateOfBirth).isEqualTo(LocalDate.of(1800, 1, 1))

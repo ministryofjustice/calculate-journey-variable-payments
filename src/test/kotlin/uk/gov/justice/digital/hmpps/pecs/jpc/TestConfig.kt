@@ -17,6 +17,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
+import java.io.InputStreamReader
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -30,24 +32,18 @@ class TestConfig {
   private lateinit var resourceLoader: ResourceLoader
 
   @Bean
-  fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource): MoveQueryRepository {
-    return MoveQueryRepository(JdbcTemplate(dataSource))
-  }
+  fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource) =
+    MoveQueryRepository(JdbcTemplate(dataSource))
 
   @Bean
-  fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource): JourneyQueryRepository {
-    return JourneyQueryRepository(JdbcTemplate(dataSource))
-  }
+  fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource) =
+    JourneyQueryRepository(JdbcTemplate(dataSource))
 
   @Bean
-  fun timeSource(): TimeSource {
-    return TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
-  }
+  fun timeSource() = TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
 
   @Bean
-  fun dataSource(): DataSource {
-    return DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
-  }
+  fun dataSource(): DataSource = DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
 
   @Bean
   fun locationsResourceProvider(): Schedule34LocationsProvider {
@@ -55,20 +51,21 @@ class TestConfig {
   }
 
   @Bean
-  fun sercoPricesResourceProvider(): SercoPricesProvider {
-    return SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
-  }
+  fun sercoPricesResourceProvider() =
+    SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
 
   @Bean
-  fun geoameyPricesResourceProvider(): GeoameyPricesProvider {
-    return GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
-  }
+  fun geoameyPricesResourceProvider() =
+    GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
 
   @Bean
-  fun reportingResourceProvider(): ReportingProvider {
-    return ReportingProvider { resourceLoader.getResource("classpath:/reporting/$it").file.readText() }
-  }
+  fun reportingResourceProvider() =
+    ReportingProvider { resourceLoader.getResource("classpath:/reporting/$it").file.readText() }
 
   @Bean
-  fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() })
+  fun reportReaderParser() =
+    ReportReaderParser { InputStreamReader(resourceLoader.getResource("classpath:/reporting/$it").inputStream) }
+
+  @Bean
+  fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() }, reportReaderParser())
 }

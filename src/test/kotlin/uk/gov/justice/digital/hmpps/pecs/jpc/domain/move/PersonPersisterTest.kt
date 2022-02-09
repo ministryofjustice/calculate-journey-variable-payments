@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.reportPersonFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicInteger
 
 private class PersonMatcher(var person: Person) : ArgumentMatcher<Person> {
   override fun matches(otherPerson: Person): Boolean {
@@ -45,7 +46,7 @@ internal class PersonPersisterTest(
   @Test
   fun `Persist PII data`() {
     val reportPerson = reportPersonFactory()
-    PersonPersister(personRepository, profileRepository).persistPeople(sequenceOf(reportPerson))
+    PersonPersister(personRepository, profileRepository).persistPerson(reportPerson, {}, {})
 
     entityManager.flush()
 
@@ -64,29 +65,21 @@ internal class PersonPersisterTest(
     PersonPersister(
       personRepositorySpy,
       profileRepositorySpy
-    ).persistPeople(entities(1) { id -> reportPersonFactory().copy(personId = id) })
+    ).persistPerson(entities(1) { id -> reportPersonFactory().copy(personId = id) }.first(), {}, {})
 
     verify(personRepositorySpy).saveAndFlush(any())
   }
 
   @Test
   fun `save invoked 50 times for 50 people`() {
-    PersonPersister(
-      personRepositorySpy,
-      profileRepositorySpy
-    ).persistPeople(entities(50) { id -> reportPersonFactory().copy(personId = id) })
+    entities(50) { id -> reportPersonFactory().copy(personId = id) }.forEach {
+      PersonPersister(
+        personRepositorySpy,
+        profileRepositorySpy
+      ).persistPerson(it, {}, {})
+    }
 
     verify(personRepositorySpy, times(50)).saveAndFlush(any())
-  }
-
-  @Test
-  fun `save invoked 51 times for 51 people`() {
-    PersonPersister(
-      personRepositorySpy,
-      profileRepositorySpy
-    ).persistPeople(entities(51) { id -> reportPersonFactory().copy(personId = id) })
-
-    verify(personRepositorySpy, times(51)).saveAndFlush(any())
   }
 
   @Test
@@ -107,15 +100,20 @@ internal class PersonPersisterTest(
       RuntimeException("An error message")
     )
 
-    assertThat(
+    val (persisted, errors) = AtomicInteger(0) to AtomicInteger(0)
+
+    (
+      entities(2) { reportPersonFactory().copy(personId = "invalid") } +
+        entities(4) { id -> reportPersonFactory().copy(personId = id) }
+      ).forEach {
       PersonPersister(
         personRepositorySpy,
         profileRepositorySpy
-      ).persistPeople(
-        entities(2) { reportPersonFactory().copy(personId = "invalid") } +
-          entities(4) { id -> reportPersonFactory().copy(personId = id) }
-      )
-    ).isEqualTo(PersistenceResult(persisted = 4, errors = 2))
+      ).persistPerson(it, { persisted.incrementAndGet() }, { errors.incrementAndGet() })
+    }
+
+    assertThat(persisted.get()).isEqualTo(4)
+    assertThat(errors.get()).isEqualTo(2)
 
     verify(personRepositorySpy, times(6)).saveAndFlush(any())
   }
@@ -125,29 +123,21 @@ internal class PersonPersisterTest(
     PersonPersister(
       personRepositorySpy,
       profileRepositorySpy
-    ).persistProfiles(entities(1) { id -> profileFactory().copy(profileId = id, personId = id) })
+    ).persistProfile(entities(1) { id -> profileFactory().copy(profileId = id, personId = id) }.first(), {}, {})
 
     verify(profileRepositorySpy, times(1)).saveAndFlush(any())
   }
 
   @Test
   fun `save invoked 50 times for 50 profiles`() {
-    PersonPersister(
-      personRepositorySpy,
-      profileRepositorySpy
-    ).persistProfiles(entities(50) { id -> profileFactory().copy(profileId = id, personId = id) })
+    entities(50) { id -> profileFactory().copy(profileId = id, personId = id) }.forEach {
+      PersonPersister(
+        personRepositorySpy,
+        profileRepositorySpy
+      ).persistProfile(it, {}, {})
+    }
 
     verify(profileRepositorySpy, times(50)).saveAndFlush(any())
-  }
-
-  @Test
-  fun `save invoked 51 times for 51 profiles`() {
-    PersonPersister(
-      personRepositorySpy,
-      profileRepositorySpy
-    ).persistProfiles(entities(51) { id -> profileFactory().copy(profileId = id, personId = id) })
-
-    verify(profileRepositorySpy, times(51)).saveAndFlush(any())
   }
 
   @Test
@@ -168,15 +158,20 @@ internal class PersonPersisterTest(
       RuntimeException("An error message")
     )
 
-    assertThat(
+    val (persisted, errors) = AtomicInteger(0) to AtomicInteger(0)
+
+    (
+      entities(2) { profileFactory().copy(profileId = "invalid", personId = "invalid") } +
+        entities(4) { id -> profileFactory().copy(profileId = id, personId = id) }
+      ).forEach {
       PersonPersister(
         personRepositorySpy,
         profileRepositorySpy
-      ).persistProfiles(
-        entities(2) { profileFactory().copy(profileId = "invalid", personId = "invalid") } +
-          entities(4) { id -> profileFactory().copy(profileId = id, personId = id) }
-      )
-    ).isEqualTo(PersistenceResult(persisted = 4, errors = 2))
+      ).persistProfile(it, { persisted.incrementAndGet() }, { errors.incrementAndGet() })
+    }
+
+    assertThat(persisted.get()).isEqualTo(4)
+    assertThat(errors.get()).isEqualTo(2)
 
     verify(profileRepositorySpy, times(6)).saveAndFlush(any())
   }

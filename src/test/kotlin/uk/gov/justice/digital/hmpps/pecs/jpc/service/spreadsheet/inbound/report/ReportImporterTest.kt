@@ -27,7 +27,7 @@ import java.time.temporal.ChronoUnit
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-internal class ReportImporterTest(@Autowired private val provider: ReportingProvider) {
+internal class ReportImporterTest(@Autowired private val provider: ReportingProvider, @Autowired val reportReaderParser: ReportReaderParser) {
 
   @MockBean
   private lateinit var monitoringService: MonitoringService
@@ -41,7 +41,7 @@ internal class ReportImporterTest(@Autowired private val provider: ReportingProv
 
   @BeforeEach
   fun beforeEach() {
-    importer = ReportImporter(provider, monitoringService)
+    importer = ReportImporter(provider, monitoringService, reportReaderParser)
 
     for (i in 0..ChronoUnit.DAYS.between(from, to)) {
       moves += importer.importMovesJourneysEventsOn(from.plusDays(i))
@@ -96,7 +96,7 @@ internal class ReportImporterTest(@Autowired private val provider: ReportingProv
 
     whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
 
-    ReportImporter(failingProvider, monitoringService).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
+    ReportImporter(failingProvider, monitoringService, reportReaderParser).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
 
     verify(monitoringService).capture("Error attempting to get moves file 2020/09/01/2020-09-01-moves.jsonl, exception: error")
     verify(monitoringService).capture("Error attempting to get journeys file 2020/09/01/2020-09-01-journeys.jsonl, exception: error")
@@ -109,7 +109,7 @@ internal class ReportImporterTest(@Autowired private val provider: ReportingProv
 
     whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
 
-    ReportImporter(failingProvider, monitoringService).importProfilesOn(LocalDate.of(2020, 9, 2))
+    ReportImporter(failingProvider, monitoringService, reportReaderParser).importProfilesOn(LocalDate.of(2020, 9, 2))
 
     verify(monitoringService).capture("Error attempting to get profiles file 2020/09/02/2020-09-02-profiles.jsonl, exception: error")
   }
@@ -120,7 +120,7 @@ internal class ReportImporterTest(@Autowired private val provider: ReportingProv
 
     whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
 
-    ReportImporter(failingProvider, monitoringService).importPeopleOn(LocalDate.of(2020, 9, 3))
+    ReportImporter(failingProvider, monitoringService, reportReaderParser).importPeopleOn(LocalDate.of(2020, 9, 3))
 
     verify(monitoringService).capture("Error attempting to get people file 2020/09/03/2020-09-03-people.jsonl, exception: error")
   }
