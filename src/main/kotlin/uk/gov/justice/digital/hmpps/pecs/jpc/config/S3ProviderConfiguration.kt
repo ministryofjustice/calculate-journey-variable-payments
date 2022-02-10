@@ -12,7 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ObfuscatingPiiReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.StandardReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.InputStreamReader
 
@@ -129,9 +131,24 @@ class S3ProviderConfiguration {
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
   fun reportReaderParser(
     @Qualifier("basmAmazonS3") client: AmazonS3,
-    @Value("\${BASM_BUCKET_NAME}") bucketName: String
+    @Value("\${BASM_BUCKET_NAME}") bucketName: String,
+    @Value("\${SENTRY_ENVIRONMENT:}") env: String
   ): ReportReaderParser {
-    logger.info("Using AWS S3 for report reader parser.")
-    return ReportReaderParser { InputStreamReader(client.getObject(GetObjectRequest(bucketName, it)).objectContent) }
+    return if (env.trim().uppercase() == "LOCAL") {
+      logger.warn("Running parser in PII obfuscation mode")
+      ObfuscatingPiiReaderParser {
+        InputStreamReader(
+          client.getObject(
+            GetObjectRequest(
+              bucketName,
+              it
+            )
+          ).objectContent
+        )
+      }
+    } else {
+      logger.info("Using AWS S3 for report reader parser.")
+      StandardReportReaderParser { InputStreamReader(client.getObject(GetObjectRequest(bucketName, it)).objectContent) }
+    }
   }
 }

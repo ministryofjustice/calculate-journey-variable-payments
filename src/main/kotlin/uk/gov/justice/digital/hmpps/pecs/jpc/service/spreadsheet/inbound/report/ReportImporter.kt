@@ -41,7 +41,7 @@ open class ReportImporter(
     return ReportParser.parseAsPerson(peopleFiles = peopleContent)
   }
 
-  fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
+  open fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
     val fileNameForDate = fileNamesForDate("people", date, date).first()
 
     reportingReaderParser.forEach(fileNameForDate, { Person.fromJson(it) }) { consumer(it) }

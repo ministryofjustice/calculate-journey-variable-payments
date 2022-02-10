@@ -27,7 +27,7 @@ import java.time.temporal.ChronoUnit
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-internal class ReportImporterTest(@Autowired private val provider: ReportingProvider, @Autowired val reportReaderParser: ReportReaderParser) {
+internal class ReportImporterTest(@Autowired private val provider: ReportingProvider, @Autowired val reportReaderParser: StandardReportReaderParser) {
 
   @MockBean
   private lateinit var monitoringService: MonitoringService
