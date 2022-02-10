@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebAppli
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportPricesService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
@@ -15,7 +15,7 @@ private val logger = loggerFor<BulkPriceImportCommand>()
 
 @ConditionalOnNotWebApplication
 @Component
-class BulkPriceImportCommand(private val importService: ImportService, private val effectiveYear: EffectiveYear) {
+class BulkPriceImportCommand(private val importService: ImportPricesService, private val effectiveYear: EffectiveYear) {
 
   fun bulkImportPricesFor(supplier: Supplier, year: Int) {
     if (!effectiveYear.canAddOrUpdatePrices(year))
@@ -27,7 +27,7 @@ class BulkPriceImportCommand(private val importService: ImportService, private v
 
     when (supplier) {
       Supplier.UNKNOWN -> throw RuntimeException("UNKNOWN is not a valid supplier")
-      else -> importService.importPrices(supplier, year)
+      else -> importService.importPricesFor(supplier, year)
     }
 
     logger.info("Finished import of prices for $supplier for effective year $year.")

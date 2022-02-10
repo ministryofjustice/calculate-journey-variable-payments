@@ -39,14 +39,14 @@ class ImportServiceIntegrationTest(
   lateinit var monitoringService: MonitoringService
 
   @Autowired
-  lateinit var importService: ImportService
+  lateinit var importReportsService: ImportReportsService
 
   @Autowired
   lateinit var historicMovesProcessingService: HistoricMovesProcessingService
 
   @Test
   fun `given some report files contain errors the import should still complete successfully and not fail`() {
-    importService.importReportsOn(LocalDate.of(2020, 12, 1))
+    importReportsService.importAllReportsOn(LocalDate.of(2020, 12, 1))
 
     verify(monitoringService).capture("people: persisted 3 and 1 errors for reporting feed date 2020-12-01.")
     verifyNoMoreInteractions(monitoringService)
@@ -56,12 +56,12 @@ class ImportServiceIntegrationTest(
   fun `given a booked move which is subsequently cancelled in time, a journey for pricing should be created so the supplier can be paid`() {
     val bookedMoveToBeCancelledIdentifier = "1dbd5d37-f728-4059-99a3-70e8bdf1d362"
 
-    importService.importReportsOn(LocalDate.of(2021, 5, 7))
+    importReportsService.importAllReportsOn(LocalDate.of(2021, 5, 7))
 
     assertThat(moveRepository.findById(bookedMoveToBeCancelledIdentifier).get().status).isEqualTo(MoveStatus.booked)
     assertThat(journeyRepository.findAllByMoveId(bookedMoveToBeCancelledIdentifier)).isEmpty()
 
-    importService.importReportsOn(LocalDate.of(2021, 5, 26))
+    importReportsService.importAllReportsOn(LocalDate.of(2021, 5, 26))
 
     assertThat(moveRepository.findById(bookedMoveToBeCancelledIdentifier).get().status).isEqualTo(MoveStatus.cancelled)
     assertThat(journeyRepository.findAllByMoveId(bookedMoveToBeCancelledIdentifier)).hasSize(1)
@@ -72,7 +72,16 @@ class ImportServiceIntegrationTest(
     assertThat(moveRepository.findAll()).isEmpty()
     assertThat(journeyRepository.findAll()).isEmpty()
 
-    importService.importReportsOn(DateRange(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)))
+    listOf(
+      date(2020, 12, 1),
+      date(2020, 12, 2),
+      date(2020, 12, 3),
+      date(2020, 12, 4),
+      date(2020, 12, 5),
+      date(2020, 12, 6),
+    ).forEach {
+      importReportsService.importAllReportsOn(it)
+    }
 
     val createdMoves = moveRepository.findAll()
     val createdJourneys = journeyRepository.findAll()
@@ -101,9 +110,11 @@ class ImportServiceIntegrationTest(
     assertThat(journeyRepository.findAll()).hasSameElementsAs(createdJourneys)
   }
 
+  private fun date(year: Int, month: Int, day: Int) = LocalDate.of(year, month, day)
+
   @Test
   fun `given people and profiles reports files when we import then people and profiles are created`() {
-    importService.importReportsOn(LocalDate.of(2022, 1, 2))
+    importReportsService.importAllReportsOn(LocalDate.of(2022, 1, 2))
 
     assertThat(profileRepository.findAll()).hasSize(3)
     assertThat(peopleRepository.findAll()).hasSize(3)

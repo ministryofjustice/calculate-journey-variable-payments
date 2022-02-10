@@ -27,7 +27,10 @@ import java.time.temporal.ChronoUnit
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-internal class ReportImporterTest(@Autowired private val provider: ReportingProvider, @Autowired val reportReaderParser: ReportReaderParser) {
+internal class ReportImporterTest(
+  @Autowired private val provider: ReportingProvider,
+  @Autowired val reportReaderParser: StandardReportReaderParser
+) {
 
   @MockBean
   private lateinit var monitoringService: MonitoringService
@@ -96,7 +99,11 @@ internal class ReportImporterTest(@Autowired private val provider: ReportingProv
 
     whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
 
-    ReportImporter(failingProvider, monitoringService, reportReaderParser).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
+    ReportImporter(
+      failingProvider,
+      monitoringService,
+      reportReaderParser
+    ).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
 
     verify(monitoringService).capture("Error attempting to get moves file 2020/09/01/2020-09-01-moves.jsonl, exception: error")
     verify(monitoringService).capture("Error attempting to get journeys file 2020/09/01/2020-09-01-journeys.jsonl, exception: error")
@@ -105,24 +112,34 @@ internal class ReportImporterTest(@Autowired private val provider: ReportingProv
 
   @Test
   fun `Monitoring service captures file download errors for profiles`() {
-    val failingProvider: ReportingProvider = mock()
+    ReportImporter(provider, monitoringService, FailingReportReaderParser("profile error")).importProfiles(
+      LocalDate.of(
+        2020,
+        9,
+        2
+      )
+    ) { }
 
-    whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
-
-    ReportImporter(failingProvider, monitoringService, reportReaderParser).importProfilesOn(LocalDate.of(2020, 9, 2))
-
-    verify(monitoringService).capture("Error attempting to get profiles file 2020/09/02/2020-09-02-profiles.jsonl, exception: error")
+    verify(monitoringService).capture("Error processing profiles file 2020/09/02/2020-09-02-profiles.jsonl, exception: profile error")
   }
 
   @Test
   fun `Monitoring service captures file download errors for people`() {
-    val failingProvider: ReportingProvider = mock()
+    ReportImporter(provider, monitoringService, FailingReportReaderParser("people error")).importPeople(
+      LocalDate.of(
+        2020,
+        10,
+        3
+      )
+    ) { }
 
-    whenever(failingProvider.get(any())).thenThrow(RuntimeException("error"))
+    verify(monitoringService).capture("Error processing people file 2020/10/03/2020-10-03-people.jsonl, exception: people error")
+  }
 
-    ReportImporter(failingProvider, monitoringService, reportReaderParser).importPeopleOn(LocalDate.of(2020, 9, 3))
-
-    verify(monitoringService).capture("Error attempting to get people file 2020/09/03/2020-09-03-people.jsonl, exception: error")
+  private class FailingReportReaderParser(private val errorMessage: String) : ReportReaderParser {
+    override fun <T> forEach(reportName: String, parser: (String) -> T?, consumer: (T) -> Unit) {
+      throw RuntimeException(errorMessage)
+    }
   }
 
   private fun movesFilteredBy(filterer: (m: Move) -> Boolean) = moves.filter(filterer)

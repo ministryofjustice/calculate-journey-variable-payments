@@ -6,7 +6,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportPricesService
 import java.time.LocalDateTime
 
 /**
@@ -21,7 +21,7 @@ internal class BulkPriceImportCommandTest {
 
   private val september2020 = LocalDateTime.of(2020, 9, 1, 0, 0)
 
-  private val importService: ImportService = mock()
+  private val importService: ImportPricesService = mock()
 
   private val effectiveYear: EffectiveYear = EffectiveYear { september2020 }
 
@@ -45,28 +45,28 @@ internal class BulkPriceImportCommandTest {
   internal fun `import prices for Serco for 2019 succeeds`() {
     command.bulkImportPricesFor(Supplier.SERCO, 2019)
 
-    verify(importService).importPrices(Supplier.SERCO, 2019)
+    verify(importService).importPricesFor(Supplier.SERCO, 2019)
   }
 
   @Test
   internal fun `import prices for Geoamey for 2019 succeeds`() {
     command.bulkImportPricesFor(Supplier.GEOAMEY, 2019)
 
-    verify(importService).importPrices(Supplier.GEOAMEY, 2019)
+    verify(importService).importPricesFor(Supplier.GEOAMEY, 2019)
   }
 
   @Test
   internal fun `import prices for Serco for the current effective year (2020) succeeds`() {
     command.bulkImportPricesFor(Supplier.SERCO, 2020)
 
-    verify(importService).importPrices(Supplier.SERCO, 2020)
+    verify(importService).importPricesFor(Supplier.SERCO, 2020)
   }
 
   @Test
   internal fun `import prices for Geoamey for the current effective year (2020) succeeds`() {
     command.bulkImportPricesFor(Supplier.GEOAMEY, 2020)
 
-    verify(importService).importPrices(Supplier.GEOAMEY, 2020)
+    verify(importService).importPricesFor(Supplier.GEOAMEY, 2020)
   }
 
   @Test

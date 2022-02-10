@@ -17,7 +17,7 @@ open class ReportImporter(
   @Autowired private val reportingReaderParser: ReportReaderParser
 ) {
 
-  fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)
+  open fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)
 
   private fun importMovesJourneysEvents(from: LocalDate, to: LocalDate): Collection<Move> {
     val movesContent = getContents("moves", from, to)
@@ -33,32 +33,24 @@ open class ReportImporter(
     )
   }
 
-  open fun importPeopleOn(date: LocalDate) = importPeople(date, date)
-
-  private fun importPeople(from: LocalDate, to: LocalDate): Sequence<Person> {
-    val peopleContent = getContents("people", from, to)
-
-    return ReportParser.parseAsPerson(peopleFiles = peopleContent)
-  }
-
-  fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
+  open fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
     val fileNameForDate = fileNamesForDate("people", date, date).first()
 
-    reportingReaderParser.forEach(fileNameForDate, { Person.fromJson(it) }) { consumer(it) }
+    Result.runCatching {
+      reportingReaderParser.forEach(fileNameForDate, { Person.fromJson(it) }) { consumer(it) }
+    }.onFailure {
+      monitoringService.capture("Error processing people file $fileNameForDate, exception: ${it.message}")
+    }
   }
-
-  fun importProfilesOn(date: LocalDate) = importProfiles(date, date)
 
   fun importProfiles(date: LocalDate, consumer: (Profile) -> Unit) {
     val fileNameForDate = fileNamesForDate("profiles", date, date).first()
 
-    reportingReaderParser.forEach(fileNameForDate, { Profile.fromJson(it) }) { consumer(it) }
-  }
-
-  private fun importProfiles(from: LocalDate, to: LocalDate): Sequence<Profile> {
-    val profilesContent = getContents("profiles", from, to)
-
-    return ReportParser.parseAsProfile(profileFiles = profilesContent)
+    Result.runCatching {
+      reportingReaderParser.forEach(fileNameForDate, { Profile.fromJson(it) }) { consumer(it) }
+    }.onFailure {
+      monitoringService.capture("Error processing profiles file $fileNameForDate, exception: ${it.message}")
+    }
   }
 
   private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String> {

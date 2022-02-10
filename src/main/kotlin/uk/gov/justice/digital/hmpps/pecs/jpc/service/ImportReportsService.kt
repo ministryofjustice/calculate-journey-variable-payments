@@ -1,13 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.PersonPersister
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
@@ -16,12 +13,14 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-private val logger = loggerFor<ImportService>()
+/**
+ * Service for importing move, journey, event, people and profile reports from AWS S3.
+ */
+private val logger = loggerFor<ImportReportsService>()
 
 @Service
-class ImportService(
+class ImportReportsService(
   private val timeSource: TimeSource,
-  private val priceImporter: PriceImporter,
   private val reportImporter: ReportImporter,
   private val movePersister: MovePersister,
   private val personPersister: PersonPersister,
@@ -29,23 +28,13 @@ class ImportService(
   private val monitoringService: MonitoringService
 ) {
 
-  @Transactional
-  fun importPrices(supplier: Supplier, year: Int) = import { priceImporter.import(supplier, year) }
-
-  fun importReportsOn(range: ClosedRange<LocalDate>) {
-    for (i in 0..ChronoUnit.DAYS.between(range.start, range.endInclusive)) {
-      importReportsOn(range.start.plusDays(i))
-    }
-  }
-
-  // The transaction boundary for this method is being set in the underlying persistence classes on purpose.
-  fun importReportsOn(date: LocalDate) {
+  fun importAllReportsOn(date: LocalDate) {
     importMovesJourneysEventsOn(date)
     importPeopleOn(date)
     importProfilesOn(date)
   }
 
-  fun importMoves(date: LocalDate) {
+  fun importMoveJourneyAndEventReportsOn(date: LocalDate) {
     importMovesJourneysEventsOn(date)
   }
 
@@ -71,7 +60,7 @@ class ImportService(
    * This will import all people and profiles starting from the date supplied upto the current date minus one day. This
    * is needed to ensure the data is as up-to-date as possible.
    */
-  fun importPeopleProfiles(from: LocalDate) {
+  fun importPeopleProfileReportsStartingFrom(from: LocalDate) {
     DateRange(from, timeSource.yesterday()).run {
       for (i in 0..ChronoUnit.DAYS.between(this.start, this.endInclusive)) {
         importPeopleOn(this.start.plusDays(i))
