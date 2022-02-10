@@ -2,11 +2,12 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.tasks
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportReportsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /**
  * This enables us to backfill all the move data from the start of the actual contract (September 2020) to the day prior
@@ -19,7 +20,7 @@ private val logger = loggerFor<BackfillReportsTask>()
 
 @Component
 class BackfillReportsTask(
-  private val importService: ImportService,
+  private val importReportsService: ImportReportsService,
   private val timeSource: TimeSource,
   monitoringService: MonitoringService
 ) : Task("Backfill reports", monitoringService) {
@@ -32,7 +33,9 @@ class BackfillReportsTask(
 
       logger.info("Starting the reports backfill for the period ${this.start} to ${this.endInclusive} at $startTime.")
 
-      importService.importReportsOn(this)
+      for (i in 0..ChronoUnit.DAYS.between(this.start, this.endInclusive)) {
+        importReportsService.importAllReportsOn(this.start.plusDays(i))
+      }
 
       logger.info("Completed the reports backfill for the period ${this.start} to ${this.endInclusive}. Started at $startTime and finished at ${timeSource.dateTime()}")
     }

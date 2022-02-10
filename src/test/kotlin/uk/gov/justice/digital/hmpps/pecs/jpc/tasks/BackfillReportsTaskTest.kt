@@ -2,32 +2,33 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.tasks
 
 import net.javacrumbs.shedlock.core.LockAssert
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportReportsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDate
 
 internal class BackfillReportsTaskTest {
 
-  private val importService: ImportService = mock()
+  private val importReportsService: ImportReportsService = mock()
 
   private val timeSource: TimeSource = TimeSource { LocalDate.of(2022, 2, 7).atStartOfDay() }
 
   private val monitoringService: MonitoringService = mock()
 
-  private val task = BackfillReportsTask(importService, timeSource, monitoringService)
+  private val task = BackfillReportsTask(importReportsService, timeSource, monitoringService)
 
   @Test
-  internal fun `given the task is executed successfully the reports importer is called with start and end dates`() {
+  internal fun `given the task is executed successfully the reports importer is called the expected number of days`() {
     LockAssert.TestHelper.makeAllAssertsPass(true)
 
     task.execute()
 
-    verify(importService).importReportsOn(DateRange(LocalDate.of(2020, 9, 1), LocalDate.of(2022, 2, 6)))
+    verify(importReportsService, times(524)).importAllReportsOn(any())
   }
 
   @Test
@@ -36,7 +37,7 @@ internal class BackfillReportsTaskTest {
 
     task.execute()
 
-    verifyNoInteractions(importService)
+    verifyNoInteractions(importReportsService)
     verify(monitoringService).capture("Unable to lock task 'Backfill reports' for execution")
   }
 }
