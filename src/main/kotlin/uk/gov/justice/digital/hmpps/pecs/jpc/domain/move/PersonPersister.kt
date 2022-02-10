@@ -3,12 +3,12 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 import org.springframework.stereotype.Component
 
 @Component
-class PersonPersister(
+open class PersonPersister(
   private val personRepository: PersonRepository,
   private val profileRepository: ProfileRepository
 ) {
 
-  fun persistPerson(person: Person, success: () -> Unit, failure: (Throwable) -> Unit) {
+  open fun persistPerson(person: Person, success: () -> Unit, failure: (Throwable) -> Unit) {
     Result.runCatching {
       personRepository.saveAndFlush(person)
     }.onSuccess {
@@ -18,7 +18,7 @@ class PersonPersister(
     }
   }
 
-  fun persistProfile(profile: Profile, success: () -> Unit, failure: (Throwable) -> Unit) {
+  open fun persistProfile(profile: Profile, success: () -> Unit, failure: (Throwable) -> Unit) {
     Result.runCatching {
       profileRepository.saveAndFlush(profile)
     }.onSuccess {

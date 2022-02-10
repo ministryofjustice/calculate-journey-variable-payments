@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -20,7 +19,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal class ImportServiceTest {
@@ -31,8 +32,6 @@ internal class ImportServiceTest {
   private val movePersister: MovePersister = mock { on { persist(any()) } doReturn 1 }
   private val personPersister: PersonPersister = mock()
   private val move: Move = mock()
-  private val person: Person = mock()
-  private val profile: Profile = mock()
   private val auditService: AuditService = mock()
   private val monitoringService: MonitoringService = mock()
   private val importService: ImportService =
@@ -71,12 +70,19 @@ internal class ImportServiceTest {
     verify(reportImporter).importProfiles(any(), any())
   }
 
-  @Disabled
   @Test
-  internal fun `expected audit interactions for moves, people and profiles `() {
-    whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf(move))
+  fun `expected audit interactions for moves, people and profiles `() {
+    val service = ImportService(
+      timeSourceWithFixedDate,
+      priceImporter,
+      FakeReportImporter(),
+      movePersister,
+      FakePersonPersister(),
+      auditService,
+      monitoringService
+    )
 
-    importService.importReportsOn(timeSourceWithFixedDate.date())
+    service.importReportsOn(timeSourceWithFixedDate.date())
 
     verify(auditService).create(AuditableEvent.importReportEvent("moves", timeSourceWithFixedDate.date(), 1, 1))
     verify(auditService).create(AuditableEvent.importReportEvent("people", timeSourceWithFixedDate.date(), 1, 1))
@@ -84,32 +90,47 @@ internal class ImportServiceTest {
     verifyNoInteractions(monitoringService)
   }
 
-  @Disabled
   @Test
-  internal fun `expected monitoring interactions when failure to persist moves`() {
+  fun `expected monitoring interactions when failure to persist moves`() {
     whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf(move))
     whenever(movePersister.persist(any())).thenReturn(0)
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
+
     verify(monitoringService).capture("moves: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
   }
 
-  @Disabled
   @Test
   fun `expected monitoring interactions when failure to persist people`() {
-    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.yesterday())).thenReturn(sequenceOf(person))
-    whenever(personPersister.persistPerson(any(), any(), any())).thenCallRealMethod()
+    val service = ImportService(
+      timeSourceWithFixedDate,
+      priceImporter,
+      FakeReportImporter(),
+      movePersister,
+      FakePersonPersister(successful = false),
+      auditService,
+      monitoringService
+    )
 
-    importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+    service.importPeopleProfiles(timeSourceWithFixedDate.yesterday())
+
     verify(monitoringService).capture("people: persisted 0 and 1 errors for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
-  @Disabled
   @Test
   fun `expected monitoring interactions when failure to persist profiles`() {
-    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.yesterday())).thenReturn(sequenceOf(profile))
+    val service = ImportService(
+      timeSourceWithFixedDate,
+      priceImporter,
+      FakeReportImporter(),
+      movePersister,
+      FakePersonPersister(successful = false),
+      auditService,
+      monitoringService
+    )
 
-    importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+    service.importPeopleProfiles(timeSourceWithFixedDate.yesterday())
+
     verify(monitoringService).capture("profiles: persisted 0 and 1 errors for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
@@ -118,24 +139,21 @@ internal class ImportServiceTest {
     whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(emptyList())
 
     importService.importReportsOn(timeSourceWithFixedDate.date())
+
     verify(monitoringService).capture("There were no moves to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
   }
 
   @Test
   fun `expected monitoring interactions when no people to persist`() {
-    whenever(reportImporter.importPeopleOn(timeSourceWithFixedDate.yesterday())).thenReturn(emptySequence())
-//    whenever(personPersister.persistPerson(any(), any(), any())).thenCallRealMethod()
-
     importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+
     verify(monitoringService).capture("There were no people to persist for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
   fun `expected monitoring interactions when no profiles to persist`() {
-    whenever(reportImporter.importProfilesOn(timeSourceWithFixedDate.yesterday())).thenReturn(emptySequence())
-    whenever(personPersister.persistProfile(any(), any(), any())).thenCallRealMethod()
-
     importService.importReportsOn(timeSourceWithFixedDate.yesterday())
+
     verify(monitoringService).capture("There were no profiles to persist for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
@@ -190,5 +208,26 @@ internal class ImportServiceTest {
     assertThatThrownBy {
       importService.importPeopleProfiles(timeSourceWithFixedDate.date().plusDays(1))
     }.isInstanceOf(RuntimeException::class.java)
+  }
+
+  private class FakeReportImporter : ReportImporter(mock(), mock(), FakeReportReaderParser()) {
+    override fun importMovesJourneysEventsOn(date: LocalDate) = listOf<Move>(mock())
+  }
+
+  private class FakeReportReaderParser : ReportReaderParser {
+    override fun <T> forEach(reportName: String, parser: (String) -> T?, consumer: (T) -> Unit) {
+      @Suppress("UNCHECKED_CAST")
+      if (reportName.contains("profile")) consumer(mock<Profile>() as T) else consumer(mock<Person>() as T)
+    }
+  }
+
+  private class FakePersonPersister(private val successful: Boolean = true) : PersonPersister(mock(), mock()) {
+    override fun persistProfile(profile: Profile, success: () -> Unit, failure: (Throwable) -> Unit) {
+      if (successful) success() else failure(RuntimeException("error"))
+    }
+
+    override fun persistPerson(person: Person, success: () -> Unit, failure: (Throwable) -> Unit) {
+      if (successful) success() else failure(RuntimeException("error"))
+    }
   }
 }
