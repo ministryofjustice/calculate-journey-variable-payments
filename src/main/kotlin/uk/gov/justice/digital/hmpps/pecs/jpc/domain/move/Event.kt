@@ -71,6 +71,7 @@ data class Event constructor(
 ) : Comparable<Event> {
 
   fun hasType(et: EventType) = type == et.value
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
@@ -86,6 +87,7 @@ data class Event constructor(
     if (occurredAt != other.occurredAt) return false
     if (recordedAt != other.recordedAt) return false
     if (notes != other.notes) return false
+    if (details != other.details) return false
 
     return true
   }
@@ -100,7 +102,12 @@ data class Event constructor(
     result = 31 * result + occurredAt.hashCode()
     result = 31 * result + recordedAt.hashCode()
     result = 31 * result + (notes?.hashCode() ?: 0)
+    result = 31 * result + (details?.hashCode() ?: 0)
     return result
+  }
+
+  override fun toString(): String {
+    return "Event(eventId='$eventId', updatedAt=$updatedAt, type='$type', supplier=$supplier, eventableType='$eventableType', eventableId='$eventableId', details=$details, occurredAt=$occurredAt, recordedAt=$recordedAt, notes=$notes)"
   }
 
   fun vehicleRegistration(): String? = details?.get("vehicle_reg") as String?

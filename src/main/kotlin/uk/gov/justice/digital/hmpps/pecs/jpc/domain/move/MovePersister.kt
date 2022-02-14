@@ -48,7 +48,7 @@ class MovePersister(
         val allJourneys = (hundredMoves.flatMap { it.journeys } + existingJourneys).distinctBy { it.journeyId }
         val allMoveEvents = (hundredMoves.flatMap { it.events } + existingMoveEvents).distinctBy { it.eventId }
         val allJourneyEvents =
-          (hundredMoves.flatMap { it.journeys.flatMap { it.events } }) + existingJourneyEvents.distinctBy { it.eventId }
+          (hundredMoves.flatMap { it.journeys.flatMap { it.events ?: emptyList() } }) + existingJourneyEvents.distinctBy { it.eventId }
 
         val moveId2Journeys = allJourneys.groupBy { it.moveId }
         val moveId2MoveEvents = allMoveEvents.groupBy { it.eventableId }
@@ -124,7 +124,7 @@ class MovePersister(
         val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
         val pickUp = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_START)?.occurredAt
         val dropOff = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
-        val vehicleRegistration = journey.combinedWithRegistrationsFrom(thisJourneyEvents)
+        val vehicleRegistration = journey.determineRegistrationsCombinedWithThoseFrom(thisJourneyEvents)
 
         journey.copy(
           events = listOf(),
@@ -138,7 +138,7 @@ class MovePersister(
       }
   }
 
-  private fun Journey.combinedWithRegistrationsFrom(events: List<Event>) = this.copy(events = events).registration()
+  private fun Journey.determineRegistrationsCombinedWithThoseFrom(events: List<Event>) = this.copy(events = events).vehicleRegistrations()
 
   /**
    * There ane no actual supplier journey/journey events for billable cancelled moves so to price a cancelled move we

@@ -1,25 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 
 internal class ReportParserTest {
-
-  private fun profileReports(): List<String> {
-    val report1 =
-      """{"id":"PR1", "updated_at" : "2020-09-07T15:30:59+01:00", "person_id":"PE1"}""".trimIndent()
-    return listOf(report1)
-  }
-
-  private fun personReports(): List<String> {
-    val report1 =
-      """
-        {"id":"PE1","created_at":"2020-09-07T16:25:15+01:00","updated_at":"2020-09-07T16:25:24+01:00","criminal_records_office":null,"nomis_prison_number":null,"police_national_computer":"83SHX5/YL","prison_number":"PRISON1","latest_nomis_booking_id":null,"gender":"male","age":46}
-      """.trimIndent()
-    return listOf(report1)
-  }
 
   private fun moveReports(): List<String> {
     val report1 =
@@ -87,18 +72,17 @@ internal class ReportParserTest {
   }
 
   @Test
-  fun `Assert no Move created from bad json and no exception generated`() {
+  fun `no move created from bad JSON and no exception generated`() {
     val moveJsonWithNullFromLocation =
       """
         {"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null, "rejection_reason":null,"from_location_type":"prison","from_location":null,"to_location_type":"prison","to_location":"GNI","supplier":"GEOAMEY"}
       """
-    val moves = ReportParser.parseAsMoves(listOf(moveJsonWithNullFromLocation))
 
-    Assertions.assertEquals(0, moves.size)
+    assertThat(ReportParser.parseAsMoves(listOf(moveJsonWithNullFromLocation))).hasSize(0)
   }
 
   @Test
-  fun `Get import journeys`() {
+  fun `parse move ids to journeys`() {
 
     val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports())
 
@@ -106,32 +90,31 @@ internal class ReportParserTest {
     assertThat(journeys.keys).containsExactlyInAnyOrder("M1", "M2", "M3")
 
     // Move 1 should have 1 journey (the same updated journey)
-    assertThat(journeys.getValue("M1").size).isEqualTo(1)
+    assertThat(journeys["M1"]).hasSize(1)
 
     // This journey should have been updated to billable=true
-    assertThat(journeys.getValue("M1")[0].billable).isTrue
+    assertThat(journeys["M1"]?.first()?.billable).isTrue
 
     // Move 2 should have 2 journeys
-    assertThat(journeys.getValue("M2").size).isEqualTo(2)
+    assertThat(journeys["M2"]).hasSize(2)
   }
 
   @Test
-  fun `Get import events`() {
-
+  fun `parse event reports only`() {
     val events = ReportParser.parseAsEventableIdToEvents(eventReports())
 
     // There should be 3 unique eventable Ids
-    Assertions.assertEquals(3, events.size)
+    assertThat(events).hasSize(3)
 
     // Eventable 1 should have 2 events
-    Assertions.assertEquals(2, events.getValue("M1").size)
+    assertThat(events["M1"]).hasSize(2)
 
     // Eventable 2 should have 1 event
-    Assertions.assertEquals(1, events.getValue("M2").size)
+    assertThat(events["M2"]).hasSize(1)
   }
 
   @Test
-  fun `import all`() {
+  fun `parse move, journey and event and event reports`() {
     val movesWithJourneysAndEvents = ReportParser.parseMovesJourneysEvents(
       moveFiles = moveReports(),
       journeyFiles = journeyReports(),
@@ -144,9 +127,6 @@ internal class ReportParserTest {
     assertThat(move1.events.map { it.eventId }).containsExactly("E1", "E4")
 
     // Move1's first journey should have event 3
-    assertThat(move1.journeys.toList()[0].events.map { it.eventId }).containsExactly("E3")
-
-    // Move 1 should have Person PE1
-    // assertThat(move1.person?.id).isEqualTo("PE1")
+    assertThat(move1.journeys.first().events?.map { it.eventId }).containsExactly("E3")
   }
 }

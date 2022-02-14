@@ -124,8 +124,8 @@ class ImportServiceIntegrationTest(
   fun `given complete moves with vehicle reg on journey and events when imported the registrations are applied accordingly`() {
     importReportsService.importAllReportsOn(date(2020, 12, 1))
 
-    assertThat(journeyRepository.findById("J1").get().vehicleRegistration).isEqualTo("ABC")
-    assertThat(journeyRepository.findById("J3").get().vehicleRegistration).isEqualTo("ABC, DEF")
+    assertThat(journeyRepository.findById("J1").get().vehicleRegistrations()).isEqualTo("ABC")
+    assertThat(journeyRepository.findById("J3").get().vehicleRegistrations()).isEqualTo("ABC, DEF")
   }
 
   private fun assertMovesHaveExpectedMoveTypeOrNull(moves: List<Pair<Move, MoveType?>>) {

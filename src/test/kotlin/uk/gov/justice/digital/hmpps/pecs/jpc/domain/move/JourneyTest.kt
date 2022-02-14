@@ -16,7 +16,7 @@ class JourneyTest {
         )
       )
     ) {
-      assertThat(registration()).isEqualTo("JOURNEY_REG")
+      assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_REG")
     }
   }
 
@@ -31,7 +31,7 @@ class JourneyTest {
         )
       )
     ) {
-      assertThat(registration()).isEqualTo("JOURNEY_START_REG")
+      assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_START_REG")
     }
   }
 
@@ -46,7 +46,7 @@ class JourneyTest {
         )
       )
     ) {
-      assertThat(registration()).isEqualTo("JOURNEY_COMPLETE_REG")
+      assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_COMPLETE_REG")
     }
   }
 
@@ -65,7 +65,7 @@ class JourneyTest {
         )
       )
     ) {
-      assertThat(registration()).isEqualTo("JOURNEY_START_REG, JOURNEY_COMPLETE_REG")
+      assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_START_REG, JOURNEY_COMPLETE_REG")
     }
   }
 
@@ -84,7 +84,7 @@ class JourneyTest {
         )
       )
     ) {
-      assertThat(registration()).isEqualTo("SAME_JOURNEY_EVENT_REG")
+      assertThat(vehicleRegistrations()).isEqualTo("SAME_JOURNEY_EVENT_REG")
     }
   }
 
@@ -106,7 +106,7 @@ class JourneyTest {
         events = listOf(journeyCompleteEvent, journeyStartEvent)
       )
     ) {
-      assertThat(registration()).isEqualTo("JOURNEY_START_REG, JOURNEY_COMPLETE_REG")
+      assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_START_REG, JOURNEY_COMPLETE_REG")
     }
   }
 }

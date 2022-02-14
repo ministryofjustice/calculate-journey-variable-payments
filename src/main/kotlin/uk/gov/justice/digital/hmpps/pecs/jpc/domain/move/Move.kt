@@ -145,7 +145,7 @@ data class Move(
   fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
   fun toSiteName() = toSiteName ?: toNomisAgencyId
   fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
-  fun registration() = journeys.map { it.registration() }.distinct().joinToString(separator = ", ")
+  fun registration() = journeys.map { it.vehicleRegistrations() }.distinct().joinToString(separator = ", ")
 
   companion object {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -232,7 +232,7 @@ data class Move(
 
   fun getEvents(vararg ets: EventType) =
     this.events.filter { ets.map { it.value }.contains(it.type) } +
-      this.journeys.flatMap { it.events }.filter { ets.map { it.value }.contains(it.type) }
+      this.journeys.flatMap { it.events ?: emptyList() }.filter { ets.map { it.value }.contains(it.type) }
 }
 
 enum class MoveStatus {

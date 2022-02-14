@@ -218,7 +218,7 @@ abstract class PriceSheet(
       add(6, pickUpTime())
       add(7, dropOffDate())
       add(8, dropOffOrTime())
-      add(9, registration())
+      add(9, vehicleRegistrations())
       add(10, "") // prison number is empty for a journey
       if (hasPrice()) row.addCell(11, priceInPounds(), fillWhitePound) else add(11, "NOT PRESENT")
       if (dataColumns.contains(DataColumn.CONTRACTOR_BILLABLE)) add(12, isBillable())

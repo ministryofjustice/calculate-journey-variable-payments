@@ -174,6 +174,7 @@
                                     <ul class="pl2">
                                         <li th:each="event: ${journey.events}">
                                             <span th:replace="fragments/event-type.html :: eventType (type=${event.type})"></span>,
+                                            <span th:unless="${event.vehicleRegistration() == null}" th:text="|Registration ${event.vehicleRegistration()}|"></span>,
                                             <span th:text="${event.notes}?: '(no notes)'"></span>,
                                             <span th:text="${#temporals.format(event.occurredAt, 'dd MMM yyyy, HH:mm')}"></span>
                                         </li>
@@ -194,7 +195,7 @@
                             <dt class="govuk-summary-list__key">
                                 Journey vehicle
                             </dt>
-                            <dd class="govuk-summary-list__value" th:text="${journey.vehicleRegistration}"></dd>
+                            <dd class="govuk-summary-list__value" th:text="${journey.vehicleRegistrations()}"></dd>
                         </div>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">

@@ -380,7 +380,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       journey.supplier.name,
       journey.toNomisAgencyId,
       journey.updatedAt,
-      journey.vehicleRegistration
+      journey.vehicleRegistrations()
     )
 
     return journey

@@ -82,7 +82,7 @@ internal class MovePersisterTest {
       journeyId = "J1",
       billable = true,
       vehicleRegistration = "REG1",
-      events = reportJourneyFactory().events +
+      events = (reportJourneyFactory().events ?: emptyList()) +
         listOf(
           journeyEventFactory(
             journeyEventId = "E4",
@@ -102,7 +102,7 @@ internal class MovePersisterTest {
       billable = true,
       fromNomisAgencyId = "NOT_MAPPED",
       vehicleRegistration = "REG2",
-      events = reportJourneyFactory().events +
+      events = (reportJourneyFactory().events ?: emptyList()) +
         listOf(
           journeyEventFactory(
             journeyEventId = "E6",
@@ -409,7 +409,7 @@ internal class MovePersisterTest {
       occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
     )
 
-    val journeyWithMoveCompleteEvent = journey1.copy(events = journey1.events + journeyCompleteEvent)
+    val journeyWithMoveCompleteEvent = journey1.copy(events = (journey1.events ?: emptyList()) + journeyCompleteEvent)
     val completedMoveWithNewJourney = inTransitMove.copy(
       status = MoveStatus.completed,
       journeys = listOf(journeyWithMoveCompleteEvent),

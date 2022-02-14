@@ -80,7 +80,7 @@ internal class LockoutMovesSheetTest {
       assertCellEquals(lockoutMovesSheet, row, 6, journey.pickUpDateTime?.toLocalTime())
       assertCellEquals(lockoutMovesSheet, row, 7, journey.dropOffDateTime?.toLocalDate())
       assertCellEquals(lockoutMovesSheet, row, 8, journey.dropOffDateTime?.toLocalTime())
-      assertCellEquals(lockoutMovesSheet, row, 9, journey.vehicleRegistration)
+      assertCellEquals(lockoutMovesSheet, row, 9, journey.vehicleRegistrations())
       assertCellEquals(lockoutMovesSheet, row, 10, "")
       assertCellEquals(lockoutMovesSheet, row, 11, journey.priceInPounds())
       assertCellEquals(lockoutMovesSheet, row, 12, journey.isBillable())
