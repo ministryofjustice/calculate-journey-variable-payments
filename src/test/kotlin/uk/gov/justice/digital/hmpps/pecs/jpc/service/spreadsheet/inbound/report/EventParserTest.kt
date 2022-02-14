@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
 
 class EventParserTest {
 

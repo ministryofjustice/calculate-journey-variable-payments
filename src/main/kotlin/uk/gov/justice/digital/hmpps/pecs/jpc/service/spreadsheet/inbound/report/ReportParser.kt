@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move

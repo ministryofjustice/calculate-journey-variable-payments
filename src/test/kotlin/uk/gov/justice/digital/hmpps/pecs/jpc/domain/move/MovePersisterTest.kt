@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.journeyEventFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.moveEventFactory

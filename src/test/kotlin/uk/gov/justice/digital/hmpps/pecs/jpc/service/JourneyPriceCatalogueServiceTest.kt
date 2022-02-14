@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound.PricesSpreadsheetGenerator
 import java.time.LocalDate
 
-internal class SpreadsheetServiceTest {
+internal class JourneyPriceCatalogueServiceTest {
 
   private val authentication: Authentication = mock()
 
@@ -19,7 +19,7 @@ internal class SpreadsheetServiceTest {
 
   private val auditService: AuditService = mock()
 
-  private val service: SpreadsheetService = SpreadsheetService(pricesSpreadsheetGenerator, auditService)
+  private val service: JourneyPriceCatalogueService = JourneyPriceCatalogueService(pricesSpreadsheetGenerator, auditService)
 
   @Test
   internal fun `service interactions for Serco`() {
@@ -32,7 +32,7 @@ internal class SpreadsheetServiceTest {
   }
 
   private fun verifyInteractionsFor(supplier: Supplier) {
-    service.spreadsheet(authentication, supplier, LocalDate.of(2021, 2, 22))
+    service.generate(authentication, supplier, LocalDate.of(2021, 2, 22))
 
     verify(pricesSpreadsheetGenerator).generate(supplier, LocalDate.of(2021, 2, 22))
     verify(auditService).create(
@@ -53,7 +53,7 @@ internal class SpreadsheetServiceTest {
       )
     ).thenThrow(RuntimeException("spreadsheet download failed for Serco"))
 
-    assertThatThrownBy { service.spreadsheet(authentication, Supplier.SERCO, LocalDate.of(2021, 6, 7)) }
+    assertThatThrownBy { service.generate(authentication, Supplier.SERCO, LocalDate.of(2021, 6, 7)) }
       .isInstanceOf(RuntimeException::class.java)
       .hasMessage("spreadsheet download failed for Serco")
 
@@ -75,7 +75,7 @@ internal class SpreadsheetServiceTest {
       )
     ).thenThrow(RuntimeException("spreadsheet download failed for GEOAmey"))
 
-    assertThatThrownBy { service.spreadsheet(authentication, Supplier.GEOAMEY, LocalDate.of(2021, 6, 6)) }
+    assertThatThrownBy { service.generate(authentication, Supplier.GEOAMEY, LocalDate.of(2021, 6, 6)) }
       .isInstanceOf(RuntimeException::class.java)
       .hasMessage("spreadsheet download failed for GEOAmey")
 

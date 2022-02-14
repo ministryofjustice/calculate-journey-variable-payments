@@ -5,7 +5,6 @@ import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.JourneyStateParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.SupplierParser
@@ -99,7 +98,7 @@ data class Journey(
 
   @Json(ignored = true)
   @Transient
-  val events: List<Event> = listOf(),
+  val events: List<Event> = emptyList(),
 
   @Json(ignored = true)
   @Transient
@@ -124,6 +123,21 @@ data class Journey(
   fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
   fun toSiteName() = toSiteName ?: toNomisAgencyId
   fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
+
+  fun registration() =
+    events
+      .asSequence()
+      .startAndCompleteEvents()
+      .vehicleRegistration()
+      .distinct()
+      .joinToString(separator = ", ")
+      .ifEmpty { vehicleRegistration }
+
+  private fun Sequence<Event>.startAndCompleteEvents() =
+    this.filter { it.hasType(EventType.JOURNEY_START) || it.hasType(EventType.JOURNEY_COMPLETE) }
+      .sortedBy { it.occurredAt }
+
+  private fun Sequence<Event>.vehicleRegistration() = this.mapNotNull { it.vehicleRegistration() }
 
   companion object {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")

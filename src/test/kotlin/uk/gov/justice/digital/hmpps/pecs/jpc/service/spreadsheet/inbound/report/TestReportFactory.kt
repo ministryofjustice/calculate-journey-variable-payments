@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
@@ -163,7 +165,7 @@ fun journeyEventFactory(
     supplier = supplier,
     eventableType = "journey",
     eventableId = journeyId,
-    details = mapOf(),
+    details = null,
     occurredAt = occurredAt,
     recordedAt = defaultDateTime,
     notes = notes

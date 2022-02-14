@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultDateTime
 import java.time.LocalDate
@@ -116,14 +114,16 @@ fun eventE1(
 fun journeyEventJE1(
   eventId: String = "JE1",
   eventType: EventType = EventType.JOURNEY_START,
-  eventableId: String = journeyJ1().journeyId
+  eventableId: String = journeyJ1().journeyId,
+  details: Map<String, Any>? = emptyMap(),
+  occurredAt: LocalDateTime = journeyJ1().pickUpDateTime!!
 ) = Event(
-  details = null,
+  details = details,
   eventableType = "journey",
   eventableId = eventableId,
   eventId = eventId,
   notes = null,
-  occurredAt = journeyJ1().pickUpDateTime!!,
+  occurredAt = occurredAt,
   recordedAt = journeyJ1().pickUpDateTime!!,
   supplier = Supplier.SERCO,
   type = eventType.value,

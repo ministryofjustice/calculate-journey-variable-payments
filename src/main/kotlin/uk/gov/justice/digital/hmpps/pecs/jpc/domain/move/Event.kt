@@ -1,17 +1,23 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.SupplierParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.supplierConverter
 import java.time.LocalDateTime
+import javax.persistence.AttributeConverter
 import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Converter
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
 import javax.persistence.Id
 import javax.persistence.Index
 import javax.persistence.Table
-import javax.persistence.Transient
 import javax.validation.constraints.NotBlank
 
 @Entity
@@ -46,8 +52,9 @@ data class Event constructor(
   @Column(name = "eventable_id")
   val eventableId: String,
 
-  @Transient
-  val details: Map<String, Any>?,
+  @Convert(converter = DetailsConverter::class)
+  @Column(name = "details")
+  val details: Map<String, Any>? = emptyMap(),
 
   @EventDateTime
   @Json(name = "occurred_at")
@@ -96,6 +103,8 @@ data class Event constructor(
     return result
   }
 
+  fun vehicleRegistration(): String? = details?.get("vehicle_reg") as String?
+
   override operator fun compareTo(other: Event): Int {
     return this.occurredAt.compareTo(other.occurredAt)
   }
@@ -131,8 +140,14 @@ enum class EventType(val value: String) {
 
   companion object {
     val types = values().map { it.value }
-
-    fun valueOfOrUnknown(name: String) =
-      if (EventType.values().any { it.name == name }) EventType.valueOf(name) else UNKNOWN
   }
+}
+
+@Converter
+class DetailsConverter : AttributeConverter<Map<String, Any>, String> {
+  override fun convertToDatabaseColumn(details: Map<String, Any>?) =
+    details?.let { Klaxon().toJsonString(details) }
+
+  override fun convertToEntityAttribute(details: String?) =
+    details?.let { Klaxon().parse<Map<String, Any>>(details) }
 }

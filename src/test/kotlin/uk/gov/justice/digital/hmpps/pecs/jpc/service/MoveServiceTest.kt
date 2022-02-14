@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository
@@ -12,7 +13,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.eventE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyEventJE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
 import java.time.Month
 import java.util.Optional

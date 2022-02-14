@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class OutputSpreadsheetControllerTest(@Autowired val mockMvc: MockMvc) {
+class JourneyPriceCatalogueControllerTest(@Autowired val mockMvc: MockMvc) {
 
   @MockBean
   lateinit var timeSource: TimeSource

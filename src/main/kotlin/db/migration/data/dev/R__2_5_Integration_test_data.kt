@@ -1,10 +1,12 @@
 package db.migration.data.dev
 
+import com.beust.klaxon.Klaxon
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.SingleConnectionDataSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
@@ -13,7 +15,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -68,8 +69,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         journey(move, fromAgencyId = priced?.fromAgencyId ?: "PRISON1", priced?.toAgencyId ?: "PRISON2"),
         template
       ).also { journey ->
-        create(journeyStartEvent(journey), template)
-        create(journeyCompleteEvent(journey), template)
+        create(journeyStartEvent(journey, details = mapOf("vehicle_reg" to "ABDCEFG")), template)
+        create(journeyCompleteEvent(journey, details = mapOf("vehicle_reg" to "HIJKLMN")), template)
 
         if (priced != null) {
           template.update(
@@ -396,7 +397,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       event.recordedAt,
       event.supplier?.name,
       event.type,
-      event.updatedAt
+      event.updatedAt,
+      event.details?.let { Klaxon().toJsonString(it) }
     )
   }
 }
@@ -468,7 +470,6 @@ private fun moveEvent(
   type: String,
   occurredAt: LocalDateTime? = null
 ) = Event(
-  details = emptyMap(),
   eventId = "ME" + UUID.randomUUID().toString(),
   eventableId = move.moveId,
   eventableType = "move",
@@ -525,8 +526,12 @@ private val journeySql = """
   ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """.trimIndent()
 
-private fun journeyStartEvent(journey: Journey, supplier: Supplier = Supplier.SERCO) = Event(
-  details = emptyMap(),
+private fun journeyStartEvent(
+  journey: Journey,
+  supplier: Supplier = Supplier.SERCO,
+  details: Map<String, Any>? = emptyMap()
+) = Event(
+  details = details,
   eventId = "JE" + UUID.randomUUID().toString(),
   eventableId = journey.journeyId,
   eventableType = "journey",
@@ -538,8 +543,12 @@ private fun journeyStartEvent(journey: Journey, supplier: Supplier = Supplier.SE
   updatedAt = startOfPreviousMonth.atStartOfDay(),
 )
 
-private fun journeyCompleteEvent(journey: Journey, supplier: Supplier = Supplier.SERCO) = Event(
-  details = emptyMap(),
+private fun journeyCompleteEvent(
+  journey: Journey,
+  supplier: Supplier = Supplier.SERCO,
+  details: Map<String, Any>? = emptyMap()
+) = Event(
+  details = details,
   eventId = "JE" + UUID.randomUUID().toString(),
   eventableId = journey.journeyId,
   eventableType = "journey",
@@ -561,8 +570,9 @@ private val eventSql = """
     recorded_at,
     supplier,
     event_type,
-    updated_at
-  ) values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    updated_at,
+    details
+  ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """.trimIndent()
 
 private val priceSql = """

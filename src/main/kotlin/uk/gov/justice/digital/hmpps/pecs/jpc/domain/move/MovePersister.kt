@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDateTime
 import java.util.UUID
@@ -120,12 +118,13 @@ class MovePersister(
 
   fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {
     return if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty())
-      listOf(fakeCancelledJourneyForPricing(move)) // add a fake cancelled journey
+      listOf(fakeCancelledJourneyForPricing(move))
     else
       journeys.map { journey ->
         val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
         val pickUp = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_START)?.occurredAt
         val dropOff = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
+        val vehicleRegistration = journey.combinedWithRegistrationsFrom(thisJourneyEvents)
 
         journey.copy(
           events = listOf(),
@@ -133,14 +132,17 @@ class MovePersister(
           dropOffDateTime = dropOff,
           effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(
             move.moveDate ?: timeSource.date()
-          )
+          ),
+          vehicleRegistration = vehicleRegistration
         )
       }
   }
 
+  private fun Journey.combinedWithRegistrationsFrom(events: List<Event>) = this.copy(events = events).registration()
+
   /**
-   * There ane no actual supplier journey/journey events for billable cancelled moves so to price a cancelled a move we
-   * create a fake journey.
+   * There ane no actual supplier journey/journey events for billable cancelled moves so to price a cancelled move we
+   * must create a fake journey.
    */
   internal fun fakeCancelledJourneyForPricing(move: Move): Journey {
     return Journey(
