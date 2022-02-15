@@ -115,7 +115,7 @@ fun journeyEventJE1(
   eventId: String = "JE1",
   eventType: EventType = EventType.JOURNEY_START,
   eventableId: String = journeyJ1().journeyId,
-  details: Map<String, Any>? = emptyMap(),
+  details: Map<String, Any> = emptyMap(),
   occurredAt: LocalDateTime = journeyJ1().pickUpDateTime!!
 ) = Event(
   details = details,

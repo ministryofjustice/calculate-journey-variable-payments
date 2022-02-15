@@ -1,6 +1,5 @@
 package db.migration.data.dev
 
-import com.beust.klaxon.Klaxon
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
 import org.slf4j.LoggerFactory
@@ -9,6 +8,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JpaDetailsConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
@@ -398,7 +398,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       event.supplier?.name,
       event.type,
       event.updatedAt,
-      event.details?.let { Klaxon().toJsonString(it) }
+      event.details?.let { JpaDetailsConverter().convertToDatabaseColumn(it) }
     )
   }
 }
@@ -470,6 +470,7 @@ private fun moveEvent(
   type: String,
   occurredAt: LocalDateTime? = null
 ) = Event(
+  details = emptyMap(),
   eventId = "ME" + UUID.randomUUID().toString(),
   eventableId = move.moveId,
   eventableType = "move",
@@ -529,7 +530,7 @@ private val journeySql = """
 private fun journeyStartEvent(
   journey: Journey,
   supplier: Supplier = Supplier.SERCO,
-  details: Map<String, Any>? = emptyMap()
+  details: Map<String, Any> = emptyMap()
 ) = Event(
   details = details,
   eventId = "JE" + UUID.randomUUID().toString(),
@@ -546,7 +547,7 @@ private fun journeyStartEvent(
 private fun journeyCompleteEvent(
   journey: Journey,
   supplier: Supplier = Supplier.SERCO,
-  details: Map<String, Any>? = emptyMap()
+  details: Map<String, Any> = emptyMap()
 ) = Event(
   details = details,
   eventId = "JE" + UUID.randomUUID().toString(),

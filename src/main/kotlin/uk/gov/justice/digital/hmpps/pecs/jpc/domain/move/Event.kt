@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import com.beust.klaxon.Json
+import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
@@ -52,9 +53,10 @@ data class Event constructor(
   @Column(name = "eventable_id")
   val eventableId: String,
 
-  @Convert(converter = DetailsConverter::class)
+  @JsonDetailsConverter
+  @Convert(converter = JpaDetailsConverter::class)
   @Column(name = "details")
-  val details: Map<String, Any>? = emptyMap(),
+  val details: Details? = null,
 
   @EventDateTime
   @Json(name = "occurred_at")
@@ -69,6 +71,30 @@ data class Event constructor(
   @Column(nullable = true, length = 1024)
   val notes: String?,
 ) : Comparable<Event> {
+
+  constructor(
+    eventId: String,
+    updatedAt: LocalDateTime,
+    type: String,
+    supplier: Supplier?,
+    eventableType: String,
+    eventableId: String,
+    details: Map<String, Any> = emptyMap(),
+    occurredAt: LocalDateTime,
+    recordedAt: LocalDateTime,
+    notes: String?
+  ) : this(
+    eventId,
+    updatedAt,
+    type,
+    supplier,
+    eventableType,
+    eventableId,
+    if (details.isNotEmpty()) Details(details) else null,
+    occurredAt,
+    recordedAt,
+    notes
+  )
 
   fun hasType(et: EventType) = type == et.value
 
@@ -110,7 +136,7 @@ data class Event constructor(
     return "Event(eventId='$eventId', updatedAt=$updatedAt, type='$type', supplier=$supplier, eventableType='$eventableType', eventableId='$eventableId', details=$details, occurredAt=$occurredAt, recordedAt=$recordedAt, notes=$notes)"
   }
 
-  fun vehicleRegistration(): String? = details?.get("vehicle_reg") as String?
+  fun vehicleRegistration(): String? = details?.attributes?.get("vehicle_reg") as String?
 
   override operator fun compareTo(other: Event): Int {
     return this.occurredAt.compareTo(other.occurredAt)
@@ -122,7 +148,9 @@ data class Event constructor(
 
     fun fromJson(json: String): Event? {
       return Klaxon().fieldConverter(SupplierParser::class, supplierConverter)
-        .fieldConverter(EventDateTime::class, dateTimeConverter).parse<Event>(json)
+        .fieldConverter(EventDateTime::class, dateTimeConverter)
+        .fieldConverter(JsonDetailsConverter::class, jsonDetailsConverter)
+        .parse<Event>(json)
     }
   }
 }
@@ -151,10 +179,26 @@ enum class EventType(val value: String) {
 }
 
 @Converter
-class DetailsConverter : AttributeConverter<Map<String, Any>, String> {
-  override fun convertToDatabaseColumn(details: Map<String, Any>?) =
-    details?.let { Klaxon().toJsonString(details) }
+class JpaDetailsConverter : AttributeConverter<Details, String> {
+  override fun convertToDatabaseColumn(entity: Details?): String? {
+    return entity?.let { Klaxon().toJsonString(it.attributes) }
+  }
 
-  override fun convertToEntityAttribute(details: String?) =
-    details?.let { Klaxon().parse<Map<String, Any>>(details) }
+  override fun convertToEntityAttribute(dbData: String?): Details? {
+    return dbData?.let { Klaxon().parse<Map<String, Any>>(it)?.let { attrs -> Details(attrs) } }
+  }
+}
+
+data class Details(val attributes: Map<String, Any?>)
+
+@Target(AnnotationTarget.FIELD)
+annotation class JsonDetailsConverter
+
+val jsonDetailsConverter = object : com.beust.klaxon.Converter {
+  override fun canConvert(cls: Class<*>) = cls == Details::class.java
+
+  override fun fromJson(jv: JsonValue) = jv.obj?.map?.let { Details(it.toMap()) }
+
+  override fun toJson(value: Any) =
+    """"$value""""
 }
