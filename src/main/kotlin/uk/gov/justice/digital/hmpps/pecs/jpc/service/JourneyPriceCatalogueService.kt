@@ -10,16 +10,16 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.File
 import java.time.LocalDate
 
-private val logger = loggerFor<SpreadsheetService>()
+private val logger = loggerFor<JourneyPriceCatalogueService>()
 
 @Transactional
 @Service
-class SpreadsheetService(
+class JourneyPriceCatalogueService(
   private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator,
   private val auditService: AuditService
 ) {
 
-  fun spreadsheet(authentication: Authentication, supplier: Supplier, startDate: LocalDate): File? {
+  fun generate(authentication: Authentication, supplier: Supplier, startDate: LocalDate): File? {
     logger.info("Generating spreadsheet for supplier '$supplier', moves from '$startDate''")
 
     return Result.runCatching {

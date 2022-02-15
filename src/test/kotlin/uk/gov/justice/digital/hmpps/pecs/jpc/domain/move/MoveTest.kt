@@ -2,45 +2,72 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import java.time.LocalDateTime
 
 class MoveTest {
 
-  private val journeyOne: Journey = mock { on { vehicleRegistration } doReturn "ABC" }
-
-  private val journeyTwo: Journey = mock { on { vehicleRegistration } doReturn "DEF" }
+  @Test
+  fun `given a move with a completed journey the registration should come from the journey`() {
+    with(
+      moveM1(
+        journeys = listOf(
+          journeyJ1(
+            vehicleRegistration = "JOURNEY_REG",
+            events = listOf(
+              journeyEventJE1(eventType = EventType.JOURNEY_START),
+              journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE)
+            )
+          )
+        )
+      )
+    ) {
+      assertThat(registration()).isEqualTo("JOURNEY_REG")
+    }
+  }
 
   @Test
-  fun `given a move with one journey there should be one vehicle registration`() {
-    val moveWithSingleJourney = move().copy(journeys = listOf(journeyOne))
-
-    assertThat(moveWithSingleJourney.registration()).isEqualTo("ABC")
+  fun `given a move with a completed journey the registration should come from the journey start event`() {
+    with(
+      moveM1(
+        journeys = listOf(
+          journeyJ1(
+            vehicleRegistration = "JOURNEY_REG",
+            events = listOf(
+              journeyEventJE1(eventType = EventType.JOURNEY_START, details = mapOf("vehicle_reg" to "JOURNEY_START_REG")),
+              journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE)
+            )
+          )
+        )
+      )
+    ) {
+      assertThat(registration()).isEqualTo("JOURNEY_START_REG")
+    }
   }
 
   @Test
   fun `given a move with two journeys and different vehicles there should be two vehicle registrations`() {
-    val moveWithTwoJourneys = move().copy(journeys = listOf(journeyOne, journeyTwo))
-
-    assertThat(moveWithTwoJourneys.registration()).isEqualTo("ABC, DEF")
+    with(
+      moveM1(
+        journeys = listOf(
+          journeyJ1(vehicleRegistration = "JOURNEY_ONE_REG"),
+          journeyJ1(journeyId = "J2", vehicleRegistration = "JOURNEY_TWO_REG")
+        )
+      )
+    ) {
+      assertThat(registration()).isEqualTo("JOURNEY_ONE_REG, JOURNEY_TWO_REG")
+    }
   }
 
   @Test
   fun `given a move with two journeys and the same vehicle there should be one vehicle registration`() {
-    val moveWithTwoJourneys = move().copy(journeys = listOf(journeyOne, journeyOne))
-
-    assertThat(moveWithTwoJourneys.registration()).isEqualTo("ABC")
+    with(
+      moveM1(
+        journeys = listOf(
+          journeyJ1(vehicleRegistration = "SAME_REG"),
+          journeyJ1(journeyId = "J2", vehicleRegistration = "SAME_REG")
+        )
+      )
+    ) {
+      assertThat(registration()).isEqualTo("SAME_REG")
+    }
   }
-
-  private fun move() = Move(
-    moveId = "MOVE_ID",
-    updatedAt = LocalDateTime.now(),
-    supplier = Supplier.SERCO,
-    status = MoveStatus.booked,
-    reference = "MOVE_REF",
-    fromNomisAgencyId = "FROM_AGENCY",
-    reportFromLocationType = "prison"
-  )
 }

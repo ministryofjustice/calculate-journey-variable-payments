@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.springframework.stereotype.Component
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 private val logger = loggerFor<ReportParser>()
@@ -31,16 +31,6 @@ object ReportParser {
         }
       }
     }.filterNotNull()
-  }
-
-  fun parseAsPerson(peopleFiles: List<String>): Sequence<Person> {
-    logger.info("Parsing people")
-    return read(peopleFiles) { Person.fromJson(it) }
-  }
-
-  fun parseAsProfile(profileFiles: List<String>): Sequence<Profile> {
-    logger.info("Parsing profiles")
-    return read(profileFiles) { Profile.fromJson(it) }
   }
 
   fun parseAsMoves(moveFiles: List<String>): Collection<Move> {

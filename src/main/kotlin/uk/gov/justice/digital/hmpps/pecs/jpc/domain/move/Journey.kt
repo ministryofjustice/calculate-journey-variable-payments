@@ -5,7 +5,6 @@ import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.JourneyStateParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.SupplierParser
@@ -89,7 +88,7 @@ data class Journey(
 
   @Json(name = "vehicle_registration")
   @Column(name = "vehicle_registration", nullable = true)
-  val vehicleRegistration: String? = null,
+  private val vehicleRegistration: String? = null,
 
   val billable: Boolean,
 
@@ -99,7 +98,7 @@ data class Journey(
 
   @Json(ignored = true)
   @Transient
-  val events: List<Event> = listOf(),
+  val events: List<Event>? = null,
 
   @Json(ignored = true)
   @Transient
@@ -125,6 +124,22 @@ data class Journey(
   fun toSiteName() = toSiteName ?: toNomisAgencyId
   fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
 
+  /**
+   * A journey can have multiple registrations. The vehicle may change due to unforeseen circumstances e.g. breakdown.
+   */
+  fun vehicleRegistrations() =
+    events?.startAndCompleteEvents()
+      ?.vehicleRegistration()
+      ?.distinct()
+      ?.joinToString(separator = ", ")
+      ?.ifEmpty { vehicleRegistration } ?: vehicleRegistration
+
+  private fun List<Event>.startAndCompleteEvents() =
+    this.filter { it.hasType(EventType.JOURNEY_START) || it.hasType(EventType.JOURNEY_COMPLETE) }
+      .sortedBy { it.occurredAt }
+
+  private fun List<Event>.vehicleRegistration() = this.mapNotNull { it.vehicleRegistration() }
+
   companion object {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -137,6 +152,61 @@ data class Journey(
   }
 
   fun stateIsAnyOf(vararg states: JourneyState) = states.contains(state)
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Journey
+
+    if (journeyId != other.journeyId) return false
+    if (updatedAt != other.updatedAt) return false
+    if (moveId != other.moveId) return false
+    if (supplier != other.supplier) return false
+    if (clientTimeStamp != other.clientTimeStamp) return false
+    if (state != other.state) return false
+    if (fromNomisAgencyId != other.fromNomisAgencyId) return false
+    if (fromSiteName != other.fromSiteName) return false
+    if (fromLocationType != other.fromLocationType) return false
+    if (toNomisAgencyId != other.toNomisAgencyId) return false
+    if (toSiteName != other.toSiteName) return false
+    if (toLocationType != other.toLocationType) return false
+    if (pickUpDateTime != other.pickUpDateTime) return false
+    if (dropOffDateTime != other.dropOffDateTime) return false
+    if (vehicleRegistration != other.vehicleRegistration) return false
+    if (billable != other.billable) return false
+    if (notes != other.notes) return false
+    if (events != other.events) return false
+    if (priceInPence != other.priceInPence) return false
+    if (effectiveYear != other.effectiveYear) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = journeyId.hashCode()
+    result = 31 * result + updatedAt.hashCode()
+    result = 31 * result + moveId.hashCode()
+    result = 31 * result + supplier.hashCode()
+    result = 31 * result + (clientTimeStamp?.hashCode() ?: 0)
+    result = 31 * result + state.hashCode()
+    result = 31 * result + fromNomisAgencyId.hashCode()
+    result = 31 * result + (fromSiteName?.hashCode() ?: 0)
+    result = 31 * result + (fromLocationType?.hashCode() ?: 0)
+    result = 31 * result + (toNomisAgencyId?.hashCode() ?: 0)
+    result = 31 * result + (toSiteName?.hashCode() ?: 0)
+    result = 31 * result + (toLocationType?.hashCode() ?: 0)
+    result = 31 * result + (pickUpDateTime?.hashCode() ?: 0)
+    result = 31 * result + (dropOffDateTime?.hashCode() ?: 0)
+    result = 31 * result + (vehicleRegistration?.hashCode() ?: 0)
+    result = 31 * result + billable.hashCode()
+    result = 31 * result + (notes?.hashCode() ?: 0)
+    result = 31 * result + (events?.hashCode() ?: 0)
+    result = 31 * result + (priceInPence ?: 0)
+    result = 31 * result + (effectiveYear ?: 0)
+
+    return result
+  }
 }
 
 enum class JourneyState() {

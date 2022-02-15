@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.GNICourtLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.journeyEventFactory
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.moveEventFactory
@@ -83,7 +82,7 @@ internal class MovePersisterTest {
       journeyId = "J1",
       billable = true,
       vehicleRegistration = "REG1",
-      events = reportJourneyFactory().events +
+      events = (reportJourneyFactory().events ?: emptyList()) +
         listOf(
           journeyEventFactory(
             journeyEventId = "E4",
@@ -103,7 +102,7 @@ internal class MovePersisterTest {
       billable = true,
       fromNomisAgencyId = "NOT_MAPPED",
       vehicleRegistration = "REG2",
-      events = reportJourneyFactory().events +
+      events = (reportJourneyFactory().events ?: emptyList()) +
         listOf(
           journeyEventFactory(
             journeyEventId = "E6",
@@ -410,7 +409,7 @@ internal class MovePersisterTest {
       occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
     )
 
-    val journeyWithMoveCompleteEvent = journey1.copy(events = journey1.events + journeyCompleteEvent)
+    val journeyWithMoveCompleteEvent = journey1.copy(events = (journey1.events ?: emptyList()) + journeyCompleteEvent)
     val completedMoveWithNewJourney = inTransitMove.copy(
       status = MoveStatus.completed,
       journeys = listOf(journeyWithMoveCompleteEvent),

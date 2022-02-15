@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.SessionAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.SpreadsheetService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyPriceCatalogueService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.FileInputStream
 import java.io.IOException
@@ -21,18 +21,18 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletResponse
 
-private val logger = loggerFor<OutputSpreadsheetController>()
+private val logger = loggerFor<JourneyPriceCatalogueController>()
 
 @RestController
 @SessionAttributes(SUPPLIER_ATTRIBUTE)
-class OutputSpreadsheetController(
-  private val spreadsheetService: SpreadsheetService,
+class JourneyPriceCatalogueController(
+  private val journeyPriceCatalogueService: JourneyPriceCatalogueService,
   private val timeSource: TimeSource
 ) {
 
   @GetMapping("/generate-prices-spreadsheet/{supplier}")
   @Throws(IOException::class)
-  fun generateSpreadsheet(
+  fun generateJourneyPriceCatalogue(
     @PathVariable supplier: String,
     @RequestParam(
       name = "moves_from",
@@ -43,7 +43,7 @@ class OutputSpreadsheetController(
   ): ResponseEntity<InputStreamResource?>? {
     logger.info("getting spreadsheet for $supplier")
 
-    return spreadsheetService.spreadsheet(authentication!!, Supplier.valueOfCaseInsensitive(supplier), movesFrom)
+    return journeyPriceCatalogueService.generate(authentication!!, Supplier.valueOfCaseInsensitive(supplier), movesFrom)
       ?.let { file ->
         val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))
         val filename =

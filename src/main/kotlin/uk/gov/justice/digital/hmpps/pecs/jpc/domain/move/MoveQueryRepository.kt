@@ -197,8 +197,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       supplier.name
     ).groupBy { it.move.moveId }
 
-    val moves = movePersonJourney.keys.map { k -> movePersonJourney.getValue(k).move() }
-    return if (moves.isEmpty()) null else moves[0]
+    return movePersonJourney.keys.map { k -> movePersonJourney.getValue(k).move() }.firstOrNull()
   }
 
   fun movesForMoveTypeInDateRange(

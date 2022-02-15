@@ -5,10 +5,8 @@ import com.beust.klaxon.Klaxon
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.MoveStatusParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.SupplierParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateConverter
@@ -147,7 +145,7 @@ data class Move(
   fun fromLocationType() = fromLocationType?.name ?: "NOT MAPPED"
   fun toSiteName() = toSiteName ?: toNomisAgencyId
   fun toLocationType() = toLocationType?.name ?: "NOT MAPPED"
-  fun registration() = journeys.map { it.vehicleRegistration }.distinct().joinToString(separator = ", ")
+  fun registration() = journeys.map { it.vehicleRegistrations() }.distinct().joinToString(separator = ", ")
 
   companion object {
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -234,7 +232,7 @@ data class Move(
 
   fun getEvents(vararg ets: EventType) =
     this.events.filter { ets.map { it.value }.contains(it.type) } +
-      this.journeys.flatMap { it.events }.filter { ets.map { it.value }.contains(it.type) }
+      this.journeys.flatMap { it.events ?: emptyList() }.filter { ets.map { it.value }.contains(it.type) }
 }
 
 enum class MoveStatus {
