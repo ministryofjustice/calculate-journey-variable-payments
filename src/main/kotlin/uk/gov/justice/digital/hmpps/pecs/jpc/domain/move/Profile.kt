@@ -32,4 +32,28 @@ data class Profile(
       return Klaxon().fieldConverter(EventDateTime::class, dateTimeConverter).parse<Profile>(json)
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Profile
+
+    if (profileId != other.profileId) return false
+    if (updatedAt != other.updatedAt) return false
+    if (personId != other.personId) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = profileId.hashCode()
+    result = 31 * result + updatedAt.hashCode()
+    result = 31 * result + personId.hashCode()
+    return result
+  }
+
+  override fun toString(): String {
+    return "Profile(profileId='$profileId', updatedAt=$updatedAt, personId='$personId')"
+  }
 }

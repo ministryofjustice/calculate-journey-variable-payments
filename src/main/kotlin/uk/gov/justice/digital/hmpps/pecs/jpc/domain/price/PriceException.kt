@@ -59,4 +59,24 @@ data class PriceException(
   }
 
   fun price() = Money(priceInPence)
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as PriceException
+
+    if (id != other.id) return false
+    if (price != other.price) return false
+    if (month != other.month) return false
+    if (priceInPence != other.priceInPence) return false
+
+    return true
+  }
+
+  override fun hashCode() = id.hashCode()
+
+  override fun toString(): String {
+    return "PriceException(id=$id, price=$price, month=$month, priceInPence=XXXXXX)"
+  }
 }

@@ -62,4 +62,40 @@ data class Person(
         .fieldConverter(EventDateTime::class, dateTimeConverter).parse<Person>(json)
     }
   }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Person
+
+    if (personId != other.personId) return false
+    if (updatedAt != other.updatedAt) return false
+    if (prisonNumber != other.prisonNumber) return false
+    if (latestNomisBookingId != other.latestNomisBookingId) return false
+    if (firstNames != other.firstNames) return false
+    if (lastName != other.lastName) return false
+    if (dateOfBirth != other.dateOfBirth) return false
+    if (gender != other.gender) return false
+    if (ethnicity != other.ethnicity) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = personId.hashCode()
+    result = 31 * result + updatedAt.hashCode()
+    result = 31 * result + (prisonNumber?.hashCode() ?: 0)
+    result = 31 * result + (latestNomisBookingId ?: 0)
+    result = 31 * result + (firstNames?.hashCode() ?: 0)
+    result = 31 * result + (lastName?.hashCode() ?: 0)
+    result = 31 * result + (dateOfBirth?.hashCode() ?: 0)
+    result = 31 * result + (gender?.hashCode() ?: 0)
+    result = 31 * result + (ethnicity?.hashCode() ?: 0)
+    return result
+  }
+
+  override fun toString(): String {
+    return "Person(personId='$personId', updatedAt=$updatedAt, prisonNumber=XXXXXX, latestNomisBookingId=XXXXXX, firstNames=XXXXXX, lastName=XXXXXX, dateOfBirth=XXXXXX, gender=XXXXXX, ethnicity=XXXXXX)"
+  }
 }
