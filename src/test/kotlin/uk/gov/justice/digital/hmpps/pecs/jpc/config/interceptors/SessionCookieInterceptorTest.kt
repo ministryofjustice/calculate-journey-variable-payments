@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.interceptors
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.interceptors
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

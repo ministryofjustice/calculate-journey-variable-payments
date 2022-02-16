@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.config
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.aws
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
@@ -16,10 +16,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.StandardReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.io.InputStream
 import java.io.InputStreamReader
 
 private val logger = loggerFor<S3ProviderConfiguration>()
 
+/**
+ * All AWS S3 resources for pulling in locations, prices and reports are configured in here.
+ */
 @Configuration
 @ConditionalOnExpression("{'s3'}.contains('\${resources.provider}')")
 class S3ProviderConfiguration {
@@ -151,4 +155,38 @@ class S3ProviderConfiguration {
       StandardReportReaderParser { InputStreamReader(client.getObject(GetObjectRequest(bucketName, it)).objectContent) }
     }
   }
+}
+
+/**
+ * Responsible for providing the Geoamey prices Excel spreadsheet via an [InputStream].
+ */
+fun interface GeoameyPricesProvider {
+  /**
+   * The caller is responsible for closing the [InputStream].
+   */
+  fun get(): InputStream
+}
+
+/**
+ * Responsible for providing the Serco prices Excel spreadsheet via an [InputStream].
+ */
+fun interface SercoPricesProvider {
+  /**
+   * The caller is responsible for closing the [InputStream].
+   */
+  fun get(): InputStream
+}
+
+fun interface ReportingProvider {
+  fun get(resourceName: String): String
+}
+/**
+ * Responsible for providing the Schedule 34 locations Excel spreadsheet via an [InputStream].
+ */
+
+fun interface Schedule34LocationsProvider {
+  /**
+   * The caller is responsible for closing the [InputStream].
+   */
+  fun get(): InputStream
 }

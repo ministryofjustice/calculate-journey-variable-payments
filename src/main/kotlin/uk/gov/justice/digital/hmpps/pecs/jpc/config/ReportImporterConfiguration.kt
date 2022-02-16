@@ -4,18 +4,20 @@ import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Clock
+import java.time.LocalDate
 import java.time.LocalDateTime
-
-private val logger = loggerFor<ImporterConfiguration>()
+import java.util.stream.Stream
 
 @Configuration
-class ImporterConfiguration {
+class ReportImporterConfiguration {
 
   @Autowired
   private lateinit var priceRepository: PriceRepository
@@ -43,4 +45,19 @@ class ImporterConfiguration {
   // This is now needed for Spring Boot as part of moving from 2.5.3 to 3.0.0 Thymeleaf Layout Dialect
   @Bean
   fun thymeleafLayoutDialect() = LayoutDialect()
+}
+
+fun interface SupplierPrices {
+  fun get(supplier: Supplier, effectiveYear: Int): Stream<Price>
+}
+
+/**
+ * To be used for providing date and or time in the applications. Enables control of time in the code (and unit tests).
+ */
+fun interface TimeSource {
+  fun dateTime(): LocalDateTime
+
+  fun date(): LocalDate = dateTime().toLocalDate()
+
+  fun yesterday(): LocalDate = date().minusDays(1)
 }

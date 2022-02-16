@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.springframework.beans.factory.annotation.Autowired
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile

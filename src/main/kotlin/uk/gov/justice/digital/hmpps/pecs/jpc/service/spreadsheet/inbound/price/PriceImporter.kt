@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.price
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.GeoameyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository

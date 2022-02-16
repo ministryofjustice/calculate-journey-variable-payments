@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.config
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.tasks
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
@@ -9,9 +9,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysLocationMappingTa
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysMovesTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysPeopleAndProfilesTask
 
+/**
+ * Config responsible for setting up the actual tasks to be scheduled.
+ */
 @ConditionalOnWebApplication
 @Component
-class TaskScheduler(
+class TasksSchedulingConfiguration(
   val previousDaysMoves: PreviousDaysMovesTask,
   val previousDaysPeopleAndProfiles: PreviousDaysPeopleAndProfilesTask,
   val previousDaysLocationMapping: PreviousDaysLocationMappingTask,

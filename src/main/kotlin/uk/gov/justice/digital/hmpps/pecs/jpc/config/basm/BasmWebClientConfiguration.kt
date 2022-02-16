@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.config
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.basm
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
- * Web client configuration for the Book a Secure Move API.
+ * Web client configuration for communication with the Book a Secure Move API e.g. automatic mapping NOMIS locations.
  */
 private val logger = loggerFor<BasmWebClientConfiguration>()
 

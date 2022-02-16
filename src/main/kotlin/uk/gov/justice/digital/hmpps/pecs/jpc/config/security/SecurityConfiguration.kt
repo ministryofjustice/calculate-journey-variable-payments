@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.config
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.security
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -31,6 +31,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 private val logger = loggerFor<SecurityConfiguration<*>>()
 
+/**
+ * All OAuth2 and user session management is configured here.
+ */
 @EnableWebSecurity
 @ConditionalOnWebApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)

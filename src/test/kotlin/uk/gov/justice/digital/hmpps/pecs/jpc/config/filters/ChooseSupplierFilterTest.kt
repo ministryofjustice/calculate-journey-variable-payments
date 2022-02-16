@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.filter
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.filters
 
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any

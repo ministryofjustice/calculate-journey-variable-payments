@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.interceptors
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.interceptors
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding

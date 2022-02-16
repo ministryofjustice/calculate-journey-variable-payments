@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.filter
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.filters
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.SUPPLIER_ATTRIBUTE

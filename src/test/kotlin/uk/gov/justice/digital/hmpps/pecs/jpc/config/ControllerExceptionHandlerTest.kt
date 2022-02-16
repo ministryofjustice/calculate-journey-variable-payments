@@ -10,11 +10,11 @@ import org.springframework.security.access.AccessDeniedException
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import javax.servlet.http.HttpServletRequest
 
-internal class ExceptionHandlerTest {
+internal class ControllerExceptionHandlerTest {
 
   private val monitoringService: MonitoringService = mock()
   private val request: HttpServletRequest = mock()
-  private val handler: ExceptionHandler = ExceptionHandler(monitoringService)
+  private val handler: ControllerExceptionHandler = ControllerExceptionHandler(monitoringService)
 
   @Test
   internal fun `catch all other exceptions handler interactions`() {

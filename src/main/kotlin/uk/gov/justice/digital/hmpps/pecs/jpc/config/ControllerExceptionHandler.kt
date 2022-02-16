@@ -10,10 +10,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.servlet.http.HttpServletRequest
 
-private val logger = loggerFor<uk.gov.justice.digital.hmpps.pecs.jpc.config.ExceptionHandler>()
+private val logger = loggerFor<ControllerExceptionHandler>()
 
 @ControllerAdvice
-class ExceptionHandler(private val monitoringService: MonitoringService) {
+class ControllerExceptionHandler(private val monitoringService: MonitoringService) {
 
   @ExceptionHandler(ResourceNotFoundException::class)
   fun handleResourceNotFound(e: ResourceNotFoundException): ModelAndView {

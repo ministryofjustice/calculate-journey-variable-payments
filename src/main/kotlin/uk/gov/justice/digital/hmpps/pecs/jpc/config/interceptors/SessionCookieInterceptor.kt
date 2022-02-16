@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.interceptors
+package uk.gov.justice.digital.hmpps.pecs.jpc.config.interceptors
 
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.ModelAndView
