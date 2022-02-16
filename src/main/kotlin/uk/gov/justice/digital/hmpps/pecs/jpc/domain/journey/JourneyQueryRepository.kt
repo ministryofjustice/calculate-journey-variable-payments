@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate

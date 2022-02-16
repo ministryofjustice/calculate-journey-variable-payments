@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
 
 class MoveTest {
 

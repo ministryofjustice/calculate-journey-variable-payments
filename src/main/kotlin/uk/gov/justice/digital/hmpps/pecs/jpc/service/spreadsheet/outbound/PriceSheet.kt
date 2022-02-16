@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.util.CellRangeAddress
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.math.BigDecimal

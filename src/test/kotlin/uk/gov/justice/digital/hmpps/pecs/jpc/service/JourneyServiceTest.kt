@@ -4,8 +4,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyQueryRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 

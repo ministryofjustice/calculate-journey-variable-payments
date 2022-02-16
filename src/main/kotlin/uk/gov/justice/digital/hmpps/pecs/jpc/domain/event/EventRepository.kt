@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.event
 
 import org.springframework.data.jpa.repository.JpaRepository
 

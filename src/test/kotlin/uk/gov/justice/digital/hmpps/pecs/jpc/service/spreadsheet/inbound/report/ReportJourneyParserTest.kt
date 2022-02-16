@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 class ReportJourneyParserTest {

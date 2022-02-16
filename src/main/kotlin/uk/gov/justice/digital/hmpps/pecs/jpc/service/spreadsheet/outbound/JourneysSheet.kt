@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound
 
 import org.apache.poi.ss.usermodel.Workbook
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyWithPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound.PriceSheet.DataColumn.BILLABLE_JOURNEY_COUNT
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.outbound.PriceSheet.DataColumn.DROP_OFF

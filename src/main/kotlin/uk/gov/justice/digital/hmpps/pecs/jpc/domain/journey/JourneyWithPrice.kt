@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain
 
 import com.beust.klaxon.Converter
 import com.beust.klaxon.JsonValue

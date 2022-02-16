@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyQueryRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyWithPrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneysSummary
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyWithPrice
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneysSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
