@@ -5,10 +5,10 @@ import org.flywaydb.core.api.migration.Context
 import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.SingleConnectionDataSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JpaDetailsConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.JpaDetailsConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType

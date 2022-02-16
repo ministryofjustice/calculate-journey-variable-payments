@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
 import java.time.LocalDate
 
 internal class ReportJourneyTest {

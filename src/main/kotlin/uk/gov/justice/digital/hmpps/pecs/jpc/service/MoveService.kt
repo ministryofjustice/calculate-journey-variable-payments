@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository

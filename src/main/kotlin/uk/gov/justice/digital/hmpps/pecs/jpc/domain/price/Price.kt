@@ -70,8 +70,6 @@ data class Price(
     if (priceInPence < 1) throw IllegalArgumentException("Price in pence must be greater than zero.")
   }
 
-  fun journey() = "${fromLocation.nomisAgencyId}-${toLocation.nomisAgencyId}"
-
   fun price() = Money(priceInPence)
 
   /**
@@ -104,6 +102,30 @@ data class Price(
   fun exceptions() = exceptions.values.toSet()
 
   fun exceptionFor(month: Month) = exceptions[month.value]
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Price
+
+    if (id != other.id) return false
+    if (supplier != other.supplier) return false
+    if (fromLocation != other.fromLocation) return false
+    if (toLocation != other.toLocation) return false
+    if (priceInPence != other.priceInPence) return false
+    if (addedAt != other.addedAt) return false
+    if (effectiveYear != other.effectiveYear) return false
+    if (exceptions != other.exceptions) return false
+
+    return true
+  }
+
+  override fun hashCode() = id.hashCode()
+
+  override fun toString(): String {
+    return "Price(id=$id, supplier=$supplier, fromLocation=$fromLocation, toLocation=$toLocation, priceInPence=XXXXXX, addedAt=$addedAt, effectiveYear=$effectiveYear, exceptions=${exceptions.values.map { it.id }})"
+  }
 }
 
 enum class Supplier {

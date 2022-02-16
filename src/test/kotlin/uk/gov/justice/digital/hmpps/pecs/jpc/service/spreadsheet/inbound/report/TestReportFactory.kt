@@ -1,16 +1,16 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime

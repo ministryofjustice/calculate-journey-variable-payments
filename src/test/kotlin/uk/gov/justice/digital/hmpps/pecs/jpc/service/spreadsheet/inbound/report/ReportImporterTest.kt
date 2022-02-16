@@ -14,19 +14,19 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-@ExtendWith(SpringExtension::class)
-@Import(TestConfig::class)
-@ActiveProfiles("test")
 /**
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
+@ExtendWith(SpringExtension::class)
+@Import(TestConfig::class)
+@ActiveProfiles("test")
 internal class ReportImporterTest(
   @Autowired private val provider: ReportingProvider,
   @Autowired val reportReaderParser: StandardReportReaderParser

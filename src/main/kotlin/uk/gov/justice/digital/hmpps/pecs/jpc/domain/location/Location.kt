@@ -34,4 +34,34 @@ data class Location(
   @Id
   @Column(name = "location_id", nullable = false)
   val id: UUID = UUID.randomUUID()
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Location
+
+    if (locationType != other.locationType) return false
+    if (nomisAgencyId != other.nomisAgencyId) return false
+    if (siteName != other.siteName) return false
+    if (addedAt != other.addedAt) return false
+    if (updatedAt != other.updatedAt) return false
+    if (id != other.id) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = locationType.hashCode()
+    result = 31 * result + nomisAgencyId.hashCode()
+    result = 31 * result + siteName.hashCode()
+    result = 31 * result + addedAt.hashCode()
+    result = 31 * result + (updatedAt?.hashCode() ?: 0)
+    result = 31 * result + id.hashCode()
+    return result
+  }
+
+  override fun toString(): String {
+    return "Location(locationType=$locationType, nomisAgencyId='$nomisAgencyId', siteName='$siteName', addedAt=$addedAt, updatedAt=$updatedAt, id=$id)"
+  }
+}

@@ -56,6 +56,36 @@ data class AuditEvent(
     metadata = metadata?.toJsonString(),
     metadataKey = metadata?.key()
   )
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as AuditEvent
+
+    if (eventType != other.eventType) return false
+    if (createdAt != other.createdAt) return false
+    if (username != other.username) return false
+    if (metadata != other.metadata) return false
+    if (metadataKey != other.metadataKey) return false
+    if (id != other.id) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = eventType.hashCode()
+    result = 31 * result + createdAt.hashCode()
+    result = 31 * result + username.hashCode()
+    result = 31 * result + (metadata?.hashCode() ?: 0)
+    result = 31 * result + (metadataKey?.hashCode() ?: 0)
+    result = 31 * result + id.hashCode()
+    return result
+  }
+
+  override fun toString(): String {
+    return "AuditEvent(eventType=$eventType, createdAt=$createdAt, username='$username', metadata=XXXXXX, metadataKey=$metadataKey, id=$id)"
+  }
 }
 
 fun interface Metadata {

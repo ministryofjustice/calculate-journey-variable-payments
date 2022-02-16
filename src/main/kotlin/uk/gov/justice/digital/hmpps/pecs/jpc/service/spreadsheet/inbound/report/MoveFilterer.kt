@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Event
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Journey
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus

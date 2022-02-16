@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.EventType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.eventE1

@@ -8,12 +8,12 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.GeoameyPricesProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.ReportingProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.Schedule34LocationsProvider
-import uk.gov.justice.digital.hmpps.pecs.jpc.config.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.JourneyQueryRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.GeoameyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.Schedule34LocationsProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.SercoPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
