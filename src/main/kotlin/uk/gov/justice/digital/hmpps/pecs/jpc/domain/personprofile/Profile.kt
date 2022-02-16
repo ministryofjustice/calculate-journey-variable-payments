@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon

@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate

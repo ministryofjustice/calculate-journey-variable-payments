@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime

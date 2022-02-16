@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Profile
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Profile
 
 class ProfileParserTest {
 

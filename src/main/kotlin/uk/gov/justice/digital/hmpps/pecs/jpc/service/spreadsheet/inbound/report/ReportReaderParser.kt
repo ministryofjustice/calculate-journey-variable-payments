@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Person
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import java.io.Reader
 import java.time.LocalDate
 import java.util.Random

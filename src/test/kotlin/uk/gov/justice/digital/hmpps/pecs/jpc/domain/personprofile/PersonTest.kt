@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
+package uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -23,13 +23,13 @@ class PersonTest {
 
     assertThat(person.toString().uppercase())
       .doesNotContain(
-        "111111",
-        222222.toString(),
-        "LUKE",
-        "SKYWALKER",
-        LocalDate.of(1980, 4, 28).toString(),
-        "MALE",
-        "JEDI"
+        person.prisonNumber,
+        person.latestNomisBookingId.toString(),
+        person.firstNames,
+        person.lastName,
+        person.dateOfBirth.toString(),
+        person.gender,
+        person.ethnicity
       )
   }
 }
