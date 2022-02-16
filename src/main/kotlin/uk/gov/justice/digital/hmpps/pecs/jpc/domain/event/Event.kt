@@ -3,11 +3,11 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.event
 import com.beust.klaxon.Json
 import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.SupplierParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonSupplierConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonSupplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.supplierConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateTimeConverter
 import java.time.LocalDateTime
 import javax.persistence.AttributeConverter
 import javax.persistence.Column
@@ -30,7 +30,7 @@ data class Event constructor(
   @Column(name = "event_id")
   val eventId: String,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "updated_at")
   @Column(name = "updated_at")
   val updatedAt: LocalDateTime,
@@ -39,7 +39,7 @@ data class Event constructor(
   @Column(name = "event_type")
   val type: String,
 
-  @SupplierParser
+  @JsonSupplierConverter
   @Enumerated(EnumType.STRING)
   @Column(name = "supplier")
   val supplier: Supplier? = null,
@@ -58,12 +58,12 @@ data class Event constructor(
   @Column(name = "details")
   val details: Details? = null,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "occurred_at")
   @Column(name = "occurred_at")
   val occurredAt: LocalDateTime,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "recorded_at")
   @Column(name = "recorded_at")
   val recordedAt: LocalDateTime,
@@ -147,8 +147,8 @@ data class Event constructor(
       events.sortedByDescending { it.occurredAt }.find { it.hasType(eventType) }
 
     fun fromJson(json: String): Event? {
-      return Klaxon().fieldConverter(SupplierParser::class, supplierConverter)
-        .fieldConverter(EventDateTime::class, dateTimeConverter)
+      return Klaxon().fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter)
         .fieldConverter(JsonDetailsConverter::class, jsonDetailsConverter)
         .parse<Event>(json)
     }

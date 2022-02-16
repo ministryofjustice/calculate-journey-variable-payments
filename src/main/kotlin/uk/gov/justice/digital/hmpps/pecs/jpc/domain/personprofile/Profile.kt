@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateTimeConverter
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -18,7 +18,7 @@ data class Profile(
   @Column(name = "profile_id")
   val profileId: String,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "updated_at")
   @Column(name = "updated_at", nullable = false)
   val updatedAt: LocalDateTime,
@@ -29,7 +29,7 @@ data class Profile(
 ) {
   companion object {
     fun fromJson(json: String): Profile? {
-      return Klaxon().fieldConverter(EventDateTime::class, dateTimeConverter).parse<Profile>(json)
+      return Klaxon().fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Profile>(json)
     }
   }
 

@@ -1,22 +1,22 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
+import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
+import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.SupplierParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonSupplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonSupplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.supplierConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.MoveStatusParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateTimeConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.moveStatusConverter
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -41,12 +41,12 @@ data class Move(
   @Column(name = "profile_id")
   val profileId: String? = null,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "updated_at")
   @Column(name = "updated_at", nullable = false)
   val updatedAt: LocalDateTime,
 
-  @SupplierParser
+  @JsonSupplierConverter
   @Enumerated(EnumType.STRING)
   @Column(name = "supplier", nullable = false)
   val supplier: Supplier,
@@ -56,7 +56,7 @@ data class Move(
   @Column(name = "move_type")
   val moveType: MoveType? = null,
 
-  @MoveStatusParser
+  @JsonMoveStatusConverter
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
   val status: MoveStatus,
@@ -64,7 +64,7 @@ data class Move(
   @Column(name = "reference", nullable = false)
   val reference: String,
 
-  @EventDate
+  @JsonDateConverter
   @Json(name = "date")
   @Column(name = "move_date")
   val moveDate: LocalDate? = null,
@@ -158,15 +158,16 @@ data class Move(
     val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
 
     fun fromJson(json: String): Move? {
-      return Klaxon().fieldConverter(MoveStatusParser::class, moveStatusConverter)
-        .fieldConverter(SupplierParser::class, supplierConverter).fieldConverter(EventDate::class, dateConverter)
-        .fieldConverter(EventDateTime::class, dateTimeConverter).parse<Move>(json)
+      return Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
+        .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+        .fieldConverter(JsonDateConverter::class, jsonDateConverter)
+        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Move>(json)
     }
   }
 
   fun toJson(): String {
-    return Klaxon().fieldConverter(EventDate::class, dateConverter)
-      .fieldConverter(EventDateTime::class, dateTimeConverter).toJsonString(this)
+    return Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
+      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).toJsonString(this)
   }
 
   override fun toString(): String {
@@ -252,4 +253,17 @@ enum class MoveStatus {
     fun valueOfCaseInsensitive(value: String?) =
       kotlin.runCatching { valueOf(value!!.lowercase()) }.getOrDefault(unknown)
   }
+}
+
+@Target(AnnotationTarget.FIELD)
+annotation class JsonMoveStatusConverter
+
+val moveStatusConverter = object : Converter {
+
+  override fun canConvert(cls: Class<*>) = cls == MoveStatus::class.java
+
+  override fun fromJson(jv: JsonValue) = MoveStatus.valueOfCaseInsensitive(jv.string)
+
+  override fun toJson(value: Any) =
+    """"$value""""
 }

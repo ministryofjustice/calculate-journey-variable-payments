@@ -2,10 +2,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile
 
 import com.beust.klaxon.Json
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateTimeConverter
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.Column
@@ -21,7 +21,7 @@ data class Person(
   @Column(name = "person_id")
   val personId: String,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "updated_at")
   @Column(name = "updated_at", nullable = false)
   val updatedAt: LocalDateTime,
@@ -42,7 +42,7 @@ data class Person(
   @Column(name = "last_name")
   val lastName: String? = null,
 
-  @EventDate
+  @JsonDateConverter
   @Json(name = "date_of_birth")
   @Column(name = "date_of_birth")
   val dateOfBirth: LocalDate? = null,
@@ -58,8 +58,8 @@ data class Person(
 ) {
   companion object {
     fun fromJson(json: String): Person? {
-      return Klaxon().fieldConverter(EventDate::class, dateConverter)
-        .fieldConverter(EventDateTime::class, dateTimeConverter).parse<Person>(json)
+      return Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
+        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Person>(json)
     }
   }
 
