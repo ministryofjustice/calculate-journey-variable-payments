@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.endOfMonth
 import java.time.LocalDate
 
 /**
- * Contains reusable extension functions for the Controllers.
+ * Contains reusable extension functions for the controllers.
  */
 
 internal val XSS_CHARACTERS = setOf('<', '＜', '〈', '〈', '>', '＞', '〉', '〉')

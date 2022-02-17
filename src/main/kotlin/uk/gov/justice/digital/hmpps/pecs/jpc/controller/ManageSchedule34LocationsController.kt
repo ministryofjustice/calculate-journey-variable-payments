@@ -20,7 +20,7 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 /**
- * Controller to support searching and maintenance of existing Schedule 34 locations.
+ * Controller to support searching for and maintenance of existing Schedule 34 locations.
  */
 private val logger = loggerFor<ManageSchedule34LocationsController>()
 
@@ -29,10 +29,9 @@ private val logger = loggerFor<ManageSchedule34LocationsController>()
 class ManageSchedule34LocationsController(
   private val service: LocationsService,
   private val basmClientApiService: BasmClientApiService
-) {
+) : PrimaryNavigationBar {
 
-  @ModelAttribute("navigation")
-  fun navigation() = "LOCATION"
+  override fun primaryNavigationChoice() = PrimaryNavigation.LOCATION
 
   @GetMapping(SEARCH_LOCATIONS)
   fun showSearchLocation(model: ModelMap): Any {

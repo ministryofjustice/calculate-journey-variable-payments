@@ -28,9 +28,13 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 import javax.validation.Valid
 
+/**
+ * This is where the user is directed to upon logging into the application. If they haven't chosen the supplier they
+ * will be redirected to the 'choose supplier' screen and then directed back to here.
+ */
 data class MonthsWidget(val currentMonth: LocalDate, val nextMonth: LocalDate, val previousMonth: LocalDate)
 
-private val logger = loggerFor<HtmlController>()
+private val logger = loggerFor<SummaryPageController>()
 
 @Controller
 @SessionAttributes(
@@ -39,15 +43,14 @@ private val logger = loggerFor<HtmlController>()
   START_OF_MONTH_DATE_ATTRIBUTE,
   END_OF_MONTH_DATE_ATTRIBUTE
 )
-class HtmlController(
+class SummaryPageController(
   @Autowired val moveService: MoveService,
   @Autowired val journeyService: JourneyService,
   @Autowired val timeSource: TimeSource,
   @Autowired val actualEffectiveYear: EffectiveYear
-) {
+) : PrimaryNavigationBar {
 
-  @ModelAttribute("navigation")
-  fun navigation() = "SUMMARY"
+  override fun primaryNavigationChoice() = PrimaryNavigation.SUMMARY
 
   @RequestMapping("/")
   fun homepage(model: ModelMap): RedirectView {

@@ -38,7 +38,7 @@ import javax.servlet.http.Cookie
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
 @TestPropertySource(properties = ["FEEDBACK_URL=http://fake_feeback_url_url"])
-class HtmlControllerTest(@Autowired private val wac: WebApplicationContext) {
+class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
   private val sessionCookie = Cookie("SESSION", "")

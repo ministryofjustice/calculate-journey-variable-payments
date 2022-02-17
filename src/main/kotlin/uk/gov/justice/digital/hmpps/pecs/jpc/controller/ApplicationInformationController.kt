@@ -15,6 +15,11 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 private val logger = loggerFor<ApplicationInformationController>()
 
+/**
+ * Provides application level information/alerts to be displayed to (or inform) the end users something important
+ *
+ * An example of this would be a bulk price adjustment is taking place, which in itself can take several minutes.
+ */
 @RestController
 @RequestMapping(name = "Supplier information", path = ["/app"], produces = [MediaType.APPLICATION_JSON_VALUE])
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
