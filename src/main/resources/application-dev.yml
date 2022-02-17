@@ -8,7 +8,7 @@ spring:
     enabled: true
     locations: classpath:/db/migration
 
-APP_DB_URL: "jdbc:postgresql://127.0.0.1:5433/jpc?reWriteBatchedInserts=true&user=jpc&password=letmein"
+APP_DB_URL: "jdbc:postgresql://localhost:5433/jpc?reWriteBatchedInserts=true&user=jpc&password=letmein"
 AWS_ACCESS_KEY_ID: foo
 AWS_SECRET_ACCESS_KEY: bar
 AWS_DEFAULT_REGION: eu-west-2

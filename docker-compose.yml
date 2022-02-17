@@ -13,7 +13,6 @@ services:
       POSTGRES_USER: jpc
       POSTGRES_PASSWORD: letmein
     command: -p 5433
-    network_mode: host
 
   localstack:
     image: localstack/localstack:0.11.5
@@ -30,7 +29,6 @@ services:
       - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - $PWD/localstack:/docker-entrypoint-initaws.d
-    network_mode: host
 
   hmpps-auth:
     image: quay.io/hmpps/hmpps-auth:latest
@@ -42,7 +40,6 @@ services:
     environment:
       - SERVER_PORT=9090
       - SPRING_PROFILES_ACTIVE=dev
-    network_mode: host
 
   hmpps-book-secure-move-api:
     image: rodolpheche/wiremock:latest
@@ -52,4 +49,3 @@ services:
     volumes:
       - $PWD/wiremock-docker:/home/wiremock
     command: --verbose --global-response-templating --port=8081
-    network_mode: host
