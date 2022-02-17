@@ -25,10 +25,9 @@ private val logger = loggerFor<ManageJourneyPriceCatalogueController>()
 
 @Controller
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE, PICK_UP_ATTRIBUTE, DROP_OFF_ATTRIBUTE)
-class ManageJourneyPriceCatalogueController(@Autowired val journeyService: JourneyService) {
+class ManageJourneyPriceCatalogueController(@Autowired val journeyService: JourneyService) : PrimaryNavigationBar {
 
-  @ModelAttribute("navigation")
-  fun navigation() = "PRICE"
+  override fun primaryNavigationChoice() = PrimaryNavigation.PRICE
 
   @GetMapping(MANAGE_JOURNEY_PRICE_CATALOGUE)
   fun index(model: ModelMap): Any {

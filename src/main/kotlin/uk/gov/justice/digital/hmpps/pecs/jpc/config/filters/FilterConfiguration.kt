@@ -4,11 +4,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.AnnualPriceAdjustmentsController
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageJourneyPriceCatalogueController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageSchedule34LocationsController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MapFriendlyLocationController
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.SummaryPageController
 
 @Configuration
 class FilterConfiguration {
@@ -22,7 +22,7 @@ class FilterConfiguration {
     FilterRegistrationBean<ChooseSupplierFilter>().apply {
       this.filter = ChooseSupplierFilter()
       this.addUrlPatterns(
-        *HtmlController.routes(),
+        *SummaryPageController.routes(),
         *MaintainSupplierPricingController.routes(),
         *ManageSchedule34LocationsController.routes(),
         *MapFriendlyLocationController.routes(),

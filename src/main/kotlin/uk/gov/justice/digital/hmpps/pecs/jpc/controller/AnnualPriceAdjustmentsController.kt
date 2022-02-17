@@ -36,10 +36,9 @@ private val logger = loggerFor<AnnualPriceAdjustmentsController>()
 class AnnualPriceAdjustmentsController(
   private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
   private val actualEffectiveYear: EffectiveYear
-) {
+) : PrimaryNavigationBar {
 
-  @ModelAttribute("navigation")
-  fun navigation() = "PRICE"
+  override fun primaryNavigationChoice() = PrimaryNavigation.PRICE
 
   @GetMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun index(model: ModelMap, @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier): Any {

@@ -26,7 +26,7 @@ import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
 /**
- * Controller to help with mapping a user friendly location name to (missing) Schedule 34 locations names.
+ * Controller to help with mapping a user-friendly location name to agency ID Schedule 34 locations names.
  */
 private val logger = loggerFor<MapFriendlyLocationController>()
 
@@ -36,10 +36,9 @@ private val logger = loggerFor<MapFriendlyLocationController>()
 class MapFriendlyLocationController(
   private val service: LocationsService,
   private val basmClientApiService: BasmClientApiService
-) {
+) : PrimaryNavigationBar {
 
-  @ModelAttribute("navigation")
-  fun navigation() = "LOCATION"
+  override fun primaryNavigationChoice() = PrimaryNavigation.LOCATION
 
   @GetMapping("$MAP_LOCATION/{agency-id}")
   fun mapFriendlyLocation(

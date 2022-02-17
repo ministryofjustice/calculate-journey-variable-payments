@@ -27,9 +27,10 @@ import javax.validation.constraints.Pattern
 
 /**
  * Controller to handle requests for Supplier price maintenance. This includes adding new prices, updating existing
- * prices and displaying the history of prices i.e. when it was added and/or last updated.
+ * prices, adding/remove price exceptions and displaying the history of prices i.e. when it was added and/or last
+ * updated.
  *
- * Only users with the price maintenance role can interact with this controller.
+ * Only users with the price maintenance role can interact with this controller. This is normally the commercial users.
  */
 private val logger = loggerFor<MaintainSupplierPricingController>()
 
@@ -44,10 +45,9 @@ private val logger = loggerFor<MaintainSupplierPricingController>()
 class MaintainSupplierPricingController(
   @Autowired val supplierPricingService: SupplierPricingService,
   @Autowired val actualEffectiveYear: EffectiveYear
-) {
+) : PrimaryNavigationBar {
 
-  @ModelAttribute("navigation")
-  fun navigation() = "PRICE"
+  override fun primaryNavigationChoice() = PrimaryNavigation.PRICE
 
   data class PriceForm(
     @get: NotNull(message = "Invalid message id")
@@ -137,7 +137,7 @@ class MaintainSupplierPricingController(
       return "add-price"
     }
 
-    return RedirectView(HtmlController.DASHBOARD_URL)
+    return RedirectView(SummaryPageController.DASHBOARD_URL)
   }
 
   @PostMapping(ADD_PRICE)
@@ -177,7 +177,7 @@ class MaintainSupplierPricingController(
 
     redirectAttributes.showPriceCreatedMessageOnRedirect(form)
 
-    return RedirectView(HtmlController.JOURNEYS_URL)
+    return RedirectView(SummaryPageController.JOURNEYS_URL)
   }
 
   private fun RedirectAttributes.showPriceCreatedMessageOnRedirect(form: PriceForm) {

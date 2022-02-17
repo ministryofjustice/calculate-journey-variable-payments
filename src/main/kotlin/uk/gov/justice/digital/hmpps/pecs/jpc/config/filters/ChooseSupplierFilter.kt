@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config.filters
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.controller.HtmlController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.SUPPLIER_ATTRIBUTE
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.SummaryPageController
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.IOException
 import javax.servlet.Filter
@@ -27,9 +27,9 @@ class ChooseSupplierFilter : Filter {
 
     when (session.getAttribute(SUPPLIER_ATTRIBUTE)) {
       null -> {
-        logger.info("no supplier present in the session, redirecting to '${HtmlController.CHOOSE_SUPPLIER_URL}'")
+        logger.info("no supplier present in the session, redirecting to '${SummaryPageController.CHOOSE_SUPPLIER_URL}'")
 
-        (response as HttpServletResponse).sendRedirect(HtmlController.CHOOSE_SUPPLIER_URL)
+        (response as HttpServletResponse).sendRedirect(SummaryPageController.CHOOSE_SUPPLIER_URL)
       }
       else -> chain.doFilter(request, response).also { logger.info("supplier present in the session") }
     }

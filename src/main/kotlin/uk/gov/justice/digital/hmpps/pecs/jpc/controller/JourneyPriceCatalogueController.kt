@@ -23,6 +23,9 @@ import javax.servlet.http.HttpServletResponse
 
 private val logger = loggerFor<JourneyPriceCatalogueController>()
 
+/**
+ * Controller responsible for generating and returning an on demand journey price catalogue spreadsheet to the end user.
+ */
 @RestController
 @SessionAttributes(SUPPLIER_ATTRIBUTE)
 class JourneyPriceCatalogueController(
