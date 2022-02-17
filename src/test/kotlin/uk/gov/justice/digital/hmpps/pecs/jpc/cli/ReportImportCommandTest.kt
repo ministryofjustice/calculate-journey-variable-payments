@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportReportsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ImportReportsService
 import java.time.LocalDate
 
 internal class ReportImportCommandTest {

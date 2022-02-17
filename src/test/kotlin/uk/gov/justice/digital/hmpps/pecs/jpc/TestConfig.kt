@@ -16,8 +16,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.StandardReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardReportReaderParser
 import java.io.InputStreamReader
 import java.time.Clock
 import java.time.Instant

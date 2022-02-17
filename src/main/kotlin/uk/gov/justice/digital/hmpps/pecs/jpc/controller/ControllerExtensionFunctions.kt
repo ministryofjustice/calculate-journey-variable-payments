@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.endOfMonth
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.endOfMonth
 import java.time.LocalDate
 
 /**

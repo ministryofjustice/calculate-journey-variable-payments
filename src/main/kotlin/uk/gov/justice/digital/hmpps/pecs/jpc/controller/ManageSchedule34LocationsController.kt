@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.ResourceNotFoundException
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.locations.LocationsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -131,7 +131,11 @@ class ManageSchedule34LocationsController(
   private fun isDuplicate(form: LocationForm) = service.locationAlreadyExists(form.agencyId, form.locationName)
 
   private fun BindingResult.duplicateLocation() {
-    this.rejectValue("locationName", "duplicate", "There is a problem, Schedule 34 location entered already exists, please enter a new schedule 34 location")
+    this.rejectValue(
+      "locationName",
+      "duplicate",
+      "There is a problem, Schedule 34 location entered already exists, please enter a new schedule 34 location"
+    )
   }
 
   data class SearchLocationForm(

@@ -14,7 +14,7 @@ import org.springframework.web.servlet.view.RedirectView
 import org.springframework.web.util.UriComponentsBuilder
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidJourneySearch
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.validation.Valid
 

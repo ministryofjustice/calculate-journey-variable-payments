@@ -18,16 +18,17 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.GNICourtLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.journeyEventFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.moveEventFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.reportJourneyFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.reportMoveFactory
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.toCourtNomisAgencyId
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.GNICourtLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.journeyEventFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.moveEventFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.reportJourneyFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.reportMoveFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.toCourtNomisAgencyId
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.WYIPrisonLocation as WYIPrisonLocation1
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.fromPrisonNomisAgencyId as fromPrisonNomisAgencyId1
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.WYIPrisonLocation as WYIPrisonLocation1
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.fromPrisonNomisAgencyId as fromPrisonNomisAgencyId1
 
 const val TOO_LONG: Int = 3000
 
@@ -290,7 +291,7 @@ internal class MovePersisterTest {
         journeyEventFactory(
           journeyEventId = "E4",
           type = EventType.JOURNEY_START.value,
-          occurredAt = java.time.LocalDate.of(2021, 8, 31).atStartOfDay().plusHours(5)
+          occurredAt = LocalDate.of(2021, 8, 31).atStartOfDay().plusHours(5)
         )
       )
     )

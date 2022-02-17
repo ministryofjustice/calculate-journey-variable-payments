@@ -32,8 +32,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.GEOAMEY
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier.SERCO
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService.PriceDto
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.SupplierPricingService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.SupplierPricingService.PriceDto
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.HistoricMovesProcessingService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.HistoricMovesProcessingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDate
 

@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebAppli
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportPricesService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.ImportPricesService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
