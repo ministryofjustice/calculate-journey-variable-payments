@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ObfuscatingPiiReaderParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.StandardReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ObfuscatingPiiReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardReportReaderParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.InputStream
 import java.io.InputStreamReader

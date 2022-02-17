@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.MoveFilterer
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.MoveFilterer
 
 enum class MoveType(val label: String, val description: String, val hasMoveType: (m: Move) -> Boolean) {
   STANDARD("Standard", "includes single journeys, cross supplier and redirects before the move has started", MoveFilterer::isStandardMove),

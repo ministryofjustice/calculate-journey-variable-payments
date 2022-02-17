@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MapFriendlyLocationContr
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidDuplicateLocation
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.locations.LocationsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank

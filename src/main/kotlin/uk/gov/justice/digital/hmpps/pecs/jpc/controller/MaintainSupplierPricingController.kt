@@ -17,7 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.ordinalMonthsAndYearForSeptemberToAugust
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.SupplierPricingService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.SupplierPricingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.math.BigDecimal
 import java.time.Month
@@ -91,7 +91,13 @@ class MaintainSupplierPricingController(
     } ?: listOf()
   }
 
-  data class PriceExceptionMonth(val value: String, val month: String, val alreadySelected: Boolean, val year: Int, val amount: Money?) {
+  data class PriceExceptionMonth(
+    val value: String,
+    val month: String,
+    val alreadySelected: Boolean,
+    val year: Int,
+    val amount: Money?
+  ) {
     constructor(month: Month, alreadySelected: Boolean, year: Int, amount: Money?) : this(
       month.name,
       month.name.titleCased(),
@@ -209,7 +215,15 @@ class MaintainSupplierPricingController(
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("existingExceptions", existingExceptions(price.exceptions, getSelectedEffectiveYear()))
-        addAttribute("exceptionsForm", PriceExceptionForm(moveId, price.exceptions, exceptionPrice = "0.00", effectiveYear = getSelectedEffectiveYear()))
+        addAttribute(
+          "exceptionsForm",
+          PriceExceptionForm(
+            moveId,
+            price.exceptions,
+            exceptionPrice = "0.00",
+            effectiveYear = getSelectedEffectiveYear()
+          )
+        )
         addContractStartAndEndDates()
       }
 
@@ -241,13 +255,17 @@ class MaintainSupplierPricingController(
       val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
 
       model.apply {
-        val existingPrice = supplierPricingService.maybePrice(supplier, fromAgencyId, toAgencyId, getSelectedEffectiveYear())!!
+        val existingPrice =
+          supplierPricingService.maybePrice(supplier, fromAgencyId, toAgencyId, getSelectedEffectiveYear())!!
 
         addAttribute("warnings", getWarningTexts(supplier, getSelectedEffectiveYear(), fromAgencyId, toAgencyId))
         addAttribute("cancelLink", getJourneySearchResultsUrl())
         addAttribute("history", priceHistoryForMove(supplier, fromAgencyId, toAgencyId))
         addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions, getSelectedEffectiveYear()))
-        addAttribute("exceptionsForm", PriceExceptionForm(form.moveId, existingPrice.exceptions, effectiveYear = getSelectedEffectiveYear()))
+        addAttribute(
+          "exceptionsForm",
+          PriceExceptionForm(form.moveId, existingPrice.exceptions, effectiveYear = getSelectedEffectiveYear())
+        )
         addContractStartAndEndDates()
       }
 
@@ -298,7 +316,8 @@ class MaintainSupplierPricingController(
   ): Any {
     logger.info("Adding price exception")
 
-    val price = parseAmount(form.exceptionPrice!!).also { if (it == null) result.rejectValue("exceptionPrice", "Invalid price") }
+    val price =
+      parseAmount(form.exceptionPrice!!).also { if (it == null) result.rejectValue("exceptionPrice", "Invalid price") }
 
     val (fromAgencyId, toAgencyId) = agencyIds(form.moveId)
 
@@ -344,7 +363,13 @@ class MaintainSupplierPricingController(
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier
   ): Any {
     val price = agencyIds(moveId).run {
-      supplierPricingService.removePriceException(supplier, this.first, this.second, model.getSelectedEffectiveYear(), Month.valueOf(month))
+      supplierPricingService.removePriceException(
+        supplier,
+        this.first,
+        this.second,
+        model.getSelectedEffectiveYear(),
+        Month.valueOf(month)
+      )
     }
 
     redirectAttributes.apply {
@@ -357,7 +382,8 @@ class MaintainSupplierPricingController(
     return RedirectView("$UPDATE_PRICE/$moveId#price-exceptions")
   }
 
-  private fun RedirectAttributes.showErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
+  private fun RedirectAttributes.showErrorOnRedirect(attribute: String) =
+    this.addFlashAttribute("flashError", attribute)
 
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current())
@@ -390,7 +416,8 @@ class MaintainSupplierPricingController(
   private fun agencyIds(combined: String) =
     Pair(combined.split("-")[0].trim().uppercase(), combined.split("-")[1].trim().uppercase())
 
-  private fun parseAmount(value: String) = value.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { Money.valueOf(it) }
+  private fun parseAmount(value: String) =
+    value.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { Money.valueOf(it) }
 
   private fun ModelMap.getFromLocation() = this.getAttribute(PICK_UP_ATTRIBUTE).takeUnless { it == "" }
 

@@ -6,7 +6,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportPricesService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.ImportPricesService
 import java.time.LocalDateTime
 
 /**

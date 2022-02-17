@@ -1,18 +1,18 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey
 
+import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
+import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.SupplierParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonSupplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonDateTimeConverter
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.jsonSupplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.supplierConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.EventDateTime
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.JourneyStateParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.dateTimeConverter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.journeyStateConverter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.persistence.Column
@@ -32,7 +32,7 @@ data class Journey(
   @Column(name = "journey_id")
   val journeyId: String,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "updated_at")
   @Column(name = "updated_at")
   val updatedAt: LocalDateTime,
@@ -41,17 +41,17 @@ data class Journey(
   @Column(name = "move_id", nullable = false)
   val moveId: String,
 
-  @SupplierParser
+  @JsonSupplierConverter
   @Enumerated(EnumType.STRING)
   @Column(name = "supplier", nullable = false)
   val supplier: Supplier,
 
-  @EventDateTime
+  @JsonDateTimeConverter
   @Json(name = "client_timestamp")
   @Column(name = "client_timestamp")
   val clientTimeStamp: LocalDateTime?,
 
-  @JourneyStateParser
+  @JsonJourneyStateConverter
   @Enumerated(EnumType.STRING)
   @Column(name = "state", nullable = false)
   val state: JourneyState,
@@ -147,9 +147,9 @@ data class Journey(
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     fun fromJson(json: String): Journey? {
-      return Klaxon().fieldConverter(JourneyStateParser::class, journeyStateConverter)
-        .fieldConverter(SupplierParser::class, supplierConverter)
-        .fieldConverter(EventDateTime::class, dateTimeConverter).parse<Journey>(json)
+      return Klaxon().fieldConverter(JsonJourneyStateConverter::class, jsonJourneyStateConverter)
+        .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Journey>(json)
     }
   }
 
@@ -223,4 +223,17 @@ enum class JourneyState() {
     fun valueOfCaseInsensitive(value: String?) =
       kotlin.runCatching { valueOf(value!!.lowercase()) }.getOrDefault(unknown)
   }
+}
+
+@Target(AnnotationTarget.FIELD)
+annotation class JsonJourneyStateConverter
+
+val jsonJourneyStateConverter = object : Converter {
+
+  override fun canConvert(cls: Class<*>) = cls == JourneyState::class.java
+
+  override fun fromJson(jv: JsonValue) = JourneyState.valueOfCaseInsensitive(jv.string)
+
+  override fun toJson(value: Any) =
+    """"$value""""
 }

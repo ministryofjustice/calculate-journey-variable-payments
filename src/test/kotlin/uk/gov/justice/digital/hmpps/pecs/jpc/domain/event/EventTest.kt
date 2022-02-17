@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.event
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.moveEventFactory
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.moveEventFactory
 import java.time.LocalDateTime
 
 internal class EventTest {

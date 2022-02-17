@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.MapLocationMetadata
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.LocationsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.locations.LocationsService
 import java.time.LocalDateTime
 
 @SpringBootTest

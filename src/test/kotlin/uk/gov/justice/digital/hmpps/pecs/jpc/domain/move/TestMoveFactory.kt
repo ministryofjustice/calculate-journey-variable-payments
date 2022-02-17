@@ -9,8 +9,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Profile
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultDateTime
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultDate
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 

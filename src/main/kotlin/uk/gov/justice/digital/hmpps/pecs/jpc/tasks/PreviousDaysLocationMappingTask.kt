@@ -2,8 +2,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.tasks
 
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.AutomaticLocationMappingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.locations.AutomaticLocationMappingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**

@@ -9,8 +9,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.ReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportImporter
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportReaderParser
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime

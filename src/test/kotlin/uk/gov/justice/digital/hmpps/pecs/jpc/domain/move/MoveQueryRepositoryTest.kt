@@ -16,10 +16,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.ProfileReposit
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.GNICourtLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.WYIPrisonLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultMoveTypeStandard
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.GNICourtLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.WYIPrisonLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultMoveTypeStandard
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerco
 import java.time.LocalDate
 import java.time.Month
 import java.util.UUID

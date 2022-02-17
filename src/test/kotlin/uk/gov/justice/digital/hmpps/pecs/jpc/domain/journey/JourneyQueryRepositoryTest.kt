@@ -19,8 +19,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.GNICourtLocation
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.WYIPrisonLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.GNICourtLocation
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.WYIPrisonLocation
 import java.util.UUID
 
 @ActiveProfiles("test")

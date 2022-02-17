@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
 import org.springframework.stereotype.Component
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.ImportReportsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ImportReportsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate

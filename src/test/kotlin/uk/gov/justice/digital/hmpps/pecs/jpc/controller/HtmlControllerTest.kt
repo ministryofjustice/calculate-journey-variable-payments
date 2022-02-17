@@ -24,9 +24,9 @@ import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveTypeSummaries
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.inbound.report.defaultSupplierSerco
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveTypeSummaries
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerco
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month

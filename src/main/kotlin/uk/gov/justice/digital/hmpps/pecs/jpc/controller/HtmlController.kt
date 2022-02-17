@@ -21,8 +21,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidMonthYe
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyService
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.MoveService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.JourneyService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate

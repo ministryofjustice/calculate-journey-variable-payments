@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.SessionAttributes
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.JourneyPriceCatalogueService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.JourneyPriceCatalogueService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.FileInputStream
 import java.io.IOException
