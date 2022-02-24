@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.0.4"
   kotlin("plugin.spring") version "1.6.10"
   kotlin("plugin.jpa") version "1.6.10"
   kotlin("plugin.allopen") version "1.6.10"
@@ -17,19 +17,19 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.5")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.154")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.165")
   implementation("io.sentry:sentry-spring-boot-starter:5.6.1")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.33.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.33.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0")
   implementation("org.apache.poi:poi-ooxml:5.2.0")
-  implementation("org.flywaydb:flyway-core:8.4.4")
+  implementation("org.flywaydb:flyway-core:8.5.1")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springframework.session:spring-session-jdbc:2.6.1")
+  implementation("org.springframework.session:spring-session-jdbc:2.6.2")
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
 
@@ -44,7 +44,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
   testRuntimeOnly("com.h2database:h2")
 
-  runtimeOnly("org.postgresql:postgresql:42.3.2")
+  runtimeOnly("org.postgresql:postgresql:42.3.3")
 }
 
 java {
