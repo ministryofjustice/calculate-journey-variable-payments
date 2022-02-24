@@ -4,6 +4,7 @@
 [![Docker Repository on Quay](https://quay.io/repository/hmpps/calculate-journey-variable-payments/status)](https://quay.io/repository/hmpps/calculate-journey-variable-payments)
 ## Prerequisites
 
+- [JDK 17](https://openjdk.java.net/projects/jdk/17/)
 - [Docker and Docker compose](https://docs.docker.com/get-docker/)
 - [Intellij IDEA](https://www.jetbrains.com/idea/)
   - [EnvFile](https://plugins.jetbrains.com/plugin/7861-envfile) plugin
