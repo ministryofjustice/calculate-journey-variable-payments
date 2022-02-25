@@ -45,7 +45,7 @@ object MoveFilterer {
         count { it.stateIsAnyOf(JourneyState.completed) } == 1 &&
           count { isCompleteBillableJourneyAndLocationsMatchMove(it, move) } == 1 &&
           count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
-      }
+      } && move.hasNoneOf(EventType.MOVE_REDIRECT)
 
   private fun isCompleteBillableJourneyAndLocationsMatchMove(journey: Journey, move: Move) =
     journey.state == JourneyState.completed && journey.billable &&
