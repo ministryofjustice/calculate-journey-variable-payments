@@ -147,6 +147,26 @@ internal class MoveFiltererTest {
     )
   )
 
+  private val multiTypeMoveRedirect = reportMoveFactory(
+    moveId = "M7",
+    events = listOf(
+      moveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
+      moveEventFactory(
+        type = EventType.MOVE_REDIRECT.value,
+        moveId = "M7",
+        occurredAt = from.atStartOfDay()
+      ),
+      moveEventFactory(
+        type = EventType.MOVE_COMPLETE.value,
+        moveId = "M7",
+        occurredAt = from.atStartOfDay().plusHours(4)
+      )
+    ),
+    journeys = listOf(
+      reportJourneyFactory(journeyId = "J1M6", moveId = "M7", billable = true),
+    )
+  )
+
   private val multiTypeMoveWhenSingleBillableJourneyPickUpLocationDoesNotMatch = reportMoveFactory(
     events = listOf(moveEventFactory(type = EventType.MOVE_COMPLETE.value, occurredAt = from.atStartOfDay())),
     journeys = listOf(reportJourneyFactory(journeyId = "J1M1", billable = true, fromLocation = "DOES_NOT_MATCH_MOVE"))
@@ -246,6 +266,11 @@ internal class MoveFiltererTest {
     assertThat(MoveFilterer.isMultiTypeMove(multiTypeMove)).isTrue
     assertThat(MoveFilterer.isMultiTypeMove(completedUnbillable)).isTrue
     assertThat(MoveFilterer.isMultiTypeMove(completedLockoutMoveLockoutEvent)).isFalse
+  }
+
+  @Test
+  fun `is multi-type move for redirection missing journey`() {
+    assertThat(MoveFilterer.isMultiTypeMove(multiTypeMoveRedirect)).isTrue
   }
 
   @Test
