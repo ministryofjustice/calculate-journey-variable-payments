@@ -1,6 +1,9 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "app.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
+{{- $cluster := default "live-1" .Values.ingress.cluster }}
+{{- $clusterColour := ternary "green" "blue" (eq $cluster "live"}}
+{{- $awsWeight := default "100" .Values.ingress.aws_weight }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
@@ -14,8 +17,8 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     {{ if .Values.ingress.enable_whitelist }}nginx.ingress.kubernetes.io/whitelist-source-range: {{ include "app.joinListWithComma" .Values.whitelist | quote }}{{ end }}
     nginx.ingress.kubernetes.io/custom-http-errors: "418"
-    external-dns.alpha.kubernetes.io/set-identifier: {{ $fullName }}-{{ .Release.Namespace }}-blue
-    external-dns.alpha.kubernetes.io/aws-weight: "100"
+    external-dns.alpha.kubernetes.io/set-identifier: {{ $fullName }}-{{ .Release.Namespace }}-{{ $clusterColour }}
+    external-dns.alpha.kubernetes.io/aws-weight: {{ $awsWeight }}
 spec:
   tls:
   {{- range .Values.ingress.hosts }}

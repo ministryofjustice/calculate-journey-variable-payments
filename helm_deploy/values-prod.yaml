@@ -24,6 +24,8 @@ ingress:
     - host: calculate-journey-variable-payments.hmpps.service.justice.gov.uk
       cert_secret: calculate-journey-variable-payments-cert
   path: /
+  cluster: live
+  aws_weight: "0"
 
 env:
   JAVA_OPTS: "-Xmx1024m"

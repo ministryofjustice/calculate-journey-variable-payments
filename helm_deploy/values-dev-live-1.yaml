@@ -24,11 +24,10 @@ ingress:
     - host: calculate-journey-variable-payments-dev.apps.live-1.cloud-platform.service.justice.gov.uk
 #      cert_secret: calculate-journey-variable-payments-cert
   path: /
-  cluster: live
-  aws_weight: "0"
+  aws_weight: "100"
 
 env:
-  JAVA_OPTS: "-Xmx1024m"
+  JAVA_OPTS: "-Xmx2048m"
   HMPPS_AUTH_BASE_URI: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
   HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.live-1.cloud-platform.service.justice.gov.uk"
   CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 13 * * ?"
