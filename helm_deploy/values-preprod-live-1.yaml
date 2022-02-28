@@ -27,7 +27,7 @@ ingress:
   aws_weight: "100"
 
 env:
-  JAVA_OPTS: "-Xmx2048m"
+  JAVA_OPTS: "-Xmx1024m"
   HMPPS_AUTH_BASE_URI: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
   HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
   CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 3 * * ?"
