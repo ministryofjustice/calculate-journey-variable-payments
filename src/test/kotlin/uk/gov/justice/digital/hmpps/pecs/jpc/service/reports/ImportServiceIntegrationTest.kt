@@ -130,13 +130,6 @@ class ImportServiceIntegrationTest(
     assertThat(journeyRepository.findById("J3").get().vehicleRegistrations()).isEqualTo("ABC, DEF")
   }
 
-  @Test
-  fun `given a redirect move missing journey when imported it is marked as a multi move type`() {
-    importReportsService.importAllReportsOn(date(2022, 2, 23))
-
-    assertThat(moveRepository.findById("M20").get().moveType).isEqualTo(MoveType.MULTI)
-  }
-
   private fun assertMovesHaveExpectedMoveTypeOrNull(moves: List<Pair<Move, MoveType?>>) {
     moves.forEach { move -> assertThat(move.first.moveType).isEqualTo(move.second) }
   }

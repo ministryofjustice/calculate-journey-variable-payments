@@ -1,1 +1,0 @@
-Contains a redirect move missing a journey. A redirect should have two journeys. This one should go into multi as a result.
