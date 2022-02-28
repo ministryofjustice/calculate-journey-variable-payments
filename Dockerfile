@@ -27,7 +27,8 @@ WORKDIR /app
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/calculate-journey-variable*.jar /app/app.jar
 COPY --from=builder --chown=appuser:appgroup /app/build/libs/applicationinsights-agent*.jar /app/agent.jar
 COPY --from=builder --chown=appuser:appgroup /app/applicationinsights.json /app
+COPY --from=builder --chown=appuser:appgroup /app/run.sh /app
 
 USER 2000
 
-ENTRYPOINT ["java", "-javaagent:/app/agent.jar", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/bin/sh", "/app/run.sh"]
