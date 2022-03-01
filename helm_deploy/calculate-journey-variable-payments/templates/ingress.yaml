@@ -1,9 +1,9 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "app.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
-{{- $cluster := default "live-1" .Values.ingress.cluster }}
-{{- $clusterColour := ternary "green" "blue" (eq $cluster "live"}}
-{{- $awsWeight := default "100" .Values.ingress.aws_weight }}
+{{- $cluster := default "live-1" .Values.ingress.cluster -}}
+{{- $clusterColour := ternary "green" "blue" (eq $cluster "live") -}}
+{{- $awsWeight := default "100" .Values.ingress.aws_weight -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
