@@ -8,14 +8,15 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.time.LocalDateTime
 
 private val logger = loggerFor<MoveFilterer>()
 
 object MoveFilterer {
 
-  private fun List<Event>.hasEventType(eventType: EventType) = this.find { it.hasType(eventType) } != null
+  private fun List<Event>.hasEventType(eventType: EventType) = this.any { it.hasType(eventType) }
 
-  private fun isCompleted(move: Move) = move.status == MoveStatus.completed
+  private fun Move.isCompleted() = this.status == MoveStatus.completed
 
   /**
    * For a cancelled move to be billable it must be a previously accepted prison to prison move in a cancelled state.
@@ -36,16 +37,18 @@ object MoveFilterer {
   /**
    * A standard move is a completed move with a single completed journey that is billable, the journey from and to
    * destinations should match that of the move, and no cancelled journeys. To be priced as a standard move, the journey
-   * as well as the move must be completed. There also should be no redirects after the move starts, but shouldn't need
-   * to check for this.
+   * as well as the move must be completed. There also should be no redirects after the move starts.
    */
   fun isStandardMove(move: Move) =
-    isCompleted(move) &&
+    move.isCompleted() &&
       with(move.journeys) {
         count { it.stateIsAnyOf(JourneyState.completed) } == 1 &&
           count { isCompleteBillableJourneyAndLocationsMatchMove(it, move) } == 1 &&
           count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
-      } && move.hasNoneOf(EventType.MOVE_REDIRECT)
+      } && when (val moveStart = move.mayBeMoveStartDate()) {
+      null -> true
+      else -> move.events.none { it.isRedirectEventAfter(moveStart) }
+    }
 
   private fun isCompleteBillableJourneyAndLocationsMatchMove(journey: Journey, move: Move) =
     journey.state == JourneyState.completed && journey.billable &&
@@ -57,7 +60,7 @@ object MoveFilterer {
    * It must also have at 2 billable, completed journeys
    */
   fun isLongHaulMove(move: Move) =
-    isCompleted(move) &&
+    move.isCompleted() &&
       (
         move.hasAllOf(EventType.JOURNEY_LODGING) ||
           move.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
@@ -72,7 +75,7 @@ object MoveFilterer {
    * And no redirect event. It must also have 2 or 3 completed, billable journeys
    */
   fun isLockoutMove(move: Move) =
-    isCompleted(move) &&
+    move.isCompleted() &&
       move.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT) &&
       with(move.journeys) {
@@ -82,7 +85,7 @@ object MoveFilterer {
   /**
    * All other completed moves not covered by standard, redirect, long haul or lockout moves
    */
-  fun isMultiTypeMove(move: Move) = isCompleted(move) &&
+  fun isMultiTypeMove(move: Move) = move.isCompleted() &&
     !isStandardMove(move) &&
     !isRedirectionMove(move) &&
     !isLongHaulMove(move) &&
@@ -94,7 +97,7 @@ object MoveFilterer {
    * If there is no move start event, it logs a warning and continues
    */
   fun isRedirectionMove(move: Move) =
-    isCompleted(move) &&
+    move.isCompleted() &&
       move.hasAnyOf(EventType.MOVE_REDIRECT) &&
       move.hasNoneOf(
         EventType.JOURNEY_LODGING,
@@ -103,16 +106,21 @@ object MoveFilterer {
         EventType.MOVE_LOCKOUT,
         EventType.JOURNEY_LOCKOUT
       ) &&
-      when (val moveStartDate = move.events.find { it.type == EventType.MOVE_START.value }?.occurredAt) {
+      when (val moveStartDate = move.mayBeMoveStartDate()) {
         null -> {
           logger.warn("No move start date event found for move reference '${move.reference}'")
           false
         }
         else -> {
-          move.events.count { it.hasType(EventType.MOVE_REDIRECT) && it.occurredAt.isAfter(moveStartDate) } == 1 &&
+          move.events.count { it.isRedirectEventAfter(moveStartDate) } == 1 &&
             with(move.journeys) {
               count { it.stateIsAnyOf(JourneyState.completed, JourneyState.cancelled) && it.billable } == 2
             }
         }
       }
+
+  private fun Move.mayBeMoveStartDate() = this.events.find { it.type == EventType.MOVE_START.value }?.occurredAt
+
+  private fun Event.isRedirectEventAfter(dateTime: LocalDateTime) =
+    this.hasType(EventType.MOVE_REDIRECT) && this.occurredAt.isAfter(dateTime)
 }

@@ -154,7 +154,7 @@ internal class MoveFiltererTest {
       moveEventFactory(
         type = EventType.MOVE_REDIRECT.value,
         moveId = "M7",
-        occurredAt = from.atStartOfDay()
+        occurredAt = from.atStartOfDay().plusMinutes(1)
       ),
       moveEventFactory(
         type = EventType.MOVE_COMPLETE.value,
