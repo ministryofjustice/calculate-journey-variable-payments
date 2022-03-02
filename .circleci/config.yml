@@ -96,6 +96,49 @@ jobs:
       - store_test_results:
           path: build/test-results
 
+  export_kube_vars:
+    docker:
+      - image: cimg/node:16.13.1-browsers
+    parameters:
+      env:
+        type: string
+      cluster:
+        type: string
+        default: "live-1"
+    steps:
+      - export_kube_vars:
+          env: << parameters.env >>
+          cluster: << parameters.cluster >>
+
+commands:
+  export_kube_vars:
+    description: "Exports kube vars for the chosen environment and cluster."
+    parameters:
+      env:
+        type: string
+      cluster:
+        type: string
+        default: live-1
+    steps:
+      - run:
+          name: Export kubernetes env vars
+          command: |
+            ENV_UPCASED=$(echo "<< parameters.env >>" | tr '[:lower:]' '[:upper:]')
+            CLUSTER_SUFFIX=""
+            HELM_SUFFIX=""
+            [[ "<< parameters.cluster >>" = "live" ]] && CLUSTER_SUFFIX="_LIVE"
+            [[ "<< parameters.cluster >>" = "live-1" ]] && HELM_SUFFIX="-live-1"
+
+            CLUSTER_VAR="KUBE_ENV_API${CLUSTER_SUFFIX}"
+            CACERT_VAR="KUBE_ENV_CACERT${CLUSTER_SUFFIX}"
+            TOKEN_VAR="KUBE_ENV_TOKEN${CLUSTER_SUFFIX}"
+            HELM_VALUES_FILE="values-<< parameters.env >>${HELM_SUFFIX}.yaml"
+
+            echo "export KUBE_ENV_API=\"${!CLUSTER_VAR}\"" >> $BASH_ENV
+            echo "export KUBE_ENV_CACERT=\"${!CACERT_VAR}\"" >> $BASH_ENV
+            echo "export KUBE_ENV_TOKEN=\"${!TOKEN_VAR}\"" >> $BASH_ENV
+
+
 workflows:
   version: 2
   build-test-and-deploy:
@@ -115,8 +158,29 @@ workflows:
             branches:
               only:
                 - main
+      - export_kube_vars:
+          name: export_dev_vars
+          env: dev
       - hmpps/deploy_env:
           name: deploy_dev
+          env: "dev"
+          helm_additional_args: "--values=${HELM_VALUES_FILE}"
+          context:
+            - hmpps-common-vars
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - validate
+            - build_docker
+            - helm_lint
+      - export_kube_vars:
+          name: export_dev_live_vars
+          env: dev
+          cluster: live
+      - hmpps/deploy_env:
+          name: deploy_dev_live
           env: "dev"
           context:
             - hmpps-common-vars
@@ -132,8 +196,24 @@ workflows:
           type: approval
           requires:
             - deploy_dev
+      - export_kube_vars:
+          name: export_preprod_vars
+          env: preprod
       - hmpps/deploy_env:
           name: deploy_preprod
+          env: "preprod"
+          helm_additional_args: "--values=${HELM_VALUES_FILE}"
+          context:
+            - hmpps-common-vars
+            - calculate-journey-variable-payments-preprod
+          requires:
+            - request-preprod-approval
+      - export_kube_vars:
+          name: export_preprod_live_vars
+          env: preprod
+          cluster: live
+      - hmpps/deploy_env:
+          name: deploy_preprod_live
           env: "preprod"
           context:
             - hmpps-common-vars
@@ -144,11 +224,27 @@ workflows:
           type: approval
           requires:
             - deploy_preprod
+      - export_kube_vars:
+          name: export_prod_vars
+          env: prod
       - hmpps/deploy_env:
           name: deploy_prod
           env: "prod"
+          helm_additional_args: "--values=${HELM_VALUES_FILE}"
           slack_notification: true
           slack_channel_name: pecs-digital
+          context:
+            - hmpps-common-vars
+            - calculate-journey-variable-payments-prod
+          requires:
+            - request-prod-approval
+      - export_kube_vars:
+          name: export_prod_live_vars
+          env: prod
+          cluster: live
+      - hmpps/deploy_env:
+          name: deploy_prod_live
+          env: "prod"
           context:
             - hmpps-common-vars
             - calculate-journey-variable-payments-prod

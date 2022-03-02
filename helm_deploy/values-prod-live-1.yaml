@@ -9,7 +9,7 @@ image:
   port: 8080
 
 db:
-  secret_name: rds-instance-calculate-journey-variable-payments-preprod
+  secret_name: rds-instance-calculate-journey-variable-payments-prod
 
 sentry:
   secret_name: calculate-journey-variable-payments-sentry
@@ -21,21 +21,20 @@ ingress:
   enabled: true
   enable_whitelist: false
   hosts:
-    - host: calculate-journey-variable-payments-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
-#      cert_secret: calculate-journey-variable-payments-cert
+    - host: calculate-journey-variable-payments.hmpps.service.justice.gov.uk
+      cert_secret: calculate-journey-variable-payments-cert
   path: /
-  cluster: live
-  aws_weight: "0"
+  aws_weight: "100"
 
 env:
   JAVA_OPTS: "-Xmx1024m"
-  HMPPS_AUTH_BASE_URI: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
-  HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
+  HMPPS_AUTH_BASE_URI: "https://sign-in.hmpps.service.justice.gov.uk/auth"
+  HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments.hmpps.service.justice.gov.uk"
   CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 3 * * ?"
   CRON_IMPORT_REPORTS: "0 30 5 * * ?"
   CRON_BACKFILL_REPORTS: "-"
-  SENTRY_ENVIRONMENT: preprod
-  BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
+  SENTRY_ENVIRONMENT: prod
+  BASM_API_BASE_URL: "https://api.bookasecuremove.service.justice.gov.uk"
 
 #whitelist:
 #  office: "217.33.148.210/32"
