@@ -140,9 +140,7 @@ workflows:
               only:
                 - main
           requires:
-            - validate
-            - build_docker
-            - helm_lint
+            - export_dev_live_vars
       - request-preprod-approval:
           type: approval
           requires:
@@ -164,7 +162,7 @@ workflows:
             - calculate-journey-variable-payments-preprod
             - calculate-journey-variable-payments-preprod-live
           requires:
-            - request-preprod-approval
+            - export_preprod_live_vars
       - request-prod-approval:
           type: approval
           requires:
@@ -188,7 +186,7 @@ workflows:
             - calculate-journey-variable-payments-prod
             - calculate-journey-variable-payments-prod-live
           requires:
-            - request-prod-approval
+            - export_prod_live_vars
 
   security:
     triggers:
