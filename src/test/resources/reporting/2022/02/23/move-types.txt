@@ -1,0 +1,4 @@
+Contains the following moves:
+
+- Move M1 is a redirect move missing a journey. A redirect should have two journeys therefore should go into multi move bucket.
+- Move M2 is a complete move with one journey and a redirect event before the move start event therefore should go into the standard move bucket.

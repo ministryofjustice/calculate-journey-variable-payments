@@ -148,22 +148,42 @@ internal class MoveFiltererTest {
   )
 
   private val multiTypeMoveRedirect = reportMoveFactory(
-    moveId = "M7",
+    moveId = "M8",
     events = listOf(
       moveEventFactory(type = EventType.MOVE_START.value, moveId = "M7", occurredAt = from.atStartOfDay()),
       moveEventFactory(
         type = EventType.MOVE_REDIRECT.value,
-        moveId = "M7",
+        moveId = "M8",
         occurredAt = from.atStartOfDay().plusMinutes(1)
       ),
       moveEventFactory(
         type = EventType.MOVE_COMPLETE.value,
-        moveId = "M7",
+        moveId = "M8",
         occurredAt = from.atStartOfDay().plusHours(4)
       )
     ),
     journeys = listOf(
-      reportJourneyFactory(journeyId = "J1M6", moveId = "M7", billable = true),
+      reportJourneyFactory(journeyId = "J1M8", moveId = "M8", billable = true),
+    )
+  )
+
+  private val standardMoveRedirect = reportMoveFactory(
+    moveId = "M9",
+    events = listOf(
+      moveEventFactory(type = EventType.MOVE_START.value, moveId = "M9", occurredAt = from.atStartOfDay()),
+      moveEventFactory(
+        type = EventType.MOVE_REDIRECT.value,
+        moveId = "M9",
+        occurredAt = from.atStartOfDay().minusMinutes(1)
+      ),
+      moveEventFactory(
+        type = EventType.MOVE_COMPLETE.value,
+        moveId = "M9",
+        occurredAt = from.atStartOfDay().plusHours(4)
+      )
+    ),
+    journeys = listOf(
+      reportJourneyFactory(journeyId = "J1M9", moveId = "M9", billable = true),
     )
   )
 
@@ -271,6 +291,11 @@ internal class MoveFiltererTest {
   @Test
   fun `is multi-type move for redirection missing journey`() {
     assertThat(MoveFilterer.isMultiTypeMove(multiTypeMoveRedirect)).isTrue
+  }
+
+  @Test
+  fun `is standard move with redirection prior to move start`() {
+    assertThat(MoveFilterer.isStandardMove(standardMoveRedirect)).isTrue
   }
 
   @Test

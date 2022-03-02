@@ -46,7 +46,7 @@ object MoveFilterer {
           count { isCompleteBillableJourneyAndLocationsMatchMove(it, move) } == 1 &&
           count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
       } && when (val moveStart = move.mayBeMoveStartDate()) {
-      null -> true
+      null -> logger.warn("No move start date event found for move reference '${move.reference}'").let { true }
       else -> move.events.none { it.isRedirectEventAfter(moveStart) }
     }
 
