@@ -161,6 +161,10 @@ workflows:
       - export_kube_vars:
           name: export_dev_vars
           env: dev
+          requires:
+            - validate
+            - build_docker
+            - helm_lint
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
@@ -172,13 +176,13 @@ workflows:
               only:
                 - main
           requires:
-            - validate
-            - build_docker
-            - helm_lint
+            - export_dev_vars
       - export_kube_vars:
           name: export_dev_live_vars
           env: dev
           cluster: live
+          requires:
+            - deploy_dev
       - hmpps/deploy_env:
           name: deploy_dev_live
           env: "dev"
@@ -189,9 +193,7 @@ workflows:
               only:
                 - main
           requires:
-            - validate
-            - build_docker
-            - helm_lint
+            - export_dev_live_vars
       - request-preprod-approval:
           type: approval
           requires:
@@ -199,6 +201,8 @@ workflows:
       - export_kube_vars:
           name: export_preprod_vars
           env: preprod
+          requires:
+            - request-preprod-approval
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
@@ -207,11 +211,13 @@ workflows:
             - hmpps-common-vars
             - calculate-journey-variable-payments-preprod
           requires:
-            - request-preprod-approval
+            - export_preprod_vars
       - export_kube_vars:
           name: export_preprod_live_vars
           env: preprod
           cluster: live
+          requires:
+            - deploy_preprod
       - hmpps/deploy_env:
           name: deploy_preprod_live
           env: "preprod"
@@ -219,7 +225,7 @@ workflows:
             - hmpps-common-vars
             - calculate-journey-variable-payments-preprod
           requires:
-            - request-preprod-approval
+            - export_preprod_live_vars
       - request-prod-approval:
           type: approval
           requires:
@@ -227,6 +233,8 @@ workflows:
       - export_kube_vars:
           name: export_prod_vars
           env: prod
+          requires:
+            - request-prod-approval
       - hmpps/deploy_env:
           name: deploy_prod
           env: "prod"
@@ -237,11 +245,13 @@ workflows:
             - hmpps-common-vars
             - calculate-journey-variable-payments-prod
           requires:
-            - request-prod-approval
+            - export_prod_vars
       - export_kube_vars:
           name: export_prod_live_vars
           env: prod
           cluster: live
+          requires:
+            - deploy_prod
       - hmpps/deploy_env:
           name: deploy_prod_live
           env: "prod"
@@ -249,7 +259,7 @@ workflows:
             - hmpps-common-vars
             - calculate-journey-variable-payments-prod
           requires:
-            - request-prod-approval
+            - export_prod_live_vars
 
   security:
     triggers:
