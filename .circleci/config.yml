@@ -118,7 +118,7 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_dev
           env: "dev"
-          helm_additional_args: "--values=${HELM_VALUES_FILE}"
+          helm_additional_args: "--values=values-dev-live-1.yaml"
           context:
             - hmpps-common-vars
           filters:
@@ -150,7 +150,7 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
-          helm_additional_args: "--values=${HELM_VALUES_FILE}"
+          helm_additional_args: "--values=values-preprod-live-1.yaml"
           context:
             - hmpps-common-vars
             - calculate-journey-variable-payments-preprod
@@ -172,7 +172,7 @@ workflows:
       - hmpps/deploy_env:
           name: deploy_prod
           env: "prod"
-          helm_additional_args: "--values=${HELM_VALUES_FILE}"
+          helm_additional_args: "--values=values-prod-live-1.yaml"
           slack_notification: true
           slack_channel_name: pecs-digital
           context:
