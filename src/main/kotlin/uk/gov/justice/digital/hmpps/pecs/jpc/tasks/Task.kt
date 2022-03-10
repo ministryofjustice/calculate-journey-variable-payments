@@ -12,7 +12,13 @@ abstract class Task(private val name: String, private val monitoringService: Mon
     Result.runCatching {
       LockAssert.assertLocked()
     }
-      .onSuccess { performTask() }
+      .onSuccess {
+        logger.info("Running task '$name'")
+
+        performTask()
+
+        logger.info("Finished running task '$name'")
+      }
       .onFailure {
         logger.error("Unable to lock task '$name' for execution", it)
         monitoringService.capture("Unable to lock task '$name' for execution")
