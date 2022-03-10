@@ -117,19 +117,6 @@ workflows:
                 - main
       - hmpps/deploy_env:
           name: deploy_dev
-          env: "dev-live-1"
-          context:
-            - hmpps-common-vars
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - validate
-            - build_docker
-            - helm_lint
-      - hmpps/deploy_env:
-          name: deploy_dev_live
           env: "dev"
           context:
             - hmpps-common-vars
@@ -148,14 +135,6 @@ workflows:
             - deploy_dev
       - hmpps/deploy_env:
           name: deploy_preprod
-          env: "preprod-live-1"
-          context:
-            - hmpps-common-vars
-            - calculate-journey-variable-payments-preprod
-          requires:
-            - request-preprod-approval
-      - hmpps/deploy_env:
-          name: deploy_preprod_live
           env: "preprod"
           context:
             - hmpps-common-vars
@@ -169,16 +148,6 @@ workflows:
             - deploy_preprod
       - hmpps/deploy_env:
           name: deploy_prod
-          env: "prod-live-1"
-          slack_notification: true
-          slack_channel_name: pecs-digital
-          context:
-            - hmpps-common-vars
-            - calculate-journey-variable-payments-prod
-          requires:
-            - request-prod-approval
-      - hmpps/deploy_env:
-          name: deploy_prod_live
           env: "prod"
           context:
             - hmpps-common-vars
