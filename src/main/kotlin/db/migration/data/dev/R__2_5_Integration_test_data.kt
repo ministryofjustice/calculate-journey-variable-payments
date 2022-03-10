@@ -62,29 +62,35 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
   private fun createStandardMoves(template: JdbcTemplate) {
     logger.info("create standard moves")
 
-    fun createMoveEventsAndJourney(move: Move, priced: Priced? = null) {
-      create(moveStartEvent(move), template)
-      create(moveCompleteEvent(move), template)
-      create(
+    fun createMoveEventsAndJourney(move: Move, priced: Priced? = null): Move {
+      val moveEvents = listOf(create(moveStartEvent(move), template), create(moveCompleteEvent(move), template))
+
+      val journey = create(
         journey(move, fromAgencyId = priced?.fromAgencyId ?: "PRISON1", priced?.toAgencyId ?: "PRISON2"),
         template
-      ).also { journey ->
-        create(journeyStartEvent(journey, details = mapOf("vehicle_reg" to "ABDCEFG")), template)
-        create(journeyCompleteEvent(journey, details = mapOf("vehicle_reg" to "HIJKLMN")), template)
-
-        if (priced != null) {
-          template.update(
-            priceSql,
-            UUID.randomUUID(),
-            LocalDateTime.now(),
-            journey.effectiveYear,
-            priced.amount.pence,
-            Supplier.SERCO.name,
-            priced.fromPrimaryKey,
-            priced.toPrimaryKey
+      ).let {
+        it.copy(
+          events = listOf(
+            create(journeyStartEvent(it, details = mapOf("vehicle_reg" to "ABDCEFG")), template),
+            create(journeyCompleteEvent(it, details = mapOf("vehicle_reg" to "HIJKLMN")), template)
           )
-        }
+        )
       }
+
+      if (priced != null) {
+        template.update(
+          priceSql,
+          UUID.randomUUID(),
+          LocalDateTime.now(),
+          journey.effectiveYear,
+          priced.amount.pence,
+          Supplier.SERCO.name,
+          priced.fromPrimaryKey,
+          priced.toPrimaryKey
+        )
+      }
+
+      return move.copy(events = moveEvents, journeys = listOf(journey))
     }
 
     fun createUnpricedStandardMovesInsideTwoYearChangeWindow() {
@@ -96,7 +102,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         create(
           move(moveId = it.key, profileId = it.value, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"),
           template
-        ).also { move -> createMoveEventsAndJourney(move) }
+        ).also { move ->
+          createMoveEventsAndJourney(move).failMigrationIfNotMoveType(MoveType.STANDARD)
+        }
       }
     }
 
@@ -120,7 +128,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             toAgencyId = "POLICE1",
             amount = Money.valueOf("100.00")
           )
-        )
+        ).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
     }
 
@@ -134,7 +142,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           date = startOfPreviousMonth.minusYears(2)
         ),
         template
-      ).also { createMoveEventsAndJourney(it) }
+      ).also {
+        createMoveEventsAndJourney(it).failMigrationIfNotMoveType(MoveType.STANDARD)
+      }
     }
 
     fun createPricedStandardMoveOutsideTwoYearChangeWindow() {
@@ -157,7 +167,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             toAgencyId = "POLICE1",
             amount = Money.valueOf("50.00")
           )
-        )
+        ).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
     }
 
@@ -185,20 +195,26 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         ),
         template
       ).also { move ->
-        create(moveStartEvent(move), template)
-        create(moveRedirectEvent(move), template)
-        create(moveCompleteEvent(move), template)
-        create(
-          journey(
-            move,
-            fromAgencyId = "FROM_AGENCY",
-            toAgencyId = "STOPOVER_AGENCY",
-            state = JourneyState.cancelled,
-            dropOff = null
+        move.copy(
+          events = listOf(
+            create(moveStartEvent(move), template),
+            create(moveRedirectEvent(move), template),
+            create(moveCompleteEvent(move), template)
           ),
-          template
-        )
-        create(journey(move, fromAgencyId = "STOPOVER_AGENCY", toAgencyId = "TO_AGENCY"), template)
+          journeys = listOf(
+            create(
+              journey(
+                move,
+                fromAgencyId = "FROM_AGENCY",
+                toAgencyId = "STOPOVER_AGENCY",
+                state = JourneyState.cancelled,
+                dropOff = null
+              ),
+              template
+            ),
+            create(journey(move, fromAgencyId = "STOPOVER_AGENCY", toAgencyId = "TO_AGENCY"), template)
+          )
+        ).failMigrationIfNotMoveType(MoveType.REDIRECTION)
       }
     }
   }
@@ -220,19 +236,27 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         ),
         template
       ).also { move ->
-        create(moveStartEvent(move), template)
-        create(moveCompleteEvent(move), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "STOPOVER_AGENCY"), template)
-        create(
-          journey(
-            move,
-            fromAgencyId = "STOPOVER_AGENCY",
-            toAgencyId = "TO_AGENCY",
-            pickUp = move.pickUpDateTime?.plusDays(1),
-            dropOff = move.dropOffOrCancelledDateTime
+        move.copy(
+          events = listOf(
+            create(moveStartEvent(move), template),
+            create(moveCompleteEvent(move), template),
+            create(moveLodgingStartEvent(move), template),
+            create(moveLodgingEndEvent(move), template)
           ),
-          template
-        )
+          journeys = listOf(
+            create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "STOPOVER_AGENCY"), template),
+            create(
+              journey(
+                move,
+                fromAgencyId = "STOPOVER_AGENCY",
+                toAgencyId = "TO_AGENCY",
+                pickUp = move.pickUpDateTime?.plusDays(1),
+                dropOff = move.dropOffOrCancelledDateTime
+              ),
+              template
+            )
+          )
+        ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
       }
     }
   }
@@ -254,19 +278,26 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         ),
         template
       ).also { move ->
-        create(moveStartEvent(move), template)
-        create(moveCompleteEvent(move), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "LOCKOUT_AGENCY"), template)
-        create(
-          journey(
-            move,
-            fromAgencyId = "LOCKOUT_AGENCY",
-            toAgencyId = "TO_AGENCY",
-            pickUp = move.pickUpDateTime?.plusDays(1),
-            dropOff = move.dropOffOrCancelledDateTime
+        move.copy(
+          events = listOf(
+            create(moveStartEvent(move), template),
+            create(moveCompleteEvent(move), template),
+            create(moveLockoutEvent(move), template)
           ),
-          template
-        )
+          journeys = listOf(
+            create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "LOCKOUT_AGENCY"), template),
+            create(
+              journey(
+                move,
+                fromAgencyId = "LOCKOUT_AGENCY",
+                toAgencyId = "TO_AGENCY",
+                pickUp = move.pickUpDateTime?.plusDays(1),
+                dropOff = move.dropOffOrCancelledDateTime
+              ),
+              template
+            )
+          )
+        ).failMigrationIfNotMoveType(MoveType.LOCKOUT)
       }
     }
   }
@@ -288,29 +319,35 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         ),
         template
       ).also { move ->
-        create(moveStartEvent(move), template)
-        create(moveCompleteEvent(move), template)
-        create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY2"), template)
-        create(
-          journey(
-            move,
-            fromAgencyId = "FROM_AGENCY2",
-            toAgencyId = "TO_AGENCY3",
-            state = JourneyState.cancelled,
-            dropOff = null
+        move.copy(
+          events = listOf(
+            create(moveStartEvent(move), template),
+            create(moveCompleteEvent(move), template)
           ),
-          template
-        )
-        create(
-          journey(
-            move,
-            fromAgencyId = "FROM_AGENCY2",
-            toAgencyId = "TO_AGENCY4",
-            pickUp = move.pickUpDateTime?.plusDays(1),
-            dropOff = move.dropOffOrCancelledDateTime
-          ),
-          template
-        )
+          journeys = listOf(
+            create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY2"), template),
+            create(
+              journey(
+                move,
+                fromAgencyId = "FROM_AGENCY2",
+                toAgencyId = "TO_AGENCY3",
+                state = JourneyState.cancelled,
+                dropOff = null
+              ),
+              template
+            ),
+            create(
+              journey(
+                move,
+                fromAgencyId = "FROM_AGENCY2",
+                toAgencyId = "TO_AGENCY4",
+                pickUp = move.pickUpDateTime?.plusDays(1),
+                dropOff = move.dropOffOrCancelledDateTime
+              ),
+              template
+            )
+          )
+        ).failMigrationIfNotMoveType(MoveType.MULTI)
       }
     }
   }
@@ -327,17 +364,32 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           profileId = it.value,
           fromAgencyId = "FROM_AGENCY",
           toAgencyId = "TO_AGENCY",
-          type = MoveType.CANCELLED
+          type = MoveType.CANCELLED,
+          cancellationReason = Move.CANCELLATION_REASON_CANCELLED_BY_PMU,
+          status = MoveStatus.cancelled
         ),
         template
       ).also { move ->
-        create(moveAcceptEvent(move), template)
-        create(moveCancelEvent(move), template)
-        create(
-          journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.cancelled),
-          template
-        )
+        move.copy(
+          events = listOf(
+            create(moveAcceptEvent(move), template),
+            create(moveCancelEvent(move), template)
+          ),
+          journeys = listOf(
+            create(
+              journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.cancelled),
+              template
+            )
+          )
+        ).failMigrationIfNotMoveType(MoveType.CANCELLED)
       }
+    }
+  }
+
+  private fun Move.failMigrationIfNotMoveType(moveType: MoveType) {
+    if (moveType.hasMoveType(this).not()) {
+      logger.error("Move should be a $moveType but is not $this")
+      throw RuntimeException("Migration failed as move ${this.moveId} is not expected move type $moveType")
     }
   }
 
@@ -358,7 +410,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       move.status.name,
       move.supplier.name,
       move.toNomisAgencyId,
-      move.updatedAt
+      move.updatedAt,
+      move.cancellationReason
     )
 
     return move
@@ -386,7 +439,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     return journey
   }
 
-  private fun create(event: Event, template: JdbcTemplate) {
+  private fun create(event: Event, template: JdbcTemplate): Event {
     template.update(
       eventSql,
       event.eventId,
@@ -400,6 +453,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       event.updatedAt,
       event.details?.let { JpaDetailsConverter().convertToDatabaseColumn(it) }
     )
+
+    return event
   }
 }
 
@@ -413,7 +468,9 @@ private fun move(
   toAgencyId: String,
   supplier: Supplier = Supplier.SERCO,
   days: Long = 0,
-  date: LocalDate = startOfPreviousMonth
+  date: LocalDate = startOfPreviousMonth,
+  cancellationReason: String? = null,
+  status: MoveStatus = MoveStatus.completed
 ) = Move(
   dropOffOrCancelledDateTime = date.plusDays(days).atStartOfDay().plusHours(12),
   fromNomisAgencyId = fromAgencyId,
@@ -426,10 +483,11 @@ private fun move(
   reference = "${type.name}$moveId",
   reportFromLocationType = "prison",
   reportToLocationType = "prison",
-  status = MoveStatus.completed,
+  status = status,
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
-  updatedAt = date.atStartOfDay()
+  updatedAt = date.atStartOfDay(),
+  cancellationReason = cancellationReason
 )
 
 private val moveSql = """
@@ -449,13 +507,15 @@ private val moveSql = """
     status,
     supplier,
     to_nomis_agency_id,
-    updated_at
-  ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    updated_at,
+    cancellation_reason
+  ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """.trimIndent()
 
 private fun moveStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Start")
 
-private fun moveRedirectEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Redirect")
+private fun moveRedirectEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
+  moveEvent(move, supplier, "Redirect", move.pickUpDateTime?.plusMinutes(1))
 
 private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
   moveEvent(move, supplier, "Complete", move.dropOffOrCancelledDateTime)
@@ -463,6 +523,14 @@ private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
 private fun moveAcceptEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Accept")
 
 private fun moveCancelEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Cancel")
+
+private fun moveLodgingStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
+  moveEvent(move, supplier, "LodgingStart")
+
+private fun moveLodgingEndEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
+  moveEvent(move, supplier, "LodgingEnd")
+
+private fun moveLockoutEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Lockout")
 
 private fun moveEvent(
   move: Move,
