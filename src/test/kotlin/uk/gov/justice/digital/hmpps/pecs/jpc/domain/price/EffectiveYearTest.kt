@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.price
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal class EffectiveYearTest {
@@ -98,6 +99,11 @@ internal class EffectiveYearTest {
         8 to 2022,
       )
     )
+  }
+
+  @Test
+  fun `start of contract is Sep 1st 2020`() {
+    assertThat(EffectiveYear.startOfContract()).isEqualTo(LocalDate.of(2020, 9, 1))
   }
 
   private fun september(year: Int) = LocalDateTime.of(year, 9, 1, 0, 0)

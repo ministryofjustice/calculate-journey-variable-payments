@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.BackfillReportsTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysLocationMappingTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysMovesTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysPeopleAndProfilesTask
+import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.ReprocessExistingMovesTask
 
 /**
  * Config responsible for setting up the actual tasks to be scheduled.
@@ -18,7 +19,8 @@ class TasksSchedulingConfiguration(
   val previousDaysMoves: PreviousDaysMovesTask,
   val previousDaysPeopleAndProfiles: PreviousDaysPeopleAndProfilesTask,
   val previousDaysLocationMapping: PreviousDaysLocationMappingTask,
-  val backfillReports: BackfillReportsTask
+  val backfillReports: BackfillReportsTask,
+  val reprocessExistingMovesTask: ReprocessExistingMovesTask
 ) {
 
   @Scheduled(cron = "\${CRON_IMPORT_REPORTS}")
@@ -38,5 +40,11 @@ class TasksSchedulingConfiguration(
   @SchedulerLock(name = "backfillReports")
   fun backfillReports() {
     backfillReports.execute()
+  }
+
+  @Scheduled(cron = "\${CRON_REPROCESS_EXISTING_MOVES}")
+  @SchedulerLock(name = "reprocessExistingMoves")
+  fun reprocessExistingMoves() {
+    reprocessExistingMovesTask.execute()
   }
 }
