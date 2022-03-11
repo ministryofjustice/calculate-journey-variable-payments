@@ -43,11 +43,11 @@ class HistoricMovesProcessingService(
       dateRange.endInclusive
     ).values.flatten()
       .also { existingMoves ->
-        logger.info("Processing ${existingMoves.size} historic moves in range ${dateRange.start} to ${dateRange.endInclusive}")
+        logger.info("Processing ${existingMoves.size} historic moves in range ${dateRange.start} to ${dateRange.endInclusive} for $supplier")
       }
       .let(this::processExisting)
       .also {
-        logger.info("Processed $it historic moves in range ${dateRange.start} to ${dateRange.endInclusive}")
+        logger.info("Processed $it historic moves in range ${dateRange.start} to ${dateRange.endInclusive} for $supplier")
         logger.info("Time taken in minutes ${start.until(timeSource.dateTime(), ChronoUnit.MINUTES)}")
       }
   }
