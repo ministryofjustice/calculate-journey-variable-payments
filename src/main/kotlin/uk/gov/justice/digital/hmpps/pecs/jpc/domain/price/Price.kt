@@ -136,5 +136,9 @@ enum class Supplier {
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
       kotlin.runCatching { valueOf(value!!.uppercase()) }.getOrDefault(UNKNOWN)
+
+    fun forEach(consumer: (Supplier) -> Unit) {
+      listOf(SERCO, GEOAMEY).forEach { consumer(it) }
+    }
   }
 }

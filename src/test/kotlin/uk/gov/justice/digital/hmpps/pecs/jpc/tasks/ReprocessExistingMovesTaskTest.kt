@@ -11,14 +11,15 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.HistoricMovesProcessingService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class ReprocessExistingMovesTaskTest {
 
-  private val historicMovesProcessingService: HistoricMovesProcessingService = mock()
+  private val service: HistoricMovesProcessingService = mock()
   private val monitoringService: MonitoringService = mock()
-  private val timeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 9, 30, 0, 0) }
-  private val task = ReprocessExistingMovesTask(historicMovesProcessingService, timeSource, monitoringService)
+  private val fixedTimeSource: TimeSource = TimeSource { LocalDateTime.of(2020, 9, 30, 0, 0) }
+  private val task = ReprocessExistingMovesTask(service, fixedTimeSource, monitoringService)
 
   @Test
   internal fun `processing service for Serco and GEO is invoked for September 2020`() {
@@ -26,13 +27,35 @@ class ReprocessExistingMovesTaskTest {
 
     task.execute()
 
-    verify(historicMovesProcessingService).process(
-      DateRange(EffectiveYear.startOfContract(), timeSource.yesterday()), Supplier.SERCO
-    )
-    verify(historicMovesProcessingService).process(
-      DateRange(EffectiveYear.startOfContract(), timeSource.yesterday()), Supplier.GEOAMEY
-    )
+    verifyCalledWith(DateRange(EffectiveYear.startOfContract(), fixedTimeSource.yesterday()), Supplier.SERCO)
+    verifyCalledWith(DateRange(EffectiveYear.startOfContract(), fixedTimeSource.yesterday()), Supplier.GEOAMEY)
     verifyNoInteractions(monitoringService)
+  }
+
+  @Test
+  internal fun `processing service for Serco and GEO is invoked for September 2020 and October 2020`() {
+    LockAssert.TestHelper.makeAllAssertsPass(true)
+
+    ReprocessExistingMovesTask(
+      service,
+      { LocalDateTime.of(2020, 11, 1, 0, 0) },
+      monitoringService
+    ).execute()
+
+    verifyCalledWith(range(EffectiveYear.startOfContract(), date(2020, 9, 30)), Supplier.SERCO)
+    verifyCalledWith(range(EffectiveYear.startOfContract(), date(2020, 9, 30)), Supplier.GEOAMEY)
+    verifyCalledWith(range(date(2020, 10, 1), date(2020, 10, 31)), Supplier.SERCO)
+    verifyCalledWith(range(date(2020, 10, 1), date(2020, 10, 31)), Supplier.GEOAMEY)
+
+    verifyNoInteractions(monitoringService)
+  }
+
+  private fun range(from: LocalDate, to: LocalDate) = DateRange(from, to)
+
+  private fun date(year: Int, month: Int, day: Int) = LocalDate.of(year, month, day)
+
+  private fun verifyCalledWith(range: DateRange, supplier: Supplier) {
+    verify(service).process(range, supplier)
   }
 
   @Test
@@ -41,7 +64,7 @@ class ReprocessExistingMovesTaskTest {
 
     task.execute()
 
-    verifyNoInteractions(historicMovesProcessingService)
+    verifyNoInteractions(service)
     verify(monitoringService).capture("Unable to lock task 'Reprocess historic moves' for execution")
   }
 }

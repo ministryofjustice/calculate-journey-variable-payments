@@ -18,17 +18,16 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
  */
 @Component
 class ReprocessExistingMovesTask(
-  private val historicMovesProcessingService: HistoricMovesProcessingService,
+  private val service: HistoricMovesProcessingService,
   private val timeSource: TimeSource,
   monitoringService: MonitoringService
 ) : Task("Reprocess historic moves", monitoringService) {
 
   override fun performTask() {
-    DateRange(EffectiveYear.startOfContract(), timeSource.yesterday()).forEach {
-      historicMovesProcessingService.process(it, Supplier.SERCO)
-      historicMovesProcessingService.process(it, Supplier.GEOAMEY)
+    DateRange(EffectiveYear.startOfContract(), timeSource.yesterday()).forEachMonth { month ->
+      Supplier.forEach { supplier -> service.process(month, supplier) }
     }
   }
 
-  private fun DateRange.forEach(consumer: (DateRange) -> Unit) = listOf().forEach { consumer(it) }
+  private fun DateRange.forEachMonth(consumer: (DateRange) -> Unit) = listOf().forEach { consumer(it) }
 }
