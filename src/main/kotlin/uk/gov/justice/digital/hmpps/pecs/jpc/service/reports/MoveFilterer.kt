@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 private val logger = loggerFor<MoveFilterer>()
@@ -30,9 +31,12 @@ object MoveFilterer {
       move.reportToLocationType == "prison" &&
       move.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
       move.events.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
-      move.moveDate != null && move.events.find {
+      move.moveDate?.let { move.events.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(it) } ?: false
+
+  private fun List<Event>.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(moveDate: LocalDate) =
+    this.find {
       it.hasType(EventType.MOVE_CANCEL)
-    }?.occurredAt?.plusHours(9)?.isAfter(move.moveDate?.atStartOfDay()) ?: false
+    }?.occurredAt?.plusHours(9)?.isAfter(moveDate.atStartOfDay()) ?: false
 
   /**
    * A standard move is a completed move with a single completed journey that is billable, the journey from and to

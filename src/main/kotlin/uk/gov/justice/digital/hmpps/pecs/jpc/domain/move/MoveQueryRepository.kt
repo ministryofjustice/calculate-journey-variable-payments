@@ -123,7 +123,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         updatedAt = getTimestamp("updated_at").toLocalDateTime(),
         supplier = Supplier.valueOfCaseInsensitive(getString("supplier")),
         status = MoveStatus.valueOfCaseInsensitive(getString("status")),
-        moveType = MoveType.valueOfCaseInsensitive(getString("move_type")),
+        moveType = getString("move_type")?.let { MoveType.valueOfCaseInsensitive(it) },
         reference = getString("reference"),
         moveDate = getDate("move_date")?.toLocalDate(),
         fromNomisAgencyId = getString("from_nomis_agency_id"),
@@ -229,8 +229,29 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     }
   }
 
-  fun movesInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) =
+  fun movesWithMoveTypeInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) =
     MoveType.values().associateBy({ it }, { movesForMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) })
+
+  /**
+   * This will include moves with and without a move type assigned in the results.
+   */
+  fun allMovesInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): List<Move> {
+    val movesWithPersonAndJourneys = jdbcTemplate.query(
+      moveJourneySelectSQL +
+        "where m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
+        "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
+      moveJourneyRowMapper,
+      supplier.name,
+      startDate.possiblePriceExceptionMonth(),
+      supplier.name,
+      Timestamp.valueOf(startDate.atStartOfDay()),
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
+    ).groupBy { it.move.moveId }
+
+    return movesWithPersonAndJourneys.keys.map { k ->
+      movesWithPersonAndJourneys.getValue(k).move()
+    }
+  }
 
   class MovePersonJourney(val move: Move, val person: Person?, val journey: Journey?)
 

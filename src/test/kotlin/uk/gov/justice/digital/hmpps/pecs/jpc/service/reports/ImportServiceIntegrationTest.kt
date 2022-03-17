@@ -102,8 +102,7 @@ class ImportServiceIntegrationTest(
       Supplier.GEOAMEY
     )
 
-    // Note out of the 9 moves one is never assigned a move type hence. The processor ignores these moves, so there are 8 and not 9 in this case.
-    assertThat(processedMoveCount).isEqualTo(8)
+    assertThat(processedMoveCount).isEqualTo(9)
 
     // Check moves have not changed
     assertThat(importedDecemberMoves.map { it.first }).hasSameElementsAs(createdMoves)
