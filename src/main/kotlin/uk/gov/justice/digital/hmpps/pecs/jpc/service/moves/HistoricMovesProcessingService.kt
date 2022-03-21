@@ -17,7 +17,7 @@ private val logger = loggerFor<HistoricMovesProcessingService>()
  * be made to Moves that have already taken place. This avoids the need to rerun the report import process which is very
  * time and resource hungry when it spans a large period of time.
  *
- * An example of a correction would be cancelled Moves that don't have a (fake) journey which are needed for pricing
+ * An example of a correction would be cancelled moves that don't have a (fake) journey which are needed for pricing
  * purposes.
  */
 @Service
@@ -28,23 +28,20 @@ class HistoricMovesProcessingService(
 ) {
 
   /**
-   * This will go through and only process historic moves that have been assigned a move type.
-   *
-   * Note: if a move does not have a move type and needs to be processed as well this will need to be changed.
+   * This will go through and process historic moves whether they have a move type assigned or not.
    */
   fun process(dateRange: DateRange, supplier: Supplier): Int {
     if (dateRange.notInPast()) throw RuntimeException("Date range must be in the past")
 
     val start = timeSource.dateTime()
 
-    return moveQueryRepository.movesInDateRange(
+    return moveQueryRepository.allMovesInDateRange(
       supplier,
       dateRange.start,
       dateRange.endInclusive
-    ).values.flatten()
-      .also { existingMoves ->
-        logger.info("Processing ${existingMoves.size} historic moves in range ${dateRange.start} to ${dateRange.endInclusive} for $supplier")
-      }
+    ).also { existingMoves ->
+      logger.info("Processing ${existingMoves.size} historic moves in range ${dateRange.start} to ${dateRange.endInclusive} for $supplier")
+    }
       .let(this::processExisting)
       .also {
         logger.info("Processed $it historic moves in range ${dateRange.start} to ${dateRange.endInclusive} for $supplier")
@@ -52,7 +49,8 @@ class HistoricMovesProcessingService(
       }
   }
 
-  private fun DateRange.notInPast() = this.start.isAfter(timeSource.yesterday()) || this.endInclusive.isAfter(timeSource.yesterday())
+  private fun DateRange.notInPast() =
+    this.start.isAfter(timeSource.yesterday()) || this.endInclusive.isAfter(timeSource.yesterday())
 
   private fun processExisting(moves: List<Move>) = movePersister.persist(moves)
 }

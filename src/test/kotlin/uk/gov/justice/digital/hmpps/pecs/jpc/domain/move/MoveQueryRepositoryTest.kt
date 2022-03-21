@@ -67,6 +67,7 @@ internal class MoveQueryRepositoryTest {
   private val standardMoveGeoamey = standardMoveSerco.copy(moveId = "M2", supplier = Supplier.GEOAMEY)
   private val journeyModelGeoamey =
     journeyModel1Serco.copy(journeyId = "J3", supplier = Supplier.GEOAMEY, moveId = standardMoveGeoamey.moveId)
+  private val moveWithoutMoveTypeGeoamey = standardMoveSerco.copy(moveId = "M3", supplier = Supplier.GEOAMEY, moveType = null)
 
   @BeforeEach
   fun beforeEach() {
@@ -103,6 +104,7 @@ internal class MoveQueryRepositoryTest {
 
     moveRepository.save(standardMoveGeoamey)
     journeyRepository.save(journeyModelGeoamey)
+    moveRepository.save(moveWithoutMoveTypeGeoamey)
 
     entityManager.flush()
   }
@@ -244,7 +246,7 @@ internal class MoveQueryRepositoryTest {
   }
 
   @Test
-  fun `GEOAMey moves count`() {
+  fun `GEOAmey moves count`() {
     assertThat(
       moveQueryRepository.moveCountInDateRange(
         Supplier.GEOAMEY,
@@ -252,5 +254,33 @@ internal class MoveQueryRepositoryTest {
         defaultMoveDate10Sep2020
       )
     ).isEqualTo(1)
+  }
+
+  @Test
+  fun `GEOAmey has one standard move for moves with a move type`() {
+    val moves = moveQueryRepository.movesWithMoveTypeInDateRange(
+      Supplier.GEOAMEY,
+      defaultMoveDate10Sep2020,
+      defaultMoveDate10Sep2020,
+    )
+
+    assertThat(moves).hasSize(6)
+    assertThat(moves[MoveType.STANDARD]).hasSize(1)
+    assertThat(moves[MoveType.CANCELLED]).isEmpty()
+    assertThat(moves[MoveType.REDIRECTION]).isEmpty()
+    assertThat(moves[MoveType.LOCKOUT]).isEmpty()
+    assertThat(moves[MoveType.LONG_HAUL]).isEmpty()
+    assertThat(moves[MoveType.MULTI]).isEmpty()
+  }
+
+  @Test
+  fun `All GEOAMey moves found, with or without a move type assigned`() {
+    assertThat(
+      moveQueryRepository.allMovesInDateRange(
+        Supplier.GEOAMEY,
+        defaultMoveDate10Sep2020,
+        defaultMoveDate10Sep2020,
+      )
+    ).hasSize(2)
   }
 }

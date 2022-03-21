@@ -35,7 +35,7 @@ class MoveService(
   }
 
   fun moves(supplier: Supplier, startDate: LocalDate) =
-    moveQueryRepository.movesInDateRange(supplier, startDate, endOfMonth(startDate))
+    moveQueryRepository.movesWithMoveTypeInDateRange(supplier, startDate, endOfMonth(startDate))
 
   fun findMoveByReferenceAndSupplier(ref: String, supplier: Supplier) =
     // At time of writing the need for filtering null moves types is a result of poor supplier data.

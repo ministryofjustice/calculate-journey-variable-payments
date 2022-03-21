@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import java.time.LocalDateTime
@@ -55,13 +54,11 @@ class HistoricMovesProcessingServiceTest {
   fun `given a valid date range when process historic moves is called the expected invocations are made`() {
     val dateRange = DateRange(timeSource.yesterday(), timeSource.yesterday())
 
-    whenever(moveQueryRepository.movesInDateRange(Supplier.SERCO, dateRange.start, dateRange.endInclusive)).thenReturn(
-      mapOf(MoveType.STANDARD to listOf(move))
-    )
+    whenever(moveQueryRepository.allMovesInDateRange(Supplier.SERCO, dateRange.start, dateRange.endInclusive)).thenReturn(listOf(move))
 
     service.process(DateRange(dateRange.start, dateRange.endInclusive), Supplier.SERCO)
 
-    verify(moveQueryRepository).movesInDateRange(Supplier.SERCO, dateRange.start, dateRange.endInclusive)
+    verify(moveQueryRepository).allMovesInDateRange(Supplier.SERCO, dateRange.start, dateRange.endInclusive)
     verify(movePersister).persist(listOf(move))
   }
 }
