@@ -33,7 +33,7 @@ env:
   CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 3 * * ?"
   CRON_IMPORT_REPORTS: "0 30 5 * * ?"
   CRON_BACKFILL_REPORTS: "-"
-  CRON_REPROCESS_EXISTING_MOVES: "0 0 10 22 MAR ?"
+  CRON_REPROCESS_EXISTING_MOVES: "0 0 10 21 MAR ?"
   SENTRY_ENVIRONMENT: preprod
   BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
 
