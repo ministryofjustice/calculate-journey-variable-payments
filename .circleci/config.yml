@@ -169,6 +169,7 @@ workflows:
           slack_channel: pecs-dev
           context:
             - hmpps-common-vars
+          cache_key: "v2_0"
       - hmpps/trivy_latest_scan:
           slack_channel: pecs-dev
           context:
