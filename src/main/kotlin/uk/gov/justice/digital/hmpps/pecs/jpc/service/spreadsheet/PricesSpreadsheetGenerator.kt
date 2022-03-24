@@ -35,28 +35,26 @@ class PricesSpreadsheetGenerator(
     SXSSFWorkbook().use { workbook ->
       val header = PriceSheet.Header(dateGenerated, DateRange(startDate, endOfMonth(startDate)), supplier)
 
-      val moves = moveService.moves(supplier, startDate)
-
       SummarySheet(workbook, header).also { logger.info("Adding summaries.") }
         .apply { writeSummaries(moveService.moveTypeSummaries(supplier, startDate)) }
 
       StandardMovesSheet(workbook, header).also { logger.info("Adding standard prices.") }
-        .apply { moves[MoveType.STANDARD]?.let { writeMoves(it) } }
+        .apply { writeMoves(moveService.movesForMoveType(supplier, MoveType.STANDARD, startDate)) }
 
       RedirectionMovesSheet(workbook, header).also { logger.info("Adding redirect prices.") }
-        .apply { moves[MoveType.REDIRECTION]?.let { writeMoves(it) } }
+        .apply { writeMoves(moveService.movesForMoveType(supplier, MoveType.REDIRECTION, startDate)) }
 
       LongHaulMovesSheet(workbook, header).also { logger.info("Adding long haul prices.") }
-        .apply { moves[MoveType.LONG_HAUL]?.let { writeMoves(it) } }
+        .apply { writeMoves(moveService.movesForMoveType(supplier, MoveType.LONG_HAUL, startDate)) }
 
       LockoutMovesSheet(workbook, header).also { logger.info("Adding lockout prices.") }
-        .apply { moves[MoveType.LOCKOUT]?.let { writeMoves(it) } }
+        .apply { writeMoves(moveService.movesForMoveType(supplier, MoveType.LOCKOUT, startDate)) }
 
       MultiTypeMovesSheet(workbook, header).also { logger.info("Adding multi-type prices.") }
-        .apply { moves[MoveType.MULTI]?.let { writeMoves(it) } }
+        .apply { writeMoves(moveService.movesForMoveType(supplier, MoveType.MULTI, startDate)) }
 
       CancelledMovesSheet(workbook, header).also { logger.info("Adding cancelled moves.") }
-        .apply { moves[MoveType.CANCELLED]?.let { writeMoves(it) } }
+        .apply { writeMoves(moveService.movesForMoveType(supplier, MoveType.CANCELLED, startDate)) }
 
       JourneysSheet(workbook, header).also { logger.info("Adding journeys.") }
         .apply { writeJourneys(journeyService.distinctJourneysIncludingPriced(supplier, startDate)) }
