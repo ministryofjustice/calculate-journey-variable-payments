@@ -411,7 +411,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       move.supplier.name,
       move.toNomisAgencyId,
       move.updatedAt,
-      move.cancellationReason
+      move.cancellationReason,
+      move.moveMonth,
+      move.moveYear
     )
 
     return move
@@ -508,8 +510,10 @@ private val moveSql = """
     supplier,
     to_nomis_agency_id,
     updated_at,
-    cancellation_reason
-  ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    cancellation_reason,
+    move_month,
+    move_year
+  ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 """.trimIndent()
 
 private fun moveStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Start")

@@ -134,10 +134,10 @@ data class Move(
   val person: Person? = null
 ) {
   @Column(name = "move_month", nullable = true)
-  val moveMonth: Int? = moveDate?.month?.value
+  val moveMonth: Int? = pickUpDateTime?.month?.value ?: moveDate?.month?.value
 
   @Column(name = "move_year", nullable = true)
-  val moveYear: Int? = moveDate?.year
+  val moveYear: Int? = pickUpDateTime?.year ?: moveDate?.year
 
   fun totalInPence() =
     if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumOf {
