@@ -71,4 +71,24 @@ class MoveTest {
       assertThat(registration()).isEqualTo("SAME_REG")
     }
   }
+
+  @Test
+  fun `given a move with a pick up date the month and year are derived from the pick up date`() {
+    with(moveM1().copy(moveDate = null)) {
+      assertThat(moveDate).isNull()
+      assertThat(pickUpDateTime).isNotNull
+      assertThat(moveMonth).isEqualTo(pickUpDateTime?.month?.value)
+      assertThat(moveYear).isEqualTo(pickUpDateTime?.year)
+    }
+  }
+
+  @Test
+  fun `given a move without a pick up date the month and year are derived from the move date`() {
+    with(moveM1().copy(pickUpDateTime = null)) {
+      assertThat(pickUpDateTime).isNull()
+      assertThat(moveDate).isNotNull
+      assertThat(moveMonth).isEqualTo(moveDate?.month?.value)
+      assertThat(moveYear).isEqualTo(moveDate?.year)
+    }
+  }
 }

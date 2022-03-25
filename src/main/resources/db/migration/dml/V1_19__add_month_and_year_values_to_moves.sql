@@ -1,0 +1,2 @@
+update moves set move_month = coalesce(extract(month from pick_up), extract(month from move_date)) where move_month is not null;
+update moves set move_year = coalesce(extract(year from pick_up), extract(year from move_date)) where move_year is not null;

@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -47,14 +48,24 @@ internal class PricesSpreadsheetGeneratorTest {
   )
 
   private val moveService: MoveService = mock {
-    on { it.moves(any(), any()) } doReturn mapOf(
-      MoveType.STANDARD to createMoveList(1, MoveType.STANDARD),
-      MoveType.REDIRECTION to createMoveList(2, MoveType.REDIRECTION),
-      MoveType.LONG_HAUL to createMoveList(3, MoveType.LONG_HAUL),
-      MoveType.LOCKOUT to createMoveList(4, MoveType.LOCKOUT),
-      MoveType.MULTI to createMoveList(5, MoveType.MULTI),
-      MoveType.CANCELLED to createMoveList(6, MoveType.CANCELLED)
-    )
+    on {
+      movesForMoveType(any(), eq(MoveType.STANDARD), any())
+    } doReturn createMoveList(1, MoveType.STANDARD)
+    on {
+      movesForMoveType(any(), eq(MoveType.REDIRECTION), any())
+    } doReturn createMoveList(2, MoveType.REDIRECTION)
+    on {
+      movesForMoveType(any(), eq(MoveType.LONG_HAUL), any())
+    } doReturn createMoveList(3, MoveType.LONG_HAUL)
+    on {
+      movesForMoveType(any(), eq(MoveType.LOCKOUT), any())
+    } doReturn createMoveList(4, MoveType.LOCKOUT)
+    on {
+      movesForMoveType(any(), eq(MoveType.MULTI), any())
+    } doReturn createMoveList(5, MoveType.MULTI)
+    on {
+      movesForMoveType(any(), eq(MoveType.CANCELLED), any())
+    } doReturn createMoveList(6, MoveType.CANCELLED)
     on { it.moveTypeSummaries(any(), any()) } doReturn MoveTypeSummaries(
       1,
       listOf(MovesSummary(MoveType.STANDARD, 1.0, 1, 0, 12345))
