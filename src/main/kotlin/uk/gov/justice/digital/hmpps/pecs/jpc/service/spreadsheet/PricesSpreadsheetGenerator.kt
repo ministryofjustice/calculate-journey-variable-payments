@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceExceptionRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.JourneyService
@@ -26,7 +27,8 @@ class PricesSpreadsheetGenerator(
   @Autowired private val moveService: MoveService,
   @Autowired private val journeyService: JourneyService,
   @Autowired private val locationRepository: LocationRepository,
-  @Autowired private val supplierPrices: SupplierPrices
+  @Autowired private val supplierPrices: SupplierPrices,
+  @Autowired private val priceExceptionRepository: PriceExceptionRepository
 ) {
 
   internal fun generate(supplier: Supplier, startDate: LocalDate): File {
@@ -64,10 +66,17 @@ class PricesSpreadsheetGenerator(
         header
       ).also {
         logger.info("Adding $supplier prices for effective year ${effectiveYearForDate(startDate)}.")
-      }.apply { write(supplierPrices.get(supplier, effectiveYearForDate(startDate))) }
+      }.apply {
+        write(
+          supplierPrices.get(supplier, effectiveYearForDate(startDate)),
+          priceExceptionRepository.findAll().groupBy { it.price.id }
+        )
+      }
 
       LocationsSheet(workbook, header).also { logger.info("Adding locations.") }
         .apply { write(locationRepository.findAllByOrderBySiteName()) }
+
+      logger.info("streaming generated prices spreadsheet.")
 
       return File.createTempFile("tmp", "xlsx").apply {
         FileOutputStream(this).use {

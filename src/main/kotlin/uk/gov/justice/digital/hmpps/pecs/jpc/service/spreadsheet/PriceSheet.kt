@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet
 import org.apache.commons.codec.binary.Hex
 import org.apache.poi.ss.usermodel.BuiltinFormats
 import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.IndexedColors
@@ -241,7 +242,19 @@ abstract class PriceSheet(
    * @param cellStyle - optional CellStyle to set on the cell
    */
   protected fun <T> Row.addCell(col: Int, value: T?, cellStyle: CellStyle? = null) {
-    val cell = createCell(col)
+
+    // setting the cell type upfront as this is more efficient
+    val cellType = when (value) {
+      is String -> CellType.STRING
+      is Double -> CellType.NUMERIC
+      is Int -> CellType.NUMERIC
+      is LocalDate -> CellType.NUMERIC
+      is BigDecimal -> CellType.NUMERIC
+      else -> CellType.BLANK
+    }
+
+    val cell = createCell(col, cellType)
+
     cellStyle?.let { cell.cellStyle = it }
 
     when (value) {

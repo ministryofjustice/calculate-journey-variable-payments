@@ -27,26 +27,25 @@ internal class SupplierPricesSheetTest {
 
   @Test
   internal fun `prices are copied over output spreadsheet`() {
-    supplierPricesSheet.write(
-      Stream.of(
-        Price(
-          UUID.randomUUID(),
-          Supplier.SERCO,
-          location("FROM SITE A"),
-          location("TO SITE A"),
-          20059,
-          effectiveYear = 2020
-        ).addException(Month.FEBRUARY, Money(20060)),
-        Price(
-          UUID.randomUUID(),
-          Supplier.SERCO,
-          location("FROM SITE B"),
-          location("TO SITE B"),
-          10024,
-          effectiveYear = 2020
-        ).addException(Month.SEPTEMBER, Money(20024))
-      )
-    )
+    val price1 = Price(
+      UUID.randomUUID(),
+      Supplier.SERCO,
+      location("FROM SITE A"),
+      location("TO SITE A"),
+      20059,
+      effectiveYear = 2020
+    ).addException(Month.FEBRUARY, Money(20060))
+
+    val price2 = Price(
+      UUID.randomUUID(),
+      Supplier.SERCO,
+      location("FROM SITE B"),
+      location("TO SITE B"),
+      10024,
+      effectiveYear = 2020
+    ).addException(Month.SEPTEMBER, Money(20024))
+
+    supplierPricesSheet.write(Stream.of(price1, price2), mapOf(price2.id to listOf(price2.exceptions().first())))
 
     assertOnSheetName(supplierPricesSheet, "JPC Price book")
     assertOnColumnDataHeadings(supplierPricesSheet, "Pick up", "Drop off", "Unit price", "Unit price exception")
@@ -59,6 +58,10 @@ internal class SupplierPricesSheetTest {
     assertThat(row.getCell(1).stringCellValue).isEqualTo(priceRow.toSite)
     assertThat(row.getCell(2).numericCellValue).isEqualTo(priceRow.price)
     assertThat(row.getCell(2).cellStyle.dataFormatString).isEqualTo("\"£\"#,##0.00_);[Red](\"£\"#,##0.00)")
+
+    priceRow.priceException?.let {
+      assertThat(row.getCell(3).numericCellValue).isEqualTo(priceRow.priceException)
+    }
   }
 
   fun location(siteName: String) = Location(LocationType.CC, "x", siteName)

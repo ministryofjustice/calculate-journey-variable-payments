@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceExceptionRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveService
@@ -104,12 +105,15 @@ internal class PricesSpreadsheetGeneratorTest {
       )
     }
 
+  private val priceExceptionRepository: PriceExceptionRepository = mock()
+
   private val pricesSpreadsheetGenerator = PricesSpreadsheetGenerator(
     timeSource,
     moveService,
     journeyService,
     locationRepository,
-    supplierPrices
+    supplierPrices,
+    priceExceptionRepository
   )
 
   @Test
