@@ -58,7 +58,7 @@ data class Price(
   val effectiveYear: Int,
 ) {
 
-  @OneToMany(mappedBy = "price", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
+  @OneToMany(mappedBy = "price", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
   @MapKey(name = "month")
   private val exceptions: MutableMap<Int, PriceException> = mutableMapOf()
 
