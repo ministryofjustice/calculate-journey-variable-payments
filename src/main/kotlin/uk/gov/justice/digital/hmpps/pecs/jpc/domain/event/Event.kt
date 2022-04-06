@@ -167,7 +167,6 @@ enum class EventType(val value: String) {
   MOVE_REDIRECT("MoveRedirect"),
   JOURNEY_START("JourneyStart"),
   JOURNEY_COMPLETE("JourneyComplete"),
-  JOURNEY_LOCKOUT("JourneyLockout"),
   JOURNEY_LODGING("JourneyLodging"),
   JOURNEY_CANCEL("JourneyCancel"),
   UNKNOWN("Unknown"),

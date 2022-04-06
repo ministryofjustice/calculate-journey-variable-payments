@@ -197,32 +197,11 @@ internal class MoveFiltererTest {
     journeys = listOf(reportJourneyFactory(journeyId = "J1M1", billable = true, toLocation = "DOES_NOT_MATCH_MOVE"))
   )
 
-  private val completedLockoutJourneyLockoutEvent = reportMoveFactory(
-    moveId = "M8",
-    events = listOf(
-      moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8", occurredAt = from.atStartOfDay()),
-      moveEventFactory(
-        type = EventType.MOVE_COMPLETE.value,
-        moveId = "M8",
-        occurredAt = from.atStartOfDay().plusHours(4)
-      )
-    ),
-    journeys = listOf(
-      reportJourneyFactory(
-        journeyId = "J1M8",
-        moveId = "M8",
-        billable = true,
-        events = listOf(journeyEventFactory(journeyId = "J1M8", type = "JourneyLockout"))
-      ),
-      reportJourneyFactory(journeyId = "J2M8", moveId = "M8", billable = true)
-    )
-  )
-
   private val completedLockoutMoveLockoutEvent = reportMoveFactory(
     moveId = "M8b",
     events = listOf(
       moveEventFactory(type = EventType.MOVE_START.value, moveId = "M8b", occurredAt = from.atStartOfDay()),
-      moveEventFactory(type = "MoveLockout", moveId = "M8b"),
+      moveEventFactory(type = EventType.MOVE_LOCKOUT.value, moveId = "M8b"),
       moveEventFactory(
         type = EventType.MOVE_COMPLETE.value,
         moveId = "M8b",
@@ -276,7 +255,6 @@ internal class MoveFiltererTest {
 
   @Test
   fun `is lockout move`() {
-    assertThat(MoveFilterer.isLockoutMove(completedLockoutJourneyLockoutEvent)).isTrue
     assertThat(MoveFilterer.isLockoutMove(completedLockoutMoveLockoutEvent)).isTrue
     assertThat(MoveFilterer.isLockoutMove(standard)).isFalse
   }

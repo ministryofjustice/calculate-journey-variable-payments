@@ -171,7 +171,6 @@ class MovePersister(
 
 private val noteworthyEvents = listOf(
   EventType.MOVE_REDIRECT,
-  EventType.JOURNEY_LOCKOUT,
   EventType.MOVE_LOCKOUT,
   EventType.JOURNEY_CANCEL,
   EventType.MOVE_LODGING_START,
