@@ -69,7 +69,7 @@ object MoveFilterer {
         move.hasAllOf(EventType.JOURNEY_LODGING) ||
           move.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
         ) &&
-      move.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
+      move.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT) &&
       with(move.journeys.map { it }) {
         count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 2
       }
@@ -80,7 +80,7 @@ object MoveFilterer {
    */
   fun isLockoutMove(move: Move) =
     move.isCompleted() &&
-      move.hasAnyOf(EventType.MOVE_LOCKOUT, EventType.JOURNEY_LOCKOUT) &&
+      move.hasAnyOf(EventType.MOVE_LOCKOUT) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT) &&
       with(move.journeys) {
         count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
@@ -108,7 +108,6 @@ object MoveFilterer {
         EventType.MOVE_LODGING_START,
         EventType.MOVE_LODGING_END,
         EventType.MOVE_LOCKOUT,
-        EventType.JOURNEY_LOCKOUT
       ) &&
       when (val moveStartDate = move.mayBeMoveStartDate()) {
         null -> {
