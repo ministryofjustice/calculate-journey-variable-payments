@@ -175,7 +175,6 @@ private val noteworthyEvents = listOf(
   EventType.JOURNEY_CANCEL,
   EventType.MOVE_LODGING_START,
   EventType.MOVE_LODGING_END,
-  EventType.JOURNEY_LODGING,
   EventType.MOVE_CANCEL
 ).map { it.value }
 
