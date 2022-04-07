@@ -115,7 +115,7 @@ internal class MoveFiltererTest {
         journeyId = "J1M6a",
         moveId = "M6a",
         billable = true,
-        events = listOf(journeyEventFactory(type = EventType.JOURNEY_LODGING.value))
+        events = listOf(journeyEventFactory(type = EventType.JOURNEY_CANCEL.value))
       ),
       reportJourneyFactory(journeyId = "J2M6a", moveId = "M6a", billable = true)
     )

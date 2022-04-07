@@ -349,7 +349,7 @@ internal class MovePersisterTest {
       events = listOf(
         journeyEventFactory(
           journeyEventId = "JE400",
-          type = EventType.JOURNEY_LODGING.value,
+          type = EventType.JOURNEY_START.value,
           occurredAt = fromSeptember1st2020.atStartOfDay().plusHours(10)
         )
       )

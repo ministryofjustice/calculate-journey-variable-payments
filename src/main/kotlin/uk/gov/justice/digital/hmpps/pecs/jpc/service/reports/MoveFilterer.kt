@@ -60,14 +60,13 @@ object MoveFilterer {
       journey.toNomisAgencyId == move.toNomisAgencyId
 
   /**
-   * A simple lodging move must be a completed move with one journey lodging event OR 1 move lodging start and 1 move lodging end event
+   * A simple lodging move must be a completed move with 1 move lodging start and 1 move lodging end event
    * It must also have at 2 billable, completed journeys
    */
   fun isLongHaulMove(move: Move) =
     move.isCompleted() &&
       (
-        move.hasAllOf(EventType.JOURNEY_LODGING) ||
-          move.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
+        move.hasAllOf(EventType.MOVE_LODGING_START, EventType.MOVE_LODGING_END)
         ) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT) &&
       with(move.journeys.map { it }) {
@@ -104,7 +103,6 @@ object MoveFilterer {
     move.isCompleted() &&
       move.hasAnyOf(EventType.MOVE_REDIRECT) &&
       move.hasNoneOf(
-        EventType.JOURNEY_LODGING,
         EventType.MOVE_LODGING_START,
         EventType.MOVE_LODGING_END,
         EventType.MOVE_LOCKOUT,
