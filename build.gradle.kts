@@ -33,6 +33,12 @@ dependencies {
   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
   implementation(kotlin("script-runtime"))
 
+  constraints {
+    implementation("org.apache.groovy:groovy:4.0.2") {
+      because("previous transitive version 4.0.0 pulled in by Thymeleaf has CVE-2020-17521")
+    }
+  }
+
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
