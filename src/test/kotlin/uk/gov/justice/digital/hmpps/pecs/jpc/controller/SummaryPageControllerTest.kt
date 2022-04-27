@@ -30,7 +30,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerc
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
-import java.util.Optional
 import javax.servlet.http.Cookie
 
 @SpringBootTest
@@ -138,7 +137,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by valid lowercase reference id with whitespace correctly redirects to move details page`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(moveM1()))
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -153,7 +152,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by a non-existent reference id calls the move service then redirects to search form`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(moveM1()))
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -168,7 +167,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by invalid reference id redirects to search form without calling the move service`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(moveM1()))
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -183,7 +182,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by move not found redirects to search form without calling the move service`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.empty())
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(null)
 
     mockMvc.post("/find-move") {
       session = mockSession

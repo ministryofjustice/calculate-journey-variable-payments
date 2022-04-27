@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerco
 import java.time.Month
-import java.util.Optional
 
 internal class MoveServiceTest {
 
@@ -117,17 +116,17 @@ internal class MoveServiceTest {
   fun `find move by move reference`() {
     val move = moveM1()
 
-    whenever(moveRepository.findByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(move))
+    whenever(moveRepository.findByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(move)
 
-    assertThat(service.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).hasValue(move)
+    assertThat(service.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).isEqualTo(move)
   }
 
   @Test
   fun `find move by move reference not found when move has no move type`() {
     val move = moveM1().copy(moveType = null)
 
-    whenever(moveRepository.findByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(move))
+    whenever(moveRepository.findByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(move)
 
-    assertThat(service.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).isNotPresent
+    assertThat(service.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).isNull()
   }
 }

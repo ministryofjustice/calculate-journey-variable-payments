@@ -92,7 +92,7 @@ class ImportServiceIntegrationTest(
     assertThat(createdJourneys).hasSize(13)
 
     val importedDecemberMoves = geoMovesDec2020()
-      .map { moveRepository.findByReferenceAndSupplier(it.moveRef, it.supplier).orElseThrow() to it.moveType }.toList()
+      .map { moveRepository.findByReferenceAndSupplier(it.moveRef, it.supplier)!! to it.moveType }.toList()
 
     assertThat(importedDecemberMoves).hasSize(9)
     assertMovesHaveExpectedMoveTypeOrNull(importedDecemberMoves)

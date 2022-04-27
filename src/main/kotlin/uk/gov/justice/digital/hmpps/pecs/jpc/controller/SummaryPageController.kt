@@ -245,7 +245,7 @@ class SummaryPageController(
 
     val maybeMove = moveService.findMoveByReferenceAndSupplier(moveRef, supplier)
     val uri =
-      maybeMove.orElse(null)?.let { "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
+      maybeMove?.let { "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
     return "redirect:$uri"
   }
 
