@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
@@ -22,15 +24,18 @@ import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveTypeSummaries
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MovesTypeSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerco
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
-import java.util.Optional
 import javax.servlet.http.Cookie
 
 @SpringBootTest
@@ -101,7 +106,8 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
 
   @Test
   internal fun `GET move with valid Move ID for supplier`() {
-    val move = moveM1()
+    val move = moveM1(moveDate = LocalDate.of(2022, 4, 27))
+
     whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)).thenReturn(
       move
     )
@@ -111,12 +117,13 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
     mockMvc.get("/moves/${move.moveId}") { session = mockSession }
       .andExpect { view { name("move") } }
       .andExpect { status { isOk() } }
+      .andExpect { model { attribute("startOfMonthDate", move.moveDate!!.withDayOfMonth(1)) } }
 
     verify(moveService).moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)
   }
 
   @Test
-  fun `GET move with invalid Move ID for supplier`() {
+  internal fun `GET move with invalid Move ID for supplier`() {
     val move = moveM1()
     whenever(
       moveService.moveWithPersonJourneysAndEvents(
@@ -128,7 +135,9 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
 
     mockSession.setAttribute("date", LocalDate.of(2021, 9, 1))
 
-    mockMvc.get("/moves/${move.moveId}") { session = mockSession }
+    mockMvc.get("/moves/${move.moveId}") {
+      session = mockSession
+    }
       .andExpect { status { isNotFound() } }
       .andExpect { view { name("error/404") } }
 
@@ -137,8 +146,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
 
   @Test
   internal fun `find a move by valid lowercase reference id with whitespace correctly redirects to move details page`() {
-
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(moveM1()))
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -153,7 +161,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by a non-existent reference id calls the move service then redirects to search form`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(moveM1()))
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -168,7 +176,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by invalid reference id redirects to search form without calling the move service`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.of(moveM1()))
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -183,7 +191,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @Test
   internal fun `find a move by move not found redirects to search form without calling the move service`() {
 
-    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(Optional.empty())
+    whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(null)
 
     mockMvc.post("/find-move") {
       session = mockSession
@@ -213,5 +221,35 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
       .andExpect { status { is4xxClientError() } }
 
     verify(monitoringService).capture(any())
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["STANDARD", "CANCELLED", "LONG_HAUL", "REDIRECTION", "LOCKOUT", "MULTI"])
+  internal fun `find moves by all types`(moveType: MoveType) {
+    whenever(
+      moveService.movesForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1))
+    ).thenReturn(
+      listOf(moveM1())
+    )
+
+    whenever(
+      moveService.summaryForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1))
+    ).thenReturn(
+      MovesTypeSummary(1, MovesSummary(moveType = moveType))
+    )
+
+    mockSession.setAttribute("startOfMonthDate", LocalDate.of(2022, 4, 1))
+
+    mockMvc.get("/moves-by-type/${moveType.name}") {
+      session = mockSession
+    }
+      .andExpect { status { isOk() } }
+      .andExpect { view { name("moves-by-type") } }
+      .andExpect { model { attribute("summary", MovesSummary(moveType = moveType)) } }
+      .andExpect { model { attribute("moves", listOf(moveM1())) } }
+      .andExpect { model { attribute("moveType", moveType.label) } }
+
+    verify(moveService).movesForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1))
+    verify(moveService).summaryForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1))
   }
 }

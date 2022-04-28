@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.MoveService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.validation.Valid
 
 /**
@@ -93,7 +94,7 @@ class SummaryPageController(
   @RequestMapping("$MOVES_BY_TYPE_URL/{moveTypeString}")
   fun movesByType(
     @PathVariable moveTypeString: String,
-    @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
+    @ModelAttribute(name = START_OF_MONTH_DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap
   ): String {
@@ -132,9 +133,13 @@ class SummaryPageController(
 
     return maybeMove?.let {
       model.addAttribute(MOVE_ATTRIBUTE, maybeMove)
+      model.addAttribute(START_OF_MONTH_DATE_ATTRIBUTE, it.pickUpDateTime?.atStartOfMonthForBreadcrumbTrail())
+
       ModelAndView("move")
     } ?: ModelAndView("error/404", HttpStatus.NOT_FOUND)
   }
+
+  private fun LocalDateTime.atStartOfMonthForBreadcrumbTrail() = this.toLocalDate()?.withDayOfMonth(1)
 
   @RequestMapping(JOURNEYS_URL)
   fun journeys(
@@ -244,8 +249,10 @@ class SummaryPageController(
     if (!moveRef.matches("[A-Za-z0-9]+".toRegex())) return "redirect:$FIND_MOVE_URL/?no-results-for=invalid-reference"
 
     val maybeMove = moveService.findMoveByReferenceAndSupplier(moveRef, supplier)
+
     val uri =
-      maybeMove.orElse(null)?.let { "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
+      maybeMove?.let { "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL/?no-results-for=${form.reference}"
+
     return "redirect:$uri"
   }
 
