@@ -39,7 +39,8 @@ fun moveM1(
   toNomisAgencyId: String = "GNI",
   dropOffOrCancelledDateTime: LocalDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
   person: Person? = personPE1(),
-  journeys: List<Journey> = listOf()
+  journeys: List<Journey> = listOf(),
+  moveDate: LocalDate = defaultMoveDate10Sep2020
 ) = Move(
   moveId = moveId,
   profileId = "PR1",
@@ -48,14 +49,14 @@ fun moveM1(
   moveType = MoveType.STANDARD,
   status = MoveStatus.completed,
   reference = "REF1",
-  moveDate = defaultMoveDate10Sep2020,
+  moveDate = moveDate,
   fromNomisAgencyId = fromNomisAgencyId,
   fromSiteName = "from",
   fromLocationType = LocationType.PR,
   toNomisAgencyId = toNomisAgencyId,
   toSiteName = "to",
   toLocationType = LocationType.PR,
-  pickUpDateTime = defaultMoveDate10Sep2020.atStartOfDay(),
+  pickUpDateTime = moveDate.atStartOfDay(),
   dropOffOrCancelledDateTime = dropOffOrCancelledDateTime,
   reportFromLocationType = "prison",
   reportToLocationType = null,
