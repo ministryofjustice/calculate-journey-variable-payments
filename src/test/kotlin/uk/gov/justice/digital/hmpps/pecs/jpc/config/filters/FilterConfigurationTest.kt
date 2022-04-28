@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.config.filters
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.AnnualPriceAdjustmentsController
+import uk.gov.justice.digital.hmpps.pecs.jpc.controller.JourneyPriceCatalogueController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.MaintainSupplierPricingController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageJourneyPriceCatalogueController
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageSchedule34LocationsController
@@ -19,7 +20,8 @@ class FilterConfigurationTest {
       *ManageSchedule34LocationsController.routes(),
       *MapFriendlyLocationController.routes(),
       *ManageJourneyPriceCatalogueController.routes(),
-      *AnnualPriceAdjustmentsController.routes()
+      *AnnualPriceAdjustmentsController.routes(),
+      *JourneyPriceCatalogueController.routes()
     )
   }
 }
