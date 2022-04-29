@@ -6,9 +6,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.SessionAttributes
+import org.springframework.web.bind.annotation.SessionAttribute
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.JourneyPriceCatalogueService
@@ -25,7 +24,6 @@ private val logger = loggerFor<JourneyPriceCatalogueController>()
  * Controller responsible for generating and returning an on demand journey price catalogue spreadsheet to the end user.
  */
 @RestController
-@SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
 class JourneyPriceCatalogueController(
   private val journeyPriceCatalogueService: JourneyPriceCatalogueService,
   private val timeSource: TimeSource
@@ -34,10 +32,17 @@ class JourneyPriceCatalogueController(
   @GetMapping(GENERATE_PRICES_SPREADSHEET)
   @Throws(IOException::class)
   fun generateJourneyPriceCatalogue(
-    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    @ModelAttribute(name = DATE_ATTRIBUTE) movesFrom: LocalDate,
+    @SessionAttribute(name = SUPPLIER_ATTRIBUTE, required = false) supplier: Supplier?,
+    @SessionAttribute(name = DATE_ATTRIBUTE, required = false) movesFrom: LocalDate?,
     response: HttpServletResponse?
   ): ResponseEntity<InputStreamResource?>? {
+
+    if (supplier == null || movesFrom == null) {
+      logger.info("Missing session attributes, no session or session has expired.")
+
+      return ResponseEntity.noContent().build()
+    }
+
     logger.info("getting spreadsheet for $supplier")
 
     return journeyPriceCatalogueService.generate(SecurityContextHolder.getContext().authentication, supplier, movesFrom)
@@ -58,7 +63,5 @@ class JourneyPriceCatalogueController(
 
   companion object {
     const val GENERATE_PRICES_SPREADSHEET = "/generate-prices-spreadsheet"
-
-    fun routes(): Array<String> = arrayOf(GENERATE_PRICES_SPREADSHEET)
   }
 }

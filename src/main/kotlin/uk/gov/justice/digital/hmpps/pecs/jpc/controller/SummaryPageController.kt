@@ -263,8 +263,5 @@ class SummaryPageController(
     const val MOVES_BY_TYPE_URL = "/moves-by-type"
     const val MOVES_URL = "/moves"
     const val SELECT_MONTH_URL = "/select-month"
-
-    fun routes(): Array<String> =
-      arrayOf(DASHBOARD_URL, FIND_MOVE_URL, "$FIND_MOVE_URL/*", JOURNEYS_URL, MOVES_BY_TYPE_URL, "$MOVES_BY_TYPE_URL/*", SELECT_MONTH_URL)
   }
 }

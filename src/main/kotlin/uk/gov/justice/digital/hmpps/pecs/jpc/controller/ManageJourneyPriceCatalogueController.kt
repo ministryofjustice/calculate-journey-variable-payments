@@ -113,8 +113,5 @@ class ManageJourneyPriceCatalogueController(@Autowired val journeyService: Journ
     const val MANAGE_JOURNEY_PRICE_CATALOGUE = "/manage-journey-price-catalogue"
     const val SEARCH_JOURNEYS_URL = "/search-journeys"
     const val SEARCH_JOURNEYS_RESULTS_URL = "/journeys-results"
-
-    fun routes(): Array<String> =
-      arrayOf(MANAGE_JOURNEY_PRICE_CATALOGUE, SEARCH_JOURNEYS_URL, SEARCH_JOURNEYS_RESULTS_URL)
   }
 }

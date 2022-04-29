@@ -81,7 +81,33 @@ class JourneyPriceCatalogueControllerTest(@Autowired private val wac: WebApplica
       }
   }
 
-  private fun MockHttpSession.addSupplierAndDateAttributes(supplier: Supplier, date: LocalDate) {
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  fun `no content when supplier not present on the session`() {
+    mockSession.addSupplierAndDateAttributes(null, LocalDate.of(2020, 10, 1))
+
+    mockMvc.get("/generate-prices-spreadsheet") {
+      session = mockSession
+    }
+      .andExpect {
+        status { isNoContent() }
+      }
+  }
+
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  fun `no content when date not present on the session`() {
+    mockSession.addSupplierAndDateAttributes(Supplier.GEOAMEY, null)
+
+    mockMvc.get("/generate-prices-spreadsheet") {
+      session = mockSession
+    }
+      .andExpect {
+        status { isNoContent() }
+      }
+  }
+
+  private fun MockHttpSession.addSupplierAndDateAttributes(supplier: Supplier?, date: LocalDate?) {
     this.setAttribute("supplier", supplier)
     this.setAttribute("date", date)
   }
