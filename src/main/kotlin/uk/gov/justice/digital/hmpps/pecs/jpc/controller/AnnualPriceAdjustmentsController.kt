@@ -132,8 +132,6 @@ class AnnualPriceAdjustmentsController(
 
   companion object {
     const val ANNUAL_PRICE_ADJUSTMENT = "/annual-price-adjustment"
-
-    fun routes(): Array<String> = arrayOf(ANNUAL_PRICE_ADJUSTMENT)
   }
 }
 

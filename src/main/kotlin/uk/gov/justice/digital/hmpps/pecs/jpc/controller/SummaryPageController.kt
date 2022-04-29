@@ -134,7 +134,6 @@ class SummaryPageController(
     return maybeMove?.let {
       model.addAttribute(MOVE_ATTRIBUTE, maybeMove)
       model.addAttribute(START_OF_MONTH_DATE_ATTRIBUTE, it.pickUpDateTime?.atStartOfMonthForBreadcrumbTrail())
-
       ModelAndView("move")
     } ?: ModelAndView("error/404", HttpStatus.NOT_FOUND)
   }
@@ -257,15 +256,12 @@ class SummaryPageController(
   }
 
   companion object {
+    const val CHOOSE_SUPPLIER_URL = "/choose-supplier"
     const val DASHBOARD_URL = "/dashboard"
-    const val SELECT_MONTH_URL = "/select-month"
+    const val FIND_MOVE_URL = "/find-move"
+    const val JOURNEYS_URL = "/journeys"
     const val MOVES_BY_TYPE_URL = "/moves-by-type"
     const val MOVES_URL = "/moves"
-    const val JOURNEYS_URL = "/journeys"
-    const val FIND_MOVE_URL = "/find-move"
-    const val CHOOSE_SUPPLIER_URL = "/choose-supplier"
-
-    fun routes(): Array<String> =
-      arrayOf(DASHBOARD_URL, JOURNEYS_URL, MOVES_BY_TYPE_URL, SELECT_MONTH_URL)
+    const val SELECT_MONTH_URL = "/select-month"
   }
 }

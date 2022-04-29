@@ -437,8 +437,5 @@ class MaintainSupplierPricingController(
     const val ADD_PRICE_EXCEPTION = "/add-price-exception"
     const val REMOVE_PRICE_EXCEPTION = "/remove-price-exception"
     const val UPDATE_PRICE = "/update-price"
-
-    fun routes(): Array<String> =
-      arrayOf(ADD_PRICE, "$ADD_PRICE/*", ADD_PRICE_EXCEPTION, REMOVE_PRICE_EXCEPTION, UPDATE_PRICE, "$UPDATE_PRICE/*")
   }
 }

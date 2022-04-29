@@ -1,18 +1,23 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.mock.web.MockHttpSession
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.FakeAuthentication
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -20,10 +25,15 @@ import java.time.LocalDateTime
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class JourneyPriceCatalogueControllerTest(@Autowired val mockMvc: MockMvc) {
+@ExtendWith(FakeAuthentication::class)
+class JourneyPriceCatalogueControllerTest(@Autowired private val wac: WebApplicationContext) {
+
+  private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
+
+  private val mockSession = MockHttpSession(wac.servletContext)
 
   @MockBean
-  lateinit var timeSource: TimeSource
+  private lateinit var timeSource: TimeSource
 
   @Test
   @WithMockUser(roles = ["PECS_JPC"])
@@ -31,7 +41,11 @@ class JourneyPriceCatalogueControllerTest(@Autowired val mockMvc: MockMvc) {
     whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
     whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-    mockMvc.get("/generate-prices-spreadsheet/serco?moves_from=2020-10-01") { }
+    mockSession.addSupplierAndDateAttributes(Supplier.SERCO, LocalDate.of(2020, 10, 1))
+
+    mockMvc.get("/generate-prices-spreadsheet") {
+      session = mockSession
+    }
       .andExpect {
         status { isOk() }
         content { contentType("application/vnd.ms-excel") }
@@ -50,7 +64,11 @@ class JourneyPriceCatalogueControllerTest(@Autowired val mockMvc: MockMvc) {
     whenever(timeSource.dateTime()).thenReturn(LocalDateTime.of(2020, 10, 13, 15, 25))
     whenever(timeSource.date()).thenReturn(LocalDate.of(2020, 10, 13))
 
-    mockMvc.get("/generate-prices-spreadsheet/geoamey?moves_from=2020-10-01") { }
+    mockSession.addSupplierAndDateAttributes(Supplier.GEOAMEY, LocalDate.of(2020, 10, 1))
+
+    mockMvc.get("/generate-prices-spreadsheet") {
+      session = mockSession
+    }
       .andExpect {
         status { isOk() }
         content { contentType("application/vnd.ms-excel") }
@@ -61,5 +79,36 @@ class JourneyPriceCatalogueControllerTest(@Autowired val mockMvc: MockMvc) {
           )
         }
       }
+  }
+
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  fun `no content when supplier not present on the session`() {
+    mockSession.addSupplierAndDateAttributes(null, LocalDate.of(2020, 10, 1))
+
+    mockMvc.get("/generate-prices-spreadsheet") {
+      session = mockSession
+    }
+      .andExpect {
+        status { isNoContent() }
+      }
+  }
+
+  @Test
+  @WithMockUser(roles = ["PECS_JPC"])
+  fun `no content when date not present on the session`() {
+    mockSession.addSupplierAndDateAttributes(Supplier.GEOAMEY, null)
+
+    mockMvc.get("/generate-prices-spreadsheet") {
+      session = mockSession
+    }
+      .andExpect {
+        status { isNoContent() }
+      }
+  }
+
+  private fun MockHttpSession.addSupplierAndDateAttributes(supplier: Supplier?, date: LocalDate?) {
+    this.setAttribute("supplier", supplier)
+    this.setAttribute("date", date)
   }
 }

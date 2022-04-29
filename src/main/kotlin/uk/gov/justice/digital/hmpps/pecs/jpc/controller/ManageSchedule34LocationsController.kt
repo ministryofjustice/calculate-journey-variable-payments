@@ -160,7 +160,5 @@ class ManageSchedule34LocationsController(
 
     const val MANAGE_LOCATION = "/manage-location"
     const val SEARCH_LOCATIONS = "/search-locations"
-
-    fun routes(): Array<String> = arrayOf(MANAGE_LOCATION, "$MANAGE_LOCATION/*", SEARCH_LOCATIONS)
   }
 }

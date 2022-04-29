@@ -209,7 +209,5 @@ class MapFriendlyLocationController(
     const val LOCATION_ORIGIN_SESSION_ATTRIBUTE = "origin"
 
     const val MAP_LOCATION = "/map-location"
-
-    fun routes(): Array<String> = arrayOf(MAP_LOCATION, "$MAP_LOCATION/*")
   }
 }

@@ -34,7 +34,7 @@
             </ul>
         </div>
         <div class="govuk-grid-column-one-third tr">
-            <a th:href="@{|/generate-prices-spreadsheet/${#strings.toLowerCase(supplier.name())}?moves_from=${#temporals.format(startOfMonthDate, 'yyyy-MM-dd')}|}"
+            <a th:href="@{/generate-prices-spreadsheet}"
                th:attr="download=${'moves-' + #temporals.format(endOfMonthDate, 'MMMM-yyyy') + '.csv'}"
                class="ma0 govuk-link govuk-heading-s download-icon dib" onclick="downloading(this)">Download all moves</a>
 
