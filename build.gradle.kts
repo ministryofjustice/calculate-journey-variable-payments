@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.5"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.1.6"
   kotlin("plugin.spring") version "1.6.21"
   kotlin("plugin.jpa") version "1.6.21"
   kotlin("plugin.allopen") version "1.6.21"
@@ -17,13 +17,13 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.207")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.211")
   implementation("io.sentry:sentry-spring-boot-starter:5.7.3")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.34.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.34.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
   implementation("org.apache.poi:poi-ooxml:5.2.2")
-  implementation("org.flywaydb:flyway-core:8.5.9")
+  implementation("org.flywaydb:flyway-core:8.5.10")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -43,7 +43,7 @@ dependencies {
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
   testImplementation("org.mockito:mockito-inline:4.5.1")
-  testImplementation("org.seleniumhq.selenium:selenium-java:4.1.3")
+  testImplementation("org.seleniumhq.selenium:selenium-java:4.1.4")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
