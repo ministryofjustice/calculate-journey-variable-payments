@@ -14,6 +14,8 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFColor
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -24,7 +26,7 @@ abstract class PriceSheet(
   val sheet: Sheet,
   private val header: Header,
   private val subheading: String? = null,
-  private val dataColumns: List<DataColumn> = listOf()
+  val dataColumns: List<DataColumn> = listOf()
 ) {
 
   enum class DataColumn(val label: String, val width: Int = 4500) {
@@ -35,9 +37,10 @@ abstract class PriceSheet(
     DROP_OFF("Drop off", 9000),
     DROP_OFF_DATE("Drop off date"),
     DROP_OFF_TIME("Drop off time"),
-    LOCATION_TYPE("Location Type"),
+    LOCATION_TYPE("Location type"),
     MOVE_DATE("Move date"),
     MOVE_ID("Move ID"),
+    MOVE_STATUS("Move status"),
     MOVE_TYPE("Move type"),
     MOVE_VOLUME("Move volume"),
     MOVE_VOLUME_WITHOUT_PRICES("Move volume without prices"),
@@ -250,6 +253,8 @@ abstract class PriceSheet(
       is Int -> CellType.NUMERIC
       is LocalDate -> CellType.NUMERIC
       is BigDecimal -> CellType.NUMERIC
+      is MoveStatus -> CellType.STRING
+      is MoveType -> CellType.STRING
       else -> CellType.BLANK
     }
 
@@ -263,6 +268,8 @@ abstract class PriceSheet(
       is Int -> cell.setCellValue(value.toDouble())
       is LocalDate -> cell.setCellValue(value)
       is BigDecimal -> cell.setCellValue(value.toDouble())
+      is MoveStatus -> cell.setCellValue(value.toString())
+      is MoveType -> cell.setCellValue(value.toString())
     }
   }
 
