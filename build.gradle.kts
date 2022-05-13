@@ -17,7 +17,7 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.211")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.219")
   implementation("io.sentry:sentry-spring-boot-starter:5.7.3")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.34.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.34.0")
@@ -50,7 +50,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
   testRuntimeOnly("com.h2database:h2")
 
-  runtimeOnly("org.postgresql:postgresql:42.3.4")
+  runtimeOnly("org.postgresql:postgresql:42.3.5")
 }
 
 java {
