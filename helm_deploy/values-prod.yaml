@@ -36,6 +36,7 @@ env:
   CRON_REPROCESS_EXISTING_MOVES: "0 0 13 21 MAR ?"
   SENTRY_ENVIRONMENT: prod
   BASM_API_BASE_URL: "https://api.bookasecuremove.service.justice.gov.uk"
+  FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "false"
 
 #whitelist:
 #  office: "217.33.148.210/32"
