@@ -36,3 +36,4 @@ env:
   CRON_REPROCESS_EXISTING_MOVES: "-"
   SENTRY_ENVIRONMENT: dev
   BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-staging.apps.live-1.cloud-platform.service.justice.gov.uk"
+  FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "true"

@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet
 
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.SupplierPrices
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
@@ -28,7 +29,8 @@ class PricesSpreadsheetGenerator(
   @Autowired private val journeyService: JourneyService,
   @Autowired private val locationRepository: LocationRepository,
   @Autowired private val supplierPrices: SupplierPrices,
-  @Autowired private val priceExceptionRepository: PriceExceptionRepository
+  @Autowired private val priceExceptionRepository: PriceExceptionRepository,
+  @Value("\${FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES}") private val includeReconciliationMoves: Boolean = false
 ) {
 
   internal fun generate(supplier: Supplier, startDate: LocalDate): File {
@@ -75,6 +77,12 @@ class PricesSpreadsheetGenerator(
 
       LocationsSheet(workbook, header).also { logger.info("Adding locations.") }
         .apply { write(locationRepository.findAllByOrderBySiteName()) }
+
+      if (includeReconciliationMoves) {
+        logger.info("Including candidate reconciliation moves.")
+
+        ReconciliationMovesSheet(workbook, header).writeMoves(moveService.candidateReconciliations(supplier, startDate))
+      }
 
       logger.info("streaming generated prices spreadsheet.")
 

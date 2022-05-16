@@ -8,10 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
-import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 internal class StandardMovesSheetTest {
 
@@ -41,9 +38,9 @@ internal class StandardMovesSheetTest {
       sms,
       "Move ID",
       "Pick up",
-      "Location Type",
+      "Location type",
       "Drop off",
-      "Location Type",
+      "Location type",
       "Pick up date",
       "Pick up time",
       "Drop off date",
@@ -91,23 +88,4 @@ internal class StandardMovesSheetTest {
     assertThat(sms.getRow(9).getCell(12)).isNull() // billable shouldn't be shown
     assertThat(sms.getRow(9).getCell(13)).isNull() // notes shouldn't be shown for a standard move
   }
-}
-
-fun <T> assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?) {
-  val actualValue = when (expectedVal) {
-    is String -> sheet.getRow(row).getCell(col).stringCellValue
-    is Double -> sheet.getRow(row).getCell(col).numericCellValue
-    is BigDecimal -> sheet.getRow(row).getCell(col).numericCellValue.toBigDecimal().setScale(2)
-    is Int -> sheet.getRow(row).getCell(col).numericCellValue.toInt()
-    is LocalDate -> LocalDate.parse(
-      sheet.getRow(row).getCell(col).stringCellValue,
-      DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    )
-    is LocalTime -> LocalTime.parse(
-      sheet.getRow(row).getCell(col).stringCellValue,
-      DateTimeFormatter.ofPattern("HH:mm")
-    )
-    else -> throw RuntimeException("Must be a string, numeric value, local date or local time.")
-  }
-  assertThat(actualValue).isEqualTo(expectedVal)
 }

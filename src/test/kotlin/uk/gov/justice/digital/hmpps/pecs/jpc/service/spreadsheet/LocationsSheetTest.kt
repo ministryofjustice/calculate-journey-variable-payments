@@ -28,7 +28,7 @@ internal class LocationsSheetTest {
     locationsSheet.write(Stream.of(location1, location2))
 
     assertOnSheetName(locationsSheet, "Locations")
-    assertOnColumnDataHeadings(locationsSheet, "NOMIS Agency ID", "Name", "Location Type")
+    assertOnColumnDataHeadings(locationsSheet, "NOMIS Agency ID", "Name", "Location type")
 
     assertCellEquals(locationsSheet, 9, 0, "LOCATION1")
     assertCellEquals(locationsSheet, 9, 1, "B Location 1")

@@ -71,6 +71,7 @@ internal class PricesSpreadsheetGeneratorTest {
       1,
       listOf(MovesSummary(MoveType.STANDARD, 1.0, 1, 0, 12345))
     )
+    on { it.candidateReconciliations(any(), any()) } doReturn createMoveList(7, MoveType.STANDARD)
   }
   private val journeyService: JourneyService = mock {
     on { it.distinctJourneysIncludingPriced(any(), any()) } doReturn listOf(
@@ -113,11 +114,35 @@ internal class PricesSpreadsheetGeneratorTest {
     journeyService,
     locationRepository,
     supplierPrices,
-    priceExceptionRepository
+    priceExceptionRepository,
+    true
   )
 
   @Test
-  internal fun `check tabs`() {
+  internal fun `check reconciliation tab feature not present`() {
+    val generatorWithoutReconciliationMoves = PricesSpreadsheetGenerator(
+      timeSource,
+      moveService,
+      journeyService,
+      locationRepository,
+      supplierPrices,
+      priceExceptionRepository,
+    )
+
+    val workbook = XSSFWorkbook(generatorWithoutReconciliationMoves.generate(Supplier.GEOAMEY, timeSource.date()))
+
+    assertThat(workbook.getSheet("Reconciliation Moves")).isNull()
+  }
+
+  @Test
+  internal fun `check reconciliation tab feature is present`() {
+    val workbook = XSSFWorkbook(pricesSpreadsheetGenerator.generate(Supplier.GEOAMEY, timeSource.date()))
+
+    assertThat(workbook.getSheet("Reconciliation Moves")).isNotNull
+  }
+
+  @Test
+  internal fun `check all tabs`() {
     val sheetFile = pricesSpreadsheetGenerator.generate(Supplier.GEOAMEY, timeSource.date())
     val workbook = XSSFWorkbook(FileInputStream(sheetFile))
 
@@ -131,7 +156,8 @@ internal class PricesSpreadsheetGeneratorTest {
       "Cancelled" to MoveType.CANCELLED.toString(),
       "Journeys" to null,
       "JPC Price book" to null,
-      "Locations" to null
+      "Locations" to null,
+      "Reconciliation Moves" to MoveType.STANDARD.toString()
     ).forEach { (sheetName, maybeMoveRef) ->
       val sheet = workbook.getSheet(sheetName)
 

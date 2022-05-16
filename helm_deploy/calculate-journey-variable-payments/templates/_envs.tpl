@@ -142,7 +142,7 @@ env:
         name: "{{ .Values.feedback.secret_name }}"
         key: feedback_url
 
-  - name: FEATURE_FLAG_PRICE_EXCEPTIONS
-    value: "{{ .Values.env.FEATURE_FLAG_PRICE_EXCEPTIONS }}"
+  - name: FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES
+    value: "{{ .Values.env.FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES }}"
 
 {{- end -}}
