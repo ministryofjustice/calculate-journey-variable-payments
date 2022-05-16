@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.moves
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.EventType
@@ -13,7 +14,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.eventE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyEventJE1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.journeyJ1
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.moveM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerco
+import java.time.LocalDate
 import java.time.Month
 
 internal class MoveServiceTest {
@@ -128,5 +131,23 @@ internal class MoveServiceTest {
     whenever(moveRepository.findByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(move)
 
     assertThat(service.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).isNull()
+  }
+
+  @Test
+  fun `find reconciliations moves for Serco`() {
+    service.candidateReconciliations(Supplier.SERCO, LocalDate.of(2021, 1, 1))
+    verify(moveRepository).findCompletedCandidateReconcilableMoves(Supplier.SERCO, 2021, 1)
+
+    service.candidateReconciliations(Supplier.SERCO, LocalDate.of(2022, 2, 1))
+    verify(moveRepository).findCompletedCandidateReconcilableMoves(Supplier.SERCO, 2022, 2)
+  }
+
+  @Test
+  fun `find reconciliations moves for GEOAmey`() {
+    service.candidateReconciliations(Supplier.GEOAMEY, LocalDate.of(2021, 5, 10))
+    verify(moveRepository).findCompletedCandidateReconcilableMoves(Supplier.GEOAMEY, 2021, 5)
+
+    service.candidateReconciliations(Supplier.GEOAMEY, LocalDate.of(2022, 3, 30))
+    verify(moveRepository).findCompletedCandidateReconcilableMoves(Supplier.GEOAMEY, 2022, 3)
   }
 }

@@ -75,12 +75,14 @@ class PricesSpreadsheetGenerator(
         )
       }
 
-      if (includeReconciliationMoves) {
-        ReconciliationMovesSheet(workbook, header).writeMoves(moveService.candidateReconciliations(supplier, startDate))
-      }
-
       LocationsSheet(workbook, header).also { logger.info("Adding locations.") }
         .apply { write(locationRepository.findAllByOrderBySiteName()) }
+
+      if (includeReconciliationMoves) {
+        logger.info("Including candidate reconciliation moves.")
+
+        ReconciliationMovesSheet(workbook, header).writeMoves(moveService.candidateReconciliations(supplier, startDate))
+      }
 
       logger.info("streaming generated prices spreadsheet.")
 

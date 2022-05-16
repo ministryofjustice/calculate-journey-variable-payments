@@ -58,13 +58,13 @@ class MoveService(
     return MoveTypeSummaries(moveCount, summaries)
   }
 
-  // TODO to be implemented
   /**
    * Provides moves present in the payment service but not included as part of the pricing/billing due missing key
    * information for pricing purposes e.g. move type or drop off date time. This will enable the end users to better
    * reconcile invoices from the supplier. Prior to this they were not readily available.
    */
-  fun candidateReconciliations(supplier: Supplier, startDate: LocalDate): List<Move> = emptyList()
+  fun candidateReconciliations(supplier: Supplier, startDate: LocalDate) =
+    moveRepository.findCompletedCandidateReconcilableMoves(supplier, startDate.year, startDate.month.value)
 }
 
 data class MovesTypeSummary(val count: Int, val movesSummary: MovesSummary)
