@@ -212,8 +212,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     offset: Long = 0
   ): List<Move> {
     val movesWithPersonAndJourneys = jdbcTemplate.query(
-      moveJourneySelectSQL +
-        "where m.supplier = ? and m.move_month = ? and m.move_year = ? and m.move_type = ? and m.drop_off_or_cancelled is not null " +
+      "$moveJourneySelectSQL where m.supplier = ? and m.move_month = ? and m.move_year = ? and m.move_type = ? and m.drop_off_or_cancelled is not null " +
         "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
       moveJourneyRowMapper,
       supplier.name,
