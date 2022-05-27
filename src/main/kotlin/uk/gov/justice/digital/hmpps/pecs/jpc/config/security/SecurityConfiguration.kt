@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -19,6 +18,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtDecoders
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.session.FindByIndexNameSessionRepository
 import org.springframework.session.Session
@@ -37,7 +37,7 @@ private val logger = loggerFor<SecurityConfiguration<*>>()
 @EnableWebSecurity
 @ConditionalOnWebApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
+class SecurityConfiguration<S : Session> {
 
   @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
   private lateinit var issuer: String
@@ -52,8 +52,9 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
   @Autowired
   private lateinit var auditService: AuditService
 
+  @Bean
   @Throws(Exception::class)
-  override fun configure(http: HttpSecurity) {
+  fun filterChain(http: HttpSecurity): SecurityFilterChain {
     http {
       authorizeRequests {
         authorize("/health/**", permitAll)
@@ -81,6 +82,8 @@ class SecurityConfiguration<S : Session> : WebSecurityConfigurerAdapter() {
         logoutSuccessHandler = logOutHandler()
       }
     }
+
+    return http.build()
   }
 
   @Bean
