@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.1"
   kotlin("plugin.spring") version "1.6.21"
   kotlin("plugin.jpa") version "1.6.21"
   kotlin("plugin.allopen") version "1.6.21"
@@ -17,13 +17,13 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.228")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.233")
   implementation("io.sentry:sentry-spring-boot-starter:5.7.4")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.35.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.35.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.36.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.36.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
   implementation("org.apache.poi:poi-ooxml:5.2.2")
-  implementation("org.flywaydb:flyway-core:8.5.11")
+  implementation("org.flywaydb:flyway-core:8.5.12")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
