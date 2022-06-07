@@ -105,9 +105,9 @@ internal class ReportImporterTest(
       reportReaderParser
     ).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
 
-    verify(monitoringService).capture("Error attempting to get moves file 2020/09/01/2020-09-01-moves.jsonl, exception: error")
-    verify(monitoringService).capture("Error attempting to get journeys file 2020/09/01/2020-09-01-journeys.jsonl, exception: error")
-    verify(monitoringService).capture("Error attempting to get events file 2020/09/01/2020-09-01-events.jsonl, exception: error")
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file 2020/09/01/2020-09-01-moves.jsonl. Exception: error")
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file 2020/09/01/2020-09-01-journeys.jsonl. Exception: error")
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file 2020/09/01/2020-09-01-events.jsonl. Exception: error")
   }
 
   @Test
