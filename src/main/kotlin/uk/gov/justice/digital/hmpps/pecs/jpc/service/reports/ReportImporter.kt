@@ -61,8 +61,8 @@ open class ReportImporter(
         logger.info("Retrieving file $it")
         provider.get(it)
       } catch (e: Exception) {
-        logger.warn("Error attempting to get file $it, exception: $e")
-        monitoringService.capture("Error attempting to get $entity file $it, exception: ${e.message}")
+        logger.error("The service is missing data which may affect pricing due to missing file $it. Exception: $e")
+        monitoringService.capture("The service is missing data which may affect pricing due to missing file $it. Exception: ${e.message}")
         null
       }
     }
