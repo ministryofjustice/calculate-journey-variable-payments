@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.3"
   kotlin("plugin.spring") version "1.6.21"
   kotlin("plugin.jpa") version "1.6.21"
   kotlin("plugin.allopen") version "1.6.21"
@@ -17,8 +17,8 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.233")
-  implementation("io.sentry:sentry-spring-boot-starter:5.7.4")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.239")
+  implementation("io.sentry:sentry-spring-boot-starter:6.0.0")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.36.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.36.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
@@ -42,7 +42,7 @@ dependencies {
   testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
   testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
   testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
-  testImplementation("org.mockito:mockito-inline:4.5.1")
+  testImplementation("org.mockito:mockito-inline:4.6.1")
   testImplementation("org.seleniumhq.selenium:htmlunit-driver:2.61.0")
   testImplementation("org.seleniumhq.selenium:selenium-java:3.141.59")
   testImplementation("org.seleniumhq.selenium:selenium-api:3.141.59")
@@ -55,7 +55,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.3.6")
+  runtimeOnly("org.postgresql:postgresql:42.4.0")
 }
 
 java {
