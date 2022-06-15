@@ -24,4 +24,7 @@ class AuditService(private val auditEventRepository: AuditEventRepository, priva
 
   internal fun auditEventsByTypeAndMetaKey(type: AuditEventType, metaKey: String) =
     auditEventRepository.findByEventTypeAndMetadataKey(type, metaKey.trim().uppercase())
+
+  fun findMostRecentEventByType(type: AuditEventType) =
+    auditEventRepository.findFirstByEventTypeOrderByCreatedAtDesc(type)
 }

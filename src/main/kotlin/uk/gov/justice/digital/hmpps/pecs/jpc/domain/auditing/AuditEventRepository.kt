@@ -6,5 +6,5 @@ import java.util.UUID
 interface AuditEventRepository : CrudRepository<AuditEvent, UUID> {
   fun findByEventTypeAndMetadataKey(eventType: AuditEventType, metadataKey: String): List<AuditEvent>
 
-  fun findByEventType(type: AuditEventType): List<AuditEvent>
+  fun findFirstByEventTypeOrderByCreatedAtDesc(eventType: AuditEventType): AuditEvent?
 }

@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.reports
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType.REPORTING_DATA_IMPORT
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.PersonPersister
@@ -29,7 +30,14 @@ class ImportReportsService(
   private val monitoringService: MonitoringService
 ) {
 
+  /**
+   * Null implies there are no imports.
+   */
+  fun dateOfLastImport(): LocalDate? =
+    auditService.findMostRecentEventByType(REPORTING_DATA_IMPORT)?.createdAt?.toLocalDate()
+
   fun importAllReportsOn(date: LocalDate) {
+    // TODO check files exist before attempting to import, raise sentry alert if missing anything followed by a runtime exception
     importMovesJourneysEventsOn(date)
     importPeopleOn(date)
     importProfilesOn(date)
