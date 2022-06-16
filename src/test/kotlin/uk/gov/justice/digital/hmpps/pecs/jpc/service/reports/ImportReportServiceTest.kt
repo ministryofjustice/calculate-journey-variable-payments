@@ -22,7 +22,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class ImportServiceTest {
+internal class ImportReportServiceTest {
 
   private val timeSourceWithFixedDate: TimeSource = TimeSource { LocalDateTime.of(2021, 2, 18, 12, 0, 0) }
   private val reportImporter: ReportImporter = mock()
