@@ -4,8 +4,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -45,11 +45,11 @@ internal class ImportServiceTest {
 
   @Test
   internal fun `expected report importer interactions`() {
-    importReportsService.importAllReportsOn(timeSourceWithFixedDate.date())
+    importReportsService.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
-    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.date())
-    verify(reportImporter).importPeople(any(), any())
-    verify(reportImporter).importProfiles(any(), any())
+    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.yesterday())
+    verify(reportImporter).importPeople(eq(timeSourceWithFixedDate.yesterday()), any())
+    verify(reportImporter).importProfiles(eq(timeSourceWithFixedDate.yesterday()), any())
   }
 
   @Test
@@ -94,7 +94,7 @@ internal class ImportServiceTest {
       reportLookup
     )
 
-    service.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.yesterday())
+    service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
     verify(monitoringService).capture("people: persisted 0 and 1 errors for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
@@ -111,7 +111,7 @@ internal class ImportServiceTest {
       reportLookup
     )
 
-    service.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.yesterday())
+    service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
     verify(monitoringService).capture("profiles: persisted 0 and 1 errors for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
@@ -120,9 +120,9 @@ internal class ImportServiceTest {
   internal fun `expected monitoring interactions when no moves to persist`() {
     whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(emptyList())
 
-    importReportsService.importAllReportsOn(timeSourceWithFixedDate.date())
+    importReportsService.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
-    verify(monitoringService).capture("There were no moves to persist for reporting feed date ${timeSourceWithFixedDate.date()}.")
+    verify(monitoringService).capture("There were no moves to persist for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
@@ -137,40 +137,6 @@ internal class ImportServiceTest {
     importReportsService.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
     verify(monitoringService).capture("There were no profiles to persist for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
-  }
-
-  @Test
-  fun `given an import date of yesterday ensure only one call is made when importing moves`() {
-    importReportsService.importMoveJourneyAndEventReportsOn(timeSourceWithFixedDate.yesterday())
-
-    verify(reportImporter).importMovesJourneysEventsOn(timeSourceWithFixedDate.yesterday())
-  }
-
-  @Test
-  fun `given an import date of yesterday ensure only one call is made when importing people and profiles`() {
-    importReportsService.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.yesterday())
-
-    verify(reportImporter).importPeople(any(), any())
-    verify(reportImporter).importProfiles(any(), any())
-  }
-
-  @Test
-  fun `given an import date of two days ago ensure two calls are made when importing people and profiles`() {
-    importReportsService.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.yesterday().minusDays(1))
-
-    verify(reportImporter, times(2)).importPeople(any(), any())
-    verify(reportImporter, times(2)).importProfiles(any(), any())
-  }
-
-  @Test
-  fun `given an import date of current or future date an exception is thrown when importing people and profiles`() {
-    assertThatThrownBy {
-      importReportsService.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.date())
-    }.isInstanceOf(RuntimeException::class.java)
-
-    assertThatThrownBy {
-      importReportsService.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.date().plusDays(1))
-    }.isInstanceOf(RuntimeException::class.java)
   }
 
   @Test

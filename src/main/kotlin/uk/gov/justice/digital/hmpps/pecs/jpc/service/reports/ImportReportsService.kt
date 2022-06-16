@@ -9,11 +9,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.PersonPersister
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -38,6 +36,10 @@ class ImportReportsService(
   fun dateOfLastImport(): LocalDate? =
     auditService.findMostRecentEventByType(REPORTING_DATA_IMPORT)?.createdAt?.toLocalDate()
 
+  /**
+   * A runtime exception will be thrown if the date is in the past or if any of the report files for the given date are
+   * missing prior to importing.
+   */
   fun importAllReportsOn(date: LocalDate) {
     failIfDateOfImportNotInPast(date)
     failIfAnyReportFilesAreMissingOn(date)
@@ -65,10 +67,6 @@ class ImportReportsService(
       }
   }
 
-  fun importMoveJourneyAndEventReportsOn(date: LocalDate) {
-    importMovesJourneysEventsOn(date)
-  }
-
   private fun importMovesJourneysEventsOn(date: LocalDate) {
     logger.info("Importing moves, journeys and events for date: $date.")
 
@@ -83,19 +81,6 @@ class ImportReportsService(
         )
 
         raiseMonitoringAlertIf(moves.isEmpty(), "There were no moves to persist for reporting feed date $date.")
-      }
-    }
-  }
-
-  /**
-   * This will import all people and profiles starting from the date supplied upto the current date minus one day. This
-   * is needed to ensure the data is as up-to-date as possible.
-   */
-  fun importPeopleProfileReportsStartingFrom(from: LocalDate) {
-    DateRange(from, timeSource.yesterday()).run {
-      for (i in 0..ChronoUnit.DAYS.between(this.start, this.endInclusive)) {
-        importPeopleOn(this.start.plusDays(i))
-        importProfilesOn(this.start.plusDays(i))
       }
     }
   }

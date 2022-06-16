@@ -31,19 +31,4 @@ class ReportImportCommand(private val importReportsService: ImportReportsService
 
     logger.info("Finished import of reports from $from to $to.")
   }
-
-  /**
-   * This will import all people and profiles from the date specified to the current date - 1.
-   */
-  fun importPeopleAndProfiles(from: LocalDate) {
-    logger.info("Starting backfill of people and profiles.")
-
-    Result.runCatching {
-      importReportsService.importPeopleProfileReportsStartingFrom(from)
-    }.onFailure {
-      logger.error("An error occurred during import people and profiles", it)
-    }
-
-    logger.info("Finished backfill of people and profiles.")
-  }
 }

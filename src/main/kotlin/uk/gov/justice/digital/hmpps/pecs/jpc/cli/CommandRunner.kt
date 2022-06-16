@@ -34,9 +34,6 @@ class CommandRunner(
         arguments.getDate("from"),
         arguments.getDate("to")
       )
-      arguments.contains("import-people-profiles") -> reportImportCommand.importPeopleAndProfiles(
-        arguments.getDate("from")
-      )
       arguments.contains("process-historic-moves") -> historicMovesCommand.process(
         arguments.getDate("from"),
         arguments.getDate("to"),
