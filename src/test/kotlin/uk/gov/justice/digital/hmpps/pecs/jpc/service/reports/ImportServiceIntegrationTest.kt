@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.reports
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -45,6 +46,54 @@ class ImportServiceIntegrationTest(
 
   @Autowired
   lateinit var historicMovesProcessingService: HistoricMovesProcessingService
+
+  @Test
+  fun `given a date when no files exist the import should fail`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(LocalDate.of(1900, 1, 1)) }
+      .hasMessageContaining("The service is missing data which may affect pricing due to missing file(s): 1900/01/01/1900-01-01-moves.jsonl, 1900/01/01/1900-01-01-events.jsonl, 1900/01/01/1900-01-01-journeys.jsonl, 1900/01/01/1900-01-01-profiles.jsonl, 1900/01/01/1900-01-01-people.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 1900/01/01/1900-01-01-moves.jsonl, 1900/01/01/1900-01-01-events.jsonl, 1900/01/01/1900-01-01-journeys.jsonl, 1900/01/01/1900-01-01-profiles.jsonl, 1900/01/01/1900-01-01-people.jsonl")
+  }
+
+  @Test
+  fun `given a date when profile file is missing the import should fail`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(LocalDate.of(2022, 6, 1)) }
+      .hasMessageContaining("The service is missing data which may affect pricing due to missing file(s): 2022/06/01/2022-06-01-profiles.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2022/06/01/2022-06-01-profiles.jsonl")
+  }
+
+  @Test
+  fun `given a date when people file is missing the import should fail`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(LocalDate.of(2022, 6, 2)) }
+      .hasMessageContaining("The service is missing data which may affect pricing due to missing file(s): 2022/06/02/2022-06-02-people.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2022/06/02/2022-06-02-people.jsonl")
+  }
+
+  @Test
+  fun `given a date when events file is missing the import should fail`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(LocalDate.of(2022, 6, 3)) }
+      .hasMessageContaining("The service is missing data which may affect pricing due to missing file(s): 2022/06/03/2022-06-03-events.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2022/06/03/2022-06-03-events.jsonl")
+  }
+
+  @Test
+  fun `given a date when journeys file is missing the import should fail`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(LocalDate.of(2022, 6, 4)) }
+      .hasMessageContaining("The service is missing data which may affect pricing due to missing file(s): 2022/06/04/2022-06-04-journeys.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2022/06/04/2022-06-04-journeys.jsonl")
+  }
+
+  @Test
+  fun `given a date when moves file is missing the import should fail`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(LocalDate.of(2022, 6, 5)) }
+      .hasMessageContaining("The service is missing data which may affect pricing due to missing file(s): 2022/06/05/2022-06-05-moves.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2022/06/05/2022-06-05-moves.jsonl")
+  }
 
   @Test
   fun `given some report files contain errors the import should still complete successfully and not fail`() {

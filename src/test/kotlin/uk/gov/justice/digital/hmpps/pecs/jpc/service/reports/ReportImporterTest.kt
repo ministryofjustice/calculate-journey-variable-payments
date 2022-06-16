@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.reports
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -134,6 +135,25 @@ internal class ReportImporterTest(
     ) { }
 
     verify(monitoringService).capture("Error processing people file 2020/10/03/2020-10-03-people.jsonl, exception: people error")
+  }
+
+  @Test
+  fun `report filenames for a given date`() {
+    assertThat(ReportImporter.reportFilenamesFor(LocalDate.of(2022, 6, 15))).containsExactlyInAnyOrder(
+      "2022/06/15/2022-06-15-moves.jsonl",
+      "2022/06/15/2022-06-15-journeys.jsonl",
+      "2022/06/15/2022-06-15-events.jsonl",
+      "2022/06/15/2022-06-15-profiles.jsonl",
+      "2022/06/15/2022-06-15-people.jsonl",
+    )
+
+    assertThat(ReportImporter.reportFilenamesFor(LocalDate.of(2022, 6, 14))).containsExactlyInAnyOrder(
+      "2022/06/14/2022-06-14-moves.jsonl",
+      "2022/06/14/2022-06-14-journeys.jsonl",
+      "2022/06/14/2022-06-14-events.jsonl",
+      "2022/06/14/2022-06-14-profiles.jsonl",
+      "2022/06/14/2022-06-14-people.jsonl",
+    )
   }
 
   private class FailingReportReaderParser(private val errorMessage: String) : ReportReaderParser {

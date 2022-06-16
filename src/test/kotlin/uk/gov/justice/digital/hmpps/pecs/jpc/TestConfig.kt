@@ -10,6 +10,7 @@ import org.springframework.core.io.ResourceLoader
 import org.springframework.jdbc.core.JdbcTemplate
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.GeoameyPricesProvider
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportLookup
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.Schedule34LocationsProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.SercoPricesProvider
@@ -68,4 +69,7 @@ class TestConfig {
 
   @Bean
   fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() }, reportReaderParser())
+
+  @Bean
+  fun reportLookup() = ReportLookup { resourceLoader.getResource("classpath:/reporting/$it").exists() }
 }

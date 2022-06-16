@@ -21,11 +21,4 @@ internal class ReportImportCommandTest {
     verify(importReportsService).importAllReportsOn(date)
     verify(importReportsService).importAllReportsOn(date.plusDays(1))
   }
-
-  @Test
-  internal fun `given a date in the past the import people and profiles is called with the correct date`() {
-    commands.importPeopleAndProfiles(date)
-
-    verify(importReportsService).importPeopleProfileReportsStartingFrom(date)
-  }
 }
