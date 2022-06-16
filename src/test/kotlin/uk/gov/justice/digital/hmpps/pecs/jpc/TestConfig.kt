@@ -71,5 +71,5 @@ class TestConfig {
   fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() }, reportReaderParser())
 
   @Bean
-  fun reportLookup() = ReportLookup { true }
+  fun reportLookup() = ReportLookup { resourceLoader.getResource("classpath:/reporting/$it").exists() }
 }
