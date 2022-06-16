@@ -10,6 +10,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportLookup
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
@@ -30,6 +31,7 @@ internal class ImportServiceTest {
   private val move: Move = mock()
   private val auditService: AuditService = mock()
   private val monitoringService: MonitoringService = mock()
+  private val reportLookup: ReportLookup = ReportLookup { true }
   private val importReportsService: ImportReportsService =
     ImportReportsService(
       timeSourceWithFixedDate,
@@ -37,7 +39,8 @@ internal class ImportServiceTest {
       movePersister,
       personPersister,
       auditService,
-      monitoringService
+      monitoringService,
+      reportLookup
     )
 
   @Test
@@ -57,25 +60,26 @@ internal class ImportServiceTest {
       movePersister,
       FakePersonPersister(),
       auditService,
-      monitoringService
+      monitoringService,
+      reportLookup
     )
 
-    service.importAllReportsOn(timeSourceWithFixedDate.date())
+    service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
-    verify(auditService).create(AuditableEvent.importReportEvent("moves", timeSourceWithFixedDate.date(), 1, 1))
-    verify(auditService).create(AuditableEvent.importReportEvent("people", timeSourceWithFixedDate.date(), 1, 1))
-    verify(auditService).create(AuditableEvent.importReportEvent("profiles", timeSourceWithFixedDate.date(), 1, 1))
+    verify(auditService).create(AuditableEvent.importReportEvent("moves", timeSourceWithFixedDate.yesterday(), 1, 1))
+    verify(auditService).create(AuditableEvent.importReportEvent("people", timeSourceWithFixedDate.yesterday(), 1, 1))
+    verify(auditService).create(AuditableEvent.importReportEvent("profiles", timeSourceWithFixedDate.yesterday(), 1, 1))
     verifyNoInteractions(monitoringService)
   }
 
   @Test
   fun `expected monitoring interactions when failure to persist moves`() {
-    whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.date())).thenReturn(listOf(move))
+    whenever(reportImporter.importMovesJourneysEventsOn(timeSourceWithFixedDate.yesterday())).thenReturn(listOf(move))
     whenever(movePersister.persist(any())).thenReturn(0)
 
-    importReportsService.importAllReportsOn(timeSourceWithFixedDate.date())
+    importReportsService.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
-    verify(monitoringService).capture("moves: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.date()}.")
+    verify(monitoringService).capture("moves: persisted 0 out of 1 for reporting feed date ${timeSourceWithFixedDate.yesterday()}.")
   }
 
   @Test
@@ -86,7 +90,8 @@ internal class ImportServiceTest {
       movePersister,
       FakePersonPersister(successful = false),
       auditService,
-      monitoringService
+      monitoringService,
+      reportLookup
     )
 
     service.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.yesterday())
@@ -102,7 +107,8 @@ internal class ImportServiceTest {
       movePersister,
       FakePersonPersister(successful = false),
       auditService,
-      monitoringService
+      monitoringService,
+      reportLookup
     )
 
     service.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.yesterday())
@@ -165,6 +171,32 @@ internal class ImportServiceTest {
     assertThatThrownBy {
       importReportsService.importPeopleProfileReportsStartingFrom(timeSourceWithFixedDate.date().plusDays(1))
     }.isInstanceOf(RuntimeException::class.java)
+  }
+
+  @Test
+  fun `fails if import date is not in the past`() {
+    assertThatThrownBy { importReportsService.importAllReportsOn(timeSourceWithFixedDate.date()) }
+      .isInstanceOf(RuntimeException::class.java)
+      .hasMessage("Import date must be in the past.")
+  }
+
+  @Test
+  fun `expected monitoring interactions when report files missing`() {
+    val service = ImportReportsService(
+      timeSourceWithFixedDate,
+      FakeReportImporter(),
+      movePersister,
+      FakePersonPersister(successful = false),
+      auditService,
+      monitoringService,
+      ReportLookup { false }
+    )
+
+    assertThatThrownBy { service.importAllReportsOn(timeSourceWithFixedDate.yesterday()) }
+      .isInstanceOf(RuntimeException::class.java)
+      .hasMessage("The service is missing data which may affect pricing due to missing file(s): 2021/02/17/2021-02-17-moves.jsonl, 2021/02/17/2021-02-17-events.jsonl, 2021/02/17/2021-02-17-journeys.jsonl, 2021/02/17/2021-02-17-profiles.jsonl, 2021/02/17/2021-02-17-people.jsonl")
+
+    verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2021/02/17/2021-02-17-moves.jsonl, 2021/02/17/2021-02-17-events.jsonl, 2021/02/17/2021-02-17-journeys.jsonl, 2021/02/17/2021-02-17-profiles.jsonl, 2021/02/17/2021-02-17-people.jsonl")
   }
 
   private class FakeReportImporter : ReportImporter(mock(), mock(), FakeReportReaderParser()) {

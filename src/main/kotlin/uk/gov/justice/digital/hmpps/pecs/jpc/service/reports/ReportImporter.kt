@@ -75,6 +75,9 @@ open class ReportImporter(
       }.toList()
     }
 
+    fun reportFilenamesFor(date: LocalDate) =
+      listOf("moves", "events", "journeys", "profiles", "people").flatMap { entity -> fileNamesForDate(entity, date, date) }
+
     private fun padZero(value: Int) = if (value < 10) "0$value" else value.toString()
   }
 }

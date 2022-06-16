@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.service.reports
 
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportLookup
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEventType.REPORTING_DATA_IMPORT
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovePersister
@@ -27,7 +28,8 @@ class ImportReportsService(
   private val movePersister: MovePersister,
   private val personPersister: PersonPersister,
   private val auditService: AuditService,
-  private val monitoringService: MonitoringService
+  private val monitoringService: MonitoringService,
+  private val reportLookup: ReportLookup
 ) {
 
   /**
@@ -37,10 +39,30 @@ class ImportReportsService(
     auditService.findMostRecentEventByType(REPORTING_DATA_IMPORT)?.createdAt?.toLocalDate()
 
   fun importAllReportsOn(date: LocalDate) {
-    // TODO check files exist before attempting to import, raise sentry alert if missing anything followed by a runtime exception
+    failIfDateOfImportNotInPast(date)
+    failIfAnyReportFilesAreMissingOn(date)
+
     importMovesJourneysEventsOn(date)
     importPeopleOn(date)
     importProfilesOn(date)
+  }
+
+  private fun failIfDateOfImportNotInPast(date: LocalDate) {
+    if (date.isAfter(timeSource.yesterday())) throw RuntimeException("Import date must be in the past.")
+  }
+
+  private fun failIfAnyReportFilesAreMissingOn(date: LocalDate) {
+    ReportImporter.reportFilenamesFor(date)
+      .mapNotNull { if (!reportLookup.doesReportExist(it)) it else null }
+      .run {
+        if (this.isNotEmpty()) {
+          val message = "The service is missing data which may affect pricing due to missing file(s): ${this.joinToString(separator = ", ")}"
+          logger.error(message)
+          monitoringService.capture(message)
+
+          throw RuntimeException(message)
+        }
+      }
   }
 
   fun importMoveJourneyAndEventReportsOn(date: LocalDate) {

@@ -5,9 +5,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.BackfillReportsTask
+import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.ImportReportsDataTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysLocationMappingTask
-import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysMovesTask
-import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.PreviousDaysPeopleAndProfilesTask
 import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.ReprocessExistingMovesTask
 
 /**
@@ -16,8 +15,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.tasks.ReprocessExistingMovesTask
 @ConditionalOnWebApplication
 @Component
 class TasksSchedulingConfiguration(
-  val previousDaysMoves: PreviousDaysMovesTask,
-  val previousDaysPeopleAndProfiles: PreviousDaysPeopleAndProfilesTask,
+  val importReportsDataTask: ImportReportsDataTask,
   val previousDaysLocationMapping: PreviousDaysLocationMappingTask,
   val backfillReports: BackfillReportsTask,
   val reprocessExistingMovesTask: ReprocessExistingMovesTask
@@ -26,8 +24,7 @@ class TasksSchedulingConfiguration(
   @Scheduled(cron = "\${CRON_IMPORT_REPORTS}")
   @SchedulerLock(name = "importReports")
   fun previousDaysReportsTask() {
-    previousDaysMoves.execute()
-    previousDaysPeopleAndProfiles.execute()
+    importReportsDataTask.execute()
   }
 
   @Scheduled(cron = "\${CRON_AUTOMATIC_LOCATION_MAPPING}")

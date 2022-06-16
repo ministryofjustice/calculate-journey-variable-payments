@@ -133,6 +133,15 @@ class S3ProviderConfiguration {
 
   @Bean
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
+  fun reportLookup(
+    @Qualifier("basmAmazonS3") client: AmazonS3,
+    @Value("\${BASM_BUCKET_NAME}") bucketName: String
+  ): ReportLookup {
+    return ReportLookup { client.doesObjectExist(bucketName, it) }
+  }
+
+  @Bean
+  @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
   fun reportReaderParser(
     @Qualifier("basmAmazonS3") client: AmazonS3,
     @Value("\${BASM_BUCKET_NAME}") bucketName: String,
@@ -189,4 +198,12 @@ fun interface Schedule34LocationsProvider {
    * The caller is responsible for closing the [InputStream].
    */
   fun get(): InputStream
+}
+
+/**
+ * Responsible for determining whether a particular report exists. For example, we can check it exists prior to trying
+ * to read/download the file.
+ */
+fun interface ReportLookup {
+  fun doesReportExist(filename: String): Boolean
 }
