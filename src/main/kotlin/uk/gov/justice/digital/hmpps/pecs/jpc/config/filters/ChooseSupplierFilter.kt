@@ -16,6 +16,10 @@ private val log = loggerFor<ChooseSupplierFilter>()
 class ChooseSupplierFilter : OncePerRequestFilter() {
 
   private val allowedLinks = arrayOf(
+    "/health",
+    "/health/liveness",
+    "/health/readiness",
+    "/info",
     CHOOSE_SUPPLIER_URL,
     "$CHOOSE_SUPPLIER_URL/geoamey",
     "$CHOOSE_SUPPLIER_URL/serco",
