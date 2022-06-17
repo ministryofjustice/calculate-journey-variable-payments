@@ -81,7 +81,8 @@ export $(cat .env | xargs)  # If you want to set or update the current shell env
 
 Pricing data makes its way into the service via two mechanisms. Via a daily CRON job (which at time of writing runs in 
 the early hours of the morning) and via a manual process (with the view the manual process will be going away). The 
-CRON job is configured in the helm config of this project via the **CRON_IMPORT_REPORTS** environment variable.
+CRON job is configured in the helm config of this project via the **CRON_IMPORT_REPORTS** environment variable in the
+helm config [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy).
 
 The data itself falls into three distinct types:
 
@@ -94,7 +95,10 @@ The data itself falls into three distinct types:
 3. Move reporting data - these are JSON files representing all the of the supplier moves, stored in a secure S3 bucket. 
    These files are uploaded automatically to S3 by an independent process not managed by this application.  The files 
    are pulled into the application via the daily early morning CRON job to be used for calculating journey prices. It is
-   important to understand that the reports (are always) being pulled based on the previous day.
+   important to understand the reports being pulled are based on the previous day. If there are any missing files for
+   the day it runs then the next time the import runs it will run from the point at which there were any missing files in an attempt
+   to recover, this can be disabled via the environment variable **IMPORT_REPORTS_BACKDATE_ENABLED** in the Helm config
+   [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy).
 
 ### Manually importing supplier prices and reporting data
 
@@ -123,15 +127,6 @@ java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --report-imp
 
 java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --process-historic-moves --supplier=SERCO --from=YYYY-MM-DD --to=YYYY-MM-DD
 ```
-```
-# Backfill people and profiles. This will backfill from the date specified to the current day - 1
-
-java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --import-people-profiles --from=YYYY-MM-DD
-```
-
-Typing help in the shell will also list the available commands.  TAB autocomplete is also available.
-
-To exit from the shell simply type: exit
 
 ### Automatic mapping of Schedule 34 locations (from BaSM)
 
@@ -140,7 +135,14 @@ the users have to do with mapping new locations, a CRON job runs daily to retrie
 BaSM and automatically add them to CJVP (if there are any).  If a location already exists in CJVP it will simply be
 ignored, nothing is overwritten, only new locations will be added.
 
-The CRON job is configured in the helm config of this project via the **CRON_AUTOMATIC_LOCATION_MAPPING** environment variable.
+The CRON job is configured in the helm config of this project via the **CRON_AUTOMATIC_LOCATION_MAPPING** environment variable [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy).
+
+### Feature toggles/flags
+
+The following feature toggles/flags are in place for the application in the Helm config [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy):
+
+1. FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES this feature includes an extra tab on the spreadsheet for moves that have been
+   categorised, as in they have a move type but may be missing some key information which excludes them from being priced e.g. date(s)
 
 ### Common gradle tasks 
 To list project dependencies, run:
