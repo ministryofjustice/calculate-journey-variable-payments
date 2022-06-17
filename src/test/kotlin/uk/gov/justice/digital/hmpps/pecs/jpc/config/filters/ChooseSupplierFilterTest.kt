@@ -51,6 +51,10 @@ internal class ChooseSupplierFilterTest {
       "image.png",
       "icon.ico",
       "javascript.js",
+      "/health",
+      "/health/liveness",
+      "/health/readiness",
+      "/info",
     ]
   )
   internal fun `filter does not redirect to choose supplier when no supplier selected for excluded URIs`(uri: String) {
