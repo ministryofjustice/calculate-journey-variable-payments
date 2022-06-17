@@ -14,9 +14,11 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.AnnualPriceAdjustmentsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ImportReportsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerco
 import java.time.LocalDate
 
@@ -24,7 +26,10 @@ import java.time.LocalDate
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class ApplicationInformationControllerTest(@Autowired private val wac: WebApplicationContext) {
+class ApplicationInformationControllerTest(
+  @Autowired private val wac: WebApplicationContext,
+  @Autowired private val timesource: TimeSource
+) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
@@ -37,6 +42,9 @@ class ApplicationInformationControllerTest(@Autowired private val wac: WebApplic
 
   @MockBean
   lateinit var annualPriceAdjustmentsService: AnnualPriceAdjustmentsService
+
+  @MockBean
+  lateinit var importReportsService: ImportReportsService
 
   @MockBean
   lateinit var effectiveYear: EffectiveYear
@@ -84,6 +92,45 @@ class ApplicationInformationControllerTest(@Autowired private val wac: WebApplic
       session = mockSession
     }
       .andExpect { content { json("{message:\"Prices for the selected catalogue year September 2021 to August 2022 can no longer be changed.\"}") } }
+      .andExpect { status { is2xxSuccessful() } }
+  }
+
+  @Test
+  internal fun `application info message is present when reports feed is behind by 2 days`() {
+    whenever(annualPriceAdjustmentsService.adjustmentInProgressFor(defaultSupplierSerco)).thenReturn(false)
+    whenever(effectiveYear.canAddOrUpdatePrices(any())).thenReturn(true)
+    whenever(importReportsService.dateOfLastImport()).thenReturn(timesource.date().minusDays(2))
+
+    mockMvc.get("/app/info") {
+      session = mockSession
+    }
+      .andExpect { content { json("{message:\"The service may be missing pricing data, please contact the Book a secure move team.\"}}") } }
+      .andExpect { status { is2xxSuccessful() } }
+  }
+
+  @Test
+  internal fun `application info message is not present when reports feed is behind by 1 day`() {
+    whenever(annualPriceAdjustmentsService.adjustmentInProgressFor(defaultSupplierSerco)).thenReturn(false)
+    whenever(effectiveYear.canAddOrUpdatePrices(any())).thenReturn(true)
+    whenever(importReportsService.dateOfLastImport()).thenReturn(timesource.date().minusDays(1))
+
+    mockMvc.get("/app/info") {
+      session = mockSession
+    }
+      .andExpect { content { json("{}") } }
+      .andExpect { status { is2xxSuccessful() } }
+  }
+
+  @Test
+  internal fun `application info message is not present when no existing feed`() {
+    whenever(annualPriceAdjustmentsService.adjustmentInProgressFor(defaultSupplierSerco)).thenReturn(false)
+    whenever(effectiveYear.canAddOrUpdatePrices(any())).thenReturn(true)
+    whenever(importReportsService.dateOfLastImport()).thenReturn(null)
+
+    mockMvc.get("/app/info") {
+      session = mockSession
+    }
+      .andExpect { content { json("{}") } }
       .andExpect { status { is2xxSuccessful() } }
   }
 }

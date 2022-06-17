@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.SessionAttributes
+import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.AnnualPriceAdjustmentsService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ImportReportsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.time.Period
 
 private val logger = loggerFor<ApplicationInformationController>()
 
@@ -23,7 +26,12 @@ private val logger = loggerFor<ApplicationInformationController>()
 @RestController
 @RequestMapping(name = "Supplier information", path = ["/app"], produces = [MediaType.APPLICATION_JSON_VALUE])
 @SessionAttributes(DATE_ATTRIBUTE, SUPPLIER_ATTRIBUTE)
-class ApplicationInformationController(val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService, val effectiveYear: EffectiveYear) {
+class ApplicationInformationController(
+  private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
+  private val effectiveYear: EffectiveYear,
+  private val reportsService: ImportReportsService,
+  private val timeSource: TimeSource
+) {
 
   @GetMapping(path = ["/info"])
   fun info(@ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier, model: ModelMap): ApplicationInformation {
@@ -31,14 +39,25 @@ class ApplicationInformationController(val annualPriceAdjustmentsService: Annual
 
     return ApplicationInformation(
       when {
-        annualPriceAdjustmentsService.adjustmentInProgressFor(supplier) ->
+        isPriceAdjustmentInProgressFor(supplier) ->
           "A bulk price adjustment is currently in progress. Any further price changes will be prevented until the adjustment is complete."
-        !effectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear()) ->
-          "Prices for the selected catalogue year ${model.getSelectedYearStart().month()} ${model.getSelectedYearStart().year()} to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} can no longer be changed."
+        isNotAbleToUpdatePricesForSelectedYear(model) ->
+          "Prices for the selected catalogue year ${model.getSelectedYearStart().month()} ${model.getSelectedYearStart().year()
+          } to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} can no longer be changed."
+        isPricingDataIsOutByTwoDays() -> "The service may be missing pricing data, please contact the Book a secure move team."
         else -> null
       }
     )
   }
+
+  private fun isPriceAdjustmentInProgressFor(supplier: Supplier) =
+    annualPriceAdjustmentsService.adjustmentInProgressFor(supplier)
+
+  private fun isNotAbleToUpdatePricesForSelectedYear(model: ModelMap) =
+    !effectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())
+
+  private fun isPricingDataIsOutByTwoDays() =
+    Period.between(reportsService.dateOfLastImport() ?: timeSource.date(), timeSource.date()).days > 1
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   data class ApplicationInformation(val message: String? = null)
