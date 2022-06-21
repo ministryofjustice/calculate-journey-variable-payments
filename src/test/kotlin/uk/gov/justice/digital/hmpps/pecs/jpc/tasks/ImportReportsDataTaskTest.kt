@@ -6,6 +6,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.TimeSource
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
@@ -28,8 +29,10 @@ class ImportReportsDataTaskTest {
     ImportReportsDataTask(true, importReportsService, timeSource, monitoringService).execute()
 
     verify(importReportsService).dateOfLastImport()
+    verify(importReportsService).importAllReportsOn(LocalDate.of(2022, 6, 12))
     verify(importReportsService).importAllReportsOn(LocalDate.of(2022, 6, 13))
     verify(importReportsService).importAllReportsOn(LocalDate.of(2022, 6, 14))
+    verifyNoMoreInteractions(importReportsService)
     verifyNoInteractions(monitoringService)
   }
 

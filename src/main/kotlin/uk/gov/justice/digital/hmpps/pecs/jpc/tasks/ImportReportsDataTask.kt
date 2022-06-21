@@ -18,10 +18,10 @@ class ImportReportsDataTask(
   override fun performTask() {
     timeSource.yesterday().run {
       if (backDateEnabled) {
-        val importDate = service.dateOfLastImport()?.plusDays(1) ?: this
+        val startDate = service.dateOfLastImport() ?: this
 
-        if (importDate.isBefore(this)) {
-          backdateReportsFrom(importDate)
+        if (startDate.isBefore(this)) {
+          backdateReportsFrom(startDate)
 
           return
         }
