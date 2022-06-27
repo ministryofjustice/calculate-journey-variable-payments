@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.2.3"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.0-beta-1"
   kotlin("plugin.spring") version "1.6.21"
   kotlin("plugin.jpa") version "1.6.21"
   kotlin("plugin.allopen") version "1.6.21"
@@ -17,13 +17,13 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.239")
-  implementation("io.sentry:sentry-spring-boot-starter:6.0.0")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.36.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.36.0")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.248")
+  implementation("io.sentry:sentry-spring-boot-starter:6.1.3")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:4.37.0")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.37.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
   implementation("org.apache.poi:poi-ooxml:5.2.2")
-  implementation("org.flywaydb:flyway-core:8.5.12")
+  implementation("org.flywaydb:flyway-core:8.5.13")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -51,8 +51,8 @@ dependencies {
   testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
-  testImplementation("com.squareup.okhttp3:okhttp:4.9.3")
+  testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+  testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
   runtimeOnly("org.postgresql:postgresql:42.4.0")
