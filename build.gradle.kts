@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.0-beta-1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.3.1"
   kotlin("plugin.spring") version "1.6.21"
   kotlin("plugin.jpa") version "1.6.21"
   kotlin("plugin.allopen") version "1.6.21"
@@ -17,8 +17,8 @@ dependencyCheck {
 
 dependencies {
   implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.248")
-  implementation("io.sentry:sentry-spring-boot-starter:6.1.3")
+  implementation("com.amazonaws:aws-java-sdk-s3:1.12.251")
+  implementation("io.sentry:sentry-spring-boot-starter:6.1.4")
   implementation("net.javacrumbs.shedlock:shedlock-spring:4.37.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.37.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
