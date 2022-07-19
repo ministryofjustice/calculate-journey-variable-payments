@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 
-internal class ReportParserTest {
+internal class InMemoryReportParserTest {
 
   private fun moveReports(): List<String> {
     val report1 =
@@ -64,7 +64,7 @@ internal class ReportParserTest {
   @Test
   fun `Get import moves should return all moves`() {
 
-    val moves = ReportParser.parseAsMoves(moveReports())
+    val moves = InMemoryReportParser.parseAsMoves(moveReports())
     assertThat(moves.map { it.moveId }).containsExactly("M1", "M2", "M3", "M4", "M5")
 
     // M1 should be complete
@@ -78,13 +78,13 @@ internal class ReportParserTest {
         {"id":"M1", "date":"2021-02-28","status":"requested","reference":"UKW4591N","move_type":"prison_transfer","additional_information":null,"time_due":null,"cancellation_reason":null,"cancellation_reason_comment":null,"profile_id":"PR1","reason_comment":null,"move_agreed":null,"move_agreed_by":null,"date_from":null,"date_to":null, "rejection_reason":null,"from_location_type":"prison","from_location":null,"to_location_type":"prison","to_location":"GNI","supplier":"GEOAMEY"}
       """
 
-    assertThat(ReportParser.parseAsMoves(listOf(moveJsonWithNullFromLocation))).hasSize(0)
+    assertThat(InMemoryReportParser.parseAsMoves(listOf(moveJsonWithNullFromLocation))).hasSize(0)
   }
 
   @Test
   fun `parse move ids to journeys`() {
 
-    val journeys = ReportParser.parseAsMoveIdToJourneys(journeyReports())
+    val journeys = InMemoryReportParser.parseAsMoveIdToJourneys(journeyReports())
 
     // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
     assertThat(journeys.keys).containsExactlyInAnyOrder("M1", "M2", "M3")
@@ -101,7 +101,7 @@ internal class ReportParserTest {
 
   @Test
   fun `parse event reports only`() {
-    val events = ReportParser.parseAsEventableIdToEvents(eventReports())
+    val events = InMemoryReportParser.parseAsEventableIdToEvents(eventReports())
 
     // There should be 3 unique eventable Ids
     assertThat(events).hasSize(3)
@@ -115,7 +115,7 @@ internal class ReportParserTest {
 
   @Test
   fun `parse move, journey and event and event reports`() {
-    val movesWithJourneysAndEvents = ReportParser.parseMovesJourneysEvents(
+    val movesWithJourneysAndEvents = InMemoryReportParser.parseMovesJourneysEvents(
       moveFiles = moveReports(),
       journeyFiles = journeyReports(),
       eventFiles = eventReports()

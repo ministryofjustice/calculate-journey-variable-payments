@@ -10,7 +10,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StreamingReportParser
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ class ReportImporterConfiguration {
   private lateinit var reportingProvider: ReportingProvider
 
   @Autowired
-  private lateinit var reportReaderParser: ReportReaderParser
+  private lateinit var streamingReportParser: StreamingReportParser
 
   @Autowired
   private lateinit var monitoringString: MonitoringService
@@ -40,7 +40,7 @@ class ReportImporterConfiguration {
 
   @Bean
   fun reportImporter() =
-    ReportImporter(reportingProvider, monitoringString, reportReaderParser)
+    ReportImporter(reportingProvider, monitoringString, streamingReportParser)
 
   // This is now needed for Spring Boot as part of moving from 2.5.3 to 3.0.0 Thymeleaf Layout Dialect
   @Bean
@@ -52,7 +52,7 @@ fun interface SupplierPrices {
 }
 
 /**
- * To be used for providing date and or time in the applications. Enables control of time in the code (and unit tests).
+ * To be used for providing dates and times in the application. Enables control of time in the code (and unit tests).
  */
 fun interface TimeSource {
   fun dateTime(): LocalDateTime

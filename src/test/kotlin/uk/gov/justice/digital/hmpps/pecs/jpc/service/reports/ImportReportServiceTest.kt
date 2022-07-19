@@ -165,12 +165,12 @@ internal class ImportReportServiceTest {
     verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2021/02/17/2021-02-17-moves.jsonl, 2021/02/17/2021-02-17-events.jsonl, 2021/02/17/2021-02-17-journeys.jsonl, 2021/02/17/2021-02-17-profiles.jsonl, 2021/02/17/2021-02-17-people.jsonl")
   }
 
-  private class FakeReportImporter : ReportImporter(mock(), mock(), FakeReportReaderParser()) {
+  private class FakeReportImporter : ReportImporter(mock(), mock(), FakeStreamingReportParser()) {
     override fun importMovesJourneysEventsOn(date: LocalDate) = listOf<Move>(mock())
   }
 
-  private class FakeReportReaderParser : ReportReaderParser {
-    override fun <T> forEach(reportName: String, parser: (String) -> T?, consumer: (T) -> Unit) {
+  private class FakeStreamingReportParser : StreamingReportParser {
+    override fun <T> forEach(reportName: String, parse: (String) -> T?, consumer: (T) -> Unit) {
       @Suppress("UNCHECKED_CAST")
       if (reportName.contains("profile")) consumer(mock<Profile>() as T) else consumer(mock<Person>() as T)
     }
