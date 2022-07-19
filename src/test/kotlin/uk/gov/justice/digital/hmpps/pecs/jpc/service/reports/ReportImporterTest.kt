@@ -30,7 +30,7 @@ import java.time.temporal.ChronoUnit
 @ActiveProfiles("test")
 internal class ReportImporterTest(
   @Autowired private val provider: ReportingProvider,
-  @Autowired val reportReaderParser: StandardReportReaderParser
+  @Autowired val reportReaderParser: StandardStreamingReportParser
 ) {
 
   @MockBean
@@ -113,7 +113,7 @@ internal class ReportImporterTest(
 
   @Test
   fun `Monitoring service captures file download errors for profiles`() {
-    ReportImporter(provider, monitoringService, FailingReportReaderParser("profile error")).importProfiles(
+    ReportImporter(provider, monitoringService, FailingStreamingReportParser("profile error")).importProfiles(
       LocalDate.of(
         2020,
         9,
@@ -126,7 +126,7 @@ internal class ReportImporterTest(
 
   @Test
   fun `Monitoring service captures file download errors for people`() {
-    ReportImporter(provider, monitoringService, FailingReportReaderParser("people error")).importPeople(
+    ReportImporter(provider, monitoringService, FailingStreamingReportParser("people error")).importPeople(
       LocalDate.of(
         2020,
         10,
@@ -156,8 +156,8 @@ internal class ReportImporterTest(
     )
   }
 
-  private class FailingReportReaderParser(private val errorMessage: String) : ReportReaderParser {
-    override fun <T> forEach(reportName: String, parser: (String) -> T?, consumer: (T) -> Unit) {
+  private class FailingStreamingReportParser(private val errorMessage: String) : StreamingReportParser {
+    override fun <T> forEach(reportName: String, parse: (String) -> T?, consumer: (T) -> Unit) {
       throw RuntimeException(errorMessage)
     }
   }

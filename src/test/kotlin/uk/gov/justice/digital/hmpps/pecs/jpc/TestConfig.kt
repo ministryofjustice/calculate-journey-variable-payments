@@ -18,7 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyQueryReposito
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveQueryRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportImporter
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardStreamingReportParser
 import java.io.InputStreamReader
 import java.time.Clock
 import java.time.Instant
@@ -65,7 +65,7 @@ class TestConfig {
 
   @Bean
   fun reportReaderParser() =
-    StandardReportReaderParser { InputStreamReader(resourceLoader.getResource("classpath:/reporting/$it").inputStream) }
+    StandardStreamingReportParser { InputStreamReader(resourceLoader.getResource("classpath:/reporting/$it").inputStream) }
 
   @Bean
   fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() }, reportReaderParser())

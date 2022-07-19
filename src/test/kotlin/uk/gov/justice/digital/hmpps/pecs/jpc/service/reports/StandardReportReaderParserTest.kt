@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-class StandardReportReaderParserTest(@Autowired val reportReaderParser: StandardReportReaderParser) {
+class StandardReportReaderParserTest(@Autowired val reportReaderParser: StandardStreamingReportParser) {
 
   @Test
   fun `read and parse multiple profiles with simple string reader`() {
@@ -26,7 +26,7 @@ class StandardReportReaderParserTest(@Autowired val reportReaderParser: Standard
 
     val parsedProfiles = mutableListOf<Profile>()
 
-    StandardReportReaderParser { StringReader(profiles) }.forEach(
+    StandardStreamingReportParser { StringReader(profiles) }.forEach(
       "_",
       { Profile.fromJson(it) }
     ) {

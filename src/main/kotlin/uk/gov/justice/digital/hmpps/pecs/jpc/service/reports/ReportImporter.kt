@@ -14,7 +14,7 @@ private val logger = loggerFor<ReportImporter>()
 open class ReportImporter(
   @Autowired private val provider: ReportingProvider,
   @Autowired private val monitoringService: MonitoringService,
-  @Autowired private val reportingReaderParser: ReportReaderParser
+  @Autowired private val streamingReportParser: StreamingReportParser
 ) {
 
   open fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)
@@ -26,31 +26,11 @@ open class ReportImporter(
 
     val eventsContent = getContents("events", from, to)
 
-    return ReportParser.parseMovesJourneysEvents(
+    return InMemoryReportParser.parseMovesJourneysEvents(
       moveFiles = movesContent,
       journeyFiles = journeysContent,
       eventFiles = eventsContent,
     )
-  }
-
-  open fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
-    val fileNameForDate = fileNamesForDate("people", date, date).first()
-
-    Result.runCatching {
-      reportingReaderParser.forEach(fileNameForDate, { Person.fromJson(it) }) { consumer(it) }
-    }.onFailure {
-      monitoringService.capture("Error processing people file $fileNameForDate, exception: ${it.message}")
-    }
-  }
-
-  fun importProfiles(date: LocalDate, consumer: (Profile) -> Unit) {
-    val fileNameForDate = fileNamesForDate("profiles", date, date).first()
-
-    Result.runCatching {
-      reportingReaderParser.forEach(fileNameForDate, { Profile.fromJson(it) }) { consumer(it) }
-    }.onFailure {
-      monitoringService.capture("Error processing profiles file $fileNameForDate, exception: ${it.message}")
-    }
   }
 
   private fun getContents(entity: String, from: LocalDate, to: LocalDate): List<String> {
@@ -65,6 +45,26 @@ open class ReportImporter(
         monitoringService.capture("The service is missing data which may affect pricing due to missing file $it. Exception: ${e.message}")
         null
       }
+    }
+  }
+
+  open fun importPeople(date: LocalDate, consumer: (Person) -> Unit) {
+    val fileNameForDate = fileNamesForDate("people", date, date).first()
+
+    Result.runCatching {
+      streamingReportParser.forEach(fileNameForDate, { Person.fromJson(it) }) { consumer(it) }
+    }.onFailure {
+      monitoringService.capture("Error processing people file $fileNameForDate, exception: ${it.message}")
+    }
+  }
+
+  fun importProfiles(date: LocalDate, consumer: (Profile) -> Unit) {
+    val fileNameForDate = fileNamesForDate("profiles", date, date).first()
+
+    Result.runCatching {
+      streamingReportParser.forEach(fileNameForDate, { Profile.fromJson(it) }) { consumer(it) }
+    }.onFailure {
+      monitoringService.capture("Error processing profiles file $fileNameForDate, exception: ${it.message}")
     }
   }
 

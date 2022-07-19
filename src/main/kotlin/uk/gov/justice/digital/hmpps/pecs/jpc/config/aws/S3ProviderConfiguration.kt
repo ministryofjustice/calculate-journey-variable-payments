@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ObfuscatingPiiReaderParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportReaderParser
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardReportReaderParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ObfuscatingStreamingReportParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardStreamingReportParser
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StreamingReportParser
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -142,14 +142,14 @@ class S3ProviderConfiguration {
 
   @Bean
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
-  fun reportReaderParser(
+  fun streamingReportParser(
     @Qualifier("basmAmazonS3") client: AmazonS3,
     @Value("\${BASM_BUCKET_NAME}") bucketName: String,
     @Value("\${SENTRY_ENVIRONMENT:}") env: String
-  ): ReportReaderParser {
+  ): StreamingReportParser {
     return if (env.trim().uppercase() == "LOCAL") {
       logger.warn("Running parser in PII obfuscation mode")
-      ObfuscatingPiiReaderParser {
+      ObfuscatingStreamingReportParser {
         InputStreamReader(
           client.getObject(
             GetObjectRequest(
@@ -160,8 +160,17 @@ class S3ProviderConfiguration {
         )
       }
     } else {
-      logger.info("Using AWS S3 for report reader parser.")
-      StandardReportReaderParser { InputStreamReader(client.getObject(GetObjectRequest(bucketName, it)).objectContent) }
+      logger.info("Using AWS S3 for streaming report parser.")
+      StandardStreamingReportParser {
+        InputStreamReader(
+          client.getObject(
+            GetObjectRequest(
+              bucketName,
+              it
+            )
+          ).objectContent
+        )
+      }
     }
   }
 }
@@ -189,6 +198,7 @@ fun interface SercoPricesProvider {
 fun interface ReportingProvider {
   fun get(resourceName: String): String
 }
+
 /**
  * Responsible for providing the Schedule 34 locations Excel spreadsheet via an [InputStream].
  */

@@ -15,7 +15,7 @@ class ObfuscatingPiiReaderParserTest {
     val lastName = "Blogs"
     val ethnicity = "European"
 
-    ObfuscatingPiiReaderParser {
+    ObfuscatingStreamingReportParser {
       StringReader(
         personProvider(
           prisonNumber = prisonNumber,
