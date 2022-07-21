@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.cli
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
@@ -15,6 +16,7 @@ import java.time.LocalDate
 private val logger = loggerFor<CommandRunner>()
 
 @ConditionalOnNotWebApplication
+@Profile("!daily-reports")
 @Component
 class CommandRunner(
   private val bulkPriceImportCommand: BulkPriceImportCommand,
