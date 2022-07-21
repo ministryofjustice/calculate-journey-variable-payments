@@ -1,5 +1,5 @@
 # This cronjob works in conjunction with the 'daily-reports' profile defined within the application. By using this
-# profile the application starts in non-web mode and the ReportImportCommand application runner class executes.
+# profile the application starts in non-web mode and the DailyReportsImporterRunner application runner class executes.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
