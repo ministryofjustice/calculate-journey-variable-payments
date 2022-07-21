@@ -1,0 +1,3 @@
+ kubectl delete job import-report-feed-try01  --namespace calculate-journey-variable-payments-dev
+
+ kubectl delete cronjob import-report-feed  --namespace calculate-journey-variable-payments-dev
