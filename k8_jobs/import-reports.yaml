@@ -7,7 +7,7 @@ metadata:
   namespace: calculate-journey-variable-payments-placeholder
 spec:
   concurrencyPolicy: Forbid
-  schedule: "0 9 * * *" # daily at 9:00 am
+  schedule: "3 6 * * *" # daily at 6:30 am UTC
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 2
   jobTemplate:
@@ -127,7 +127,7 @@ spec:
                 - name: FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES
                   value: "false"
                 - name: IMPORT_REPORTS_BACKDATE_ENABLED
-                  value: "false"
+                  value: "true"
                 - name: IMPORT_FILES_PRICES_GEO
                   value: "we_dont_care"
                 - name: IMPORT_FILES_PRICES_SERCO
