@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-jammy AS builder
+FROM openjdk:17-slim AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
@@ -7,7 +7,7 @@ WORKDIR /app
 ADD . .
 RUN ./gradlew clean assemble -Dorg.gradle.daemon=false
 
-FROM eclipse-temurin:17-jre-jammy
+FROM openjdk:17-slim
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 RUN apt-get update && \
