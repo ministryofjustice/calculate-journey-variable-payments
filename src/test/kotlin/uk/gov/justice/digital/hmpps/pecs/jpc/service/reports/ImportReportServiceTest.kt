@@ -163,6 +163,7 @@ internal class ImportReportServiceTest {
       .hasMessage("The service is missing data which may affect pricing due to missing file(s): 2021/02/17/2021-02-17-moves.jsonl, 2021/02/17/2021-02-17-events.jsonl, 2021/02/17/2021-02-17-journeys.jsonl, 2021/02/17/2021-02-17-profiles.jsonl, 2021/02/17/2021-02-17-people.jsonl")
 
     verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file(s): 2021/02/17/2021-02-17-moves.jsonl, 2021/02/17/2021-02-17-events.jsonl, 2021/02/17/2021-02-17-journeys.jsonl, 2021/02/17/2021-02-17-profiles.jsonl, 2021/02/17/2021-02-17-people.jsonl")
+    verifyNoInteractions(auditService)
   }
 
   private class FakeReportImporter : ReportImporter(mock(), mock(), FakeStreamingReportParser()) {
