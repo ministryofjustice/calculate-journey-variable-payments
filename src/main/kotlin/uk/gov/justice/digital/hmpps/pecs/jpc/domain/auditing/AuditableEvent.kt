@@ -151,15 +151,25 @@ data class AuditableEvent(
     private fun authentication() = SecurityContextHolder.getContext().authentication
       ?: throw RuntimeException("Attempted to create audit event $AuditEventType.LOCATION without a user")
 
-    fun importReportEvent(type: String, reportDate: LocalDate, processed: Int, saved: Int) =
+    fun importReportsEvent(
+      reportDate: LocalDate,
+      moves_processed: Int,
+      moves_saved: Int,
+      people_processed: Int,
+      people_saved: Int,
+      profiles_processed: Int,
+      profiles_saved: Int,
+    ) =
       createEvent(
         type = AuditEventType.REPORTING_DATA_IMPORT,
         metadata = mapOf(
-          "type" to type,
           "report_date" to reportDate.toString(),
-          "processed" to processed,
-          "saved" to saved
-
+          "moves_processed" to moves_processed,
+          "moves_saved" to moves_saved,
+          "people_processed" to people_processed,
+          "people_saved" to people_saved,
+          "profiles_processed" to profiles_processed,
+          "profiles_saved" to profiles_saved,
         ),
         allowNoUser = true
       )

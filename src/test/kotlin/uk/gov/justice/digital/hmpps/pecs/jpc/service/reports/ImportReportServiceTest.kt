@@ -66,9 +66,17 @@ internal class ImportReportServiceTest {
 
     service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
 
-    verify(auditService).create(AuditableEvent.importReportEvent("moves", timeSourceWithFixedDate.yesterday(), 1, 1))
-    verify(auditService).create(AuditableEvent.importReportEvent("people", timeSourceWithFixedDate.yesterday(), 1, 1))
-    verify(auditService).create(AuditableEvent.importReportEvent("profiles", timeSourceWithFixedDate.yesterday(), 1, 1))
+    verify(auditService).create(
+      AuditableEvent.importReportsEvent(
+        timeSourceWithFixedDate.yesterday(),
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      )
+    )
     verifyNoInteractions(monitoringService)
   }
 

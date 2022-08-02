@@ -44,9 +44,23 @@ class ImportReportsService(
     failIfDateOfImportNotInPast(date)
     failIfAnyReportFilesAreMissingOn(date)
 
-    importMovesJourneysEventsOn(date)
-    importPeopleOn(date)
-    importProfilesOn(date)
+    val maybeMoves = importMovesJourneysEventsOn(date)
+    val maybePeople = importPeopleOn(date)
+    val maybeProfiles = importProfilesOn(date)
+
+    if (maybeMoves != null && maybePeople != null && maybeProfiles != null) {
+      auditService.create(
+        AuditableEvent.importReportsEvent(
+          reportDate = date,
+          moves_processed = maybeMoves.processed,
+          moves_saved = maybeMoves.saved,
+          people_processed = maybePeople.processed,
+          people_saved = maybePeople.saved,
+          profiles_processed = maybeProfiles.processed,
+          profiles_saved = maybeProfiles.saved,
+        )
+      )
+    }
   }
 
   private fun failIfDateOfImportNotInPast(date: LocalDate) {
@@ -58,7 +72,8 @@ class ImportReportsService(
       .mapNotNull { if (!reportLookup.doesReportExist(it)) it else null }
       .run {
         if (this.isNotEmpty()) {
-          val message = "The service is missing data which may affect pricing due to missing file(s): ${this.joinToString(separator = ", ")}"
+          val message =
+            "The service is missing data which may affect pricing due to missing file(s): ${this.joinToString(separator = ", ")}"
           logger.error(message)
           monitoringService.capture(message)
 
@@ -67,28 +82,30 @@ class ImportReportsService(
       }
   }
 
-  private fun importMovesJourneysEventsOn(date: LocalDate) {
+  private fun importMovesJourneysEventsOn(date: LocalDate): Totals? {
     logger.info("Importing moves, journeys and events for date: $date.")
 
-    import { reportImporter.importMovesJourneysEventsOn(date) }?.let {
+    return import { reportImporter.importMovesJourneysEventsOn(date) }?.let {
       val moves = it.toList()
-      movePersister.persist(moves).let { persisted ->
-        auditService.create(AuditableEvent.importReportEvent("moves", date, moves.size, persisted))
-
+      val persisted = movePersister.persist(moves).let { persisted ->
         raiseMonitoringAlertIf(
           moves.isNotEmpty() && moves.size > persisted,
           "moves: persisted $persisted out of ${moves.size} for reporting feed date $date."
         )
 
         raiseMonitoringAlertIf(moves.isEmpty(), "There were no moves to persist for reporting feed date $date.")
+
+        persisted
       }
+
+      Totals(moves.size, persisted)
     }
   }
 
-  private fun importPeopleOn(date: LocalDate) {
+  private fun importPeopleOn(date: LocalDate): Totals? {
     logger.info("Importing people for date: $date.")
 
-    import {
+    return import {
       val (saved, errors) = AtomicInteger(0) to AtomicInteger(0)
 
       reportImporter.importPeople(date) { person ->
@@ -105,8 +122,6 @@ class ImportReportsService(
         )
       }
 
-      auditService.create(AuditableEvent.importReportEvent("people", date, saved.get() + errors.get(), saved.get()))
-
       raiseMonitoringAlertIf(
         errors.get() > 0,
         "people: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date."
@@ -115,13 +130,15 @@ class ImportReportsService(
       raiseMonitoringAlertIf(saved.get() == 0, "There were no people to persist for reporting feed date $date.")
 
       logger.info("Imported ${saved.get()} people with ${errors.get()} errors.")
+
+      Totals(saved.get() + errors.get(), saved.get())
     }
   }
 
-  private fun importProfilesOn(date: LocalDate) {
+  private fun importProfilesOn(date: LocalDate): Totals? {
     logger.info("Importing profiles for date: $date.")
 
-    import {
+    return import {
       val (saved, errors) = AtomicInteger(0) to AtomicInteger(0)
 
       reportImporter.importProfiles(date) { profile ->
@@ -138,8 +155,6 @@ class ImportReportsService(
         )
       }
 
-      auditService.create(AuditableEvent.importReportEvent("profiles", date, saved.get() + errors.get(), saved.get()))
-
       raiseMonitoringAlertIf(
         errors.get() > 0,
         "profiles: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date."
@@ -148,6 +163,8 @@ class ImportReportsService(
       raiseMonitoringAlertIf(saved.get() == 0, "There were no profiles to persist for reporting feed date $date.")
 
       logger.info("Imported ${saved.get()} profiles with ${errors.get()} errors.")
+
+      Totals(saved.get() + errors.get(), saved.get())
     }
   }
 
@@ -168,3 +185,5 @@ class ImportReportsService(
     }
   }
 }
+
+private data class Totals(val processed: Int, val saved: Int)

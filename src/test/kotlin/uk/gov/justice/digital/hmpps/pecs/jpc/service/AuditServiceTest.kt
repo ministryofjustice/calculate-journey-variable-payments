@@ -342,12 +342,30 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create import reports audit event`() {
-    service.create(AuditableEvent.importReportEvent("moves", LocalDate.of(2021, 2, 22), 20, 10))
+    service.create(
+      AuditableEvent.importReportsEvent(
+        LocalDate.of(2021, 2, 22),
+        20,
+        10,
+        people_processed = 5,
+        people_saved = 5,
+        profiles_processed = 5,
+        profiles_saved = 4
+      )
+    )
 
     verifyEvent(
       AuditEventType.REPORTING_DATA_IMPORT,
       "_TERMINAL_",
-      mapOf("type" to "moves", "report_date" to "2021-02-22", "processed" to 20, "saved" to 10)
+      mapOf(
+        "report_date" to "2021-02-22",
+        "moves_processed" to 20,
+        "moves_saved" to 10,
+        "people_processed" to 5,
+        "people_saved" to 5,
+        "profiles_processed" to 5,
+        "profiles_saved" to 4
+      )
     )
   }
 
