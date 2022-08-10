@@ -41,11 +41,11 @@ data class Price(
   @Enumerated(EnumType.STRING)
   val supplier: Supplier,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "from_location_id")
   val fromLocation: Location,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "to_location_id")
   val toLocation: Location,
 
