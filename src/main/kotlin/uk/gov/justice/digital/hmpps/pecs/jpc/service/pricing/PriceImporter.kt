@@ -41,7 +41,7 @@ class PriceImporter(
     PricesSpreadsheet(
       XSSFWorkbook(prices),
       supplier,
-      locationRepository.findAll().toList(),
+      locationRepository.findAll(),
       priceRepo,
       effectiveYear
     ).use { import(it) }
