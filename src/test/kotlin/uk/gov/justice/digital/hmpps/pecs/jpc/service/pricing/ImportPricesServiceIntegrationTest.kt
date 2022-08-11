@@ -20,7 +20,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 /**
- * This test imports the Serco prices spreadsheet from the test resources folder which in turn is referenced in the TestConfig class.
+ * This test imports the supplier prices spreadsheets from the test resources folder which in turn is referenced in the TestConfig class.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("test")
