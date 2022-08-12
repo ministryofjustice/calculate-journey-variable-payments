@@ -36,6 +36,16 @@ else
 
   NAMESPACE=calculate-journey-variable-payments-$ENV
 
+  read -r -p "HAVE YOU TAKEN A SNAPSHOT OF THE RDS AND UPLOADED THE JOURNEY PRICE SPREADSHEET FOR $CHOSEN_SUPPLIER ? (yes/no) " yn
+
+  case $yn in
+	  yes ) ;;
+	  no ) echo exiting...;
+		  exit;;
+	  * ) echo invalid response;
+		  exit 1;;
+  esac
+
   kubectl get pods -n "$NAMESPACE"
 
   read -r -p "PLEASE ENTER THE POD NAME YOU WISH TO RUN THE BULK PRICE UPLOAD ON: " POD
