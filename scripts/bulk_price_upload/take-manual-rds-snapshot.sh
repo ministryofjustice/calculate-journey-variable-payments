@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# This script takes a manual RDS snapshot and should be used prior to any bulk price upload.
+
+# The following command line tools are required to run this script:
+#  aws cli
+#  kubectl
+#  jq
+
 ENV=$1
 
 if [ -z "$ENV" ]

@@ -18,7 +18,6 @@ are steps for bulk prices uploads with a possible third option:
 - IT IS ADVISABLE TO DO A DRY RUN IN THE PRE-PRODUCTION ENVIRONMENT BEFORE DOING THIS IN THE PRODUCTION ENVIRONMENT.
 - CARE SHOULD BE TAKEN WHEN RUNNING ANY COMMANDS IN PRODUCTION.
 - A JOURNEY PRICE WILL ONLY ADDED IF IT IS NOT ALREADY PRICED, EXISTING JOURNEY PRICES ARE NOT UPDATED.
-- TO ACTUALLY IMPORT THE DATA YOU WILL NEED TO GO ONTO ONE OF THE RUNNING SERVICE PODS AND RUN A SHELL COMMAND.
 
 ### How to upload journey price spreadsheets to S3 in preparation for running the price-import using the script in this folder.
 
@@ -57,7 +56,7 @@ GEOAmey example on development environment from a local terminal session
 $ ./upload_journey_prices_spreadsheet_to_s3.sh dev geo
 ```
 
-### How to run the **price-import** command from a pod
+### How to run actual the bulk price upload part
 
 **IMPORTANT:**
 - Make sure the year parameter is set correctly. This is the contractual effective year for the prices e.g. for Sept 2021 to Aug 2022 the year would be 2021.
@@ -72,13 +71,13 @@ select effective_year, count(*) from prices group by effective_year order by eff
 Serco example
 
 ```bash
-$ java -jar app.jar --spring.main.web-application-type=none --price-import --supplier=SERCO --year=2021
+$ ./run-bulk-price-upload.sh dev s 2021
 ```
 
 GEOAmey example
 
 ```bash
-$ java -jar app.jar --spring.main.web-application-type=none --price-import --supplier=GEOAMEY --year=2021
+$ ./run-bulk-price-upload.sh dev g 2021
 ```
 
 When the prices are imported you will be be given some feedback in the logs as to the success rate e.g. how many

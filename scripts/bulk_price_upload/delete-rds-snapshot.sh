@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# This script deletes manual RDS snapshots and should be used after we happy the bulk price upload was successful.
+
+# USE WITH EXTREME CARE, THIS OPERATION IS CANNOT BE REVERSED.
+
+# The following command line tools are required to run this script:
+#  aws cli
+#  kubectl
+#  jq
+
 ENV=$1
 SNAPSHOT_IDENTIFIER=$2
 
@@ -14,6 +23,10 @@ then
   echo "No snapshot identifier specified, please supply snapshot identifier in the second argument."
   exit
 else
+  if [[ $SNAPSHOT_IDENTIFIER == "rds"* ]] ; then
+    echo "Cannot delete automatic snapshots"
+    exit
+  fi
 
   NAMESPACE=calculate-journey-variable-payments-$ENV
 
