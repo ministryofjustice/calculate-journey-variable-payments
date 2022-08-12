@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# The following command line tools are required to run this script:
+#  aws cli
+#  kubectl
+#  jq
+
 ENV=$1
 SUPPLIER=$2
 

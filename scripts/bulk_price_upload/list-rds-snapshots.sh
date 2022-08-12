@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# This script lists all RDS snapshots within a given namespace environment.
+
+# The following command line tools are required to run this script:
+#  aws cli
+#  kubectl
+#  jq
+
 ENV=$1
 
 if [ -z "$ENV" ]

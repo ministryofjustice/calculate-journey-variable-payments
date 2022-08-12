@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# This script creates a cron job for the daily reports ingress into the payment service.
+
+# The following command line tools are required to run this script:
+#  aws cli
+#  kubectl
+#  jq
+
 ENV=$1
 
 if [ -z "$ENV" ]

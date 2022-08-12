@@ -100,7 +100,11 @@ The data itself falls into three distinct types:
    to recover, this can be disabled via the environment variable **IMPORT_REPORTS_BACKDATE_ENABLED** in the Helm config
    [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy).
 
-### Manually importing supplier prices and reporting data
+### Manually importing supplier journey prices in bulk
+
+For details on how to manually run a bulk price import for a supplier refer to the README [here](scripts/bulk_price_upload/README.md).
+
+### Manually importing reporting data
 
 **IMPORTANT:**
 
@@ -111,11 +115,6 @@ The data itself falls into three distinct types:
 
 ```bash
 export $(cat .env | xargs) # Only run this if you want to set or update the current local environment
-```
-```
-# Import the supplier price spreadsheet that has been uploaded to S3
-
-java -jar app.jar --spring.main.web-application-type=none --price-import --supplier=SERCO/GEOAMEY --year=2020
 ```
 ```
 # Import the reporting data for the supplied dates from S3
