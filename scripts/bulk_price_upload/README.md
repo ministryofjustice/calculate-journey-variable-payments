@@ -56,7 +56,7 @@ GEOAmey example on development environment from a local terminal session
 $ ./upload_journey_prices_spreadsheet_to_s3.sh dev geo
 ```
 
-### How to run actual the bulk price upload part
+### How to run the actual bulk price upload part
 
 **IMPORTANT:**
 - Make sure the year parameter is set correctly. This is the contractual effective year for the prices e.g. for Sept 2021 to Aug 2022 the year would be 2021.
