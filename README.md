@@ -74,7 +74,7 @@ If you prefer to run the app from the command line, you can do so from the root 
 
 ```bash
 export $(cat .env | xargs)  # If you want to set or update the current shell environment
-./gradlew bootRun '
+./gradlew bootRun
 ```
 
 ### Data for pricing journeys/moves
@@ -82,7 +82,7 @@ export $(cat .env | xargs)  # If you want to set or update the current shell env
 Pricing data makes its way into the service via two mechanisms. Via a daily CRON job (which at time of writing runs in 
 the early hours of the morning) and via a manual process (with the view the manual process will be going away). The 
 CRON job is configured in the helm config of this project via the **CRON_IMPORT_REPORTS** environment variable in the
-helm config [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy).
+helm config [here](helm_deploy).
 
 The data itself falls into three distinct types:
 
@@ -98,34 +98,11 @@ The data itself falls into three distinct types:
    important to understand the reports being pulled are based on the previous day. If there are any missing files for
    the day it runs then the next time the import runs it will run from the point at which there were any missing files in an attempt
    to recover, this can be disabled via the environment variable **IMPORT_REPORTS_BACKDATE_ENABLED** in the Helm config
-   [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy).
+   [here](helm_deploy).
 
-### Manually importing supplier journey prices in bulk
-
-For details on how to manually run a bulk price import for a supplier refer to the README [here](scripts/bulk_price_upload/README.md).
-
-### Manually importing reporting data
-
-**IMPORTANT:**
-
-- EXTREME CARE SHOULD BE TAKEN WHEN RUNNING PRICING IMPORTS IN PRODUCTION. PRICES ARE ADDED IF NOT ALREADY PRESENT.
-- TO MANUALLY IMPORT DATA IN PRODUCTION YOU WILL NEED TO GO DIRECTLY ONTO ONE OF THE KUBE PODS.
-- MANUALLY IMPORTING REPORTING DATA IS MAINLY TO SUPPORT LOADING OF BACK-FILLED SUPPLIER REPORTING DATA. IT CAN BE SLOW, 
-  IF YOU HAVE TO IMPORT A LOT OF DATA ALLOW PLENTY OF TIME AND ALSO CONSIDER TIME OF EXECUTION I.E OUT OF HOURS.
-
-```bash
-export $(cat .env | xargs) # Only run this if you want to set or update the current local environment
-```
-```
-# Import the reporting data for the supplied dates from S3
-
-java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --report-import --from=YYYY-MM-DD --to=YYYY-MM-DD
-```
-```
-# Historic moves processing to adjust/fix moves in the past. This is done at the supplier level.
-
-java -Xmx1024m -jar app.jar --spring.main.web-application-type=none --process-historic-moves --supplier=SERCO --from=YYYY-MM-DD --to=YYYY-MM-DD
-```
+## How-to
+- Manually import supplier journey prices in bulk refer to [here](scripts/bulk_price_upload/README.md).
+- Manually import reporting data refer to [here](scripts/backfill_reports/README.md).
 
 ### Automatic mapping of Schedule 34 locations (from BaSM)
 
@@ -138,7 +115,7 @@ The CRON job is configured in the helm config of this project via the **CRON_AUT
 
 ### Feature toggles/flags
 
-The following feature toggles/flags are in place for the application in the Helm config [here](https://github.com/ministryofjustice/calculate-journey-variable-payments/tree/main/helm_deploy):
+The following feature toggles/flags are in place for the application in the Helm config [here](helm_deploy):
 
 1. FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES this feature includes an extra tab on the spreadsheet for moves that have been
    categorised, as in they have a move type but may be missing some key information which excludes them from being priced e.g. date(s)

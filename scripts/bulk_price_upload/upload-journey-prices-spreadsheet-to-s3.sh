@@ -20,6 +20,23 @@ then
   exit
 fi
 
+case $SUPPLIER in
+	serco ) ;;
+	geo ) ;;
+	* ) echo invalid supplier "$SUPPLIER";
+	  exit 1;;
+esac
+
+read -r -p "UPLOADING JOURNEY PRICES TO S3 IN $ENV FOR SUPPLIER $SUPPLIER. ARE YOU SURE YOU WANT TO CONTINUE ? (yes/no) " yn
+
+case $yn in
+	yes ) ;;
+	no ) echo exiting...;
+		exit;;
+	* ) echo invalid response;
+	  exit 1;;
+esac
+
 ACCESS_KEY_ID=$(kubectl get secret calculate-journey-variable-payments-bucket -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).access_key_id")
 SECRET_ACCESS_KEY=$(kubectl get secret calculate-journey-variable-payments-bucket -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).secret_access_key")
 BUCKET=$(kubectl get secret calculate-journey-variable-payments-bucket -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).bucket_name")
