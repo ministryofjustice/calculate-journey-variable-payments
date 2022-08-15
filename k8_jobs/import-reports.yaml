@@ -7,7 +7,7 @@ metadata:
   namespace: calculate-journey-variable-payments-placeholder
 spec:
   concurrencyPolicy: Forbid
-  schedule: "3 6 * * *" # daily at 6:30 am UTC
+  schedule: "30 6 * * *" # daily at 6:30 am UTC
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 2
   jobTemplate:
