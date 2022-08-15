@@ -36,7 +36,7 @@ else
 
   NAMESPACE=calculate-journey-variable-payments-$ENV
 
-  read -r -p "HAVE YOU TAKEN A SNAPSHOT OF THE RDS AND UPLOADED THE JOURNEY PRICE SPREADSHEET FOR $CHOSEN_SUPPLIER ? (yes/no) " yn
+  read -r -p "HAVE YOU TAKEN A SNAPSHOT OF THE $ENV RDS AND UPLOADED THE JOURNEY PRICE SPREADSHEET FOR $CHOSEN_SUPPLIER ? (yes/no) " yn
 
   case $yn in
 	  yes ) ;;

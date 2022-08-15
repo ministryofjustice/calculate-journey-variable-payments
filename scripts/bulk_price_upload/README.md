@@ -7,8 +7,8 @@ The journey price data is sent to us from the commercial team via email in an Ex
 are steps for bulk prices uploads with a possible third option:
 
 1. Take a RDS snapshot of the database using the **take-manual-rds-snapshot.sh** script where the journey prices are going to be loaded.
-2. Using the shell script **upload_journey_prices_spreadsheet_to_s3.sh** upload the spreadsheet(s) to the appropriate environments (dev, preprod, prod) AWS S3 bucket. It is from here where the prices are fed into the service.
-3. Go onto one of the services pods and run the **price-import** command to load the prices from step one above into the system.
+2. Using the shell script **upload-journey-prices-spreadsheet-to-s3.sh** upload the spreadsheet(s) to the appropriate environments (dev, preprod, prod) AWS S3 bucket. It is from here where the prices are fed into the service.
+3. Use the script **run-bulk-price-upload.sh** to load the prices from step one above into the system.
 4. (optional) Run a bulk price update via the frontend. Technically this can be done by the end users however you may wish
    to do this for testing purpose in preprod for example.
 5. (optional) delete the backup RDS snapshot.
@@ -47,13 +47,13 @@ $ ./list-rds-snapshots.sh dev
 Serco example on development environment from a local terminal session
 
 ```bash
-$ ./upload_journey_prices_spreadsheet_to_s3.sh dev serco
+$ ./upload-journey-prices-spreadsheet-to-s3.sh dev serco
 ```
 
 GEOAmey example on development environment from a local terminal session
 
 ```bash
-$ ./upload_journey_prices_spreadsheet_to_s3.sh dev geo
+$ ./upload-journey-prices-spreadsheet-to-s3.sh dev geo
 ```
 
 ### How to run the actual bulk price upload part
