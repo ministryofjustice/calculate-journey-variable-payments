@@ -2,9 +2,9 @@
 
 Backfilling reports is something hopefully you will not need to do. However, should need arise the process is scripted.
 
-1. Take a RDS snapshot of the database using the **take-manual-rds-snapshot.sh** script where the journey prices are going to be loaded.
+1. Take a RDS snapshot of the database using the **take-manual-rds-snapshot.sh** script.
 2. Use the shell script **run-reports-backfill.sh** to begin the backfill.
-3(optional) delete the backup RDS snapshot.
+3. Delete the backup RDS snapshot.
 
 **IMPORTANT:**
 
@@ -38,4 +38,10 @@ _Start the backfill from a local terminal session by running the following_
 
 ```bash
 $ ./run-reports-backfill.sh <dev/preprod/prod> <DATE_FROM> <DATE_TO> 
+```
+
+_If you are happy all has worked then you can delete the snapshot taken at the start of the process_
+
+```bash
+$ ./delete-rds-snapshot.sh <dev/preprod/prod> <snapshot_identifier>
 ```
