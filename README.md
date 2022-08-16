@@ -101,8 +101,10 @@ The data itself falls into three distinct types:
    [here](helm_deploy).
 
 ## How-to
-- Manually import supplier journey prices in bulk refer to [here](scripts/bulk_price_upload/README.md).
-- Manually import reporting data refer to [here](scripts/backfill_reports/README.md).
+- [Manually import supplier journey prices in bulk](scripts/bulk_price_upload/README.md).
+- [Manually import reporting data](scripts/backfill_reports/README.md).
+- [Manually process historic moves](scripts/process_historic_moves/README.md).
+- [Apply K8s job for the daily reporting feed](k8_jobs/README.md).
 
 ### Automatic mapping of Schedule 34 locations (from BaSM)
 
