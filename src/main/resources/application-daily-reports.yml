@@ -1,3 +1,4 @@
+# This profile is used by the K8s cron job when running the daily reports feed.
 spring:
   main:
     web-application-type: none
