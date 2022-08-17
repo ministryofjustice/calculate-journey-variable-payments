@@ -8,6 +8,7 @@
 - [Docker and Docker compose](https://docs.docker.com/get-docker/)
 - [Intellij IDEA](https://www.jetbrains.com/idea/)
   - [EnvFile](https://plugins.jetbrains.com/plugin/7861-envfile) plugin
+- Chromedriver for running the integration tests
 
 ## Building
 
@@ -16,30 +17,30 @@ To build (append `-x test` to build without running tests):
 $ ./gradlew clean build
 ```
 
-## Running the integration tests locally
+## Running the integration tests locally from the command line
 
-*Note: This will require chromedriver available on the path - check the version of selenium in build.gradle.kts*
+_Note: you will need several terminal sessions for this._
 
 Start up the dependencies followed by the application and then running the integration tests:
 
-In a terminal window:
+Run docker-compose.  This will start up the dependent containers e.g. Postgres, Auth etc:
 ```bash
 $ docker-compose down --remove-orphans
 
 $ docker-compose up
 ```
 
-In a separate terminal window:
+Start the application:
 ```bash
 $ SPRING_PROFILES_ACTIVE=dev SERVER_SERVLET_SESSION_COOKIE_SECURE=false ./gradlew bootRun
 ```
 
-In another separate terminal window:
+Run the integration tests:
 ```bash
 $ ./gradlew clean testIntegration
 ```
 
-## Running the service and its dependent services locally
+## Running the containerised service and its dependent services locally
 
 You can run the latest version of the application using with Docker compose (note this runs the app in a container, you may need to rebuild it. See section on integration tests for an example) :
 
@@ -49,7 +50,7 @@ $ docker-compose down --remove-orphans
 $ docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
 ```
 
-## Running dependent services locally when developing:
+## Running dependent services (containers) locally when developing:
 
 You can run the dependent services locally using with Docker compose (note this runs the app in a container, so you may need to rebuild it, see section on integration tests for an example) :
 
@@ -59,7 +60,7 @@ $ docker-compose up
 
 *Note: to log into the application (via the redirect to the HMPPS auth service) your user will need the PECS_JPC role assigned. A hmpps-auth in-memory user has been set up with this role to help with this 'jpc_user'.*
 
-The command will launch:
+The above command will launch:
 
 - [Localstack](https://github.com/localstack/localstack) (which is used to mock Amazon S3)
 - Postgres
@@ -119,8 +120,11 @@ The CRON job is configured in the helm config of this project via the **CRON_AUT
 
 The following feature toggles/flags are in place for the application in the Helm config [here](helm_deploy):
 
-1. FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES this feature includes an extra tab on the spreadsheet for moves that have been
-   categorised, as in they have a move type but may be missing some key information which excludes them from being priced e.g. date(s)
+- FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES 
+  > Setting this to "true" includes an extra tab on the spreadsheet for moves that have been
+categorised but cannot be priced. This is because whilst they have a move type they are missing some key information 
+which prevents them from being priced e.g. date(s). This would only be enabled (in prod) if we are trying to reconcile 
+moves with the supplier, it is not used by the end users per se.
 
 ### Common gradle tasks 
 To list project dependencies, run:
@@ -143,6 +147,9 @@ To upgrade the gradle wrapper version, run:
 $ ./gradlew wrapper --gradle-version=<VERSION>
 ```
 To automatically update project dependencies, run:
+
+_Note: this should be used with caution, there may be genuine reasons certain dependencies are at a particular versions._
+
 ```bash
 $ ./gradlew useLatestVersions
 ```
