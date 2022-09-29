@@ -51,8 +51,8 @@ class AnnualPriceAdjustmentsService(
     authentication: Authentication?,
     details: String
   ) {
-    if (suppliedEffective < actualEffectiveYear.current()) {
-      throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
+    if (suppliedEffective < actualEffectiveYear.previous()) {
+      throw RuntimeException("Price adjustments cannot be before the previous effective year ${actualEffectiveYear.previous()}.")
     }
 
     inflationary(

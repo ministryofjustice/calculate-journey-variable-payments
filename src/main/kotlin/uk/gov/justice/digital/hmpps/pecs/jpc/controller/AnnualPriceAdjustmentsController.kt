@@ -47,7 +47,7 @@ class AnnualPriceAdjustmentsController(
     model.addContractStartAndEndDates()
     model.addAdjustmentHistoryFor(supplier)
 
-    if (model.getSelectedEffectiveYear().isBefore(actualEffectiveYear)) {
+    if (model.getSelectedEffectiveYear().isBeforePrevious(actualEffectiveYear)) {
       return "annual-price-adjustment-history"
     }
 
@@ -59,6 +59,7 @@ class AnnualPriceAdjustmentsController(
   }
 
   private fun Int.isBefore(effectiveYear: EffectiveYear): Boolean = this < effectiveYear.current()
+  private fun Int.isBeforePrevious(effectiveYear: EffectiveYear): Boolean = this < effectiveYear.previous() - 1
 
   @PostMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun applyAnnualPriceAdjustment(
