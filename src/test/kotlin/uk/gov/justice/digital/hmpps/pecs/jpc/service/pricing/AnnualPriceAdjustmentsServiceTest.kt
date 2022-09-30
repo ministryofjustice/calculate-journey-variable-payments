@@ -176,7 +176,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     }
 
     @Test
-    internal fun `cannot adjust years prior to the current effective year`() {
+    internal fun `cannot adjust years prior to the previous effective year`() {
       assertThatThrownBy {
         AnnualPriceAdjustmentsService(
           annualPriceAdjuster,
@@ -186,14 +186,14 @@ internal class AnnualPriceAdjustmentsServiceTest {
           jobRunner
         ).adjust(
           Supplier.GEOAMEY,
-          effectiveYear.current() - 1,
+          effectiveYear.current() - 2,
           AdjustmentMultiplier(2.0.toBigDecimal()),
           null,
           authentication,
           "some details"
         )
       }.isInstanceOf(RuntimeException::class.java)
-        .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")
+        .hasMessage("Price adjustments cannot be before the previous effective year ${effectiveYear.previous()}.")
     }
   }
 
@@ -290,7 +290,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     }
 
     @Test
-    internal fun `cannot adjust years prior to the current effective year`() {
+    internal fun `cannot adjust years prior to the previous effective year`() {
       assertThatThrownBy {
         AnnualPriceAdjustmentsService(
           annualPriceAdjuster,
@@ -300,14 +300,14 @@ internal class AnnualPriceAdjustmentsServiceTest {
           jobRunner
         ).adjust(
           Supplier.GEOAMEY,
-          effectiveYear.current() - 1,
+          effectiveYear.current() - 2,
           AdjustmentMultiplier(2.0.toBigDecimal()),
           null,
           authentication,
           "some details"
         )
       }.isInstanceOf(RuntimeException::class.java)
-        .hasMessage("Price adjustments cannot be before the current effective year ${effectiveYear.current()}.")
+        .hasMessage("Price adjustments cannot be before the previous effective year ${effectiveYear.previous()}.")
     }
   }
 

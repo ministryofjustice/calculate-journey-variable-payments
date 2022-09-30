@@ -1,11 +1,14 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import okhttp3.internal.wait
 import org.fluentlenium.adapter.junit.jupiter.FluentTest
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.support.FindBy
+import org.openqa.selenium.support.ui.ExpectedConditions
+import org.openqa.selenium.support.ui.WebDriverWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.ApplicationPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages
@@ -23,7 +26,7 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
 
   // The custom driver is for testing the spreadsheet download functionality only!
   private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver(ChromeOptions().apply { addArguments("--headless") })
-
+  private val wait: WebDriverWait = WebDriverWait(testDriver, 10)
   override fun newWebDriver(): WebDriver = testDriver
 
   fun goToPage(page: Pages<*>) {
@@ -32,7 +35,7 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
 
   fun loginAndGotoDashboardFor(supplier: Supplier) {
     goToPage(Dashboard)
-
+    wait.until(ExpectedConditions.urlToBe("http://localhost:9090/auth/sign-in"))
     isAtPage(Login).login()
 
     isAtPage(ChooseSupplier).choose(supplier)
