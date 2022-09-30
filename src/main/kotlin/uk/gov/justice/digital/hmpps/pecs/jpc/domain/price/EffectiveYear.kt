@@ -15,7 +15,7 @@ class EffectiveYear(private val timeSource: TimeSource) {
 
   fun previous(): Int = current() - 1
 
-  fun canAddOrUpdatePrices(year: Int) = year <= current() && current() - year <= 2
+  fun canAddOrUpdatePrices(year: Int) = year <= current() && current() - year < 2
 
   companion object {
     fun startOfContract(): LocalDate = LocalDate.of(2020, 9, 1)
