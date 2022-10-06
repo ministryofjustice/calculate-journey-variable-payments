@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @PageUrl("http://localhost:8080/moves/{moveId}")
 class MoveDetailsPage : ApplicationPage() {
@@ -50,19 +51,34 @@ class MoveDetailsPage : ApplicationPage() {
   fun isAtPageFor(move: Move, expectedPrice: Money? = null) {
     this.isAt(move.moveId)
 
+    logger.info("Checking prison number")
     assertThat(prisonNumber.text()).isEqualTo(move.person?.prisonNumber)
+
+    logger.info("Checking first names")
     assertThat(firstNames.text()).isEqualTo(move.person?.firstNames)
+
+    logger.info("Checking last name")
     assertThat(lastName.text()).isEqualTo(move.person?.lastName)
-    assertThat(dateOfBirth.text()).isEqualTo(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy")))
+    logger.info("Checking date of birth")
+    assertThat(dateOfBirth.text()).isEqualTo(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM yyyy", Locale.ENGLISH)))
+    logger.info("Checking gender")
     assertThat(gender.text()).isEqualTo(move.person?.gender)
-    assertThat(movePickupDate.text()).isEqualTo(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")) ?: "Not known")
-    assertThat(moveDropoffDate.text()).isEqualTo(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")))
+    logger.info("Checking pick up date/time")
+    assertThat(movePickupDate.text()).isEqualTo(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm", Locale.ENGLISH)) ?: "Not known")
+    logger.info("Checking drop off date/time")
+    assertThat(moveDropoffDate.text()).isEqualTo(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm", Locale.ENGLISH)))
+    logger.info("Checking FROM site name")
     assertThat(fromSite.text()).isEqualTo(move.fromSiteName)
+    logger.info("Checking TO site name")
     assertThat(toSite.text()).isEqualTo(move.toSiteName)
+    logger.info("Checking move type")
     assertThat(moveType.text()).isEqualTo(move.moveType?.name)
 
     if (expectedPrice != null) {
+      logger.info("Checking expected price")
       assertThat(movePrice.text()).isEqualTo("£${moneyFormatter.format(expectedPrice.pounds())}")
+    } else {
+      logger.info("Expected price is null, not checking")
     }
   }
 }

@@ -7,7 +7,7 @@ import org.openqa.selenium.support.FindBy
 @PageUrl("http://localhost:9090/auth/sign-in")
 class LoginPage : ApplicationPage() {
 
-  @FindBy(css = "input[type='submit']")
+  @FindBy(xpath = "/html/body/div/main/div/div/form/div[2]/ul/li/button")
   private lateinit var signInButton: FluentWebElement
 
   @FindBy(css = "input[name='username']")
@@ -16,6 +16,9 @@ class LoginPage : ApplicationPage() {
   @FindBy(css = "input[name='password']")
   private lateinit var password: FluentWebElement
 
+  fun loginReady(): Boolean {
+    return signInButton.displayed()
+  }
   fun login(username: String = "JPC_USER", password: String = "password123456") {
     this.username.fill().withText(username)
     this.password.fill().withText(password)
