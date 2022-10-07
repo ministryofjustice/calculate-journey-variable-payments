@@ -40,8 +40,8 @@ class AnnualPriceAdjustmentsService(
   }
 
   /**
-   * Price adjustments cannot be before the current effective year, if the supplied effective year is before it then an
-   * exception will be thrown.
+   * Price adjustments cannot be before the current effective year unless forced, if the supplied effective year is
+   * before it and not forced then an exception will be thrown.
    */
   fun adjust(
     supplier: Supplier,
@@ -49,10 +49,11 @@ class AnnualPriceAdjustmentsService(
     inflationary: AdjustmentMultiplier,
     volumetric: AdjustmentMultiplier? = null,
     authentication: Authentication?,
-    details: String
+    details: String,
+    force: Boolean = false
   ) {
-    if (suppliedEffective < actualEffectiveYear.current()) {
-      throw RuntimeException("Price adjustments cannot be before the current effective year ${actualEffectiveYear.current()}.")
+    if (!force && suppliedEffective < actualEffectiveYear.previous()) {
+      throw RuntimeException("Price adjustments cannot be before the previous effective year ${actualEffectiveYear.previous()}.")
     }
 
     inflationary(

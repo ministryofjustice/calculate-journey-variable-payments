@@ -54,7 +54,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/app
-      - browser-tools/install-browser-tools
+      - browser-tools/install-browser-tools:
+          chrome-version: 104.0.5112.101
+          install-firefox: false
+          install-geckodriver: false
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m

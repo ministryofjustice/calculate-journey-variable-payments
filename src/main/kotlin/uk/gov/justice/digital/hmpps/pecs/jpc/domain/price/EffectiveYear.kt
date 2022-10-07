@@ -13,6 +13,8 @@ import java.time.LocalDate
 class EffectiveYear(private val timeSource: TimeSource) {
   fun current(): Int = effectiveYearForDate(timeSource.date())
 
+  fun previous(): Int = current() - 1
+
   fun canAddOrUpdatePrices(year: Int) = year <= current() && current() - year < 2
 
   companion object {

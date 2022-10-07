@@ -5,30 +5,43 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AnnualPriceAdjustment
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
+  private val logger = loggerFor <AnnualBulkPriceAdjustmentTest>()
   @Test
   fun `apply annual price adjustments`() {
+
+    logger.info("Logging in and going to Dashboard")
     loginAndGotoDashboardFor(Supplier.SERCO)
 
+    logger.info("Doing inflationary Adjustment")
     doInflationaryAdjustment()
 
+    logger.info("Going back to Dashboard")
     goToPage(Dashboard)
 
+    logger.info("Doing Volumetric adjustment")
     doVolumetricAdjustment()
   }
 
   private fun doInflationaryAdjustment() {
+    logger.info("Navigating to Manage Journey Price")
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
+    logger.info("Navigating to Apply Bulk Price Adjustment")
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
-    isAtPage(AnnualPriceAdjustment).applyAdjustment(1.123456789012345, "Inflationary rate of 1.123456789012345.")
+    val rate = 1.123456789012345
+    logger.info("Applying Inflationary rate of $rate")
+    isAtPage(AnnualPriceAdjustment).applyAdjustment(rate, "Inflationary rate of $rate.")
 
+    logger.info("Navigating to Apply Bulk Price Adjustment")
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
-    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(1.123456789012345, "Inflationary rate of 1.123456789012345.")
+    logger.info("Checking for price history row on Price history tab")
+    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(rate, "Inflationary rate of $rate.")
   }
 
   private fun doVolumetricAdjustment() {

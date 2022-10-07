@@ -38,7 +38,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
-  private val effectiveDate = LocalDate.now()
+  private val effectiveDate = LocalDate.of(2022, 9, 1)
 
   @MockBean
   private lateinit var effectiveYear: EffectiveYear
@@ -54,11 +54,13 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
   @BeforeEach
   fun before() {
     whenever(effectiveYear.current()).thenReturn(effectiveYearForDate(effectiveDate))
+    whenever(effectiveYear.previous()).thenReturn(effectiveYearForDate(effectiveDate.minusYears(1)))
   }
 
   @Test
-  fun `user can only see the price adjustment history if not in current effective year`() {
-    whenever(effectiveYear.current()).thenReturn(effectiveDate.year + 1)
+  fun `if not in current effective year or year previous, user can only see the price adjustment history`() {
+    whenever(effectiveYear.current()).thenReturn(effectiveDate.year + 2)
+    whenever(effectiveYear.previous()).thenReturn(effectiveDate.year + 2)
 
     mockMvc.get("/annual-price-adjustment") { session = mockSession }
       .andExpect { view { name("annual-price-adjustment-history") } }
@@ -234,6 +236,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
           anyOrNull(),
           anyOrNull(),
           eq(allowedCharacters),
+          eq(false)
         )
 
         verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -258,6 +261,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         anyOrNull(),
         anyOrNull(),
         eq("some details"),
+        eq(false)
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -281,6 +285,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         anyOrNull(),
         anyOrNull(),
         eq("some details"),
+        eq(false)
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -307,6 +312,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         eq(AdjustmentMultiplier("2.0".toBigDecimal())),
         anyOrNull(),
         eq("some details"),
+        eq(false)
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -330,6 +336,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         eq(AdjustmentMultiplier("-2.0".toBigDecimal())),
         anyOrNull(),
         eq("some details"),
+        eq(false)
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())

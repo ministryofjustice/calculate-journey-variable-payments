@@ -32,10 +32,12 @@ class DashboardPage : ApplicationPage() {
   private lateinit var monthYear: FluentWebElement
 
   fun navigateToSelectMonthPage() {
+    logger.info("Navigating to select month page")
     selectMonthLink.click()
   }
 
   fun isAtMonthYear(month: Month, year: Year): DashboardPage {
+    logger.info("Asserting Heading is $month ${year.value}")
     assertThat(monthYear.text().uppercase()).isEqualTo("$month ${year.value}")
 
     return this
