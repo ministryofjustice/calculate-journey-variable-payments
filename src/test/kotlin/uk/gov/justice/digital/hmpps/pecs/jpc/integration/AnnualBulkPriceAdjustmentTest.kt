@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.junit.jupiter.api.Test
-import org.openqa.selenium.By
 import org.openqa.selenium.support.ui.FluentWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AnnualPriceAdjustment
@@ -65,7 +64,7 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
       .isPriceHistoryRowPresent(1.0, "Inflationary and volumetric rates 1.5 and 1.0.")
   }
 
-  private fun waitFiveSeconds(){
+  private fun waitFiveSeconds() {
     var timer = 0
     FluentWait(this).withTimeout(Duration.ofSeconds(6)).pollingEvery(Duration.ofSeconds(1)).until {
       timer += 1
