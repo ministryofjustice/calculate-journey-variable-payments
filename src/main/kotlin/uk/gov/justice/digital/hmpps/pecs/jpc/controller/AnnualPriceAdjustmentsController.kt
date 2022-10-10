@@ -59,7 +59,7 @@ class AnnualPriceAdjustmentsController(
   }
 
   private fun Int.isBefore(effectiveYear: EffectiveYear): Boolean = this < effectiveYear.current()
-  private fun Int.isBeforePrevious(effectiveYear: EffectiveYear): Boolean = this < effectiveYear.previous() - 1
+  private fun Int.isBeforePrevious(effectiveYear: EffectiveYear): Boolean = this < effectiveYear.previous()
 
   @PostMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun applyAnnualPriceAdjustment(

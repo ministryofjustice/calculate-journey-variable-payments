@@ -38,7 +38,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
 
-  private val effectiveDate = LocalDate.of(2022, 9, 1)
+  private val effectiveDate = LocalDate.now()
 
   @MockBean
   private lateinit var effectiveYear: EffectiveYear

@@ -9,8 +9,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 class JourneysForReviewPage : ApplicationPage() {
 
   fun addPriceForJourney(fromAgencyId: String, toAgencyId: String) {
-    val element = this.find(By.xpath("//a[@href='/add-price/$fromAgencyId-$toAgencyId']")).firstOrNull()
+    val xpath = "//a[@href='/add-price/$fromAgencyId-$toAgencyId']"
+    logger.info("Finding element by xpath $xpath")
 
+    val element = this.find(By.xpath(xpath)).firstOrNull()
+
+    logger.info("Asserting element in add price for journey is not null")
     assertThat(element).isNotNull
 
     element?.click()
