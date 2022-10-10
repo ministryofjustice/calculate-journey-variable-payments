@@ -17,6 +17,8 @@ class BackgroundJobRunner : JobRunner {
       logger.info("Running background job '$label'.")
 
       job()
+
+      logger.info("Background job $label complete")
     }
   }
 }

@@ -52,6 +52,7 @@ class AnnualPriceAdjustmentsService(
     details: String,
     force: Boolean = false
   ) {
+    logger.info("Annual Price Adjustment request received. Force [$force]")
     if (!force && suppliedEffective < actualEffectiveYear.previous()) {
       throw RuntimeException("Price adjustments cannot be before the previous effective year ${actualEffectiveYear.previous()}.")
     }
@@ -99,7 +100,7 @@ class AnnualPriceAdjustmentsService(
       callback
     )
 
-    logger.info("Running inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Completed inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
   }
 
   /**
@@ -116,7 +117,7 @@ class AnnualPriceAdjustmentsService(
 
     doAdjustment(supplier, suppliedEffective, multiplier, authentication, details, AdjustmentType.VOLUME)
 
-    logger.info("Running volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Completed volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
   }
 
   private fun doAdjustment(

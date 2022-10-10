@@ -110,6 +110,7 @@ class AnnualPriceAdjustmentsController(
       .sortedByDescending { lh -> lh.datetime }
 
   private fun ModelMap.addAdjustmentHistoryFor(supplier: Supplier) {
+    logger.info("Adding price adjustment history")
     this.addAttribute("history", priceAdjustmentHistoryFor(supplier))
   }
 

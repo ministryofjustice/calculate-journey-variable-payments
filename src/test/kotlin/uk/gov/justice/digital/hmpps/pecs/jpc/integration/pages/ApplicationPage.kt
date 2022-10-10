@@ -49,6 +49,7 @@ abstract class ApplicationPage : FluentPage() {
     logger.info(query)
     FluentWait(this).withTimeout(Duration.ofSeconds(30)).pollingEvery(Duration.ofSeconds(2)).until {
       find(By.xpath("//tr[contains(.,'$value') $query]")).firstOrNull() != null
+      //*[@id="price-adjustment-history"]/table/tbody/tr/td[5]
     }
 
     return this as T
