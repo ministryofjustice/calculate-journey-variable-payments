@@ -44,6 +44,9 @@ class ApplicationInformationController(
         isNotAbleToUpdatePricesForSelectedYear(model) ->
           "Prices for the selected catalogue year ${model.getSelectedYearStart().month()} ${model.getSelectedYearStart().year()
           } to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} can no longer be changed."
+        isPreviousContractualYear(model) ->
+          "Adjusting prices for the selected catalogue year ${model.getSelectedYearStart().month()} ${model.getSelectedYearStart().year()
+          } to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} will affect prices in the current year."
         isPricingDataIsOutByTwoDays() -> "The service may be missing pricing data, please contact the Book a secure move team."
         else -> null
       }
@@ -52,6 +55,9 @@ class ApplicationInformationController(
 
   private fun isPriceAdjustmentInProgressFor(supplier: Supplier) =
     annualPriceAdjustmentsService.adjustmentInProgressFor(supplier)
+
+  private fun isPreviousContractualYear(model: ModelMap) =
+    effectiveYear.previous() == model.getSelectedEffectiveYear()
 
   private fun isNotAbleToUpdatePricesForSelectedYear(model: ModelMap) =
     !effectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())

@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.junit.jupiter.api.Test
+import org.openqa.selenium.support.ui.FluentWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AnnualPriceAdjustment
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.time.Duration
 
 internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
@@ -37,6 +39,8 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
     logger.info("Applying Inflationary rate of $rate")
     isAtPage(AnnualPriceAdjustment).applyAdjustment(rate, "Inflationary rate of $rate.")
 
+    waitFiveSeconds()
+
     logger.info("Navigating to Apply Bulk Price Adjustment")
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
@@ -51,10 +55,20 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
     isAtPage(AnnualPriceAdjustment).applyAdjustments(1.5, 1.0, "Inflationary and volumetric rates 1.5 and 1.0.")
 
+    waitFiveSeconds()
+
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
     isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab()
       .isPriceHistoryRowPresent(1.5, "Inflationary and volumetric rates 1.5 and 1.0.")
       .isPriceHistoryRowPresent(1.0, "Inflationary and volumetric rates 1.5 and 1.0.")
+  }
+
+  private fun waitFiveSeconds() {
+    var timer = 0
+    FluentWait(this).withTimeout(Duration.ofSeconds(6)).pollingEvery(Duration.ofSeconds(1)).until {
+      timer += 1
+      timer == 5
+    }
   }
 }
