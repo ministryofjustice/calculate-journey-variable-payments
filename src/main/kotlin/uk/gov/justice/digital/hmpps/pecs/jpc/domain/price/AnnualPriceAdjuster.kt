@@ -64,7 +64,7 @@ class AnnualPriceAdjuster(
   }
 
   /**
-   * There can only every be one supplier price adjustment in progress. This will fail (as expected) if one already exists!
+   * There can only ever be one supplier price adjustment in progress. This will fail (as expected) if one already exists!
    *
    * Returns the ID of the lock (if successfully created).
    */
