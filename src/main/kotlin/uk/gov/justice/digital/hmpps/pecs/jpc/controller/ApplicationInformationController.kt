@@ -46,7 +46,8 @@ class ApplicationInformationController(
           } to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} can no longer be changed."
         isPreviousContractualYear(model) ->
           "Adjusting prices for the selected catalogue year ${model.getSelectedYearStart().month()} ${model.getSelectedYearStart().year()
-          } to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()} will affect prices in the current year."
+          } to ${model.getSelectedYearEnd().month()} ${model.getSelectedYearEnd().year()}  will affect prices in the current year. " +
+            "If inflationary adjustments have been made for the current year, please re-apply them."
         isPricingDataIsOutByTwoDays() -> "The service may be missing pricing data, please contact the Book a secure move team."
         else -> null
       }
