@@ -44,8 +44,8 @@ dependencies {
   }
 
   // Test versions
-  val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.5.0"
+  val fluentleniumVersion = "4.8.0"
+  val seleniumVersion = "3.141.59"
   listOf(
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
