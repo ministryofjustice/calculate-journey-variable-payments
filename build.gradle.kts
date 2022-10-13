@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.4.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.5.4"
   kotlin("plugin.spring") version "1.7.10"
   kotlin("plugin.jpa") version "1.7.10"
   kotlin("plugin.allopen") version "1.7.10"
@@ -16,21 +16,25 @@ dependencyCheck {
 }
 
 dependencies {
-  implementation("com.beust:klaxon:5.6")
-  implementation("com.amazonaws:aws-java-sdk-s3:1.12.279")
-  implementation("io.sentry:sentry-spring-boot-starter:6.3.1")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:4.39.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:4.39.0")
-  implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0")
-  implementation("org.apache.poi:poi-ooxml:5.2.2")
-  implementation("org.flywaydb:flyway-core")
-  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-  implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-  implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springframework.session:spring-session-jdbc:2.7.0")
-  implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE")
+
+  val shedlockVersion = "4.42.0"
+  listOf(
+    "com.beust:klaxon:5.6",
+    "com.amazonaws:aws-java-sdk-s3:1.12.279",
+    "io.sentry:sentry-spring-boot-starter:6.4.2",
+    "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
+    "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
+    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0",
+    "org.apache.poi:poi-ooxml:5.2.2",
+    "org.flywaydb:flyway-core",
+    "org.springframework.boot:spring-boot-starter-data-jpa",
+    "org.springframework.boot:spring-boot-starter-thymeleaf",
+    "org.springframework.boot:spring-boot-starter-oauth2-client",
+    "org.springframework.boot:spring-boot-starter-oauth2-resource-server",
+    "org.springframework.boot:spring-boot-starter-webflux",
+    "org.springframework.session:spring-session-jdbc:2.7.0",
+    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE"
+  ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
   constraints {
@@ -39,20 +43,25 @@ dependencies {
     }
   }
 
-  testImplementation("com.github.tomakehurst:wiremock-standalone:2.27.2")
-  testImplementation("org.fluentlenium:fluentlenium-junit-jupiter:4.8.0")
-  testImplementation("org.fluentlenium:fluentlenium-assertj:4.8.0")
-  testImplementation("org.mockito:mockito-inline:4.6.1")
-  testImplementation("org.seleniumhq.selenium:htmlunit-driver:2.61.0")
-  testImplementation("org.seleniumhq.selenium:selenium-java:3.141.59")
-  testImplementation("org.seleniumhq.selenium:selenium-api:3.141.59")
-  testImplementation("org.seleniumhq.selenium:selenium-remote-driver:3.141.59")
-  testImplementation("org.seleniumhq.selenium:selenium-support:3.141.59")
-  testImplementation("org.seleniumhq.selenium:selenium-chrome-driver:3.141.59")
-  testImplementation("org.springframework.boot:spring-boot-starter-test")
-  testImplementation("org.springframework.security:spring-security-test")
-  testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
-  testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
+  // Test versions
+  val fluentleniumVersion = "4.8.0"
+  val seleniumVersion = "3.141.59"
+  listOf(
+    "com.github.tomakehurst:wiremock-standalone:2.27.2",
+    "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
+    "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
+    "org.mockito:mockito-inline:4.8.0",
+    "org.seleniumhq.selenium:htmlunit-driver:2.61.0",
+    "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion",
+    "org.springframework.boot:spring-boot-starter-test",
+    "org.springframework.security:spring-security-test",
+    "com.squareup.okhttp3:mockwebserver:4.10.0",
+    "com.squareup.okhttp3:okhttp:4.10.0"
+  ).forEach { testImplementation(it) }
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
   runtimeOnly("org.postgresql:postgresql:42.4.1")
