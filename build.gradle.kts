@@ -62,6 +62,11 @@ dependencies {
     "com.squareup.okhttp3:mockwebserver:4.10.0",
     "com.squareup.okhttp3:okhttp:4.10.0"
   ).forEach { testImplementation(it) }
+  constraints {
+    implementation(" org.apache.commons:commons-text:1.10.0") {
+      because("previous transitive version 1.9.0 pulled in by Fluentlenium has CVE-2022-42889")
+    }
+  }
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
   runtimeOnly("org.postgresql:postgresql:42.4.1")
