@@ -4,7 +4,6 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import org.openqa.selenium.support.ui.FluentWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
@@ -19,7 +18,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
-import java.time.Duration
 import java.time.LocalDate
 import java.time.Year
 
