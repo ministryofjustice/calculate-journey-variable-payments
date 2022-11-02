@@ -4,6 +4,7 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import org.openqa.selenium.support.ui.FluentWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
@@ -18,6 +19,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
+import java.time.Duration
 import java.time.LocalDate
 import java.time.Year
 
@@ -93,7 +95,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("100.00"))
+      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("101.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
 
     isAtPage(UpdatePrice)
@@ -114,6 +116,6 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .navigateToDetailsFor(standardMoveSM4())
 
     isAtPage(MoveDetails)
-      .isAtPageFor(standardMoveSM4(), Money.valueOf("100.00"))
+      .isAtPageFor(standardMoveSM4(), Money.valueOf("101.00"))
   }
 }
