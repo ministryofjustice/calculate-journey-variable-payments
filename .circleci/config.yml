@@ -43,7 +43,7 @@ jobs:
         environment:
           - SERVER_PORT=9090
           - SPRING_PROFILES_ACTIVE=dev
-      - image: postgres:10.16
+      - image: postgres:12.11
         environment:
           POSTGRES_DB: jpc
           POSTGRES_USER: jpc

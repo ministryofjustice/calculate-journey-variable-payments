@@ -93,7 +93,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("100.00"))
+      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("101.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
 
     isAtPage(UpdatePrice)
@@ -114,6 +114,6 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .navigateToDetailsFor(standardMoveSM4())
 
     isAtPage(MoveDetails)
-      .isAtPageFor(standardMoveSM4(), Money.valueOf("100.00"))
+      .isAtPageFor(standardMoveSM4(), Money.valueOf("101.00"))
   }
 }
