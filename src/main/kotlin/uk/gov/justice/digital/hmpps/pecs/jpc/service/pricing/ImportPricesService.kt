@@ -16,13 +16,13 @@ class ImportPricesService(
   private val priceImporter: PriceImporter,
   private val timeSource: TimeSource
 ) {
-  fun importPricesFor(supplier: Supplier, year: Int) {
+  fun importPricesFor(supplier: Supplier, year: Int, action: PriceImporter.Action? = PriceImporter.Action.ERROR) {
     logger.info("Attempting import of prices")
 
     val start = timeSource.dateTime()
 
     try {
-      priceImporter.import(supplier, year)
+      priceImporter.import(supplier, year, action)
     } finally {
       val end = timeSource.dateTime()
       logger.info("Import ended: $end. Time taken (in seconds): ${Duration.between(start, end).seconds}")

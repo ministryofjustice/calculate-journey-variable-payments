@@ -70,10 +70,10 @@ data class AuditableEvent(
     /**
      * A price can be added via the front end in which case it is authenticated or by the back end via bulk price import which is un-authenticated.
      */
-    fun addPrice(newPrice: Price, authentication: Authentication? = null): AuditableEvent {
+    fun addPrice(newPrice: Price): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
-        username = authentication?.name ?: terminal,
+        username = authentication()?.name ?: terminal,
         metadata = PriceMetadata.new(newPrice)
       )
     }
@@ -81,7 +81,7 @@ data class AuditableEvent(
     fun updatePrice(updatedPrice: Price, oldPrice: Money): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
-        username = authentication().name,
+        username = authentication()?.name ?: terminal,
         metadata = PriceMetadata.update(oldPrice, updatedPrice)
       )
     }
@@ -89,7 +89,7 @@ data class AuditableEvent(
     fun addPriceException(price: Price, month: Month, amount: Money): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
-        username = authentication().name,
+        username = enforcedAuthentication().name,
         metadata = PriceMetadata.exception(price, month, amount)
       )
     }
@@ -97,7 +97,7 @@ data class AuditableEvent(
     fun removePriceException(price: Price, month: Month, amount: Money): AuditableEvent {
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
-        username = authentication().name,
+        username = enforcedAuthentication().name,
         metadata = PriceMetadata.removeException(price, month, amount)
       )
     }
@@ -130,14 +130,14 @@ data class AuditableEvent(
     fun mapLocation(location: Location) =
       AuditableEvent(
         type = AuditEventType.LOCATION,
-        username = authentication().name,
+        username = enforcedAuthentication().name,
         metadata = MapLocationMetadata.map(location)
       )
 
     fun remapLocation(old: Location, new: Location) =
       AuditableEvent(
         type = AuditEventType.LOCATION,
-        username = authentication().name,
+        username = enforcedAuthentication().name,
         metadata = MapLocationMetadata.remap(old, new)
       )
 
@@ -148,8 +148,10 @@ data class AuditableEvent(
         metadata = MapLocationMetadata.map(location)
       )
 
-    private fun authentication() = SecurityContextHolder.getContext().authentication
-      ?: throw RuntimeException("Attempted to create audit event $AuditEventType.LOCATION without a user")
+    fun authentication(): Authentication? = SecurityContextHolder.getContext().authentication
+
+    private fun enforcedAuthentication() = authentication()
+      ?: throw RuntimeException("Attempted to create audit event $AuditEventType without a user")
 
     fun importReportsEvent(
       reportDate: LocalDate,

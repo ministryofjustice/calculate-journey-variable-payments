@@ -34,7 +34,7 @@ class AnnualPriceAdjustmentsService(
   private val jobRunner: JobRunner
 ) {
 
-  private enum class AdjustmentType {
+  enum class AdjustmentType {
     INFLATION,
     VOLUME
   }
@@ -88,7 +88,7 @@ class AnnualPriceAdjustmentsService(
     details: String,
     callback: () -> Unit = { }
   ) {
-    logger.info("Starting inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Queueing inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
 
     doAdjustment(
       supplier,
@@ -100,7 +100,7 @@ class AnnualPriceAdjustmentsService(
       callback
     )
 
-    logger.info("Completed inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Queued inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
   }
 
   /**
@@ -113,11 +113,11 @@ class AnnualPriceAdjustmentsService(
     authentication: Authentication?,
     details: String
   ) {
-    logger.info("Starting volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Queuing volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
 
     doAdjustment(supplier, suppliedEffective, multiplier, authentication, details, AdjustmentType.VOLUME)
 
-    logger.info("Completed volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
+    logger.info("Queued volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
   }
 
   private fun doAdjustment(

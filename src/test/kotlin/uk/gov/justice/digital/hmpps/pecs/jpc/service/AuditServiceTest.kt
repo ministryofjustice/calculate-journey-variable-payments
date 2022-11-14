@@ -211,8 +211,7 @@ internal class AuditServiceTest {
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 234,
           effectiveYear = effectiveYearForDate(timeSource.date())
-        ),
-        authentication
+        )
       )
     )
 
@@ -234,6 +233,7 @@ internal class AuditServiceTest {
 
   @Test
   internal fun `create un-authenticated journey price set audit event`() {
+    SecurityContextHolder.clearContext()
     service.create(
       AuditableEvent.addPrice(
         Price(

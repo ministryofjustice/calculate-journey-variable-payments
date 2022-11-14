@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
@@ -23,19 +24,24 @@ class PriceImporter(
   private val auditService: AuditService
 ) {
 
-  fun import(supplier: Supplier, effectiveYear: Int) {
+  enum class Action {
+    WARN,
+    ERROR
+  }
+
+  fun import(supplier: Supplier, effectiveYear: Int, action: Action? = Action.ERROR) {
     val start = System.currentTimeMillis()
 
     when (supplier) {
-      Supplier.SERCO -> sercoPrices.get().use { import(it, Supplier.SERCO, effectiveYear) }
-      Supplier.GEOAMEY -> geoameyPrices.get().use { import(it, Supplier.GEOAMEY, effectiveYear) }
+      Supplier.SERCO -> sercoPrices.get().use { import(it, Supplier.SERCO, effectiveYear, action) }
+      Supplier.GEOAMEY -> geoameyPrices.get().use { import(it, Supplier.GEOAMEY, effectiveYear, action) }
       else -> throw RuntimeException("Supplier '$supplier' not supported.")
     }
 
     logger.info("Supplier $supplier prices import finished in '${(System.currentTimeMillis() - start) / 1000}' seconds.")
   }
 
-  private fun import(prices: InputStream, supplier: Supplier, effectiveYear: Int) {
+  private fun import(prices: InputStream, supplier: Supplier, effectiveYear: Int, action: Action?) {
     logger.info("Importing prices for $supplier and effective year $effectiveYear")
 
     PricesSpreadsheet(
@@ -43,19 +49,31 @@ class PriceImporter(
       supplier,
       locationRepository.findAll(),
       priceRepo,
-      effectiveYear
+      effectiveYear,
+      action
     ).use { import(it) }
   }
 
   private fun import(spreadsheet: PricesSpreadsheet) {
     val count = priceRepo.count()
+    var updateCount = 0
 
-    spreadsheet.forEachRow { auditService.create(AuditableEvent.addPrice(priceRepo.save(it))) }
+    spreadsheet.forEachRow {
+
+      if (it.previousPrice != null) {
+        logger.info("Updating price")
+        auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
+        updateCount++
+      } else {
+        logger.info("Adding new price")
+        auditService.create(AuditableEvent.addPrice(priceRepo.save(it)))
+      }
+    }
 
     spreadsheet.errors.forEach { logger.info(it.toString()) }
 
     val inserted = priceRepo.count() - count
 
-    logger.info("${spreadsheet.supplier} PRICES INSERTED: $inserted. TOTAL ERRORS: ${spreadsheet.errors.size}")
+    logger.info("${spreadsheet.supplier} PRICES INSERTED: $inserted. PRICES UPDATE: $updateCount. TOTAL ERRORS: ${spreadsheet.errors.size}")
   }
 }

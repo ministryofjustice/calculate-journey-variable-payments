@@ -57,6 +57,9 @@ internal class PricesSpreadsheetTest {
     private val spreadsheet: PricesSpreadsheet =
       PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation), priceRepository, 2020)
 
+    private val warnSpreadsheet: PricesSpreadsheet =
+      PricesSpreadsheet(workbookSpy, Supplier.GEOAMEY, listOf(fromLocation, toLocation), priceRepository, 2020, PriceImporter.Action.WARN)
+
     private val row: Row = sheet.createRow(1).apply {
       this.createCell(0).setCellValue(1.0)
       this.createCell(1).setCellValue("from site")
@@ -141,6 +144,28 @@ internal class PricesSpreadsheetTest {
       assertThatThrownBy { spreadsheet.mapToPrice(row) }
         .isInstanceOf(RuntimeException::class.java)
         .hasMessage("Duplicate price: 'from site' to 'to site' for GEOAMEY")
+    }
+
+    @Test
+    internal fun `No Error if duplicate price and action is WARN`() {
+      whenever(
+        priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+          Supplier.GEOAMEY,
+          fromLocation,
+          toLocation,
+          2020
+        )
+      ).thenReturn(price)
+
+      whenever(
+        price.priceInPence
+      ).thenReturn(500)
+
+      val price = warnSpreadsheet.mapToPrice(row)
+      assertThat(price.fromLocation).isEqualTo(fromLocation)
+      assertThat(price.toLocation).isEqualTo(toLocation)
+      assertThat(price.priceInPence).isEqualTo(10001)
+      assertThat(price.previousPrice).isEqualTo(500)
     }
   }
 }
