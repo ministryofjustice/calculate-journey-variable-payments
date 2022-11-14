@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -157,6 +158,46 @@ internal class PriceImporterTest {
       assertThat(metadata).isEqualTo(PriceMetadata.update(Money(5000), priceToAudit))
       assertThat(username).isEqualTo("_TERMINAL_")
     }
+  }
+
+  @Test
+  internal fun `verify import interactions for geoamey_non_updated_price`() {
+    whenever(geoameyPricesProvider.get()).thenReturn(priceSheetWithRow(2.0, "GEO FROM", "GEO TO", 50.00))
+    whenever(auth.name).thenReturn("Geo")
+
+    val fromLocation = Location(LocationType.PR, "ID1", "GEO FROM")
+    val toLocation = Location(LocationType.CC, "ID2", "GEO TO")
+
+    val oldPrice = Price(
+      supplier = Supplier.GEOAMEY,
+      fromLocation = fromLocation,
+      toLocation = toLocation,
+      priceInPence = 5000,
+      effectiveYear = 2019,
+      previousPrice = null
+    )
+
+    whenever(priceRepo.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.GEOAMEY, fromLocation, toLocation, 2019)).thenReturn(oldPrice)
+
+    val priceToAudit = Price(
+      supplier = Supplier.GEOAMEY,
+      fromLocation = fromLocation,
+      toLocation = toLocation,
+      priceInPence = 5000,
+      effectiveYear = 2019,
+      previousPrice = 5000
+    )
+
+    whenever(priceRepo.save(any())).thenReturn(priceToAudit)
+    whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
+
+    import.import(Supplier.GEOAMEY, 2019, PriceImporter.Action.WARN)
+
+    verify(locationRepo).findAll()
+    verify(geoameyPricesProvider).get()
+    verify(priceRepo, times(2)).count()
+    verify(priceRepo, never()).save(any())
+    verify(auditService, never()).create(any())
   }
 
   @Test

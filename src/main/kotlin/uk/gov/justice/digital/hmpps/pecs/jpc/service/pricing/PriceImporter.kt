@@ -57,13 +57,19 @@ class PriceImporter(
   private fun import(spreadsheet: PricesSpreadsheet) {
     val count = priceRepo.count()
     var updateCount = 0
+    var skipCount = 0
 
     spreadsheet.forEachRow {
 
       if (it.previousPrice != null) {
-        logger.info("Updating price")
-        auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
-        updateCount++
+        if (it.previousPrice!! != it.priceInPence) {
+          logger.info("Updating price")
+          auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
+          updateCount++
+        } else {
+          logger.info("No price change, skipping")
+          skipCount++
+        }
       } else {
         logger.info("Adding new price")
         auditService.create(AuditableEvent.addPrice(priceRepo.save(it)))
@@ -74,6 +80,6 @@ class PriceImporter(
 
     val inserted = priceRepo.count() - count
 
-    logger.info("${spreadsheet.supplier} PRICES INSERTED: $inserted. PRICES UPDATE: $updateCount. TOTAL ERRORS: ${spreadsheet.errors.size}")
+    logger.info("${spreadsheet.supplier} PRICES INSERTED: $inserted. PRICES UPDATED: $updateCount. PRICES SKIPPED: $skipCount. TOTAL ERRORS: ${spreadsheet.errors.size}")
   }
 }
