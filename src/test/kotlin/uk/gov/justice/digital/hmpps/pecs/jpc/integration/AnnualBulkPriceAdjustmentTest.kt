@@ -12,6 +12,12 @@ import java.time.Duration
 internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
   private val logger = loggerFor <AnnualBulkPriceAdjustmentTest>()
+  private val volumetric = "Volumetric"
+  private val inflationary = "Inflationary"
+
+  // This will break in September, fix test to get current CY or otherwise fix up time providers in tests.
+  private val year = 2022
+
   @Test
   fun `apply annual price adjustments`() {
 
@@ -35,17 +41,18 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
     logger.info("Navigating to Apply Bulk Price Adjustment")
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
-    val rate = 1.123456789012345
+    // This is currently less than 1 to be determined as inflationary
+    val rate = 0.123456789012345
     logger.info("Applying Inflationary rate of $rate")
     isAtPage(AnnualPriceAdjustment).applyAdjustment(rate, "Inflationary rate of $rate.")
 
-    waitFiveSeconds()
+    waitThreeSeconds()
 
     logger.info("Navigating to Apply Bulk Price Adjustment")
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
     logger.info("Checking for price history row on Price history tab")
-    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(rate, "Inflationary rate of $rate.")
+    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(inflationary, rate, year, "Inflationary rate of $rate.")
   }
 
   private fun doVolumetricAdjustment() {
@@ -53,22 +60,22 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
-    isAtPage(AnnualPriceAdjustment).applyAdjustments(1.5, 1.0, "Inflationary and volumetric rates 1.5 and 1.0.")
+    isAtPage(AnnualPriceAdjustment).applyAdjustments(0.5, 1.0, "Inflationary and volumetric rates 0.5 and 1.0.")
 
-    waitFiveSeconds()
+    waitThreeSeconds()
 
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
     isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab()
-      .isPriceHistoryRowPresent(1.5, "Inflationary and volumetric rates 1.5 and 1.0.")
-      .isPriceHistoryRowPresent(1.0, "Inflationary and volumetric rates 1.5 and 1.0.")
+      .isPriceHistoryRowPresent(inflationary, 0.5, year, "Inflationary and volumetric rates 0.5 and 1.0.")
+      .isPriceHistoryRowPresent(volumetric, 1.0, year, "Inflationary and volumetric rates 0.5 and 1.0.")
   }
 
-  private fun waitFiveSeconds() {
+  private fun waitThreeSeconds() {
     var timer = 0
     FluentWait(this).withTimeout(Duration.ofSeconds(6)).pollingEvery(Duration.ofSeconds(1)).until {
       timer += 1
-      timer == 5
+      timer == 3
     }
   }
 }

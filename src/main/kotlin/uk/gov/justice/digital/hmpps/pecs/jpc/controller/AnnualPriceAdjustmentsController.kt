@@ -153,7 +153,7 @@ data class PriceAdjustmentHistoryDto(
       if (data.supplier != supplier) throw RuntimeException("Audit bulk price adjusted event not for supplier $supplier")
 
       // Hack until we store, backdate and retrieve adjustment type in metadata. Fix properly under P4-4021
-      val type = if (data.multiplier > BigDecimal.ONE) "Volumetric" else "Inflationary"
+      val type = if (data.multiplier >= BigDecimal.ONE) "Volumetric" else "Inflationary"
 
       return PriceAdjustmentHistoryDto(
         event.createdAt,

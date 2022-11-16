@@ -43,8 +43,8 @@ class AnnualPriceAdjustmentPage : ApplicationPage() {
     return this
   }
 
-  fun isPriceHistoryRowPresent(rate: Double, notes: String): AnnualPriceAdjustmentPage {
-    isRowPresent<AnnualPriceAdjustmentPage>("Prices adjusted by rate of $rate", notes)
+  fun isPriceHistoryRowPresent(type: String, rate: Double, year: Int, notes: String): AnnualPriceAdjustmentPage {
+    isRowPresent<AnnualPriceAdjustmentPage>("$type price adjustment by rate of $rate for contractual year $year", notes)
 
     return this
   }
