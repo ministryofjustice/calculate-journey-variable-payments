@@ -4,7 +4,7 @@
 {{- $cluster := default "live" .Values.ingress.cluster -}}
 {{- $clusterColour := ternary "green" "blue" (eq $cluster "live") -}}
 {{- $awsWeight := default "100" .Values.ingress.aws_weight -}}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ print $fullName "-new" }}
