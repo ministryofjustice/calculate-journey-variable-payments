@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing
 
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditEvent
@@ -77,9 +76,10 @@ class SupplierPricingService(
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = price.pence,
-        effectiveYear = effectiveYear
+        effectiveYear = effectiveYear,
+        previousPrice = null
       )
-    ).let { auditService.create(AuditableEvent.addPrice(it, SecurityContextHolder.getContext().authentication)) }
+    ).let { auditService.create(AuditableEvent.addPrice(it)) }
   }
 
   fun updatePriceForSupplier(
@@ -94,6 +94,14 @@ class SupplierPricingService(
 
     val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
+
+    updatePriceForSupplier(existingPrice, agreedNewPrice)
+  }
+
+  fun updatePriceForSupplier(
+    existingPrice: Price,
+    agreedNewPrice: Money,
+  ) {
 
     if (existingPrice.price() != agreedNewPrice) {
       val oldPrice = existingPrice.price().copy()

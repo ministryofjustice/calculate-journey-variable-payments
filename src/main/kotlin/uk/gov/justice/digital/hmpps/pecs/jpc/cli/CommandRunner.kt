@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.AdjustmentMultiplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 
@@ -32,7 +33,8 @@ class CommandRunner(
     when {
       arguments.contains("price-import") -> bulkPriceImportCommand.bulkImportPricesFor(
         arguments.getSupplier(),
-        arguments.getYear()
+        arguments.getYear(),
+        arguments.getAction()
       )
       arguments.contains("price-adjust") -> priceAdjustmentCommand.adjustPricesFor(
         arguments.getSupplier(),
@@ -59,6 +61,9 @@ class CommandRunner(
 
   private fun ApplicationArguments.getSupplier() =
     this.get("supplier")?.let { Supplier.valueOf(it) } ?: throw RuntimeException("Missing supplier argument")
+
+  private fun ApplicationArguments.getAction() =
+    this.get("action")?.let { PriceImporter.Action.valueOf(it) } ?: PriceImporter.Action.ERROR
 
   private fun ApplicationArguments.getYear() =
     this.get("year")?.toIntOrNull() ?: throw RuntimeException("Missing year argument")

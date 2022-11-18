@@ -7,6 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Price
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.Closeable
 
 private const val FROM_LOCATION = 1
@@ -23,15 +24,22 @@ class PricesSpreadsheet(
   val supplier: Supplier,
   supplierLocations: List<Location>,
   private val pricesRepository: PriceRepository,
-  private val effectiveYear: Int
+  private val effectiveYear: Int,
+  private val action: PriceImporter.Action? = PriceImporter.Action.ERROR
 ) : Closeable {
+
+  private val logger = loggerFor<PricesSpreadsheet>()
 
   val errors: MutableList<PricesSpreadsheetError> = mutableListOf()
 
   private val locations = supplierLocations.associateBy { it.siteName.uppercase() }
 
   fun forEachRow(f: (price: Price) -> Unit) {
-    getRows().forEach { row -> Result.runCatching { f(mapToPrice(row)) }.onFailure { this.addError(row, it) } }
+    getRows().forEach { row ->
+      Result.runCatching {
+        f(mapToPrice(row))
+      }.onFailure { this.addError(row, it) }
+    }
   }
 
   /**
@@ -59,9 +67,16 @@ class PricesSpreadsheet(
     val toLocation = locations[toLocationName]
       ?: throw RuntimeException("To location '$toLocationName' for supplier '$supplier' not found")
 
-    failIfPriceAlreadyExists(supplier, fromLocation, toLocation)
+    val existing = findExistingPrice(supplier, fromLocation, toLocation)?.apply {
+      if (action == PriceImporter.Action.WARN) {
+        logger.warn("Overwriting existing price of : '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
+      } else {
+        throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
+      }
+    }
 
     return Price(
+      previousPrice = existing,
       supplier = supplier,
       fromLocation = fromLocation,
       toLocation = toLocation,
@@ -70,15 +85,14 @@ class PricesSpreadsheet(
     )
   }
 
-  private fun failIfPriceAlreadyExists(supplier: Supplier, fromLocation: Location, toLocation: Location) {
-    pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+  private fun findExistingPrice(supplier: Supplier, fromLocation: Location, toLocation: Location): Price? {
+    return pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
       supplier,
       fromLocation,
       toLocation,
       effectiveYear
-    )?.let {
-      throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
-    }
+    )
+      .also { logger.debug("Found existing price for '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier") }
   }
 
   fun addError(row: Row, error: Throwable) = errors.add(

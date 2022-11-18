@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.EffectiveYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.ImportPricesService
+import uk.gov.justice.digital.hmpps.pecs.jpc.service.pricing.PriceImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 /**
@@ -17,17 +18,17 @@ private val logger = loggerFor<BulkPriceImportCommand>()
 @Component
 class BulkPriceImportCommand(private val importService: ImportPricesService, private val effectiveYear: EffectiveYear) {
 
-  fun bulkImportPricesFor(supplier: Supplier, year: Int) {
+  fun bulkImportPricesFor(supplier: Supplier, year: Int, action: PriceImporter.Action? = PriceImporter.Action.ERROR) {
     if (!effectiveYear.canAddOrUpdatePrices(year))
       throw RuntimeException(
         "Price imports can only take place in the current '${effectiveYear.current()}' or previous effective year '${effectiveYear.current() - 1}'."
       )
 
-    logger.info("Starting import of prices for $supplier for effective year $year.")
+    logger.info("Starting import of prices for $supplier for effective year $year. $action on existing prices")
 
     when (supplier) {
       Supplier.UNKNOWN -> throw RuntimeException("UNKNOWN is not a valid supplier")
-      else -> importService.importPricesFor(supplier, year)
+      else -> importService.importPricesFor(supplier, year, action)
     }
 
     logger.info("Finished import of prices for $supplier for effective year $year.")

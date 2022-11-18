@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
-@SpringBootTest(args = ["--price-import", "--supplier=serco", "--year=2021"], webEnvironment = WebEnvironment.NONE)
+@SpringBootTest(args = ["--price-import", "--supplier=serco", "--year=2021", "--action=ERROR"], webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
 class CommandRunnerPriceImporterTest {

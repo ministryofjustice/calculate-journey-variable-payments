@@ -93,6 +93,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
+      // The price here is affected by the volume adjustment test, need to make them not affect each other
       .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("101.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
 

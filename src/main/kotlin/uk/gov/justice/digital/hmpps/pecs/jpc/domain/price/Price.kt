@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.Location
 import java.time.LocalDateTime
 import java.time.Month
 import java.util.UUID
+import javax.annotation.Nullable
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -56,6 +57,10 @@ data class Price(
 
   @Column(name = "effective_year", nullable = false)
   val effectiveYear: Int,
+
+  @Nullable
+  @Transient
+  val previousPrice: Price? = null,
 ) {
 
   @OneToMany(mappedBy = "price", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
