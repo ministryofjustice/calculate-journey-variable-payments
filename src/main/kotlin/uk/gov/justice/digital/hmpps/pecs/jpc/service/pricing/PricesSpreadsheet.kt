@@ -92,7 +92,7 @@ class PricesSpreadsheet(
       toLocation,
       effectiveYear
     )
-      .also { logger.info("Found existing price for '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier") }
+      .also { logger.debug("Found existing price for '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier") }
   }
 
   fun addError(row: Row, error: Throwable) = errors.add(

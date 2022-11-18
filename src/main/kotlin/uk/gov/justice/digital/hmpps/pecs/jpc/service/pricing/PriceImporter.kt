@@ -63,7 +63,6 @@ class PriceImporter(
 
       if (it.previousPrice != null) {
         if (it.previousPrice!!.priceInPence != it.priceInPence) {
-          logger.info("Updating price")
           supplierPricingService.updatePriceForSupplier(it.previousPrice!!, it.price())
           // auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
           updateCount++
