@@ -76,7 +76,7 @@ class PricesSpreadsheet(
     }
 
     return Price(
-      previousPrice = existing?.priceInPence,
+      previousPrice = existing,
       supplier = supplier,
       fromLocation = fromLocation,
       toLocation = toLocation,

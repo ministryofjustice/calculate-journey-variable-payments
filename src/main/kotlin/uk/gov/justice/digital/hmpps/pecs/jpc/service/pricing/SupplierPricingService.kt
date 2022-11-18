@@ -95,6 +95,14 @@ class SupplierPricingService(
     val existingPrice = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)
       ?: throw RuntimeException("No matching price found for $supplier")
 
+    updatePriceForSupplier(existingPrice, agreedNewPrice)
+  }
+
+  fun updatePriceForSupplier(
+    existingPrice: Price,
+    agreedNewPrice: Money,
+  ) {
+
     if (existingPrice.price() != agreedNewPrice) {
       val oldPrice = existingPrice.price().copy()
 

@@ -161,11 +161,11 @@ internal class PricesSpreadsheetTest {
         price.priceInPence
       ).thenReturn(500)
 
-      val price = warnSpreadsheet.mapToPrice(row)
-      assertThat(price.fromLocation).isEqualTo(fromLocation)
-      assertThat(price.toLocation).isEqualTo(toLocation)
-      assertThat(price.priceInPence).isEqualTo(10001)
-      assertThat(price.previousPrice).isEqualTo(500)
+      val mappedPrice = warnSpreadsheet.mapToPrice(row)
+      assertThat(mappedPrice.fromLocation).isEqualTo(fromLocation)
+      assertThat(mappedPrice.toLocation).isEqualTo(toLocation)
+      assertThat(mappedPrice.priceInPence).isEqualTo(10001)
+      assertThat(mappedPrice.previousPrice).isEqualTo(price)
     }
   }
 }

@@ -60,7 +60,7 @@ data class Price(
 
   @Nullable
   @Transient
-  val previousPrice: Int? = null,
+  val previousPrice: Price? = null,
 ) {
 
   @OneToMany(mappedBy = "price", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)

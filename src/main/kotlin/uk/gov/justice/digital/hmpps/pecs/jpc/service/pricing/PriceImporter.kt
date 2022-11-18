@@ -6,7 +6,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.GeoameyPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.SercoPricesProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.AuditableEvent
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationRepository
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.PriceRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
@@ -21,7 +20,8 @@ class PriceImporter(
   private val sercoPrices: SercoPricesProvider,
   private val geoameyPrices: GeoameyPricesProvider,
   private val locationRepository: LocationRepository,
-  private val auditService: AuditService
+  private val auditService: AuditService,
+  private val supplierPricingService: SupplierPricingService
 ) {
 
   enum class Action {
@@ -62,9 +62,10 @@ class PriceImporter(
     spreadsheet.forEachRow {
 
       if (it.previousPrice != null) {
-        if (it.previousPrice!! != it.priceInPence) {
+        if (it.previousPrice!!.priceInPence != it.priceInPence) {
           logger.info("Updating price")
-          auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
+          supplierPricingService.updatePriceForSupplier(it.previousPrice!!, it.price())
+          // auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
           updateCount++
         } else {
           logger.info("No price change, skipping")

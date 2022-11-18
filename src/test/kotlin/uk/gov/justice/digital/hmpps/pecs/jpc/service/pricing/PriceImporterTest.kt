@@ -42,12 +42,14 @@ internal class PriceImporterTest {
 
   private val auditService: AuditService = mock()
 
+  private val supplierPricingService: SupplierPricingService = mock()
+
   private val auth: Authentication = mock()
 
   private val auditCaptor = argumentCaptor<AuditableEvent>()
 
   private val import: PriceImporter =
-    PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo, auditService)
+    PriceImporter(priceRepo, sercoPricesProvider, geoameyPricesProvider, locationRepo, auditService, supplierPricingService)
 
   @Test
   internal fun `verify import interactions for serco`() {
@@ -139,7 +141,7 @@ internal class PriceImporterTest {
       toLocation = toLocation,
       priceInPence = 10100,
       effectiveYear = 2019,
-      previousPrice = 5000
+      previousPrice = oldPrice
     )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
@@ -150,14 +152,7 @@ internal class PriceImporterTest {
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
     verify(priceRepo, times(2)).count()
-    verify(priceRepo).save(any())
-    verify(auditService).create(auditCaptor.capture())
-
-    with(auditCaptor.firstValue) {
-      assertThat(type).isEqualTo(AuditEventType.JOURNEY_PRICE)
-      assertThat(metadata).isEqualTo(PriceMetadata.update(Money(5000), priceToAudit))
-      assertThat(username).isEqualTo("_TERMINAL_")
-    }
+    verify(supplierPricingService).updatePriceForSupplier(oldPrice, Money(priceToAudit.priceInPence))
   }
 
   @Test
@@ -185,7 +180,7 @@ internal class PriceImporterTest {
       toLocation = toLocation,
       priceInPence = 5000,
       effectiveYear = 2019,
-      previousPrice = 5000
+      previousPrice = oldPrice
     )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
