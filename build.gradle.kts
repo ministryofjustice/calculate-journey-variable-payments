@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.7.4"
-  kotlin("plugin.spring") version "1.7.20"
-  kotlin("plugin.jpa") version "1.7.20"
-  kotlin("plugin.allopen") version "1.7.20"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.1"
+  kotlin("plugin.spring") version "1.8.0"
+  kotlin("plugin.jpa") version "1.8.0"
+  kotlin("plugin.allopen") version "1.8.0"
 }
 
 allOpen {
@@ -69,7 +69,7 @@ dependencies {
   }
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.5.0")
+  runtimeOnly("org.postgresql:postgresql:42.5.2")
 }
 
 java {
