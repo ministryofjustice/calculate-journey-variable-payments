@@ -4,6 +4,14 @@ import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
 import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
+import jakarta.persistence.Index
+import jakarta.persistence.Table
+import jakarta.persistence.Transient
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonDateTimeConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.JsonSupplierConverter
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
@@ -15,14 +23,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.Id
-import javax.persistence.Index
-import javax.persistence.Table
-import javax.persistence.Transient
 
 @Entity
 @Table(name = "JOURNEYS", indexes = [Index(name = "move_id_index", columnList = "move_id", unique = false)])

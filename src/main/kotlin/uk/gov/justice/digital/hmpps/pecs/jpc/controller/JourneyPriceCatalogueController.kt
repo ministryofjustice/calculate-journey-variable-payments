@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.core.io.InputStreamResource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -16,7 +17,6 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import javax.servlet.http.HttpServletResponse
 
 private val logger = loggerFor<JourneyPriceCatalogueController>()
 

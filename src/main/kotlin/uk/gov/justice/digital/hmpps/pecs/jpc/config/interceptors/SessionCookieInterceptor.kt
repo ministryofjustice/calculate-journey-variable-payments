@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config.interceptors
 
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.ModelAndView
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 private const val SPRING_SESSION_COOKIE = "SESSION"
 private const val ANY_PATH_STARTING_AT_ROOT = "/"

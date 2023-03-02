@@ -1,5 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import org.hibernate.validator.constraints.Length
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -15,9 +18,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.BasmClientApiService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.locations.LocationsService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
-import javax.validation.Valid
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.NotNull
 
 /**
  * Controller to support searching for and maintenance of existing Schedule 34 locations.

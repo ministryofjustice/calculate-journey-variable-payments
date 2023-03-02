@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
+import jakarta.servlet.http.HttpServletRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -8,7 +9,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
-import javax.servlet.http.HttpServletRequest
 
 internal class ControllerExceptionHandlerTest {
 
