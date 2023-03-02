@@ -1,14 +1,14 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.3"
-  kotlin("plugin.spring") version "1.8.0"
-  kotlin("plugin.jpa") version "1.8.0"
-  kotlin("plugin.allopen") version "1.8.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.1.0"
+  kotlin("plugin.spring") version "1.8.10"
+  kotlin("plugin.jpa") version "1.8.10"
+  kotlin("plugin.allopen") version "1.8.10"
 }
 
 allOpen {
-  annotation("javax.persistence.Entity")
-  annotation("javax.persistence.Embeddable")
-  annotation("javax.persistence.MappedSuperclass")
+  annotation("jakarta.persistence.Entity")
+  annotation("jakarta.persistence.Embeddable")
+  annotation("jakarta.persistence.MappedSuperclass")
 }
 
 dependencyCheck {
@@ -17,24 +17,24 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "4.42.0"
+  val shedlockVersion = "5.1.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.279",
-    "io.sentry:sentry-spring-boot-starter:6.4.2",
+    "com.amazonaws:aws-java-sdk-s3:1.12.408",
+    "io.sentry:sentry-spring-boot-starter:6.14.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
-    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0",
-    "org.apache.poi:poi-ooxml:5.2.2",
+    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.0",
+    "org.apache.poi:poi-ooxml:5.2.3",
     "org.flywaydb:flyway-core",
     "org.springframework.boot:spring-boot-starter-data-jpa",
     "org.springframework.boot:spring-boot-starter-thymeleaf",
     "org.springframework.boot:spring-boot-starter-oauth2-client",
     "org.springframework.boot:spring-boot-starter-oauth2-resource-server",
     "org.springframework.boot:spring-boot-starter-webflux",
-    "org.springframework.session:spring-session-jdbc:2.7.0",
-    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE"
-  ).forEach { implementation(it) }
+    "org.springframework.session:spring-session-jdbc:3.0.0",
+    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.1.1.RELEASE"
+  ).forEach { implementation(it) { exclude("org.springframework.boot", "spring-boot-starter-logging") } }
   implementation(kotlin("script-runtime"))
 
   constraints {
@@ -61,7 +61,7 @@ dependencies {
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.10.0",
     "com.squareup.okhttp3:okhttp:4.10.0"
-  ).forEach { testImplementation(it) }
+  ).forEach { testImplementation(it) { exclude(" org.slf4j.helpers", "NOPLoggerFactory") } }
   constraints {
     implementation(" org.apache.commons:commons-text:1.10.0") {
       because("previous transitive version 1.9.0 pulled in by Fluentlenium has CVE-2022-42889")
@@ -69,7 +69,12 @@ dependencies {
   }
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.5.2")
+  runtimeOnly("org.postgresql:postgresql:42.5.4")
+}
+configurations {
+  all {
+    exclude(module = "spring-boot-starter-logging")
+  }
 }
 
 java {
