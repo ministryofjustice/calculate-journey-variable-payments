@@ -22,9 +22,8 @@ internal class ViewMoveDetailsTest : IntegrationTest() {
 
     findMove.findBy(standardMoveM4())
 
-
     val details = isAtPage(MoveDetails)
-    wait.until { details.atPage(standardMoveM4().moveId)}
+    wait.until { details.atPage(standardMoveM4().moveId) }
     details.isAtPageFor(standardMoveM4())
   }
 }
