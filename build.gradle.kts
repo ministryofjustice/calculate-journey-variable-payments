@@ -1,8 +1,8 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.8"
-  kotlin("plugin.spring") version "1.8.0"
-  kotlin("plugin.jpa") version "1.8.0"
-  kotlin("plugin.allopen") version "1.8.0"
+  kotlin("plugin.spring") version "1.8.22"
+  kotlin("plugin.jpa") version "1.8.22"
+  kotlin("plugin.allopen") version "1.8.22"
 }
 
 allOpen {
