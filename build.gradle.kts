@@ -68,7 +68,7 @@ dependencies {
       because("previous transitive version 1.9.0 pulled in by Fluentlenium has CVE-2022-42889")
     }
   }
-  testRuntimeOnly("com.h2database:h2:2.1.214")
+  testRuntimeOnly("com.h2database:h2:1.4.200")
 
   runtimeOnly("org.postgresql:postgresql:42.5.4")
 }
