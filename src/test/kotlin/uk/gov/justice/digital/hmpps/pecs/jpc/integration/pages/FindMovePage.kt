@@ -18,4 +18,8 @@ class FindMovePage : ApplicationPage() {
     referenceInput.fill().withText(move.reference)
     findMoveSubmit.submit()
   }
+
+  fun searchReady(): Boolean {
+    return referenceInput.displayed() && findMoveSubmit.displayed()
+  }
 }

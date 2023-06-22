@@ -14,9 +14,17 @@ internal class ViewMoveDetailsTest : IntegrationTest() {
     loginAndGotoDashboardFor(Supplier.GEOAMEY)
 
     isAtPage(Dashboard).navigateToFindMoveByReferenceId()
+    val findMove = isAtPage(FindMove)
 
-    isAtPage(FindMove).findBy(standardMoveM4())
+    wait.until {
+      findMove.searchReady()
+    }
 
-    isAtPage(MoveDetails).isAtPageFor(standardMoveM4())
+    findMove.findBy(standardMoveM4())
+
+
+    val details = isAtPage(MoveDetails)
+    wait.until { details.atPage(standardMoveM4().moveId)}
+    details.isAtPageFor(standardMoveM4())
   }
 }

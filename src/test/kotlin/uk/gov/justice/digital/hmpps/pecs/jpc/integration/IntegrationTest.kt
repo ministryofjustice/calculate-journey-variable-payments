@@ -30,7 +30,7 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
 
   // The custom driver is for testing the spreadsheet download functionality only!
   private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver(ChromeOptions().apply { addArguments("--headless", "--ignore-certificate-errors") })
-  private val wait: Wait<WebDriver> = FluentWait(testDriver).withTimeout(Duration.ofSeconds(30)).pollingEvery(Duration.ofSeconds(2))
+  protected val wait: Wait<WebDriver> = FluentWait(testDriver).withTimeout(Duration.ofSeconds(30)).pollingEvery(Duration.ofSeconds(2))
   override fun newWebDriver(): WebDriver = testDriver
 
   fun goToPage(page: Pages<*>) {
