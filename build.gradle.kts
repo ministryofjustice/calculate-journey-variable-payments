@@ -51,7 +51,7 @@ dependencies {
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:4.11.0",
-    "org.seleniumhq.selenium:htmlunit-driver:3.64.0",
+    "org.seleniumhq.selenium:htmlunit-driver:2.70.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
