@@ -39,8 +39,8 @@ internal class JourneyPriceCatalogueServiceTest {
       AuditableEvent.downloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 22),
         supplier,
-        authentication
-      )
+        authentication,
+      ),
     )
   }
 
@@ -49,8 +49,8 @@ internal class JourneyPriceCatalogueServiceTest {
     whenever(
       pricesSpreadsheetGenerator.generate(
         Supplier.SERCO,
-        LocalDate.of(2021, 6, 7)
-      )
+        LocalDate.of(2021, 6, 7),
+      ),
     ).thenThrow(RuntimeException("spreadsheet download failed for Serco"))
 
     assertThatThrownBy { service.generate(authentication, Supplier.SERCO, LocalDate.of(2021, 6, 7)) }
@@ -61,8 +61,8 @@ internal class JourneyPriceCatalogueServiceTest {
       AuditableEvent.downloadSpreadsheetFailure(
         LocalDate.of(2021, 6, 7),
         Supplier.SERCO,
-        authentication
-      )
+        authentication,
+      ),
     )
   }
 
@@ -71,8 +71,8 @@ internal class JourneyPriceCatalogueServiceTest {
     whenever(
       pricesSpreadsheetGenerator.generate(
         Supplier.GEOAMEY,
-        LocalDate.of(2021, 6, 6)
-      )
+        LocalDate.of(2021, 6, 6),
+      ),
     ).thenThrow(RuntimeException("spreadsheet download failed for GEOAmey"))
 
     assertThatThrownBy { service.generate(authentication, Supplier.GEOAMEY, LocalDate.of(2021, 6, 6)) }
@@ -83,8 +83,8 @@ internal class JourneyPriceCatalogueServiceTest {
       AuditableEvent.downloadSpreadsheetFailure(
         LocalDate.of(2021, 6, 6),
         Supplier.GEOAMEY,
-        authentication
-      )
+        authentication,
+      ),
     )
   }
 }

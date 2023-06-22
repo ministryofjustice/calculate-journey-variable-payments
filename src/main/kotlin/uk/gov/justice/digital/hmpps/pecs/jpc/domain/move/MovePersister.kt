@@ -21,14 +21,13 @@ class MovePersister(
   private val moveRepository: MoveRepository,
   private val journeyRepository: JourneyRepository,
   private val eventRepository: EventRepository,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
 ) {
 
   /**
    * Returns the total number of successfully persisted moves.
    */
   fun persist(moves: List<Move>): Int {
-
     var counter = 0
     val movesToSave = mutableListOf<Move>()
     val journeysToSave = mutableListOf<Journey>()
@@ -45,7 +44,6 @@ class MovePersister(
     moves.chunked(100).forEach { hundredMoves ->
 
       Result.runCatching {
-
         val existingMoves = moveRepository.findAllByMoveIdIn(hundredMoves.map { it.moveId })
         val existingJourneys = journeyRepository.findAllByMoveIdIn(existingMoves.map { it.moveId })
         val existingMoveEvents = eventRepository.findAllByEventableIdIn(existingMoves.map { it.moveId })
@@ -79,7 +77,7 @@ class MovePersister(
           // This is just used to calculated moveType
           val moveWithJourneysAndEvents = newMove.copy(
             events = moveEvents,
-            journeys = journeysWithEvents
+            journeys = journeysWithEvents,
           )
 
           val moveToSave = newMove.copy(
@@ -123,9 +121,9 @@ class MovePersister(
   }
 
   fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {
-    return if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty())
+    return if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty()) {
       listOf(fakeCancelledJourneyForPricing(move))
-    else
+    } else {
       journeys.map { journey ->
         val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
         val pickUp = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_START)?.occurredAt
@@ -137,11 +135,12 @@ class MovePersister(
           pickUpDateTime = pickUp,
           dropOffDateTime = dropOff,
           effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(
-            move.moveDate ?: timeSource.date()
+            move.moveDate ?: timeSource.date(),
           ),
-          vehicleRegistration = vehicleRegistration
+          vehicleRegistration = vehicleRegistration,
         )
       }
+    }
   }
 
   private fun Journey.determineRegistrationsCombinedWithThoseFrom(events: List<Event>) = this.copy(events = events).vehicleRegistrations()
@@ -160,11 +159,11 @@ class MovePersister(
       clientTimeStamp = LocalDateTime.now(),
       fromNomisAgencyId = move.fromNomisAgencyId,
       toNomisAgencyId = move.toNomisAgencyId!!,
-      state = JourneyState.cancelled,
+      state = JourneyState.Cancelled,
       vehicleRegistration = null,
       notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
       effectiveYear = effectiveYearForDate(move.moveDate ?: timeSource.date()),
-      events = listOf()
+      events = listOf(),
     )
   }
 }
@@ -175,7 +174,7 @@ private val noteworthyEvents = listOf(
   EventType.JOURNEY_CANCEL,
   EventType.MOVE_LODGING_START,
   EventType.MOVE_LODGING_END,
-  EventType.MOVE_CANCEL
+  EventType.MOVE_CANCEL,
 ).map { it.value }
 
 fun List<Event>.notes() =

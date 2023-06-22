@@ -34,8 +34,8 @@ class MultiTypeMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
     NOMIS_PRISON_ID,
     PRICE,
     CONTRACTOR_BILLABLE,
-    NOTES
-  )
+    NOTES,
+  ),
 ) {
 
   override fun writeMove(move: Move) {

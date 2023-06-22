@@ -56,8 +56,8 @@ class ReferenceDataControllerTest(@Autowired private val wac: WebApplicationCont
       listOf(
         Location(LocationType.PR, "TESTLOC1", "Test Loc 1"),
         Location(LocationType.PR, "TESTLOC2", "Test Loc 2"),
-        Location(LocationType.PR, "TESTLOC3", "Test Loc 3")
-      )
+        Location(LocationType.PR, "TESTLOC3", "Test Loc 3"),
+      ),
     )
 
     mockMvc.get("/reference/locations") {

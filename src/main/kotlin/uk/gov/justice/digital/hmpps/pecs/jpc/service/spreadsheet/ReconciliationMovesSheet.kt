@@ -18,8 +18,8 @@ class ReconciliationMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
     DataColumn.PICK_UP_DATE,
     DataColumn.PICK_UP_TIME,
     DataColumn.DROP_OFF_DATE,
-    DataColumn.DROP_OFF_TIME
-  )
+    DataColumn.DROP_OFF_TIME,
+  ),
 ) {
   override fun writeMove(move: Move) {
     createRow().apply { move.values().forEachIndexed { i, v -> addCell(i, v) } }

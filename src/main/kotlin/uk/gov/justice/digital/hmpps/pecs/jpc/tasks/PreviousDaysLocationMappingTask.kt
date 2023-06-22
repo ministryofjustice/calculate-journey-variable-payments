@@ -15,7 +15,7 @@ private val logger = loggerFor<PreviousDaysLocationMappingTask>()
 class PreviousDaysLocationMappingTask(
   private val service: AutomaticLocationMappingService,
   private val timeSource: TimeSource,
-  monitoringService: MonitoringService
+  monitoringService: MonitoringService,
 ) : Task("Previous days locations", monitoringService) {
 
   override fun performTask() {

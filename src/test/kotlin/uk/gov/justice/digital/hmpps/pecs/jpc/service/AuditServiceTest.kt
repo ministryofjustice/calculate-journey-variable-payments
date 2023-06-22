@@ -60,10 +60,10 @@ internal class AuditServiceTest {
             type,
             dateTime,
             username.trim().uppercase(),
-            if (metadata != null) Klaxon().toJsonString(metadata) else null
-          )
-        )
-      )
+            if (metadata != null) Klaxon().toJsonString(metadata) else null,
+          ),
+        ),
+      ),
     )
 
   @BeforeEach
@@ -91,14 +91,14 @@ internal class AuditServiceTest {
       AuditableEvent.downloadSpreadsheetEvent(
         LocalDate.of(2021, 2, 1),
         Supplier.SERCO,
-        authentication
-      )
+        authentication,
+      ),
     )
 
     verifyEvent(
       AuditEventType.DOWNLOAD_SPREADSHEET,
       authentication.name,
-      mapOf("month" to "2021-02", "supplier" to "SERCO")
+      mapOf("month" to "2021-02", "supplier" to "SERCO"),
     )
   }
 
@@ -108,14 +108,14 @@ internal class AuditServiceTest {
       AuditableEvent.downloadSpreadsheetFailure(
         LocalDate.of(2021, 6, 7),
         Supplier.GEOAMEY,
-        authentication
-      )
+        authentication,
+      ),
     )
 
     verifyEvent(
       AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE,
       authentication.name,
-      mapOf("month" to "2021-06", "supplier" to "GEOAMEY")
+      mapOf("month" to "2021-06", "supplier" to "GEOAMEY"),
     )
   }
 
@@ -128,7 +128,7 @@ internal class AuditServiceTest {
     assertThat(eventCaptor.firstValue.username).isEqualTo(authentication.name.trim().uppercase())
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
-      MapLocationMetadata(nomisId = "TEST2", newName = "TEST 2 NAME", newType = LocationType.AP)
+      MapLocationMetadata(nomisId = "TEST2", newName = "TEST 2 NAME", newType = LocationType.AP),
     )
   }
 
@@ -139,8 +139,8 @@ internal class AuditServiceTest {
     service.create(
       AuditableEvent.remapLocation(
         location,
-        location.copy(siteName = "TEST B NAME")
-      )
+        location.copy(siteName = "TEST B NAME"),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -151,8 +151,8 @@ internal class AuditServiceTest {
       MapLocationMetadata(
         nomisId = "TEST2",
         newName = "TEST B NAME",
-        oldName = "TEST 2 NAME"
-      )
+        oldName = "TEST 2 NAME",
+      ),
     )
   }
 
@@ -163,8 +163,8 @@ internal class AuditServiceTest {
     service.create(
       AuditableEvent.remapLocation(
         location,
-        location.copy(locationType = LocationType.PR)
-      )
+        location.copy(locationType = LocationType.PR),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -175,8 +175,8 @@ internal class AuditServiceTest {
       MapLocationMetadata(
         nomisId = "TEST2",
         oldType = LocationType.HP,
-        newType = LocationType.PR
-      )
+        newType = LocationType.PR,
+      ),
     )
   }
 
@@ -189,7 +189,7 @@ internal class AuditServiceTest {
     val location = Location(LocationType.PR, "PRISON_ONE", "PRISON ONE")
 
     service.create(
-      AuditableEvent.autoMapLocation(location)
+      AuditableEvent.autoMapLocation(location),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -197,7 +197,7 @@ internal class AuditServiceTest {
     assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
     assertThatMappedLocationsAreTheSame(
       eventCaptor.firstValue,
-      MapLocationMetadata(nomisId = "PRISON_ONE", newType = LocationType.PR, newName = "PRISON ONE")
+      MapLocationMetadata(nomisId = "PRISON_ONE", newType = LocationType.PR, newName = "PRISON ONE"),
     )
   }
 
@@ -210,9 +210,9 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 234,
-          effectiveYear = effectiveYearForDate(timeSource.date())
-        )
-      )
+          effectiveYear = effectiveYearForDate(timeSource.date()),
+        ),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -227,7 +227,7 @@ internal class AuditServiceTest {
         "TEST21",
         effectiveYearForDate(timeSource.date()),
         2.34.toBigDecimal(),
-      )
+      ),
     )
   }
 
@@ -241,9 +241,9 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 234,
-          effectiveYear = effectiveYearForDate(timeSource.date())
-        )
-      )
+          effectiveYear = effectiveYearForDate(timeSource.date()),
+        ),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -258,7 +258,7 @@ internal class AuditServiceTest {
         "TEST21",
         effectiveYearForDate(timeSource.date()),
         2.34.toBigDecimal(),
-      )
+      ),
     )
   }
 
@@ -271,10 +271,10 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 2340,
-          effectiveYear = effectiveYearForDate(timeSource.date())
+          effectiveYear = effectiveYearForDate(timeSource.date()),
         ),
-        Money(234)
-      )
+        Money(234),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -288,8 +288,8 @@ internal class AuditServiceTest {
         "TEST21",
         effectiveYearForDate(timeSource.date()),
         "23.40".toBigDecimal(),
-        "2.34".toBigDecimal()
-      )
+        "2.34".toBigDecimal(),
+      ),
     )
   }
 
@@ -308,8 +308,8 @@ internal class AuditServiceTest {
         2020,
         AdjustmentMultiplier(1.5.toBigDecimal()),
         null,
-        "serco details"
-      )
+        "serco details",
+      ),
     )
     service.create(
       AuditableEvent.journeyPriceBulkPriceAdjustmentEvent(
@@ -317,8 +317,8 @@ internal class AuditServiceTest {
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
         null,
-        "geo details"
-      )
+        "geo details",
+      ),
     )
 
     verify(auditEventRepository, times(2)).save(eventCaptor.capture())
@@ -326,13 +326,13 @@ internal class AuditServiceTest {
     assertThat(eventCaptor.firstValue.username).isEqualTo("_TERMINAL_")
     assertPriceAdjustmentIsSame(
       eventCaptor.firstValue,
-      AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2020, 1.5.toBigDecimal(), "serco details")
+      AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2020, 1.5.toBigDecimal(), "serco details"),
     )
     assertThat(eventCaptor.secondValue.eventType).isEqualTo(AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT)
     assertThat(eventCaptor.secondValue.username).isEqualTo("_TERMINAL_")
     assertPriceAdjustmentIsSame(
       eventCaptor.secondValue,
-      AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "geo details")
+      AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "geo details"),
     )
   }
 
@@ -350,8 +350,8 @@ internal class AuditServiceTest {
         people_processed = 5,
         people_saved = 5,
         profiles_processed = 5,
-        profiles_saved = 4
-      )
+        profiles_saved = 4,
+      ),
     )
 
     verifyEvent(
@@ -364,8 +364,8 @@ internal class AuditServiceTest {
         "people_processed" to 5,
         "people_saved" to 5,
         "profiles_processed" to 5,
-        "profiles_saved" to 4
-      )
+        "profiles_saved" to 4,
+      ),
     )
   }
 
@@ -378,12 +378,12 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 200,
-          effectiveYear = effectiveYearForDate(timeSource.date())
+          effectiveYear = effectiveYearForDate(timeSource.date()),
         ),
         original = Money(100),
         multiplier = AdjustmentMultiplier(2.0.toBigDecimal()),
-        authentication = authentication
-      )
+        authentication = authentication,
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -398,8 +398,8 @@ internal class AuditServiceTest {
         effectiveYearForDate(timeSource.date()),
         "2.00".toBigDecimal(),
         "1.00".toBigDecimal(),
-        "2.0".toBigDecimal()
-      )
+        "2.0".toBigDecimal(),
+      ),
     )
   }
 
@@ -412,11 +412,11 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 200,
-          effectiveYear = effectiveYearForDate(timeSource.date())
+          effectiveYear = effectiveYearForDate(timeSource.date()),
         ),
         original = Money(100),
         multiplier = AdjustmentMultiplier(2.0.toBigDecimal()),
-      )
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -431,8 +431,8 @@ internal class AuditServiceTest {
         effectiveYearForDate(timeSource.date()),
         "2.00".toBigDecimal(),
         "1.00".toBigDecimal(),
-        "2.0".toBigDecimal()
-      )
+        "2.0".toBigDecimal(),
+      ),
     )
   }
 
@@ -445,11 +445,11 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 200,
-          effectiveYear = effectiveYearForDate(timeSource.date())
+          effectiveYear = effectiveYearForDate(timeSource.date()),
         ),
         month = Month.OCTOBER,
-        amount = Money(300)
-      )
+        amount = Money(300),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -465,8 +465,8 @@ internal class AuditServiceTest {
         newPrice = "3.00".toBigDecimal(),
         oldPrice = "2.00".toBigDecimal(),
         exceptionMonth = Month.OCTOBER.name,
-        exceptionDeleted = false
-      )
+        exceptionDeleted = false,
+      ),
     )
   }
 
@@ -479,11 +479,11 @@ internal class AuditServiceTest {
           fromLocation = Location(LocationType.CC, "TEST2", "TEST2"),
           toLocation = Location(LocationType.CC, "TEST21", "TEST21"),
           priceInPence = 200,
-          effectiveYear = effectiveYearForDate(timeSource.date())
+          effectiveYear = effectiveYearForDate(timeSource.date()),
         ),
         month = Month.OCTOBER,
-        amount = Money(300)
-      )
+        amount = Money(300),
+      ),
     )
 
     verify(auditEventRepository).save(eventCaptor.capture())
@@ -499,8 +499,8 @@ internal class AuditServiceTest {
         newPrice = "3.00".toBigDecimal(),
         oldPrice = "2.00".toBigDecimal(),
         exceptionMonth = Month.OCTOBER.name,
-        exceptionDeleted = true
-      )
+        exceptionDeleted = true,
+      ),
     )
   }
 }

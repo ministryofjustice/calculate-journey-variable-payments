@@ -38,11 +38,11 @@ fun <T> assertCellEquals(sheet: PriceSheet, row: Int, col: Int, expectedVal: T?)
     is Int -> sheet.getRow(row).getCell(col).numericCellValue.toInt()
     is LocalDate -> LocalDate.parse(
       sheet.getRow(row).getCell(col).stringCellValue,
-      DateTimeFormatter.ofPattern("dd/MM/yyyy")
+      DateTimeFormatter.ofPattern("dd/MM/yyyy"),
     )
     is LocalTime -> LocalTime.parse(
       sheet.getRow(row).getCell(col).stringCellValue,
-      DateTimeFormatter.ofPattern("HH:mm")
+      DateTimeFormatter.ofPattern("HH:mm"),
     )
     is MoveStatus -> MoveStatus.valueOf(sheet.getRow(row).getCell(col).stringCellValue)
     is MoveType -> MoveType.valueOf(sheet.getRow(row).getCell(col).stringCellValue)

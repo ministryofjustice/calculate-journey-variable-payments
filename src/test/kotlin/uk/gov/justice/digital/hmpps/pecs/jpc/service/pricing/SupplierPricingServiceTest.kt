@@ -53,7 +53,7 @@ internal class SupplierPricingServiceTest {
     priceInPence = 10024,
     fromLocation = fromLocation,
     toLocation = toLocation,
-    effectiveYear = effectiveYear
+    effectiveYear = effectiveYear,
   )
   private val priceCaptor = argumentCaptor<Price>()
   private val eventCaptor = argumentCaptor<AuditableEvent>()
@@ -68,8 +68,8 @@ internal class SupplierPricingServiceTest {
       priceRepository.findBySupplierAndFromLocationAndToLocation(
         Supplier.SERCO,
         fromLocation,
-        toLocation
-      )
+        toLocation,
+      ),
     ).thenReturn(null)
 
     val siteNames = service.getSiteNamesForPricing(Supplier.SERCO, "from", "to", effectiveYear)
@@ -81,7 +81,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       fromLocation,
       toLocation,
-      effectiveYear
+      effectiveYear,
     )
   }
 
@@ -94,7 +94,7 @@ internal class SupplierPricingServiceTest {
       "from",
       "to",
       Money.valueOf("100.24"),
-      effectiveYear
+      effectiveYear,
     )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -116,7 +116,7 @@ internal class SupplierPricingServiceTest {
         "from",
         "to",
         Money.valueOf("100.24"),
-        effectiveYear
+        effectiveYear,
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for SERCO")
 
@@ -131,7 +131,7 @@ internal class SupplierPricingServiceTest {
         "from",
         "to",
         Money.valueOf("100.24"),
-        effectiveYear - 2
+        effectiveYear - 2,
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Price changes can longer be made, change is outside of price change window.")
@@ -146,8 +146,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(sercoPrice)
 
     val existingPrice = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
@@ -156,8 +156,8 @@ internal class SupplierPricingServiceTest {
       SupplierPricingService.PriceDto(
         "from site",
         "to site",
-        Money.valueOf("100.24")
-      )
+        Money.valueOf("100.24"),
+      ),
     )
     verify(locationRepository).findByNomisAgencyId("FROM")
     verify(locationRepository).findByNomisAgencyId("TO")
@@ -165,7 +165,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       fromLocation,
       toLocation,
-      effectiveYear
+      effectiveYear,
     )
   }
 
@@ -176,8 +176,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(sercoPrice.addException(JANUARY, Money(200)))
 
     val existingPrice = service.maybePrice(Supplier.SERCO, "from", "to", effectiveYear)
@@ -186,8 +186,8 @@ internal class SupplierPricingServiceTest {
       SupplierPricingService.PriceDto(
         "from site",
         "to site",
-        Money.valueOf("100.24")
-      ).apply { exceptions[1] = Money(200) }
+        Money.valueOf("100.24"),
+      ).apply { exceptions[1] = Money(200) },
     )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -196,7 +196,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       fromLocation,
       toLocation,
-      effectiveYear
+      effectiveYear,
     )
   }
 
@@ -207,8 +207,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(sercoPrice)
     whenever(priceRepository.save(any())).thenReturn(sercoPrice)
 
@@ -217,7 +217,7 @@ internal class SupplierPricingServiceTest {
       "from",
       "to",
       sercoPrice.price(),
-      effectiveYear
+      effectiveYear,
     )
 
     verify(priceRepository, never()).save(any())
@@ -231,8 +231,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(sercoPrice)
     whenever(priceRepository.save(any())).thenReturn(sercoPrice)
 
@@ -241,7 +241,7 @@ internal class SupplierPricingServiceTest {
       "from",
       "to",
       Money.valueOf("200.35"),
-      effectiveYear
+      effectiveYear,
     )
 
     verify(locationRepository).findByNomisAgencyId("FROM")
@@ -250,7 +250,7 @@ internal class SupplierPricingServiceTest {
       Supplier.SERCO,
       fromLocation,
       toLocation,
-      effectiveYear
+      effectiveYear,
     )
     verify(priceRepository).save(sercoPrice)
     assertThat(sercoPrice.priceInPence).isEqualTo(20035)
@@ -268,7 +268,7 @@ internal class SupplierPricingServiceTest {
         "from",
         "to",
         Money.valueOf("200.35"),
-        effectiveYear
+        effectiveYear,
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for GEOAMEY")
 
@@ -283,7 +283,7 @@ internal class SupplierPricingServiceTest {
         "from",
         "to",
         Money.valueOf("200.35"),
-        effectiveYear - 2
+        effectiveYear - 2,
       )
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Price changes can longer be made, change is outside of price change window.")
@@ -300,8 +300,8 @@ internal class SupplierPricingServiceTest {
     whenever(
       auditService.auditEventsByTypeAndMetaKey(
         JOURNEY_PRICE,
-        "SERCO-FROM_AGENCY_ID-TO_AGENCY_ID"
-      )
+        "SERCO-FROM_AGENCY_ID-TO_AGENCY_ID",
+      ),
     ).thenReturn(listOf(sercoOriginalPriceEvent))
 
     val sercoPriceHistory = service.priceHistoryForJourney(Supplier.SERCO, "from_agency_id", "to_agency_id")
@@ -324,8 +324,8 @@ internal class SupplierPricingServiceTest {
     whenever(
       auditService.auditEventsByTypeAndMetaKey(
         JOURNEY_PRICE,
-        "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID"
-      )
+        "GEOAMEY-FROM_AGENCY_ID-TO_AGENCY_ID",
+      ),
     ).thenReturn(listOf(geoameyOriginalPriceEvent, geoameyPriceChangeEvent))
 
     val geoameyPriceHistory = service.priceHistoryForJourney(Supplier.GEOAMEY, "from_agency_id", "to_agency_id")
@@ -342,8 +342,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(sercoPrice)
 
     service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear, SEPTEMBER, Money.valueOf("20.00"))
@@ -368,8 +368,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(null)
 
     assertThatThrownBy {
@@ -385,10 +385,10 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(
-      sercoPrice.addException(JULY, Money.valueOf("500.00"))
+      sercoPrice.addException(JULY, Money.valueOf("500.00")),
     )
 
     val priceWithExceptionRemoved =
@@ -416,8 +416,8 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(null)
 
     assertThatThrownBy {
@@ -433,10 +433,10 @@ internal class SupplierPricingServiceTest {
         Supplier.SERCO,
         fromLocation,
         toLocation,
-        effectiveYear
-      )
+        effectiveYear,
+      ),
     ).thenReturn(
-      sercoPrice.addException(JULY, Money.valueOf("500.00"))
+      sercoPrice.addException(JULY, Money.valueOf("500.00")),
     )
 
     assertThatThrownBy {

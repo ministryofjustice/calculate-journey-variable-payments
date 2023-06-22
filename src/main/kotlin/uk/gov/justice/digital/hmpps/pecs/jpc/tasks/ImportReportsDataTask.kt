@@ -12,7 +12,7 @@ class ImportReportsDataTask(
   @Value("\${IMPORT_REPORTS_BACKDATE_ENABLED}") private val backDateEnabled: Boolean = false,
   private val service: ImportReportsService,
   private val timeSource: TimeSource,
-  monitoringService: MonitoringService
+  monitoringService: MonitoringService,
 ) : Task("Import reports data", monitoringService) {
 
   override fun performTask() {

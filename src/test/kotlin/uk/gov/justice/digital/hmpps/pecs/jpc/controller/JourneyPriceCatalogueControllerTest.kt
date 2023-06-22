@@ -52,7 +52,7 @@ class JourneyPriceCatalogueControllerTest(@Autowired private val wac: WebApplica
         header {
           string(
             "Content-Disposition",
-            "attachment;filename=Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx"
+            "attachment;filename=Journey_Variable_Payment_Output_SERCO_2020-10-13_15_25.xlsx",
           )
         }
       }
@@ -75,7 +75,7 @@ class JourneyPriceCatalogueControllerTest(@Autowired private val wac: WebApplica
         header {
           string(
             "Content-Disposition",
-            "attachment;filename=Journey_Variable_Payment_Output_GEOAMEY_2020-10-13_15_25.xlsx"
+            "attachment;filename=Journey_Variable_Payment_Output_GEOAMEY_2020-10-13_15_25.xlsx",
           )
         }
       }

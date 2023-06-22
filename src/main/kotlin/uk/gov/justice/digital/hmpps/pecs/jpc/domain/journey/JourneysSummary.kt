@@ -7,5 +7,5 @@ data class JourneysSummary(
   val totalPriceInPence: Int,
   val countWithoutLocations: Int,
   val countUnpriced: Int,
-  val supplier: Supplier
+  val supplier: Supplier,
 )

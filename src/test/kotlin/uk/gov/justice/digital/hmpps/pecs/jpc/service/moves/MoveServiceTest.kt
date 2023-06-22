@@ -40,8 +40,8 @@ internal class MoveServiceTest {
       moveQueryRepository.moveWithPersonAndJourneys(
         "M1",
         defaultSupplierSerco,
-        Month.SEPTEMBER
-      )
+        Month.SEPTEMBER,
+      ),
     ).thenReturn(move)
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(moveEvent))
 
@@ -52,20 +52,20 @@ internal class MoveServiceTest {
 
   @Test
   fun `journeys on the move are ordered by pickup datetime`() {
-    val journey1 = journeyJ1().copy(state = JourneyState.cancelled, dropOffDateTime = null)
+    val journey1 = journeyJ1().copy(state = JourneyState.Cancelled, dropOffDateTime = null)
 
     val journey2 = journey1.copy(
       journeyId = "J2",
       fromNomisAgencyId = "WYI",
       toNomisAgencyId = "BOG",
-      state = JourneyState.completed,
-      pickUpDateTime = journey1.pickUpDateTime?.plusMinutes(1)
+      state = JourneyState.Completed,
+      pickUpDateTime = journey1.pickUpDateTime?.plusMinutes(1),
     )
 
     val moveWithJourneysOutOfOrder = moveM1(journeys = listOf(journey2, journey1))
 
     whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(
-      moveWithJourneysOutOfOrder
+      moveWithJourneysOutOfOrder,
     )
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(eventE1()))
 
@@ -73,11 +73,11 @@ internal class MoveServiceTest {
       service.moveWithPersonJourneysAndEvents(
         "M1",
         defaultSupplierSerco,
-        Month.SEPTEMBER
-      )?.journeys
+        Month.SEPTEMBER,
+      )?.journeys,
     ).containsExactly(
       journey1,
-      journey2
+      journey2,
     )
   }
 
@@ -88,30 +88,30 @@ internal class MoveServiceTest {
       journeyEventJE1(eventType = EventType.JOURNEY_COMPLETE).copy(occurredAt = journeyEventJE1().occurredAt.plusHours(1))
 
     val journey = journeyJ1().copy(
-      state = JourneyState.cancelled,
+      state = JourneyState.Cancelled,
       dropOffDateTime = null,
-      events = listOf(journeyCompleteEvent, journeyStartEvent)
+      events = listOf(journeyCompleteEvent, journeyStartEvent),
     )
 
     val moveWithJourneyEventsOutOfOrder = moveM1(journeys = listOf(journey))
 
     whenever(moveQueryRepository.moveWithPersonAndJourneys("M1", defaultSupplierSerco, Month.SEPTEMBER)).thenReturn(
-      moveWithJourneyEventsOutOfOrder
+      moveWithJourneyEventsOutOfOrder,
     )
     whenever(eventRepository.findAllByEventableId("M1")).thenReturn(listOf(eventE1()))
     whenever((eventRepository.findByEventableIdIn(listOf(journey.journeyId)))).thenReturn(
       listOf(
         journeyCompleteEvent,
-        journeyStartEvent
-      )
+        journeyStartEvent,
+      ),
     )
 
     assertThat(
       service.moveWithPersonJourneysAndEvents(
         "M1",
         defaultSupplierSerco,
-        Month.SEPTEMBER
-      )!!.journeys.first().events
+        Month.SEPTEMBER,
+      )!!.journeys.first().events,
     ).containsExactly(journeyStartEvent, journeyCompleteEvent)
   }
 

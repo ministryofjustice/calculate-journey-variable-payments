@@ -20,13 +20,12 @@ typealias PriceId = UUID
 internal class SupplierPricesSheet(workbook: Workbook, private val header: Header) : PriceSheet(
   sheet = workbook.createSheet("JPC Price book"),
   header = header,
-  dataColumns = listOf(PICK_UP, DROP_OFF, UNIT_PRICE, UNIT_PRICE_EXCEPTION)
+  dataColumns = listOf(PICK_UP, DROP_OFF, UNIT_PRICE, UNIT_PRICE_EXCEPTION),
 ) {
   override fun writeMove(move: Move) {}
 
   fun write(prices: Stream<Price>, possiblePriceExceptions: Map<PriceId, List<PriceException>>) {
     prices.use {
-
       if (possiblePriceExceptions.isEmpty()) {
         prices.forEach {
           val row = createRow()
@@ -45,7 +44,7 @@ internal class SupplierPricesSheet(workbook: Workbook, private val header: Heade
           row.addCell(
             3,
             possiblePriceExceptions[it.id]?.first { pe -> pe.month == startOfMonth }?.price()?.pounds(),
-            fillWhitePound
+            fillWhitePound,
           )
         }
       }

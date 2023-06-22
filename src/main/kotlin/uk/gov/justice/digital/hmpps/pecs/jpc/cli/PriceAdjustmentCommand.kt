@@ -19,12 +19,13 @@ class PriceAdjustmentCommand(private val adjustmentsService: AnnualPriceAdjustme
     year: Int,
     inflationary: AdjustmentMultiplier,
     volumetric: AdjustmentMultiplier? = null,
-    details: String
+    details: String,
   ) {
-    if (!effectiveYear.canAddOrUpdatePrices(year))
+    if (!effectiveYear.canAddOrUpdatePrices(year)) {
       logger.warn(
-        "Price being adjusted before previous effective year '${effectiveYear.previous()}'. Subsequent years must be adjusted accordingly."
+        "Price being adjusted before previous effective year '${effectiveYear.previous()}'. Subsequent years must be adjusted accordingly.",
       )
+    }
 
     logger.info("Starting adjustment of prices for $supplier for effective year $year.")
 
@@ -37,7 +38,7 @@ class PriceAdjustmentCommand(private val adjustmentsService: AnnualPriceAdjustme
         volumetric,
         null,
         details,
-        true
+        true,
       )
     }
 

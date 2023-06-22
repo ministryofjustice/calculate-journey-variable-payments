@@ -23,7 +23,7 @@ class DateRangeTest {
 
     assertThat(range.listOf()).containsExactly(
       range(Month.JANUARY, Year.of(2021)),
-      DateRange(LocalDate.of(2021, 2, 1), LocalDate.of(2021, 2, 1))
+      DateRange(LocalDate.of(2021, 2, 1), LocalDate.of(2021, 2, 1)),
     )
   }
 
@@ -53,7 +53,7 @@ class DateRangeTest {
 
     assertThat(range.listOf()).containsExactly(
       range(Month.DECEMBER, Year.of(2021)),
-      range(Month.JANUARY, Year.of(2022))
+      range(Month.JANUARY, Year.of(2022)),
     )
   }
 

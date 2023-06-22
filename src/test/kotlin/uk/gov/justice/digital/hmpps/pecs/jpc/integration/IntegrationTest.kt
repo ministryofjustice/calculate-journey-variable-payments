@@ -23,7 +23,7 @@ import java.time.Duration
  */
 internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : FluentTest() {
 
-  private val logger = loggerFor <IntegrationTest>()
+  private val logger = loggerFor<IntegrationTest>()
 
   @FindBy(id = "sign-out")
   private lateinit var logoutButton: FluentWebElement

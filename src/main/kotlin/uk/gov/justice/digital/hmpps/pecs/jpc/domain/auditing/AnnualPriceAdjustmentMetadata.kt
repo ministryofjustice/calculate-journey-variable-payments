@@ -22,16 +22,17 @@ data class AnnualPriceAdjustmentMetadata(
   val multiplier: BigDecimal,
 
   @Json(name = "details", index = 4)
-  val details: String
+  val details: String,
 
 ) : Metadata {
   companion object {
 
     fun map(event: AuditEvent): AnnualPriceAdjustmentMetadata {
-      return if (event.eventType == AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT)
+      return if (event.eventType == AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT) {
         Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<AnnualPriceAdjustmentMetadata>(event.metadata!!)!!
-      else
+      } else {
         throw IllegalArgumentException("Audit event type is not a price event.")
+      }
     }
   }
 

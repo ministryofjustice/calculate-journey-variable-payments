@@ -82,8 +82,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
@@ -92,7 +92,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.")),
           )
         }
       }
@@ -113,8 +113,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        previousContractualEffectiveYear
-      )
+        previousContractualEffectiveYear,
+      ),
     ).thenReturn(Pair("from", "to"))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
@@ -123,7 +123,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year."))
+            listOf(Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")),
           )
         }
       }
@@ -142,8 +142,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        previousContractualEffectiveYear
-      )
+        previousContractualEffectiveYear,
+      ),
     ).thenReturn(Pair("from", "to"))
 
     whenever(
@@ -151,8 +151,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        actualEffectiveYear.current()
-      )
+        actualEffectiveYear.current(),
+      ),
     ).thenReturn(PriceDto("a", "b", Money(10)))
 
     mockMvc.get("/add-price/$fromAgencyId-$toAgencyId") { session = mockSession }
@@ -163,8 +163,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             "warnings",
             listOf(
               Warning("Please note a price for this journey already exists in the current contractual year ${actualEffectiveYear.current()} to ${actualEffectiveYear.current() + 1}."),
-              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
-            )
+              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year."),
+            ),
           )
         }
       }
@@ -208,7 +208,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       Money.valueOf("9999.99"),
-      currentContractualEffectiveYear
+      currentContractualEffectiveYear,
     )
   }
 
@@ -238,7 +238,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.")),
           )
         }
       }
@@ -262,7 +262,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.")),
           )
         }
       }
@@ -286,7 +286,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.")),
           )
         }
       }
@@ -305,8 +305,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("from", "to", Money(1000)).apply { exceptions[7] = Money(100) })
 
     val priceHistoryDateTime = LocalDateTime.now()
@@ -315,7 +315,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       currentContractualEffectiveYear,
-      Money.valueOf("10.00").pounds()
+      Money.valueOf("10.00").pounds(),
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
@@ -327,7 +327,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by GEOAMEY in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}."))
+            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by GEOAMEY in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.")),
           )
         }
       }
@@ -339,9 +339,9 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
               PriceHistoryDto(
                 priceHistoryDateTime,
                 "Journey priced at £10.00. Effective from $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.",
-                "SYSTEM"
-              )
-            )
+                "SYSTEM",
+              ),
+            ),
           )
         }
       }
@@ -349,7 +349,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         model {
           attribute(
             "existingExceptions",
-            listOf(PriceExceptionMonth(Month.JULY, true, currentContractualEffectiveYear + 1, Money(100)))
+            listOf(PriceExceptionMonth(Month.JULY, true, currentContractualEffectiveYear + 1, Money(100))),
           )
         }
       }
@@ -361,8 +361,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
               "$fromAgencyId-$toAgencyId",
               mapOf(7 to Money(100)),
               effectiveYear = currentContractualEffectiveYear,
-              exceptionPrice = "0.00"
-            )
+              exceptionPrice = "0.00",
+            ),
           )
         }
       }
@@ -382,8 +382,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("from", "to", Money(1000)).apply { exceptions[7] = Money(100) })
 
     val priceHistoryDateTime = LocalDateTime.now()
@@ -392,7 +392,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       currentContractualEffectiveYear,
-      Money.valueOf("10.00").pounds()
+      Money.valueOf("10.00").pounds(),
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
@@ -407,9 +407,9 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
               PriceHistoryDto(
                 priceHistoryDateTime,
                 "Journey priced at £10.00. Effective from $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.",
-                "SYSTEM"
-              )
-            )
+                "SYSTEM",
+              ),
+            ),
           )
         }
       }
@@ -428,8 +428,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        previousContractualEffectiveYear
-      )
+        previousContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("from", "to", Money.valueOf("10.00")))
 
     val priceHistory = PriceMetadata(
@@ -437,7 +437,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       previousContractualEffectiveYear,
-      Money.valueOf("10.00").pounds()
+      Money.valueOf("10.00").pounds(),
     )
 
     val priceHistoryDateTime = LocalDateTime.now()
@@ -452,8 +452,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
           attribute(
             "warnings",
             listOf(
-              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
-            )
+              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year."),
+            ),
           )
         }
       }
@@ -465,9 +465,9 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
               PriceHistoryDto(
                 priceHistoryDateTime,
                 "Journey priced at £10.00. Effective from $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}.",
-                "SYSTEM"
-              )
-            )
+                "SYSTEM",
+              ),
+            ),
           )
         }
       }
@@ -486,8 +486,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        previousContractualEffectiveYear
-      )
+        previousContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("from", "to", Money(1000)))
 
     whenever(
@@ -495,8 +495,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         GEOAMEY,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("from", "to", Money(1500)))
 
     val priceHistoryDateTime = LocalDateTime.now()
@@ -505,7 +505,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       previousContractualEffectiveYear,
-      Money.valueOf("10.00").pounds()
+      Money.valueOf("10.00").pounds(),
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, priceHistoryDateTime, "_TERMINAL_", priceHistory)
 
@@ -519,8 +519,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
             "warnings",
             listOf(
               Warning("Please note a price for this journey already exists in the current contractual year ${actualEffectiveYear.current()} to ${actualEffectiveYear.current() + 1}."),
-              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
-            )
+              Warning("Making this change will only affect journeys undertaken in the contractual year $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year."),
+            ),
           )
         }
       }
@@ -532,9 +532,9 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
               PriceHistoryDto(
                 priceHistoryDateTime,
                 "Journey priced at £10.00. Effective from $previousContractualEffectiveYear to ${previousContractualEffectiveYear + 1}.",
-                "SYSTEM"
-              )
-            )
+                "SYSTEM",
+              ),
+            ),
           )
         }
       }
@@ -562,8 +562,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("a", "b", Money(10)))
 
     mockMvc.post("/add-price-exception") {
@@ -586,7 +586,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       toAgencyId,
       currentContractualEffectiveYear,
       Month.SEPTEMBER,
-      Money.valueOf("50.00")
+      Money.valueOf("50.00"),
     )
   }
 
@@ -599,8 +599,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("a", "b", Money(10)))
 
     mockMvc.post("/add-price-exception") {
@@ -625,8 +625,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         SERCO,
         fromAgencyId,
         toAgencyId,
-        currentContractualEffectiveYear
-      )
+        currentContractualEffectiveYear,
+      ),
     ).thenReturn(PriceDto("a", "b", Money(100)))
 
     mockMvc.post("/add-price-exception") {
@@ -652,8 +652,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
         fromAgencyId,
         toAgencyId,
         currentContractualEffectiveYear,
-        Month.SEPTEMBER
-      )
+        Month.SEPTEMBER,
+      ),
     ).thenReturn(PriceDto("a", "b", Money(100)))
 
     mockMvc.post("/remove-price-exception") {
@@ -673,7 +673,7 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       fromAgencyId,
       toAgencyId,
       currentContractualEffectiveYear,
-      Month.SEPTEMBER
+      Month.SEPTEMBER,
     )
   }
 

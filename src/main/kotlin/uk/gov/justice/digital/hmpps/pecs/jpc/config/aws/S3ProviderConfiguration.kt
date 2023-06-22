@@ -34,9 +34,8 @@ class S3ProviderConfiguration {
     @Value("\${resources.endpoint.url:}") endpoint: String,
     @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
     @Value("\${JPC_AWS_ACCESS_KEY_ID:}") accessKey: String,
-    @Value("\${JPC_AWS_SECRET_ACCESS_KEY:}") secretKey: String
+    @Value("\${JPC_AWS_SECRET_ACCESS_KEY:}") secretKey: String,
   ): AmazonS3 {
-
     return amazonS3(endpoint, region, accessKey, secretKey)
   }
 
@@ -46,9 +45,8 @@ class S3ProviderConfiguration {
     @Value("\${resources.endpoint.url:}") endpoint: String,
     @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
     @Value("\${BASM_AWS_ACCESS_KEY_ID:}") accessKey: String,
-    @Value("\${BASM_AWS_SECRET_ACCESS_KEY:}") secretKey: String
+    @Value("\${BASM_AWS_SECRET_ACCESS_KEY:}") secretKey: String,
   ): AmazonS3 {
-
     return amazonS3(endpoint, region, accessKey, secretKey)
   }
 
@@ -68,7 +66,7 @@ class S3ProviderConfiguration {
       AmazonS3ClientBuilder.standard()
         .withRegion(region)
         .withCredentials(
-          AWSStaticCredentialsProvider(awsCreds)
+          AWSStaticCredentialsProvider(awsCreds),
         )
     }
 
@@ -80,7 +78,7 @@ class S3ProviderConfiguration {
   fun locationsResourceProvider(
     @Qualifier("jpcAmazonS3") client: AmazonS3,
     @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-    @Value("\${import-files.locations}") locationsFile: String
+    @Value("\${import-files.locations}") locationsFile: String,
   ): Schedule34LocationsProvider {
     logger.info("Using AWS S3 provider for Schedule 34 locations file: $locationsFile")
 
@@ -95,7 +93,7 @@ class S3ProviderConfiguration {
   fun sercoPricesResourceProvider(
     @Qualifier("jpcAmazonS3") client: AmazonS3,
     @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-    @Value("\${import-files.serco-prices}") sercoPricesFile: String
+    @Value("\${import-files.serco-prices}") sercoPricesFile: String,
   ): SercoPricesProvider {
     logger.info("Using AWS S3 provider for Serco prices file: $sercoPricesFile")
     return SercoPricesProvider {
@@ -109,7 +107,7 @@ class S3ProviderConfiguration {
   fun geoameyPricesResourceProvider(
     @Qualifier("jpcAmazonS3") client: AmazonS3,
     @Value("\${JPC_BUCKET_NAME}") bucketName: String,
-    @Value("\${import-files.geo-prices}") geoPricesFile: String
+    @Value("\${import-files.geo-prices}") geoPricesFile: String,
   ): GeoameyPricesProvider {
     logger.info("Using AWS S3 provider for Geoamey prices file: $geoPricesFile")
     return GeoameyPricesProvider {
@@ -122,7 +120,7 @@ class S3ProviderConfiguration {
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
   fun reportingResourceProvider(
     @Qualifier("basmAmazonS3") client: AmazonS3,
-    @Value("\${BASM_BUCKET_NAME}") bucketName: String
+    @Value("\${BASM_BUCKET_NAME}") bucketName: String,
   ): ReportingProvider {
     logger.info("Using AWS S3 resource provider for move.")
     return ReportingProvider {
@@ -135,7 +133,7 @@ class S3ProviderConfiguration {
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
   fun reportLookup(
     @Qualifier("basmAmazonS3") client: AmazonS3,
-    @Value("\${BASM_BUCKET_NAME}") bucketName: String
+    @Value("\${BASM_BUCKET_NAME}") bucketName: String,
   ): ReportLookup {
     return ReportLookup { client.doesObjectExist(bucketName, it) }
   }
@@ -145,7 +143,7 @@ class S3ProviderConfiguration {
   fun streamingReportParser(
     @Qualifier("basmAmazonS3") client: AmazonS3,
     @Value("\${BASM_BUCKET_NAME}") bucketName: String,
-    @Value("\${SENTRY_ENVIRONMENT:}") env: String
+    @Value("\${SENTRY_ENVIRONMENT:}") env: String,
   ): StreamingReportParser {
     return if (env.trim().uppercase() == "LOCAL") {
       logger.warn("Running parser in PII obfuscation mode")
@@ -154,9 +152,9 @@ class S3ProviderConfiguration {
           client.getObject(
             GetObjectRequest(
               bucketName,
-              it
-            )
-          ).objectContent
+              it,
+            ),
+          ).objectContent,
         )
       }
     } else {
@@ -166,9 +164,9 @@ class S3ProviderConfiguration {
           client.getObject(
             GetObjectRequest(
               bucketName,
-              it
-            )
-          ).objectContent
+              it,
+            ),
+          ).objectContent,
         )
       }
     }

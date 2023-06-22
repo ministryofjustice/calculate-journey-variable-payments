@@ -30,9 +30,9 @@ import javax.validation.constraints.NotNull
     Index(
       name = "supplier_from_to_year_index",
       columnList = "supplier, from_location_id, to_location_id, effective_year",
-      unique = true
-    )
-  ]
+      unique = true,
+    ),
+  ],
 )
 data class Price(
   @Id
@@ -84,7 +84,7 @@ data class Price(
     id = UUID.randomUUID(),
     priceInPence = amount.pence,
     effectiveYear = effectiveYear,
-    addedAt = addedAt
+    addedAt = addedAt,
   )
 
   /**
@@ -136,7 +136,8 @@ data class Price(
 enum class Supplier {
   SERCO,
   GEOAMEY,
-  UNKNOWN;
+  UNKNOWN,
+  ;
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =

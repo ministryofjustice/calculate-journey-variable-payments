@@ -35,7 +35,7 @@ internal class AutomaticLocationMappingServiceTest {
     locationRepository,
     timeSource,
     auditService,
-    monitoringService
+    monitoringService,
   )
 
   @Test
@@ -81,12 +81,12 @@ internal class AutomaticLocationMappingServiceTest {
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(
       listOf(
         basmLocationOne,
-        basmLocationTwo
-      )
+        basmLocationTwo,
+      ),
     )
     whenever(locationRepository.save(any())).thenReturn(
       Location(LocationType.CRT, "AGENCY_ONE_ID", "ONE"),
-      Location(LocationType.PB, "AGENCY_TWO_ID", "TWO")
+      Location(LocationType.PB, "AGENCY_TWO_ID", "TWO"),
     )
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
@@ -121,14 +121,14 @@ internal class AutomaticLocationMappingServiceTest {
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(
       listOf(
-        duplicateBasmLocation
-      )
+        duplicateBasmLocation,
+      ),
     )
     whenever(
       locationRepository.findByNomisAgencyIdOrSiteName(
         "AGENCY_ID",
-        "NAME"
-      )
+        "NAME",
+      ),
     ).thenReturn(listOf(duplicateLocation))
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
@@ -150,8 +150,8 @@ internal class AutomaticLocationMappingServiceTest {
     whenever(locationRepository.findByNomisAgencyIdOrSiteName("AGENCY_ID", "NAME")).thenReturn(
       listOf(
         location1,
-        location2
-      )
+        location2,
+      ),
     )
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())

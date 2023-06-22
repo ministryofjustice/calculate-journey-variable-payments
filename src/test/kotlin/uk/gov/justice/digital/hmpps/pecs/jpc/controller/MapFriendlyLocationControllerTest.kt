@@ -57,7 +57,7 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
         model {
           attribute(
             "form",
-            MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName)
+            MapFriendlyLocationController.MapLocationForm(agencyId, nomisLocationName = nomisLocationName),
           )
         }
       }
@@ -81,8 +81,8 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
             "form",
             MapFriendlyLocationController.MapLocationForm(
               agencyId,
-              nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
-            )
+              nomisLocationName = "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.",
+            ),
           )
         }
       }
@@ -106,9 +106,9 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
           AuditEventType.LOCATION,
           auditEventDatetime,
           "Jane",
-          auditEventMetadata
-        )
-      )
+          auditEventMetadata,
+        ),
+      ),
     )
 
     whenever(basmClientApiService.findNomisAgencyLocationNameBy(agencyId)).thenReturn(nomisLocationName)
@@ -123,8 +123,8 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
               "EXISTING LOCATION",
               LocationType.CC,
               "update",
-              nomisLocationName
-            )
+              nomisLocationName,
+            ),
           )
         }
       }
@@ -136,9 +136,9 @@ internal class MapFriendlyLocationControllerTest(@Autowired private val wac: Web
               LocationHistoryDto(
                 auditEventDatetime,
                 "Assigned to location name 'EXISTING LOCATION' and type 'Crown Court'",
-                "Jane"
-              )
-            )
+                "Jane",
+              ),
+            ),
           )
         }
       }

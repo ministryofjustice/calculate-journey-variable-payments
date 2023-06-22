@@ -60,8 +60,8 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
       Location(
         LocationType.PR,
         "AGENCY_ID",
-        "LOCATION NAME"
-      )
+        "LOCATION NAME",
+      ),
     )
 
     mockMvc.post("/search-locations") {
@@ -87,9 +87,9 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
           AuditEventType.LOCATION,
           auditEventDatetime,
           "Jane",
-          auditEventMetadata
-        )
-      )
+          auditEventMetadata,
+        ),
+      ),
     )
 
     mockMvc.get("/manage-location/ABCDEF")
@@ -101,8 +101,8 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
               agencyId,
               agencyName,
               LocationType.CC,
-              "DIFFERENT AGENCY NAME"
-            )
+              "DIFFERENT AGENCY NAME",
+            ),
           )
         }
       }
@@ -114,9 +114,9 @@ class ManageSchedule34LocationsControllerTest(@Autowired private val wac: WebApp
               LocationHistoryDto(
                 auditEventDatetime,
                 "Assigned to location name 'AGENCY NAME' and type 'Crown Court'",
-                "Jane"
-              )
-            )
+                "Jane",
+              ),
+            ),
           )
         }
       }

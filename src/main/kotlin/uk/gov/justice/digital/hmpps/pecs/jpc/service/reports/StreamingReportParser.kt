@@ -37,7 +37,7 @@ class ObfuscatingStreamingReportParser(private val reader: (String) -> Reader) :
             firstNames = randomString(20),
             lastName = randomString(20),
             dateOfBirth = LocalDate.of(1800, 1, 1),
-            ethnicity = "Other"
+            ethnicity = "Other",
           ) as ENTITY
           else -> entity
         }

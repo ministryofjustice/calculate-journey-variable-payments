@@ -24,13 +24,13 @@ internal class PriceRepositoryTest {
   private val fromLocation = Location(
     nomisAgencyId = "FROM_AGENCY",
     locationType = LocationType.PR,
-    siteName = "FROM AGENCY"
+    siteName = "FROM AGENCY",
   )
 
   private val toLocation = Location(
     nomisAgencyId = "TO_AGENCY",
     locationType = LocationType.PR,
-    siteName = "TO AGENCY"
+    siteName = "TO AGENCY",
   )
 
   @BeforeEach
@@ -46,7 +46,7 @@ internal class PriceRepositoryTest {
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     )
 
     assertThat(priceRepo.findById(priceRepo.saveAndFlush(price).id)).hasValue(price)
@@ -59,7 +59,7 @@ internal class PriceRepositoryTest {
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     )
 
     assertThat(priceRepo.saveAndFlush(priceWithoutException).exceptions()).isEmpty()
@@ -71,7 +71,7 @@ internal class PriceRepositoryTest {
     }
 
     assertThat(
-      priceRepo.saveAndFlush(priceWithExceptions).exceptions().map { Pair(Month.of(it.month), it.priceInPence) }
+      priceRepo.saveAndFlush(priceWithExceptions).exceptions().map { Pair(Month.of(it.month), it.priceInPence) },
     ).containsExactlyInAnyOrder(
       Pair(Month.SEPTEMBER, 9),
       Pair(Month.OCTOBER, 10),
@@ -84,7 +84,7 @@ internal class PriceRepositoryTest {
       Pair(Month.MAY, 5),
       Pair(Month.JUNE, 6),
       Pair(Month.JULY, 7),
-      Pair(Month.AUGUST, 8)
+      Pair(Month.AUGUST, 8),
     )
   }
 
@@ -95,7 +95,7 @@ internal class PriceRepositoryTest {
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     ).apply { addException(Month.JANUARY, Money(1)) }
 
     assertThat(priceRepo.saveAndFlush(priceWithException).exceptions()).isNotEmpty

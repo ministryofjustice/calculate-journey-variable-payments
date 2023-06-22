@@ -79,7 +79,7 @@ internal class BulkPriceImportCommandTest {
     assertThatThrownBy {
       command.bulkImportPricesFor(
         Supplier.GEOAMEY,
-        2021
+        2021,
       )
     }.isInstanceOf(RuntimeException::class.java)
   }
@@ -89,7 +89,7 @@ internal class BulkPriceImportCommandTest {
     assertThatThrownBy {
       command.bulkImportPricesFor(
         Supplier.UNKNOWN,
-        2019
+        2019,
       )
     }.isInstanceOf(RuntimeException::class.java)
   }

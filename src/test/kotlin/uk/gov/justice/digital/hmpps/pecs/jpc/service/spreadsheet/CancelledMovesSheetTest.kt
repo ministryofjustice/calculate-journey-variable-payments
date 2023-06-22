@@ -11,14 +11,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 
 internal class CancelledMovesSheetTest {
 
-  private val move = moveM1(journeys = listOf(journeyJ1(state = JourneyState.cancelled)))
+  private val move = moveM1(journeys = listOf(journeyJ1(state = JourneyState.Cancelled)))
   private val cancelledMovesSheet = CancelledMovesSheet(
     SXSSFWorkbook(),
     PriceSheet.Header(
       defaultMoveDate10Sep2020,
       DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-      Supplier.SERCO
-    )
+      Supplier.SERCO,
+    ),
   )
 
   @Test
@@ -28,7 +28,7 @@ internal class CancelledMovesSheetTest {
     assertOnSheetName(cancelledMovesSheet, "Cancelled")
     assertOnSubheading(
       cancelledMovesSheet,
-      "CANCELLED MOVES (includes prison to prison transfer moves that have been cancelled by the population management unit after 3pm on the day before the move)"
+      "CANCELLED MOVES (includes prison to prison transfer moves that have been cancelled by the population management unit after 3pm on the day before the move)",
     )
     assertOnColumnDataHeadings(
       cancelledMovesSheet,
@@ -42,7 +42,7 @@ internal class CancelledMovesSheetTest {
       "Cancellation time",
       "NOMIS prison ID",
       "Price",
-      "Notes"
+      "Notes",
     )
 
     assertCellEquals(cancelledMovesSheet, 9, 0, "REF1")

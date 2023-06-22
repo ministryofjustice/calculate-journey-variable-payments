@@ -20,7 +20,7 @@ class AnnualPriceAdjuster(
   private val priceRepository: PriceRepository,
   private val priceAdjustmentRepository: PriceAdjustmentRepository,
   private val auditService: AuditService,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
 ) {
 
   internal fun isInProgressFor(supplier: Supplier) = priceAdjustmentRepository.existsPriceAdjustmentBySupplier(supplier)
@@ -52,7 +52,7 @@ class AnnualPriceAdjuster(
     supplier: Supplier,
     effectiveYear: Int,
     multiplier: AdjustmentMultiplier,
-    basedOnPreviousYearsPrices: Boolean
+    basedOnPreviousYearsPrices: Boolean,
   ): Int {
     priceAdjustmentRepository.failIfLockNotPresent(id, supplier)
 
@@ -74,15 +74,15 @@ class AnnualPriceAdjuster(
         supplier = supplier,
         addedAt = timeSource.dateTime(),
         multiplier = multiplier.value,
-        effectiveYear = effectiveYear
-      )
+        effectiveYear = effectiveYear,
+      ),
     ).id
 
   private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(
     supplier: Supplier,
     effectiveYear: Int,
     multiplier: AdjustmentMultiplier,
-    basedOnPreviousYearsPrices: Boolean
+    basedOnPreviousYearsPrices: Boolean,
   ): Int {
     var adjustments = 0
 
@@ -131,7 +131,7 @@ class AnnualPriceAdjuster(
     price.adjusted(
       amount = multiplier * price.price(),
       effectiveYear = effectiveYear,
-      addedAt = timeSource.dateTime()
+      addedAt = timeSource.dateTime(),
     )
 
   private fun maybeExistingAdjustedPrice(price: Price, effectiveYear: Int) =
@@ -139,7 +139,7 @@ class AnnualPriceAdjuster(
       price.supplier,
       price.fromLocation,
       price.toLocation,
-      effectiveYear
+      effectiveYear,
     )
 
   internal fun releaseLockForPriceAdjustment(id: UUID) {

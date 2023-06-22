@@ -32,12 +32,12 @@ internal class PriceTest {
       toLocation = mock(),
       effectiveYear = 2020,
       priceInPence = 1000,
-      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
     )
     val adjustedPrice = originalPrice.adjusted(
       amount = Money(2000),
       effectiveYear = 2021,
-      addedAt = LocalDate.of(2021, 7, 27).atStartOfDay()
+      addedAt = LocalDate.of(2021, 7, 27).atStartOfDay(),
     )
 
     with(originalPrice) {
@@ -68,7 +68,7 @@ internal class PriceTest {
       toLocation = mock(),
       effectiveYear = 2020,
       priceInPence = 1,
-      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
     )
 
     assertThatThrownBy {
@@ -78,7 +78,7 @@ internal class PriceTest {
         toLocation = mock(),
         effectiveYear = 2020,
         priceInPence = 0,
-        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
       )
     }
       .isInstanceOf(IllegalArgumentException::class.java)
@@ -90,7 +90,7 @@ internal class PriceTest {
         toLocation = mock(),
         effectiveYear = 2020,
         priceInPence = -1,
-        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay()
+        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
       )
     }
       .isInstanceOf(IllegalArgumentException::class.java)
@@ -103,7 +103,7 @@ internal class PriceTest {
       fromLocation = mock(),
       toLocation = mock(),
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     )
 
     assertThat(price.exceptions()).isEmpty()
@@ -116,7 +116,7 @@ internal class PriceTest {
     assertThat(price.exceptions().map { Pair(Month.of(it.month), it.priceInPence) }).containsExactlyInAnyOrder(
       Pair(JANUARY, 1),
       Pair(FEBRUARY, 2),
-      Pair(DECEMBER, 12)
+      Pair(DECEMBER, 12),
     )
   }
 
@@ -127,7 +127,7 @@ internal class PriceTest {
       fromLocation = mock(),
       toLocation = mock(),
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     ).addException(JANUARY, Money(1))
       .addException(DECEMBER, Money(12))
       .addException(FEBRUARY, Money(2))
@@ -138,8 +138,8 @@ internal class PriceTest {
       assertThat(exceptionFor(DECEMBER)?.let { Pair(Month.of(it.month), it.priceInPence) }).isEqualTo(
         Pair(
           DECEMBER,
-          12
-        )
+          12,
+        ),
       )
       assertThat(exceptionFor(MARCH)).isNull()
     }
@@ -152,7 +152,7 @@ internal class PriceTest {
       fromLocation = mock(),
       toLocation = mock(),
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     )
 
     assertThat(price.exceptions()).isEmpty()
@@ -184,7 +184,7 @@ internal class PriceTest {
       fromLocation = mock(),
       toLocation = mock(),
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     )
 
     assertThat(price.exceptions()).isEmpty()
@@ -197,7 +197,7 @@ internal class PriceTest {
 
     assertThat(price.exceptions().map { Pair(Month.of(it.month), it.priceInPence) }).containsExactlyInAnyOrder(
       Pair(JANUARY, 1),
-      Pair(FEBRUARY, 2)
+      Pair(FEBRUARY, 2),
     )
   }
 
@@ -208,7 +208,7 @@ internal class PriceTest {
       fromLocation = mock(),
       toLocation = mock(),
       priceInPence = 1000,
-      effectiveYear = 2021
+      effectiveYear = 2021,
     )
 
     assertThat(price.exceptions()).isEmpty()

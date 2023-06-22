@@ -10,7 +10,6 @@ class ReportJourneyParserTest {
 
   @Test
   fun `Journey can be created from JSON with unknown state and unknown supplier`() {
-
     val from = fromPrisonNomisAgencyId()
     val to = notMappedNomisAgencyId()
 
@@ -26,7 +25,7 @@ class ReportJourneyParserTest {
     assertThat(parsedJourney!!.fromNomisAgencyId).isEqualTo(expectedJourney.fromNomisAgencyId)
     assertThat(parsedJourney.toNomisAgencyId).isEqualTo(expectedJourney.toNomisAgencyId)
     assertThat(parsedJourney.vehicleRegistrations()).isEqualTo("UHE-92")
-    assertThat(parsedJourney.state).isEqualTo(JourneyState.unknown)
+    assertThat(parsedJourney.state).isEqualTo(JourneyState.Unknown)
     assertThat(parsedJourney.supplier).isEqualTo(Supplier.UNKNOWN)
   }
 }

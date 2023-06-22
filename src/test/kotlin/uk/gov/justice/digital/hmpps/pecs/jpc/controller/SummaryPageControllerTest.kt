@@ -109,7 +109,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
     val move = moveM1(moveDate = LocalDate.of(2022, 4, 27))
 
     whenever(moveService.moveWithPersonJourneysAndEvents(move.moveId, defaultSupplierSerco, Month.FEBRUARY)).thenReturn(
-      move
+      move,
     )
 
     mockSession.setAttribute("date", LocalDate.of(2021, 2, 1))
@@ -129,8 +129,8 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
       moveService.moveWithPersonJourneysAndEvents(
         move.moveId,
         defaultSupplierSerco,
-        Month.SEPTEMBER
-      )
+        Month.SEPTEMBER,
+      ),
     ).thenReturn(null)
 
     mockSession.setAttribute("date", LocalDate.of(2021, 9, 1))
@@ -160,7 +160,6 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
 
   @Test
   internal fun `find a move by a non-existent reference id calls the move service then redirects to search form`() {
-
     whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
@@ -175,7 +174,6 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
 
   @Test
   internal fun `find a move by invalid reference id redirects to search form without calling the move service`() {
-
     whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(moveM1())
 
     mockMvc.post("/find-move") {
@@ -190,7 +188,6 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
 
   @Test
   internal fun `find a move by move not found redirects to search form without calling the move service`() {
-
     whenever(moveService.findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)).thenReturn(null)
 
     mockMvc.post("/find-move") {
@@ -209,8 +206,8 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
     whenever(
       moveService.findMoveByReferenceAndSupplier(
         "REF1",
-        defaultSupplierSerco
-      )
+        defaultSupplierSerco,
+      ),
     ).thenThrow(RuntimeException("Something has gone wrong"))
 
     mockMvc.post("/find-move") {
@@ -227,15 +224,15 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
   @ValueSource(strings = ["STANDARD", "CANCELLED", "LONG_HAUL", "REDIRECTION", "LOCKOUT", "MULTI"])
   internal fun `find moves by all types`(moveType: MoveType) {
     whenever(
-      moveService.movesForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1))
+      moveService.movesForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1)),
     ).thenReturn(
-      listOf(moveM1())
+      listOf(moveM1()),
     )
 
     whenever(
-      moveService.summaryForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1))
+      moveService.summaryForMoveType(Supplier.SERCO, moveType, LocalDate.of(2022, 4, 1)),
     ).thenReturn(
-      MovesTypeSummary(1, MovesSummary(moveType = moveType))
+      MovesTypeSummary(1, MovesSummary(moveType = moveType)),
     )
 
     mockSession.setAttribute("startOfMonthDate", LocalDate.of(2022, 4, 1))

@@ -107,7 +107,7 @@ class SecurityConfiguration<S : Session> {
       DefaultOAuth2User(
         jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
         user.attributes,
-        "name"
+        "name",
       )
     }
   }

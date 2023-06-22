@@ -57,7 +57,7 @@ internal class MoveQueryRepositoryTest {
   private val gni = GNICourtLocation()
 
   private val standardMoveSerco = moveM1(
-    dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5)
+    dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5),
   ) // should appear before the one above
 
   private val journeyModel1Serco = journeyJ1()
@@ -80,8 +80,8 @@ internal class MoveQueryRepositoryTest {
         toLocation = gni,
         priceInPence = 999,
         supplier = defaultSupplierSerco,
-        effectiveYear = 2020
-      )
+        effectiveYear = 2020,
+      ),
     )
 
     priceRepository.save(
@@ -91,8 +91,8 @@ internal class MoveQueryRepositoryTest {
         toLocation = gni,
         priceInPence = 666,
         supplier = Supplier.GEOAMEY,
-        effectiveYear = 2020
-      )
+        effectiveYear = 2020,
+      ),
     )
 
     moveRepository.save(standardMoveSerco)
@@ -121,8 +121,8 @@ internal class MoveQueryRepositoryTest {
       moveQueryRepository.moveWithPersonAndJourneys(
         sercoMoveWithMissingType.moveId,
         sercoMoveWithMissingType.supplier,
-        Month.SEPTEMBER
-      )
+        Month.SEPTEMBER,
+      ),
     ).isNull()
   }
 
@@ -132,7 +132,7 @@ internal class MoveQueryRepositoryTest {
       defaultSupplierSerco,
       defaultMoveTypeStandard,
       defaultMoveDate10Sep2020,
-      defaultMoveDate10Sep2020
+      defaultMoveDate10Sep2020,
     )[0]
     // Move should be priced
     assertThat(move.hasPrice()).isTrue
@@ -176,7 +176,6 @@ internal class MoveQueryRepositoryTest {
 
   @Test
   fun `find all moves for Serco for move type in date range with non billable journey`() {
-
     val nonBillableJourney = journeyJ1(journeyId = "J3", billable = false)
     val journeyWithoutDropOffDate = journeyJ1(journeyId = "J4", pickUpDateTime = null, dropOffDateTime = null)
 
@@ -189,7 +188,7 @@ internal class MoveQueryRepositoryTest {
       defaultSupplierSerco,
       defaultMoveTypeStandard,
       defaultMoveDate10Sep2020,
-      defaultMoveDate10Sep2020
+      defaultMoveDate10Sep2020,
     )[0]
 
     assertThat(move.journeys.size).isEqualTo(4)
@@ -206,7 +205,6 @@ internal class MoveQueryRepositoryTest {
 
   @Test
   fun `all summaries for Serco`() {
-
     val moveWithUnbillableJourney = standardMoveSerco.copy(moveId = "M2")
     val journey3 = journeyJ1(moveId = "M2", journeyId = "J3", billable = false)
 
@@ -229,7 +227,7 @@ internal class MoveQueryRepositoryTest {
       defaultSupplierSerco,
       defaultMoveDate10Sep2020,
       defaultMoveDate10Sep2020,
-      4
+      4,
     )
     assertThat(summaries).containsExactly(MovesSummary(defaultMoveTypeStandard, 1.0, 4, 2, 1998))
   }
@@ -240,8 +238,8 @@ internal class MoveQueryRepositoryTest {
       moveQueryRepository.moveCountInDateRange(
         defaultSupplierSerco,
         defaultMoveDate10Sep2020,
-        defaultMoveDate10Sep2020
-      )
+        defaultMoveDate10Sep2020,
+      ),
     ).isEqualTo(1)
   }
 
@@ -251,8 +249,8 @@ internal class MoveQueryRepositoryTest {
       moveQueryRepository.moveCountInDateRange(
         Supplier.GEOAMEY,
         defaultMoveDate10Sep2020,
-        defaultMoveDate10Sep2020
-      )
+        defaultMoveDate10Sep2020,
+      ),
     ).isEqualTo(1)
   }
 
@@ -280,7 +278,7 @@ internal class MoveQueryRepositoryTest {
         Supplier.GEOAMEY,
         defaultMoveDate10Sep2020,
         defaultMoveDate10Sep2020,
-      )
+      ),
     ).hasSize(2)
   }
 }

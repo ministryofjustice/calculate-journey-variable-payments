@@ -8,7 +8,8 @@ enum class MoveType(val label: String, val description: String, val hasMoveType:
   REDIRECTION("Redirection", "a redirection after the move has started", MoveFilterer::isRedirectionMove),
   LOCKOUT("Lockout", "refused admission to prison", MoveFilterer::isLockoutMove),
   MULTI("Multi type", "includes combinations of standard, long haul, redirection and lockout", MoveFilterer::isMultiTypeMove),
-  CANCELLED("Cancelled", "prison to prison moves cancelled by PMU later than 3pm the day before the move date", MoveFilterer::isCancelledBillableMove);
+  CANCELLED("Cancelled", "prison to prison moves cancelled by PMU later than 3pm the day before the move date", MoveFilterer::isCancelledBillableMove),
+  ;
 
   companion object {
     fun valueOfCaseInsensitive(value: String): MoveType {

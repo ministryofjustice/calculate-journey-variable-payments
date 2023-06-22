@@ -24,7 +24,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SupplierPricingServiceIntegrationTest(
   @Autowired private val locationRepository: LocationRepository,
-  @Autowired private val service: SupplierPricingService
+  @Autowired private val service: SupplierPricingService,
 ) {
 
   @BeforeAll
@@ -33,16 +33,16 @@ internal class SupplierPricingServiceIntegrationTest(
       Location(
         LocationType.PR,
         "PRISON1",
-        "PRISON ONE"
-      )
+        "PRISON ONE",
+      ),
     )
 
     locationRepository.save(
       Location(
         LocationType.PR,
         "PRISON2",
-        "PRISON TWO"
-      )
+        "PRISON TWO",
+      ),
     )
   }
 

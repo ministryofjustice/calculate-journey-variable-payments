@@ -15,11 +15,11 @@ class MoveTest {
             vehicleRegistration = "JOURNEY_REG",
             events = listOf(
               journeyEventJE1(eventType = EventType.JOURNEY_START),
-              journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE)
-            )
-          )
-        )
-      )
+              journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE),
+            ),
+          ),
+        ),
+      ),
     ) {
       assertThat(registration()).isEqualTo("JOURNEY_REG")
     }
@@ -34,11 +34,11 @@ class MoveTest {
             vehicleRegistration = "JOURNEY_REG",
             events = listOf(
               journeyEventJE1(eventType = EventType.JOURNEY_START, details = mapOf("vehicle_reg" to "JOURNEY_START_REG")),
-              journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE)
-            )
-          )
-        )
-      )
+              journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE),
+            ),
+          ),
+        ),
+      ),
     ) {
       assertThat(registration()).isEqualTo("JOURNEY_START_REG")
     }
@@ -50,9 +50,9 @@ class MoveTest {
       moveM1(
         journeys = listOf(
           journeyJ1(vehicleRegistration = "JOURNEY_ONE_REG"),
-          journeyJ1(journeyId = "J2", vehicleRegistration = "JOURNEY_TWO_REG")
-        )
-      )
+          journeyJ1(journeyId = "J2", vehicleRegistration = "JOURNEY_TWO_REG"),
+        ),
+      ),
     ) {
       assertThat(registration()).isEqualTo("JOURNEY_ONE_REG, JOURNEY_TWO_REG")
     }
@@ -64,9 +64,9 @@ class MoveTest {
       moveM1(
         journeys = listOf(
           journeyJ1(vehicleRegistration = "SAME_REG"),
-          journeyJ1(journeyId = "J2", vehicleRegistration = "SAME_REG")
-        )
-      )
+          journeyJ1(journeyId = "J2", vehicleRegistration = "SAME_REG"),
+        ),
+      ),
     ) {
       assertThat(registration()).isEqualTo("SAME_REG")
     }

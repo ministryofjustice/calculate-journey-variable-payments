@@ -24,13 +24,13 @@ class SessionCookieInterceptorTest {
       SessionCookieProperties(
         Duration.ofMinutes(1),
         httpOnly = true,
-        secure = false
-      )
+        secure = false,
+      ),
     ).postHandle(
       inSecureRequest,
       response,
       mock(),
-      mock()
+      mock(),
     )
 
     assertThat(response.cookies).contains(sessionCookie)
@@ -48,13 +48,13 @@ class SessionCookieInterceptorTest {
       SessionCookieProperties(
         Duration.ofMinutes(2),
         httpOnly = false,
-        secure = true
-      )
+        secure = true,
+      ),
     ).postHandle(
       secureRequest,
       response,
       mock(),
-      mock()
+      mock(),
     )
 
     assertThat(response.cookies).contains(sessionCookie)
@@ -68,9 +68,11 @@ class SessionCookieInterceptorTest {
   fun `non-session cookie is not intercepted`() {
     SessionCookieInterceptor(SessionCookieProperties(Duration.ofMinutes(1), httpOnly = true, secure = true)).postHandle(
       requestWith(
-        nonSessionCookie
+        nonSessionCookie,
       ),
-      response, mock(), mock()
+      response,
+      mock(),
+      mock(),
     )
 
     assertThat(response.cookies).doesNotContain(nonSessionCookie)

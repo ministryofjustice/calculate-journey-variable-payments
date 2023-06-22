@@ -11,7 +11,7 @@ import java.time.Duration
 
 internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
-  private val logger = loggerFor <AnnualBulkPriceAdjustmentTest>()
+  private val logger = loggerFor<AnnualBulkPriceAdjustmentTest>()
   private val volumetric = "Volumetric"
   private val inflationary = "Inflationary"
 
@@ -20,7 +20,6 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
   @Test
   fun `apply annual price adjustments`() {
-
     logger.info("Logging in and going to Dashboard")
     loginAndGotoDashboardFor(Supplier.SERCO)
 

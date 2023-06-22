@@ -50,7 +50,7 @@ internal class JourneyQueryRepositoryTest {
   val gni = GNICourtLocation()
 
   val standardMove = moveM1(
-    dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5)
+    dropOffOrCancelledDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(5),
   ) // should appear before the one above
   val journeyModel1 = journeyJ1()
   val journeyModel2 = journeyJ1(journeyId = "J2")
@@ -67,8 +67,8 @@ internal class JourneyQueryRepositoryTest {
         toLocation = gni,
         priceInPence = 999,
         supplier = Supplier.SERCO,
-        effectiveYear = 2020
-      )
+        effectiveYear = 2020,
+      ),
     )
 
     priceRepository.save(
@@ -78,8 +78,8 @@ internal class JourneyQueryRepositoryTest {
         toLocation = gni,
         priceInPence = 666,
         supplier = Supplier.GEOAMEY,
-        effectiveYear = 2020
-      )
+        effectiveYear = 2020,
+      ),
     )
 
     moveRepository.save(standardMove)
@@ -91,7 +91,6 @@ internal class JourneyQueryRepositoryTest {
 
   @Test
   fun `unique journeys and journey summaries`() {
-
     val locationX =
       Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationX", siteName = "banana")
     val locationY =
@@ -107,8 +106,8 @@ internal class JourneyQueryRepositoryTest {
         toLocation = locationX,
         priceInPence = 201,
         supplier = Supplier.SERCO,
-        effectiveYear = 2020
-      )
+        effectiveYear = 2020,
+      ),
     )
 
     val moveWithNonBillableJourney = standardMove.copy(moveId = "M2")
@@ -136,14 +135,14 @@ internal class JourneyQueryRepositoryTest {
     val summaries = journeyQueryRepository.journeysSummaryInDateRange(
       Supplier.SERCO,
       defaultMoveDate10Sep2020,
-      defaultMoveDate10Sep2020
+      defaultMoveDate10Sep2020,
     )
     assertThat(summaries).isEqualTo(JourneysSummary(4, 1998, 1, 2, Supplier.SERCO))
 
     val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(
       Supplier.SERCO,
       defaultMoveDate10Sep2020,
-      defaultMoveDate10Sep2020
+      defaultMoveDate10Sep2020,
     )
     assertThat(unpricedUniqueJourneys.size).isEqualTo(2)
 
@@ -153,7 +152,6 @@ internal class JourneyQueryRepositoryTest {
 
   @Test
   fun `2021 prices don't appear in 2020 journeys`() {
-
     val locationY =
       Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "locationY", siteName = "apple")
     locationRepository.save(locationY)
@@ -164,8 +162,8 @@ internal class JourneyQueryRepositoryTest {
         toLocation = gni,
         priceInPence = 999,
         supplier = Supplier.SERCO,
-        effectiveYear = 2021
-      )
+        effectiveYear = 2021,
+      ),
     )
 
     val moveWithUpriced2020Journey = standardMove.copy(moveId = "M2")
@@ -180,14 +178,14 @@ internal class JourneyQueryRepositoryTest {
     val summaries = journeyQueryRepository.journeysSummaryInDateRange(
       Supplier.SERCO,
       defaultMoveDate10Sep2020,
-      defaultMoveDate10Sep2020
+      defaultMoveDate10Sep2020,
     )
     assertThat(summaries).isEqualTo(JourneysSummary(2, 999, 0, 1, Supplier.SERCO))
 
     val unpricedUniqueJourneys = journeyQueryRepository.distinctJourneysAndPriceInDateRange(
       Supplier.SERCO,
       defaultMoveDate10Sep2020,
-      defaultMoveDate10Sep2020
+      defaultMoveDate10Sep2020,
     )
     assertThat(unpricedUniqueJourneys.size).isEqualTo(1)
     assertThat(unpricedUniqueJourneys[0].totalPriceInPence).isEqualTo(0)
@@ -206,7 +204,7 @@ internal class JourneyQueryRepositoryTest {
         toSiteName = "to",
         volume = null,
         unitPriceInPence = 999,
-        totalPriceInPence = null
+        totalPriceInPence = null,
       ),
     )
   }
@@ -224,7 +222,7 @@ internal class JourneyQueryRepositoryTest {
         toSiteName = "to",
         volume = null,
         unitPriceInPence = 999,
-        totalPriceInPence = null
+        totalPriceInPence = null,
       ),
     )
   }

@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext
 
 @Component
 class DuplicateLocationConstraintsValidator(
-  val service: LocationsService
+  val service: LocationsService,
 ) : ConstraintValidator<ValidDuplicateLocation?, MapLocationForm?> {
 
   override fun initialize(arg0: ValidDuplicateLocation?) {}
@@ -16,7 +16,7 @@ class DuplicateLocationConstraintsValidator(
   override fun isValid(form: MapLocationForm?, context: ConstraintValidatorContext): Boolean {
     return form == null || form.locationName.isBlank() || !service.locationAlreadyExists(
       form.agencyId,
-      form.locationName
+      form.locationName,
     )
   }
 }

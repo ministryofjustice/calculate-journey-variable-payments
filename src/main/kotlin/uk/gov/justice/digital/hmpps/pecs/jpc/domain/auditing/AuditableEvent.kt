@@ -15,12 +15,12 @@ import java.time.format.DateTimeFormatter
 data class AuditableEvent(
   val type: AuditEventType,
   val username: String,
-  val metadata: Metadata? = null
+  val metadata: Metadata? = null,
 ) {
   constructor(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) : this(
     type,
     username,
-    metadata?.let { MetadataWrapper(it) }
+    metadata?.let { MetadataWrapper(it) },
   )
 
   companion object {
@@ -32,15 +32,16 @@ data class AuditableEvent(
       type: AuditEventType,
       authentication: Authentication? = null,
       metadata: Map<String, Any>? = null,
-      allowNoUser: Boolean = false
+      allowNoUser: Boolean = false,
     ): AuditableEvent {
-      if (authentication == null && !allowNoUser)
+      if (authentication == null && !allowNoUser) {
         throw RuntimeException("Attempted to create audit event $type without a user")
+      }
 
       return AuditableEvent(
         type,
         authentication?.name ?: terminal,
-        metadata = metadata?.let { MetadataWrapper(it) }
+        metadata = metadata?.let { MetadataWrapper(it) },
       )
     }
 
@@ -56,14 +57,14 @@ data class AuditableEvent(
       createEvent(
         AuditEventType.DOWNLOAD_SPREADSHEET,
         authentication,
-        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
+        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier),
       )
 
     fun downloadSpreadsheetFailure(date: LocalDate, supplier: Supplier, authentication: Authentication) =
       createEvent(
         AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE,
         authentication,
-        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier)
+        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier),
 
       )
 
@@ -74,7 +75,7 @@ data class AuditableEvent(
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = authentication()?.name ?: terminal,
-        metadata = PriceMetadata.new(newPrice)
+        metadata = PriceMetadata.new(newPrice),
       )
     }
 
@@ -82,7 +83,7 @@ data class AuditableEvent(
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = authentication()?.name ?: terminal,
-        metadata = PriceMetadata.update(oldPrice, updatedPrice)
+        metadata = PriceMetadata.update(oldPrice, updatedPrice),
       )
     }
 
@@ -90,7 +91,7 @@ data class AuditableEvent(
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = enforcedAuthentication().name,
-        metadata = PriceMetadata.exception(price, month, amount)
+        metadata = PriceMetadata.exception(price, month, amount),
       )
     }
 
@@ -98,7 +99,7 @@ data class AuditableEvent(
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = enforcedAuthentication().name,
-        metadata = PriceMetadata.removeException(price, month, amount)
+        metadata = PriceMetadata.removeException(price, month, amount),
       )
     }
 
@@ -111,7 +112,7 @@ data class AuditableEvent(
       return AuditableEvent(
         type = AuditEventType.JOURNEY_PRICE,
         username = authentication?.name ?: terminal,
-        metadata = PriceMetadata.adjustment(price, original, multiplier)
+        metadata = PriceMetadata.adjustment(price, original, multiplier),
       )
     }
 
@@ -120,32 +121,32 @@ data class AuditableEvent(
       effectiveYear: Int,
       multiplier: AdjustmentMultiplier,
       authentication: Authentication? = null,
-      details: String
+      details: String,
     ) = AuditableEvent(
       type = AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
       username = authentication?.name ?: terminal,
-      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier.value, details)
+      metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier.value, details),
     )
 
     fun mapLocation(location: Location) =
       AuditableEvent(
         type = AuditEventType.LOCATION,
         username = enforcedAuthentication().name,
-        metadata = MapLocationMetadata.map(location)
+        metadata = MapLocationMetadata.map(location),
       )
 
     fun remapLocation(old: Location, new: Location) =
       AuditableEvent(
         type = AuditEventType.LOCATION,
         username = enforcedAuthentication().name,
-        metadata = MapLocationMetadata.remap(old, new)
+        metadata = MapLocationMetadata.remap(old, new),
       )
 
     fun autoMapLocation(location: Location) =
       AuditableEvent(
         type = AuditEventType.LOCATION,
         username = terminal,
-        metadata = MapLocationMetadata.map(location)
+        metadata = MapLocationMetadata.map(location),
       )
 
     fun authentication(): Authentication? = SecurityContextHolder.getContext().authentication
@@ -173,7 +174,7 @@ data class AuditableEvent(
           "profiles_processed" to profiles_processed,
           "profiles_saved" to profiles_saved,
         ),
-        allowNoUser = true
+        allowNoUser = true,
       )
   }
 }

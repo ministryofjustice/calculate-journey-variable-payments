@@ -40,7 +40,7 @@ internal class ImportReportServiceTest {
       personPersister,
       auditService,
       monitoringService,
-      reportLookup
+      reportLookup,
     )
 
   @Test
@@ -61,7 +61,7 @@ internal class ImportReportServiceTest {
       FakePersonPersister(),
       auditService,
       monitoringService,
-      reportLookup
+      reportLookup,
     )
 
     service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
@@ -74,8 +74,8 @@ internal class ImportReportServiceTest {
         1,
         1,
         1,
-        1
-      )
+        1,
+      ),
     )
     verifyNoInteractions(monitoringService)
   }
@@ -99,7 +99,7 @@ internal class ImportReportServiceTest {
       FakePersonPersister(successful = false),
       auditService,
       monitoringService,
-      reportLookup
+      reportLookup,
     )
 
     service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
@@ -116,7 +116,7 @@ internal class ImportReportServiceTest {
       FakePersonPersister(successful = false),
       auditService,
       monitoringService,
-      reportLookup
+      reportLookup,
     )
 
     service.importAllReportsOn(timeSourceWithFixedDate.yesterday())
@@ -163,7 +163,7 @@ internal class ImportReportServiceTest {
       FakePersonPersister(successful = false),
       auditService,
       monitoringService,
-      ReportLookup { false }
+      ReportLookup { false },
     )
 
     assertThatThrownBy { service.importAllReportsOn(timeSourceWithFixedDate.yesterday()) }

@@ -82,7 +82,7 @@ data class Event constructor(
     details: Map<String, Any> = emptyMap(),
     occurredAt: LocalDateTime,
     recordedAt: LocalDateTime,
-    notes: String?
+    notes: String?,
   ) : this(
     eventId,
     updatedAt,
@@ -93,7 +93,7 @@ data class Event constructor(
     if (details.isNotEmpty()) Details(details) else null,
     occurredAt,
     recordedAt,
-    notes
+    notes,
   )
 
   fun hasType(et: EventType) = type == et.value

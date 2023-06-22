@@ -32,7 +32,7 @@ data class Money(val pence: Int) {
       pounds
         .setScale(2, RoundingMode.HALF_UP)
         .multiply(BigDecimal("100"))
-        .toInt()
+        .toInt(),
     )
   }
 }

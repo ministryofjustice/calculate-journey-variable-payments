@@ -17,8 +17,8 @@ class AuditService(private val auditEventRepository: AuditEventRepository, priva
         eventType = event.type,
         createdAt = timeSource.dateTime(),
         username = event.username.trim().uppercase(),
-        metadata = event.metadata
-      )
+        metadata = event.metadata,
+      ),
     )
   }
 

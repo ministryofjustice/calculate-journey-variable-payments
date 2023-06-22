@@ -131,7 +131,7 @@ data class Move(
 
   @Json(ignored = true)
   @Transient
-  val person: Person? = null
+  val person: Person? = null,
 ) {
   @Column(name = "move_month", nullable = true)
   val moveMonth: Int? = pickUpDateTime?.month?.value ?: moveDate?.month?.value
@@ -140,8 +140,12 @@ data class Move(
   val moveYear: Int? = pickUpDateTime?.year ?: moveDate?.year
 
   fun totalInPence() =
-    if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) null else journeys.sumOf {
-      it.priceInPence ?: 0
+    if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) {
+      null
+    } else {
+      journeys.sumOf {
+        it.priceInPence ?: 0
+      }
     }
 
   fun hasPrice() = totalInPence() != null
@@ -161,7 +165,7 @@ data class Move(
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
+    const val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
 
     fun fromJson(json: String): Move? {
       return Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
@@ -247,17 +251,21 @@ data class Move(
 }
 
 enum class MoveStatus {
-  proposed,
-  requested,
-  booked,
-  in_transit,
-  completed,
-  cancelled,
-  unknown;
+  Proposed,
+  Requested,
+  Booked,
+  InTransit,
+  Completed,
+  Cancelled,
+  Unknown,
+  ;
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { valueOf(value!!.lowercase()) }.getOrDefault(unknown)
+
+      kotlin.runCatching {
+        MoveStatus.values().first { ms -> ms.toString().lowercase() == value!!.lowercase() }
+      }.getOrDefault(Unknown)
   }
 }
 

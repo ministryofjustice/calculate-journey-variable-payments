@@ -30,7 +30,7 @@ fun personPE1() = Person(
 fun profilePR1() = Profile(
   profileId = "PR1",
   personId = "PE1",
-  updatedAt = defaultDateTime
+  updatedAt = defaultDateTime,
 )
 
 fun moveM1(
@@ -40,14 +40,14 @@ fun moveM1(
   dropOffOrCancelledDateTime: LocalDateTime = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
   person: Person? = personPE1(),
   journeys: List<Journey> = listOf(),
-  moveDate: LocalDate = defaultMoveDate10Sep2020
+  moveDate: LocalDate = defaultMoveDate10Sep2020,
 ) = Move(
   moveId = moveId,
   profileId = "PR1",
   updatedAt = defaultDateTime,
   supplier = Supplier.SERCO,
   moveType = MoveType.STANDARD,
-  status = MoveStatus.completed,
+  status = MoveStatus.Completed,
   reference = "REF1",
   moveDate = moveDate,
   fromNomisAgencyId = fromNomisAgencyId,
@@ -70,12 +70,12 @@ fun journeyJ1(
   journeyId: String = "J1",
   fromNomisAgencyId: String = "WYI",
   toNomisAgencyId: String = "GNI",
-  state: JourneyState = JourneyState.completed,
+  state: JourneyState = JourneyState.Completed,
   billable: Boolean = true,
   pickUpDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay(),
   dropOffDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
   events: List<Event> = listOf(),
-  vehicleRegistration: String = "REG100"
+  vehicleRegistration: String = "REG100",
 ) = Journey(
   journeyId = journeyId,
   supplier = moveM1().supplier,
@@ -97,14 +97,14 @@ fun journeyJ1(
   notes = "some notes",
   events = events,
   effectiveYear = effectiveYearForDate(
-    defaultDate
-  )
+    defaultDate,
+  ),
 )
 
 fun eventE1(
   eventId: String = "E1",
   eventType: EventType = EventType.MOVE_START,
-  eventableId: String = moveM1().moveId
+  eventableId: String = moveM1().moveId,
 ) = Event(
   eventId = eventId,
   updatedAt = defaultDateTime,
@@ -115,7 +115,7 @@ fun eventE1(
   recordedAt = defaultMoveDate10Sep2020.atStartOfDay(),
   notes = null,
   details = null,
-  supplier = Supplier.SERCO
+  supplier = Supplier.SERCO,
 )
 
 fun journeyEventJE1(
@@ -123,7 +123,7 @@ fun journeyEventJE1(
   eventType: EventType = EventType.JOURNEY_START,
   eventableId: String = journeyJ1().journeyId,
   details: Map<String, Any> = emptyMap(),
-  occurredAt: LocalDateTime = journeyJ1().pickUpDateTime!!
+  occurredAt: LocalDateTime = journeyJ1().pickUpDateTime!!,
 ) = Event(
   details = details,
   eventableType = "journey",

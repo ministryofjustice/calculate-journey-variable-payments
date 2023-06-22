@@ -30,7 +30,7 @@ import java.time.temporal.ChronoUnit
 @ActiveProfiles("test")
 internal class ReportImporterTest(
   @Autowired private val provider: ReportingProvider,
-  @Autowired val reportReaderParser: StandardStreamingReportParser
+  @Autowired val reportReaderParser: StandardStreamingReportParser,
 ) {
 
   @MockBean
@@ -103,7 +103,7 @@ internal class ReportImporterTest(
     ReportImporter(
       failingProvider,
       monitoringService,
-      reportReaderParser
+      reportReaderParser,
     ).importMovesJourneysEventsOn(LocalDate.of(2020, 9, 1))
 
     verify(monitoringService).capture("The service is missing data which may affect pricing due to missing file 2020/09/01/2020-09-01-moves.jsonl. Exception: error")
@@ -117,8 +117,8 @@ internal class ReportImporterTest(
       LocalDate.of(
         2020,
         9,
-        2
-      )
+        2,
+      ),
     ) { }
 
     verify(monitoringService).capture("Error processing profiles file 2020/09/02/2020-09-02-profiles.jsonl, exception: profile error")
@@ -130,8 +130,8 @@ internal class ReportImporterTest(
       LocalDate.of(
         2020,
         10,
-        3
-      )
+        3,
+      ),
     ) { }
 
     verify(monitoringService).capture("Error processing people file 2020/10/03/2020-10-03-people.jsonl, exception: people error")

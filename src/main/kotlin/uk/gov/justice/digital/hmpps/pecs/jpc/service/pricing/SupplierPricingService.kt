@@ -26,13 +26,13 @@ class SupplierPricingService(
   private val priceRepository: PriceRepository,
   private val annualPriceAdjuster: AnnualPriceAdjuster,
   private val auditService: AuditService,
-  private val actualEffectiveYear: EffectiveYear
+  private val actualEffectiveYear: EffectiveYear,
 ) {
   fun getSiteNamesForPricing(
     supplier: Supplier,
     fromAgencyId: String,
     toAgencyId: String,
-    effectiveYear: Int
+    effectiveYear: Int,
   ): Pair<String, String> {
     val (fromLocation, toLocation) = getFromAndToLocationBy(fromAgencyId, toAgencyId)
 
@@ -40,7 +40,7 @@ class SupplierPricingService(
       supplier,
       fromLocation,
       toLocation,
-      effectiveYear
+      effectiveYear,
     )
       ?.let {
         throw RuntimeException("Supplier $supplier price already exists from ${fromLocation.siteName} to ${toLocation.siteName} for $effectiveYear")
@@ -53,7 +53,7 @@ class SupplierPricingService(
     supplier: Supplier,
     fromAgencyId: String,
     toAgencyId: String,
-    effectiveYear: Int
+    effectiveYear: Int,
   ): PriceDto? = existingPriceOrNull(supplier, fromAgencyId, toAgencyId, effectiveYear)?.let { price ->
     PriceDto(price).apply { price.exceptions().forEach { exceptions[it.month] = it.price() } }
   }
@@ -63,7 +63,7 @@ class SupplierPricingService(
     fromAgencyId: String,
     toAgencyId: String,
     price: Money,
-    effectiveYear: Int
+    effectiveYear: Int,
   ) {
     failIfPriceAdjustmentInProgressFor(supplier)
     failIfOutsideOfPriceChangeWindow(effectiveYear)
@@ -77,8 +77,8 @@ class SupplierPricingService(
         toLocation = toLocation,
         priceInPence = price.pence,
         effectiveYear = effectiveYear,
-        previousPrice = null
-      )
+        previousPrice = null,
+      ),
     ).let { auditService.create(AuditableEvent.addPrice(it)) }
   }
 
@@ -87,7 +87,7 @@ class SupplierPricingService(
     fromAgencyId: String,
     toAgencyId: String,
     agreedNewPrice: Money,
-    effectiveYear: Int
+    effectiveYear: Int,
   ) {
     failIfPriceAdjustmentInProgressFor(supplier)
     failIfOutsideOfPriceChangeWindow(effectiveYear)
@@ -102,7 +102,6 @@ class SupplierPricingService(
     existingPrice: Price,
     agreedNewPrice: Money,
   ) {
-
     if (existingPrice.price() != agreedNewPrice) {
       val oldPrice = existingPrice.price().copy()
 
@@ -117,7 +116,7 @@ class SupplierPricingService(
     toAgencyId: String,
     effectiveYear: Int,
     month: Month,
-    amount: Money
+    amount: Money,
   ) {
     failIfOutsideOfPriceChangeWindow(effectiveYear)
 
@@ -161,7 +160,7 @@ class SupplierPricingService(
       supplier,
       from,
       to,
-      effectiveYear
+      effectiveYear,
     )
   }
 
@@ -176,7 +175,7 @@ class SupplierPricingService(
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =
     Pair(
       getLocationBy(from) ?: throw RuntimeException("From NOMIS agency id '$from' not found."),
-      getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found.")
+      getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found."),
     )
 
   private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(agencyId.sanitised())
@@ -184,7 +183,7 @@ class SupplierPricingService(
   fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
     return auditService.auditEventsByTypeAndMetaKey(
       AuditEventType.JOURNEY_PRICE,
-      PriceMetadata.key(supplier, fromAgencyId, toAgencyId)
+      PriceMetadata.key(supplier, fromAgencyId, toAgencyId),
     )
       .associateWith { PriceMetadata.map(it) }
       .keys

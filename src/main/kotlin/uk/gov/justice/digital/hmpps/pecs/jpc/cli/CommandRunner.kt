@@ -24,7 +24,7 @@ class CommandRunner(
   private val bulkPriceImportCommand: BulkPriceImportCommand,
   private val reportImportCommand: ReportImportCommand,
   private val historicMovesCommand: HistoricMovesCommand,
-  private val priceAdjustmentCommand: PriceAdjustmentCommand
+  private val priceAdjustmentCommand: PriceAdjustmentCommand,
 ) : ApplicationRunner {
 
   override fun run(arguments: ApplicationArguments) {
@@ -34,24 +34,24 @@ class CommandRunner(
       arguments.contains("price-import") -> bulkPriceImportCommand.bulkImportPricesFor(
         arguments.getSupplier(),
         arguments.getYear(),
-        arguments.getAction()
+        arguments.getAction(),
       )
       arguments.contains("price-adjust") -> priceAdjustmentCommand.adjustPricesFor(
         arguments.getSupplier(),
         arguments.getYear(),
         arguments.getMultiplier("inflationary") ?: throw RuntimeException("Missing inflation multiplier argument"),
         arguments.getMultiplier("volumetric"),
-        arguments.get("details") ?: "Price adjusted via terminal"
+        arguments.get("details") ?: "Price adjusted via terminal",
 
       )
       arguments.contains("report-import") -> reportImportCommand.importReports(
         arguments.getDate("from"),
-        arguments.getDate("to")
+        arguments.getDate("to"),
       )
       arguments.contains("process-historic-moves") -> historicMovesCommand.process(
         arguments.getDate("from"),
         arguments.getDate("to"),
-        arguments.getSupplier()
+        arguments.getSupplier(),
       )
       else -> logger.info("no commands executed")
     }

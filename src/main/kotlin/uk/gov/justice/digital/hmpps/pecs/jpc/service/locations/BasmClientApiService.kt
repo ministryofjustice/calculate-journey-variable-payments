@@ -24,7 +24,7 @@ private val logger = loggerFor<BasmClientApiService>()
 class BasmClientApiService(
   private val basmApiWebClient: WebClient,
   private val monitoringService: MonitoringService,
-  @Value("\${BASM_API_TIMEOUT:10s}") val basmApiTimeout: Duration
+  @Value("\${BASM_API_TIMEOUT:10s}") val basmApiTimeout: Duration,
 ) {
 
   fun findNomisAgencyLocationNameBy(agencyId: String): String? {
@@ -78,7 +78,7 @@ class BasmClientApiService(
 data class LocationResponse(
   @JsonProperty("data")
   @JsonDeserialize(contentUsing = NomisLocationDeserializer::class)
-  val locations: List<BasmNomisLocation> = listOf()
+  val locations: List<BasmNomisLocation> = listOf(),
 )
 
 data class BasmNomisLocation(
@@ -98,7 +98,7 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
     "prison" to LocationType.PR,
     "probation_office" to LocationType.PB,
     "secure_childrens_home" to LocationType.SCH,
-    "secure_training_centre" to LocationType.STC
+    "secure_training_centre" to LocationType.STC,
   )
 
   override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): BasmNomisLocation? =
@@ -121,6 +121,8 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
         sanitisedTitle.contains("MAGISTRATES COURT") -> LocationType.MC
         else -> LocationType.CRT
       }
-    } else null
+    } else {
+      null
+    }
   }
 }

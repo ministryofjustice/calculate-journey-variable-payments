@@ -16,7 +16,7 @@ private val logger = loggerFor<JourneyPriceCatalogueService>()
 @Service
 class JourneyPriceCatalogueService(
   private val pricesSpreadsheetGenerator: PricesSpreadsheetGenerator,
-  private val auditService: AuditService
+  private val auditService: AuditService,
 ) {
 
   fun generate(authentication: Authentication, supplier: Supplier, startDate: LocalDate): File? {

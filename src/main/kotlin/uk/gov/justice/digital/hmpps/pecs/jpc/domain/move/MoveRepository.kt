@@ -18,10 +18,10 @@ interface MoveRepository : JpaRepository<Move, String> {
      where m.supplier = :supplier
        and m.moveYear = :year
        and m.moveMonth = :month
-       and m.status= 'completed'
+       and upper(m.status) = 'COMPLETED'
        and (m.moveType is null or m.dropOffOrCancelledDateTime is null)
   order by m.moveDate, m.pickUpDateTime
-  """
+  """,
   )
   fun findCompletedCandidateReconcilableMoves(
     @Param("supplier") supplier: Supplier,

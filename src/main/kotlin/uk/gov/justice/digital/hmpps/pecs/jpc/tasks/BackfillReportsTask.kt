@@ -22,7 +22,7 @@ private val logger = loggerFor<BackfillReportsTask>()
 class BackfillReportsTask(
   private val importReportsService: ImportReportsService,
   private val timeSource: TimeSource,
-  monitoringService: MonitoringService
+  monitoringService: MonitoringService,
 ) : Task("Backfill reports", monitoringService) {
 
   override fun performTask() {

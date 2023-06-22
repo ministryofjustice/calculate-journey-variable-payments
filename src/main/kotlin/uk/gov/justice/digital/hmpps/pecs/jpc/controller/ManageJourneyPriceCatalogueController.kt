@@ -50,7 +50,7 @@ class ManageJourneyPriceCatalogueController(@Autowired val journeyService: Journ
     @RequestParam(name = PICK_UP_ATTRIBUTE, required = false) pickUpLocation: String?,
     @RequestParam(name = DROP_OFF_ATTRIBUTE, required = false) dropOffLocation: String?,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    model: ModelMap
+    model: ModelMap,
   ): Any {
     logger.info("getting search journey results for $supplier")
 
@@ -76,7 +76,9 @@ class ManageJourneyPriceCatalogueController(@Autowired val journeyService: Journ
 
   @PostMapping(SEARCH_JOURNEYS_URL)
   fun performJourneySearch(
-    @Valid @ModelAttribute("form") form: SearchJourneyForm,
+    @Valid
+    @ModelAttribute("form")
+    form: SearchJourneyForm,
     result: BindingResult,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     model: ModelMap,

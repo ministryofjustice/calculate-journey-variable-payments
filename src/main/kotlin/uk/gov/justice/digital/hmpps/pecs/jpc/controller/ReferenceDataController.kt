@@ -24,8 +24,11 @@ class ReferenceDataController(@Autowired val locationService: LocationsService) 
 
     return LocationsDto(
       locationsVersion,
-      if (userVersion != locationsVersion) locationService.findAll().associateBy({ it.nomisAgencyId }, { it.siteName })
-      else null
+      if (userVersion != locationsVersion) {
+        locationService.findAll().associateBy({ it.nomisAgencyId }, { it.siteName })
+      } else {
+        null
+      },
     )
   }
 

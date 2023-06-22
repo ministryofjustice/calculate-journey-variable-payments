@@ -12,7 +12,6 @@ internal class JourneysSheetTest {
 
   @Test
   internal fun `test unique journeys`() {
-
     val journey = JourneyWithPrice(
       fromNomisAgencyId = "FRO",
       fromLocationType = LocationType.PR,
@@ -22,7 +21,7 @@ internal class JourneysSheetTest {
       toSiteName = null,
       unitPriceInPence = 100,
       volume = 22,
-      totalPriceInPence = 2200
+      totalPriceInPence = 2200,
     )
 
     val journeysSheet = JourneysSheet(
@@ -30,8 +29,8 @@ internal class JourneysSheetTest {
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-        Supplier.SERCO
-      )
+        Supplier.SERCO,
+      ),
     )
     journeysSheet.writeJourneys(listOf(journey))
 
@@ -44,7 +43,7 @@ internal class JourneysSheetTest {
       "Total journey count",
       "Billable journey count",
       "Unit price",
-      "Total price"
+      "Total price",
     )
     assertCellEquals(journeysSheet, 9, 0, "from") // from site name
     assertCellEquals(journeysSheet, 9, 1, "TO") // TO - NOMIS Agency ID because there is no site name
@@ -56,7 +55,6 @@ internal class JourneysSheetTest {
 
   @Test
   internal fun `test unique journeys price not present`() {
-
     val journey = JourneyWithPrice(
       fromNomisAgencyId = "FRO",
       fromLocationType = LocationType.PR,
@@ -66,7 +64,7 @@ internal class JourneysSheetTest {
       toSiteName = null,
       unitPriceInPence = null,
       volume = 22,
-      totalPriceInPence = 0
+      totalPriceInPence = 0,
     )
 
     val sheet = JourneysSheet(
@@ -74,8 +72,8 @@ internal class JourneysSheetTest {
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-        Supplier.SERCO
-      )
+        Supplier.SERCO,
+      ),
     )
     sheet.writeJourneys(listOf(journey))
 

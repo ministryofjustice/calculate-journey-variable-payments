@@ -8,7 +8,8 @@ enum class AuditEventType(val label: String) {
   LOCATION("Location"),
   LOG_IN("Log in"),
   LOG_OUT("Log out"),
-  REPORTING_DATA_IMPORT("Reporting data import");
+  REPORTING_DATA_IMPORT("Reporting data import"),
+  ;
 
   companion object {
     /**

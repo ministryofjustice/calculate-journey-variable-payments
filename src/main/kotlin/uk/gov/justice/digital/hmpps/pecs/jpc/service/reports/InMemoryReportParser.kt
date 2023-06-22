@@ -22,7 +22,7 @@ object InMemoryReportParser {
   fun parseMovesJourneysEvents(
     moveFiles: List<String>,
     journeyFiles: List<String>,
-    eventFiles: List<String>
+    eventFiles: List<String>,
   ): List<Move> {
     val moves = parseAsMoves(moveFiles)
     val journeys = parseAsMoveIdToJourneys(journeyFiles)
@@ -32,7 +32,7 @@ object InMemoryReportParser {
       move.copy(
         events = events.getOrDefault(move.moveId, listOf()),
         journeys = journeys.getOrDefault(move.moveId, listOf())
-          .map { journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf())) }
+          .map { journey -> journey.copy(events = events.getOrDefault(journey.journeyId, listOf())) },
       )
     }
   }
@@ -44,7 +44,7 @@ object InMemoryReportParser {
 
   fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
     logger.info("Parsing journeys")
-    return read(journeyFiles) { Journey.fromJson(it) }.filter { (JourneyState.completed == it.state || JourneyState.cancelled == it.state) }
+    return read(journeyFiles) { Journey.fromJson(it) }.filter { (JourneyState.Completed == it.state || JourneyState.Cancelled == it.state) }
       .associateBy(Journey::journeyId).values.groupBy(Journey::moveId) // associateBy will only include latest Journey by id
   }
 

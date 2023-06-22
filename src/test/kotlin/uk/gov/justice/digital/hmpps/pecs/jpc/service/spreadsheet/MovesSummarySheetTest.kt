@@ -20,15 +20,15 @@ internal class MovesSummarySheetTest {
 
   private val summaries = MoveTypeSummaries(
     1,
-    listOf(standardSummary, longHaulSummary, redirectionSummary, lockoutSummary, multiTypeSummary, cancelledSummary)
+    listOf(standardSummary, longHaulSummary, redirectionSummary, lockoutSummary, multiTypeSummary, cancelledSummary),
   )
   private val summarySheet = SummarySheet(
     SXSSFWorkbook(),
     PriceSheet.Header(
       defaultMoveDate10Sep2020,
       DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-      Supplier.SERCO
-    )
+      Supplier.SERCO,
+    ),
   )
 
   @Test

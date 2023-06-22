@@ -30,7 +30,7 @@ class AuditEventRepositoryTest {
         createdAt = LocalDateTime.now(),
         metadata = null,
         metadataKey = null,
-        username = "first"
+        username = "first",
       )
 
       val second = first.copy(id = UUID.randomUUID(), createdAt = first.createdAt.minusMinutes(1), username = "second")
@@ -38,7 +38,7 @@ class AuditEventRepositoryTest {
       repository.saveAll(listOf(first, second))
 
       assertThat(repository.findFirstByEventTypeOrderByCreatedAtDesc(eventType)).isEqualTo(
-        first
+        first,
       )
     }
   }

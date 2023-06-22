@@ -27,7 +27,7 @@ class ImportReportsService(
   private val personPersister: PersonPersister,
   private val auditService: AuditService,
   private val monitoringService: MonitoringService,
-  private val reportLookup: ReportLookup
+  private val reportLookup: ReportLookup,
 ) {
 
   /**
@@ -58,7 +58,7 @@ class ImportReportsService(
           people_saved = maybePeople.saved,
           profiles_processed = maybeProfiles.processed,
           profiles_saved = maybeProfiles.saved,
-        )
+        ),
       )
     }
   }
@@ -90,7 +90,7 @@ class ImportReportsService(
       val persisted = movePersister.persist(moves).let { persisted ->
         raiseMonitoringAlertIf(
           moves.isNotEmpty() && moves.size > persisted,
-          "moves: persisted $persisted out of ${moves.size} for reporting feed date $date."
+          "moves: persisted $persisted out of ${moves.size} for reporting feed date $date.",
         )
 
         raiseMonitoringAlertIf(moves.isEmpty(), "There were no moves to persist for reporting feed date $date.")
@@ -118,13 +118,13 @@ class ImportReportsService(
           {
             errors.incrementAndGet()
             logger.warn("Error persisting person ${person.personId} - ${it.message}")
-          }
+          },
         )
       }
 
       raiseMonitoringAlertIf(
         errors.get() > 0,
-        "people: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date."
+        "people: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date.",
       )
 
       raiseMonitoringAlertIf(saved.get() == 0, "There were no people to persist for reporting feed date $date.")
@@ -151,13 +151,13 @@ class ImportReportsService(
           {
             errors.incrementAndGet()
             logger.warn("Error persisting profile ${profile.profileId} - ${it.message}")
-          }
+          },
         )
       }
 
       raiseMonitoringAlertIf(
         errors.get() > 0,
-        "profiles: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date."
+        "profiles: persisted ${saved.get()} and ${errors.get()} errors for reporting feed date $date.",
       )
 
       raiseMonitoringAlertIf(saved.get() == 0, "There were no profiles to persist for reporting feed date $date.")

@@ -53,7 +53,7 @@ data class Person(
 
   @Json(name = "ethnicity")
   @Column(name = "ethnicity")
-  val ethnicity: String? = null
+  val ethnicity: String? = null,
 
 ) {
   companion object {

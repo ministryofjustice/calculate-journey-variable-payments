@@ -17,7 +17,7 @@ class SessionCookieInterceptor(private val properties: SessionCookieProperties) 
     request: HttpServletRequest,
     response: HttpServletResponse,
     handler: Any,
-    modelAndView: ModelAndView?
+    modelAndView: ModelAndView?,
   ) {
     request.cookies?.firstOrNull { it.name == SPRING_SESSION_COOKIE }?.apply {
       this.maxAge = properties.maxAge.toSeconds().toInt()

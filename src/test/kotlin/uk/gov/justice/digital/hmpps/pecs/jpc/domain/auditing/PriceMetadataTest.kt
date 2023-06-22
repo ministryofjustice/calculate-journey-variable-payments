@@ -113,9 +113,10 @@ internal class PriceMetadataTest {
   @Test
   fun `can map audit event with unquoted new price`() {
     val auditEvent = AuditEvent(
-      AuditEventType.JOURNEY_PRICE, LocalDateTime.now(),
+      AuditEventType.JOURNEY_PRICE,
+      LocalDateTime.now(),
       "some user",
-      "{\"supplier\" : \"SERCO\", \"from_nomis_id\" : \"SNAACC\", \"to_nomis_id\" : \"PVI\", \"effective_year\" : 2020, \"new_price\" : 5000.01}"
+      "{\"supplier\" : \"SERCO\", \"from_nomis_id\" : \"SNAACC\", \"to_nomis_id\" : \"PVI\", \"effective_year\" : 2020, \"new_price\" : 5000.01}",
     )
 
     assertThat(PriceMetadata.map(auditEvent)).isEqualTo(PriceMetadata(Supplier.SERCO, "SNAACC", "PVI", 2020, BigDecimal("5000.01")))
@@ -124,9 +125,10 @@ internal class PriceMetadataTest {
   @Test
   fun `can map new audit event with quoted new price`() {
     val auditEvent = AuditEvent(
-      AuditEventType.JOURNEY_PRICE, LocalDateTime.now(),
+      AuditEventType.JOURNEY_PRICE,
+      LocalDateTime.now(),
       "some user",
-      "{\"supplier\" : \"SERCO\", \"from_nomis_id\" : \"SNAACC\", \"to_nomis_id\" : \"PVI\", \"effective_year\" : 2020, \"new_price\" : \"5000.01\"}"
+      "{\"supplier\" : \"SERCO\", \"from_nomis_id\" : \"SNAACC\", \"to_nomis_id\" : \"PVI\", \"effective_year\" : 2020, \"new_price\" : \"5000.01\"}",
     )
 
     assertThat(PriceMetadata.map(auditEvent)).isEqualTo(PriceMetadata(Supplier.SERCO, "SNAACC", "PVI", 2020, BigDecimal("5000.01")))

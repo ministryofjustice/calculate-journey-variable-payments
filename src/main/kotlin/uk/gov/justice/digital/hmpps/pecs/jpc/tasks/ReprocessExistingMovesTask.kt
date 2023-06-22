@@ -26,7 +26,7 @@ class ReprocessExistingMovesTask(
   private val processingService: HistoricMovesProcessingService,
   private val moveService: MoveService,
   private val timeSource: TimeSource,
-  monitoringService: MonitoringService
+  monitoringService: MonitoringService,
 ) : Task("Reprocess historic moves", monitoringService) {
 
   override fun performTask() {

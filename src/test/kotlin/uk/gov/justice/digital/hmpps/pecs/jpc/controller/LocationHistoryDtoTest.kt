@@ -23,8 +23,8 @@ internal class LocationHistoryDtoTest {
       LocationHistoryDto(
         datetime,
         "Assigned to location name 'Court Name' and type 'County Court'",
-        "SYSTEM"
-      )
+        "SYSTEM",
+      ),
     )
   }
 
@@ -40,8 +40,8 @@ internal class LocationHistoryDtoTest {
       LocationHistoryDto(
         datetime,
         "Assigned to location name 'Probation Name' and type 'Probation'",
-        "Bob"
-      )
+        "Bob",
+      ),
     )
   }
 
@@ -57,8 +57,8 @@ internal class LocationHistoryDtoTest {
       LocationHistoryDto(
         datetime,
         "Location name changed from 'Probation Name' to 'New Probation Name'",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -75,8 +75,8 @@ internal class LocationHistoryDtoTest {
       LocationHistoryDto(
         datetime,
         "Location type changed from 'County Court' to 'Probation'",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -93,8 +93,8 @@ internal class LocationHistoryDtoTest {
       LocationHistoryDto(
         datetime,
         "Location name changed from 'Old Probation Name' to 'New Probation Name' and location type changed from 'County Court' to 'Probation'",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -106,8 +106,8 @@ internal class LocationHistoryDtoTest {
           AuditEventType.JOURNEY_PRICE,
           LocalDateTime.now(),
           "Jane",
-          metadata = ""
-        )
+          metadata = "",
+        ),
       )
     }
   }

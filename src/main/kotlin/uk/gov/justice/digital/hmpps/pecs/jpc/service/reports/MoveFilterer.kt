@@ -17,14 +17,17 @@ object MoveFilterer {
 
   private fun List<Event>.hasEventType(eventType: EventType) = this.any { it.hasType(eventType) }
 
-  private fun Move.isCompleted() = this.status == MoveStatus.completed
+  private fun Move.isCompleted() = this.status == MoveStatus.Completed
 
   /**
    * For a cancelled move to be billable it must be a previously accepted prison to prison move in a cancelled state.
    * It must have a cancellation reason of cancelled_by_pmu and have been cancelled after 3pm the day before the move date
    */
-  fun isCancelledBillableMove(move: Move) =
-    move.status == MoveStatus.cancelled &&
+  fun isCancelledBillableMove(move: Move): Boolean {
+    println(move.status)
+    println(MoveStatus.Cancelled)
+    println(move.status == MoveStatus.Cancelled)
+    return move.status == MoveStatus.Cancelled &&
       CANCELLATION_REASON_CANCELLED_BY_PMU == move.cancellationReason &&
       move.reportFromLocationType == "prison" &&
       move.toNomisAgencyId != null &&
@@ -32,6 +35,7 @@ object MoveFilterer {
       move.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
       move.events.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
       move.moveDate?.let { move.events.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(it) } ?: false
+  }
 
   private fun List<Event>.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(moveDate: LocalDate) =
     this.find {
@@ -46,16 +50,16 @@ object MoveFilterer {
   fun isStandardMove(move: Move) =
     move.isCompleted() &&
       with(move.journeys) {
-        count { it.stateIsAnyOf(JourneyState.completed) } == 1 &&
+        count { it.stateIsAnyOf(JourneyState.Completed) } == 1 &&
           count { isCompleteBillableJourneyAndLocationsMatchMove(it, move) } == 1 &&
-          count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
+          count { it.stateIsAnyOf(JourneyState.Cancelled) } == 0
       } && when (val moveStart = move.mayBeMoveStartDate()) {
       null -> logger.warn("No move start date event found for move reference '${move.reference}'").let { true }
       else -> move.events.none { it.isRedirectEventAfter(moveStart) }
     }
 
   private fun isCompleteBillableJourneyAndLocationsMatchMove(journey: Journey, move: Move) =
-    journey.state == JourneyState.completed && journey.billable &&
+    journey.state == JourneyState.Completed && journey.billable &&
       journey.fromNomisAgencyId == move.fromNomisAgencyId &&
       journey.toNomisAgencyId == move.toNomisAgencyId
 
@@ -70,7 +74,7 @@ object MoveFilterer {
         ) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT) &&
       with(move.journeys.map { it }) {
-        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 2
+        count { it.stateIsAnyOf(JourneyState.Completed) && it.billable } == 2
       }
 
   /**
@@ -82,7 +86,7 @@ object MoveFilterer {
       move.hasAnyOf(EventType.MOVE_LOCKOUT) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT) &&
       with(move.journeys) {
-        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
+        count { it.stateIsAnyOf(JourneyState.Completed) && it.billable } in 2..3
       }
 
   /**
@@ -115,7 +119,7 @@ object MoveFilterer {
         else -> {
           move.events.count { it.isRedirectEventAfter(moveStartDate) } == 1 &&
             with(move.journeys) {
-              count { it.stateIsAnyOf(JourneyState.completed, JourneyState.cancelled) && it.billable } == 2
+              count { it.stateIsAnyOf(JourneyState.Completed, JourneyState.Cancelled) && it.billable } == 2
             }
         }
       }

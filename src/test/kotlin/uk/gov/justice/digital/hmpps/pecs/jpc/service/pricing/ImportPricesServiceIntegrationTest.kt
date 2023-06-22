@@ -36,13 +36,13 @@ class ImportPricesServiceIntegrationTest(
   private val prison = Location(
     LocationType.PR,
     "PRISON",
-    "HMP FRED"
+    "HMP FRED",
   )
 
   private val court = Location(
     LocationType.CC,
     "COURT",
-    "FREDS COUNTY COURT"
+    "FREDS COUNTY COURT",
   )
 
   @BeforeAll

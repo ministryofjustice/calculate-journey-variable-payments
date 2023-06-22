@@ -30,8 +30,8 @@ class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
     DROP_OFF_TIME,
     VEHICLE_REG,
     NOMIS_PRISON_ID,
-    PRICE
-  )
+    PRICE,
+  ),
 ) {
   override fun writeMove(move: Move) = writeMoveRow(move, false)
 }

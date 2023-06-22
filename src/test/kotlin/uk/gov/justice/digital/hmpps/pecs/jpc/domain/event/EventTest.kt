@@ -14,7 +14,7 @@ internal class EventTest {
     val moveCancelLast = moveCancelFirst.copy(eventId = "ME2", occurredAt = moveCancelFirst.occurredAt.plusHours(3))
 
     assertThat(Event.getLatestByType(listOf(moveCancelLast, moveCancelFirst), EventType.MOVE_CANCEL)).isEqualTo(
-      moveCancelLast
+      moveCancelLast,
     )
   }
 

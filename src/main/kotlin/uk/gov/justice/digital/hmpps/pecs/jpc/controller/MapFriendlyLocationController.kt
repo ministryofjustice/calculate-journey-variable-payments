@@ -35,7 +35,7 @@ private val logger = loggerFor<MapFriendlyLocationController>()
 @ConditionalOnWebApplication
 class MapFriendlyLocationController(
   private val service: LocationsService,
-  private val basmClientApiService: BasmClientApiService
+  private val basmClientApiService: BasmClientApiService,
 ) : PrimaryNavigationBar {
 
   override fun primaryNavigationChoice() = PrimaryNavigation.LOCATION
@@ -44,7 +44,7 @@ class MapFriendlyLocationController(
   fun mapFriendlyLocation(
     @PathVariable("agency-id") agencyId: String,
     @RequestParam(name = LOCATION_ORIGIN_SESSION_ATTRIBUTE, required = false) origin: String?,
-    model: ModelMap
+    model: ModelMap,
   ): String {
     logger.info("getting map friendly location for $agencyId")
 
@@ -59,15 +59,15 @@ class MapFriendlyLocationController(
           locationName = it.second,
           locationType = it.third,
           operation = "update",
-          nomisLocationName = nomisLocationName
-        )
+          nomisLocationName = nomisLocationName,
+        ),
       )
 
       model.addAttribute(
         "history",
         service.locationHistoryForAgencyId(agencyId)
           .map { history -> LocationHistoryDto.valueOf(history) }
-          .sortedByDescending { lh -> lh.datetime }
+          .sortedByDescending { lh -> lh.datetime },
       )
 
       model.addCancelLinkFor(UriComponentsBuilder.fromUriString(SEARCH_JOURNEYS_RESULTS_URL))
@@ -81,8 +81,8 @@ class MapFriendlyLocationController(
       MapLocationForm(
         agencyId = agencyId,
         operation = "create",
-        nomisLocationName = nomisLocationName
-      )
+        nomisLocationName = nomisLocationName,
+      ),
     )
 
     return "add-location"
@@ -94,10 +94,12 @@ class MapFriendlyLocationController(
 
   @PostMapping(MAP_LOCATION)
   fun mapFriendlyLocation(
-    @Valid @ModelAttribute("form") form: MapLocationForm,
+    @Valid
+    @ModelAttribute("form")
+    form: MapLocationForm,
     result: BindingResult,
     model: ModelMap,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): String {
     logger.info("mapping friendly location for agency id ${form.agencyId}")
 
@@ -113,7 +115,7 @@ class MapFriendlyLocationController(
           "history",
           service.locationHistoryForAgencyId(form.agencyId)
             .map { history -> LocationHistoryDto.valueOf(history) }
-            .sortedByDescending { lh -> lh.datetime }
+            .sortedByDescending { lh -> lh.datetime },
         )
 
         return "update-location"
@@ -202,7 +204,7 @@ class MapFriendlyLocationController(
 
     val operation: String = "create",
 
-    val nomisLocationName: String
+    val nomisLocationName: String,
   )
 
   companion object {
