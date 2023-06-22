@@ -49,7 +49,8 @@ class MoveDetailsPage : ApplicationPage() {
   private val moneyFormatter = DecimalFormat("#,###.00")
 
   fun atPage(moveId: String): Boolean {
-    return try { this.isAt(moveId)
+    return try {
+      this.isAt(moveId)
       true
     } catch (ae: AssertionError) {
       false
