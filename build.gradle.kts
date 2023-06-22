@@ -50,13 +50,14 @@ dependencies {
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
-    "org.mockito:mockito-inline:4.8.0",
-    "org.seleniumhq.selenium:htmlunit-driver:2.61.0",
+    "org.mockito:mockito-inline:5.2.0",
+    "org.seleniumhq.selenium:htmlunit-driver:3.64.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.10.0",
@@ -67,9 +68,9 @@ dependencies {
       because("previous transitive version 1.9.0 pulled in by Fluentlenium has CVE-2022-42889")
     }
   }
-  testRuntimeOnly("com.h2database:h2:1.4.200")
+  testRuntimeOnly("com.h2database:h2:2.1.214")
 
-  runtimeOnly("org.postgresql:postgresql:42.5.2")
+  runtimeOnly("org.postgresql:postgresql:42.5.4")
 }
 
 java {
