@@ -44,23 +44,24 @@ dependencies {
   }
 
   // Test versions
-  val fluentleniumVersion = "4.8.0"
-  val seleniumVersion = "3.141.59"
+  val fluentleniumVersion = "5.0.2"
+  val seleniumVersion = "4.10.0"
   listOf(
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:4.11.0",
-    "org.seleniumhq.selenium:htmlunit-driver:2.70.0",
+    "org.seleniumhq.selenium:htmlunit-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-chromium-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
-    "com.squareup.okhttp3:mockwebserver:4.10.0",
+    "com.squareup.okhttp3:mockwebserver:4.11.0",
     "com.squareup.okhttp3:okhttp:4.10.0"
   ).forEach { testImplementation(it) }
   constraints {
