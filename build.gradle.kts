@@ -50,7 +50,7 @@ dependencies {
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
-    "org.mockito:mockito-inline:5.2.0",
+    "org.mockito:mockito-inline:4.11.0",
     "org.seleniumhq.selenium:htmlunit-driver:3.64.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
