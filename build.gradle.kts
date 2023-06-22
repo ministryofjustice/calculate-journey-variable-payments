@@ -48,6 +48,7 @@ dependencies {
   val seleniumVersion = "4.10.0"
   listOf(
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
+    "net.sourceforge.htmlunit:htmlunit:2.70.0",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:4.11.0",
