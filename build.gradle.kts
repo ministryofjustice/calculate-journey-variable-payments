@@ -44,7 +44,7 @@ dependencies {
   }
 
   // Test versions
-  val fluentleniumVersion = "5.0.2"
+  val fluentleniumVersion = "5.0.4"
   val seleniumVersion = "4.10.0"
   listOf(
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
@@ -52,7 +52,7 @@ dependencies {
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:4.11.0",
     "org.seleniumhq.selenium:htmlunit-driver:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-java:4.1.0",
+    "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
