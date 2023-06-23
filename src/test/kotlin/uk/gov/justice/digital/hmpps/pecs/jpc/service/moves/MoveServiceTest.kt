@@ -52,7 +52,7 @@ internal class MoveServiceTest {
 
   @Test
   fun `journeys on the move are ordered by pickup datetime`() {
-    val journey1 = journeyJ1().copy(state = JourneyState.Cancelled, dropOffDateTime = null)
+    val journey1 = journeyJ1().copy(state = JourneyState.cancelled, dropOffDateTime = null)
 
     val journey2 = journey1.copy(
       journeyId = "J2",
@@ -88,7 +88,7 @@ internal class MoveServiceTest {
       journeyEventJE1(eventType = EventType.JOURNEY_COMPLETE).copy(occurredAt = journeyEventJE1().occurredAt.plusHours(1))
 
     val journey = journeyJ1().copy(
-      state = JourneyState.Cancelled,
+      state = JourneyState.cancelled,
       dropOffDateTime = null,
       events = listOf(journeyCompleteEvent, journeyStartEvent),
     )

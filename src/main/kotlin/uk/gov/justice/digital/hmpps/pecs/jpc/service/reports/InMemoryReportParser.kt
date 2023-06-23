@@ -44,7 +44,7 @@ object InMemoryReportParser {
 
   fun parseAsMoveIdToJourneys(journeyFiles: List<String>): Map<String, List<Journey>> {
     logger.info("Parsing journeys")
-    return read(journeyFiles) { Journey.fromJson(it) }.filter { (JourneyState.Completed == it.state || JourneyState.Cancelled == it.state) }
+    return read(journeyFiles) { Journey.fromJson(it) }.filter { (JourneyState.completed == it.state || JourneyState.cancelled == it.state) }
       .associateBy(Journey::journeyId).values.groupBy(Journey::moveId) // associateBy will only include latest Journey by id
   }
 

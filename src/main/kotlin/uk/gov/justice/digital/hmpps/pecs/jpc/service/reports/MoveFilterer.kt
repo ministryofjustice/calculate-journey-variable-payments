@@ -17,7 +17,7 @@ object MoveFilterer {
 
   private fun List<Event>.hasEventType(eventType: EventType) = this.any { it.hasType(eventType) }
 
-  private fun Move.isCompleted() = this.status == MoveStatus.Completed
+  private fun Move.isCompleted() = this.status == MoveStatus.completed
 
   /**
    * For a cancelled move to be billable it must be a previously accepted prison to prison move in a cancelled state.
@@ -50,16 +50,16 @@ object MoveFilterer {
   fun isStandardMove(move: Move) =
     move.isCompleted() &&
       with(move.journeys) {
-        count { it.stateIsAnyOf(JourneyState.Completed) } == 1 &&
+        count { it.stateIsAnyOf(JourneyState.completed) } == 1 &&
           count { isCompleteBillableJourneyAndLocationsMatchMove(it, move) } == 1 &&
-          count { it.stateIsAnyOf(JourneyState.Cancelled) } == 0
+          count { it.stateIsAnyOf(JourneyState.cancelled) } == 0
       } && when (val moveStart = move.mayBeMoveStartDate()) {
       null -> logger.warn("No move start date event found for move reference '${move.reference}'").let { true }
       else -> move.events.none { it.isRedirectEventAfter(moveStart) }
     }
 
   private fun isCompleteBillableJourneyAndLocationsMatchMove(journey: Journey, move: Move) =
-    journey.state == JourneyState.Completed && journey.billable &&
+    journey.state == JourneyState.completed && journey.billable &&
       journey.fromNomisAgencyId == move.fromNomisAgencyId &&
       journey.toNomisAgencyId == move.toNomisAgencyId
 
@@ -74,7 +74,7 @@ object MoveFilterer {
         ) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT) &&
       with(move.journeys.map { it }) {
-        count { it.stateIsAnyOf(JourneyState.Completed) && it.billable } == 2
+        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 2
       }
 
   /**
@@ -86,7 +86,7 @@ object MoveFilterer {
       move.hasAnyOf(EventType.MOVE_LOCKOUT) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT) &&
       with(move.journeys) {
-        count { it.stateIsAnyOf(JourneyState.Completed) && it.billable } in 2..3
+        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } in 2..3
       }
 
   /**
@@ -119,7 +119,7 @@ object MoveFilterer {
         else -> {
           move.events.count { it.isRedirectEventAfter(moveStartDate) } == 1 &&
             with(move.journeys) {
-              count { it.stateIsAnyOf(JourneyState.Completed, JourneyState.Cancelled) && it.billable } == 2
+              count { it.stateIsAnyOf(JourneyState.completed, JourneyState.cancelled) && it.billable } == 2
             }
         }
       }

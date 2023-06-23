@@ -559,7 +559,7 @@ private fun journey(
   fromAgencyId: String,
   toAgencyId: String,
   supplier: Supplier = Supplier.SERCO,
-  state: JourneyState = JourneyState.Completed,
+  state: JourneyState = JourneyState.completed,
   pickUp: LocalDateTime? = move.pickUpDateTime,
   dropOff: LocalDateTime? = move.dropOffOrCancelledDateTime,
 ) = Journey(
