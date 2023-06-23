@@ -18,7 +18,7 @@ class ReportMoveParserTest {
     assertThat(parsedMove?.toNomisAgencyId).isNull()
     assertThat(parsedMove?.reference).isEqualTo("UKW4591N")
     assertThat(parsedMove?.supplier).isEqualTo(Supplier.UNKNOWN)
-    assertThat(parsedMove?.status).isEqualTo(MoveStatus.unknown)
+    assertThat(parsedMove?.status).isEqualTo(MoveStatus.Unknown)
   }
 
   @Test
@@ -27,7 +27,7 @@ class ReportMoveParserTest {
     val moveJson = move.toJson()
 
     val expectedJson =
-      """{"cancellation_reason" : "", "cancellation_reason_comment" : null, "from_location" : "WYI", "date" : "2021-02-28", "id" : "M1", "moveMonth" : 2, "moveYear" : 2021, "profile_id" : "PR1", "reference" : "UKW4591N", "from_location_type" : "prison", "to_location_type" : "court", "status" : "completed", "supplier" : "SERCO", "to_location" : "GNI", "updated_at" : "2020-06-16T10:20:30"}"""
+      """{"cancellation_reason" : "", "cancellation_reason_comment" : null, "from_location" : "WYI", "date" : "2021-02-28", "id" : "M1", "moveMonth" : 2, "moveYear" : 2021, "profile_id" : "PR1", "reference" : "UKW4591N", "from_location_type" : "prison", "to_location_type" : "court", "status" : "Completed", "supplier" : "SERCO", "to_location" : "GNI", "updated_at" : "2020-06-16T10:20:30"}"""
     assertThat(moveJson).isEqualTo(expectedJson)
 
     val parsedMove = Move.fromJson(moveJson)

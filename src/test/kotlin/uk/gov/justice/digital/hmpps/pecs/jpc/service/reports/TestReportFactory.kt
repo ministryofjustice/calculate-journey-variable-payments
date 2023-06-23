@@ -44,7 +44,7 @@ fun reportMoveFactory(
   moveId: String = defaultMoveId,
   supplier: Supplier = defaultSupplierSerco,
   profileId: String = defaultProfileId,
-  status: MoveStatus = MoveStatus.completed,
+  status: MoveStatus = MoveStatus.Completed,
   fromLocation: String = fromPrisonNomisAgencyId(),
   fromLocationType: String = "prison",
   toLocation: String = toCourtNomisAgencyId(),
@@ -123,7 +123,7 @@ fun moveEventFactory(
 fun reportJourneyFactory(
   journeyId: String = defaultJourneyId,
   moveId: String = defaultMoveId,
-  state: JourneyState = JourneyState.completed,
+  state: JourneyState = JourneyState.Completed,
   supplier: Supplier = defaultSupplierSerco,
   billable: Boolean = false,
   fromLocation: String = fromPrisonNomisAgencyId(),

@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.DateRange
 
 internal class CancelledMovesSheetTest {
 
-  private val move = moveM1(journeys = listOf(journeyJ1(state = JourneyState.cancelled)))
+  private val move = moveM1(journeys = listOf(journeyJ1(state = JourneyState.Cancelled)))
   private val cancelledMovesSheet = CancelledMovesSheet(
     SXSSFWorkbook(),
     PriceSheet.Header(
