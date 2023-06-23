@@ -250,14 +250,15 @@ data class Move(
       this.journeys.flatMap { it.events ?: emptyList() }.filter { ets.map { it.value }.contains(it.type) }
 }
 
+/* ktlint-disable enum-entry-name-case */
 enum class MoveStatus {
-  Proposed,
-  Requested,
-  Booked,
-  InTransit,
-  Completed,
-  Cancelled,
-  Unknown,
+  proposed,
+  requested,
+  booked,
+  in_transit,
+  completed,
+  cancelled,
+  unknown,
   ;
 
   companion object {
@@ -265,7 +266,7 @@ enum class MoveStatus {
 
       kotlin.runCatching {
         MoveStatus.values().first { ms -> ms.toString().lowercase() == value!!.lowercase() }
-      }.getOrDefault(Unknown)
+      }.getOrDefault(unknown)
   }
 }
 

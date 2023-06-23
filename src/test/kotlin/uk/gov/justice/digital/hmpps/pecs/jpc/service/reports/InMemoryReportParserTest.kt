@@ -67,7 +67,7 @@ internal class InMemoryReportParserTest {
     assertThat(moves.map { it.moveId }).containsExactly("M1", "M2", "M3", "M4", "M5")
 
     // M1 should be complete
-    assertThat(MoveStatus.Completed).isEqualTo(moves.find { it.moveId == "M1" }?.status)
+    assertThat(MoveStatus.completed).isEqualTo(moves.find { it.moveId == "M1" }?.status)
   }
 
   @Test

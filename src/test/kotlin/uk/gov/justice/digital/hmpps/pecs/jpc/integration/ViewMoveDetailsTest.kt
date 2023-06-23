@@ -19,7 +19,6 @@ internal class ViewMoveDetailsTest : IntegrationTest() {
     wait.until {
       findMove.searchReady()
     }
-    findMove.takeScreenshot()
 
     findMove.findBy(standardMoveM4())
 
