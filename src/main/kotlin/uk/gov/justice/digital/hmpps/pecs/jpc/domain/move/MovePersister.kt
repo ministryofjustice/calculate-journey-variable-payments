@@ -159,7 +159,7 @@ class MovePersister(
       clientTimeStamp = LocalDateTime.now(),
       fromNomisAgencyId = move.fromNomisAgencyId,
       toNomisAgencyId = move.toNomisAgencyId!!,
-      state = JourneyState.Cancelled,
+      state = JourneyState.cancelled,
       vehicleRegistration = null,
       notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
       effectiveYear = effectiveYearForDate(move.moveDate ?: timeSource.date()),

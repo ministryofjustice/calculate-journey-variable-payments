@@ -211,18 +211,19 @@ data class Journey(
   }
 }
 
+/* ktlint-disable enum-entry-name-case */
 enum class JourneyState() {
-  Proposed,
-  InProgress,
-  Rejected,
-  Cancelled,
-  Completed,
-  Unknown,
+  proposed,
+  in_progress,
+  rejected,
+  cancelled,
+  completed,
+  unknown,
   ;
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { JourneyState.values().first { js -> js.toString().lowercase() == value!!.lowercase() } }.getOrDefault(Unknown)
+      kotlin.runCatching { JourneyState.values().first { js -> js.toString().lowercase() == value!!.lowercase() } }.getOrDefault(unknown)
   }
 }
 

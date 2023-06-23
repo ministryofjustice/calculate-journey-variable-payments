@@ -19,7 +19,7 @@ internal class MoveFiltererTest {
 
   private val cancelled = reportMoveFactory(
     moveId = "M2",
-    status = MoveStatus.Cancelled,
+    status = MoveStatus.cancelled,
     events = listOf(
       moveEventFactory(
         type = EventType.MOVE_CANCEL.value,
@@ -216,7 +216,7 @@ internal class MoveFiltererTest {
 
   private val cancelledBillable = reportMoveFactory(
     moveId = "M9",
-    status = MoveStatus.Cancelled,
+    status = MoveStatus.cancelled,
     fromLocation = fromPrisonNomisAgencyId(),
     fromLocationType = "prison",
     toLocation = toCourtNomisAgencyId(),

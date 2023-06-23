@@ -387,7 +387,7 @@ internal class MovePersisterTest {
       )
 
     val inTransitMove = reportMoveFactory(
-      status = MoveStatus.InTransit,
+      status = MoveStatus.in_transit,
       events = listOf(moveStartEvent),
       journeys = listOf(journey1),
     )
@@ -410,7 +410,7 @@ internal class MovePersisterTest {
 
     val journeyWithMoveCompleteEvent = journey1.copy(events = (journey1.events ?: emptyList()) + journeyCompleteEvent)
     val completedMoveWithNewJourney = inTransitMove.copy(
-      status = MoveStatus.Completed,
+      status = MoveStatus.completed,
       journeys = listOf(journeyWithMoveCompleteEvent),
       events = listOf(moveCompleteEvent),
     )
@@ -426,7 +426,7 @@ internal class MovePersisterTest {
   fun `Cancelled billable move`() {
     val cancelledBillable = reportMoveFactory(
       moveId = "M9",
-      status = MoveStatus.Cancelled,
+      status = MoveStatus.cancelled,
       fromLocation = fromPrisonNomisAgencyId1(),
       fromLocationType = "prison",
       toLocation = toCourtNomisAgencyId(),

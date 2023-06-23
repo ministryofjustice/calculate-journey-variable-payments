@@ -207,7 +207,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 move,
                 fromAgencyId = "FROM_AGENCY",
                 toAgencyId = "STOPOVER_AGENCY",
-                state = JourneyState.Cancelled,
+                state = JourneyState.cancelled,
                 dropOff = null,
               ),
               template,
@@ -331,7 +331,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 move,
                 fromAgencyId = "FROM_AGENCY2",
                 toAgencyId = "TO_AGENCY3",
-                state = JourneyState.Cancelled,
+                state = JourneyState.cancelled,
                 dropOff = null,
               ),
               template,
@@ -366,7 +366,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           toAgencyId = "TO_AGENCY",
           type = MoveType.CANCELLED,
           cancellationReason = Move.CANCELLATION_REASON_CANCELLED_BY_PMU,
-          status = MoveStatus.Cancelled,
+          status = MoveStatus.cancelled,
         ),
         template,
       ).also { move ->
@@ -377,7 +377,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           ),
           journeys = listOf(
             create(
-              journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.Cancelled),
+              journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.cancelled),
               template,
             ),
           ),
@@ -472,7 +472,7 @@ private fun move(
   days: Long = 0,
   date: LocalDate = startOfPreviousMonth,
   cancellationReason: String? = null,
-  status: MoveStatus = MoveStatus.Completed,
+  status: MoveStatus = MoveStatus.completed,
 ) = Move(
   dropOffOrCancelledDateTime = date.plusDays(days).atStartOfDay().plusHours(12),
   fromNomisAgencyId = fromAgencyId,
@@ -559,7 +559,7 @@ private fun journey(
   fromAgencyId: String,
   toAgencyId: String,
   supplier: Supplier = Supplier.SERCO,
-  state: JourneyState = JourneyState.Completed,
+  state: JourneyState = JourneyState.completed,
   pickUp: LocalDateTime? = move.pickUpDateTime,
   dropOff: LocalDateTime? = move.dropOffOrCancelledDateTime,
 ) = Journey(
