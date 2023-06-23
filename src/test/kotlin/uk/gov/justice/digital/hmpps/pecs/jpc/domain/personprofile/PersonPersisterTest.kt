@@ -38,7 +38,7 @@ private class ProfileMatcher(var profile: Profile) : ArgumentMatcher<Profile> {
 internal class PersonPersisterTest(
   @Autowired private val personRepository: PersonRepository,
   @Autowired private val profileRepository: ProfileRepository,
-  @Autowired private val entityManager: TestEntityManager
+  @Autowired private val entityManager: TestEntityManager,
 ) {
   private val personRepositorySpy: PersonRepository = mock { spy(personRepository) }
   private val profileRepositorySpy: ProfileRepository = mock { spy(profileRepository) }
@@ -64,7 +64,7 @@ internal class PersonPersisterTest(
   fun `save invoked once for 1 person`() {
     PersonPersister(
       personRepositorySpy,
-      profileRepositorySpy
+      profileRepositorySpy,
     ).persistPerson(entities(1) { id -> reportPersonFactory().copy(personId = id) }.first(), {}, {})
 
     verify(personRepositorySpy).saveAndFlush(any())
@@ -75,7 +75,7 @@ internal class PersonPersisterTest(
     entities(50) { id -> reportPersonFactory().copy(personId = id) }.forEach {
       PersonPersister(
         personRepositorySpy,
-        profileRepositorySpy
+        profileRepositorySpy,
       ).persistPerson(it, {}, {})
     }
 
@@ -91,13 +91,13 @@ internal class PersonPersisterTest(
             Person(
               "invalid",
               LocalDateTime.now(),
-              "invalid"
-            )
-          )
-        )
-      )
+              "invalid",
+            ),
+          ),
+        ),
+      ),
     ).thenThrow(
-      RuntimeException("An error message")
+      RuntimeException("An error message"),
     )
 
     val (persisted, errors) = AtomicInteger(0) to AtomicInteger(0)
@@ -108,7 +108,7 @@ internal class PersonPersisterTest(
       ).forEach {
       PersonPersister(
         personRepositorySpy,
-        profileRepositorySpy
+        profileRepositorySpy,
       ).persistPerson(it, { persisted.incrementAndGet() }, { errors.incrementAndGet() })
     }
 
@@ -122,7 +122,7 @@ internal class PersonPersisterTest(
   fun `save invoked once for 1 profile`() {
     PersonPersister(
       personRepositorySpy,
-      profileRepositorySpy
+      profileRepositorySpy,
     ).persistProfile(entities(1) { id -> profileFactory().copy(profileId = id, personId = id) }.first(), {}, {})
 
     verify(profileRepositorySpy, times(1)).saveAndFlush(any())
@@ -133,7 +133,7 @@ internal class PersonPersisterTest(
     entities(50) { id -> profileFactory().copy(profileId = id, personId = id) }.forEach {
       PersonPersister(
         personRepositorySpy,
-        profileRepositorySpy
+        profileRepositorySpy,
       ).persistProfile(it, {}, {})
     }
 
@@ -149,13 +149,13 @@ internal class PersonPersisterTest(
             Profile(
               "invalid",
               LocalDateTime.now(),
-              "invalid"
-            )
-          )
-        )
-      )
+              "invalid",
+            ),
+          ),
+        ),
+      ),
     ).thenThrow(
-      RuntimeException("An error message")
+      RuntimeException("An error message"),
     )
 
     val (persisted, errors) = AtomicInteger(0) to AtomicInteger(0)
@@ -166,7 +166,7 @@ internal class PersonPersisterTest(
       ).forEach {
       PersonPersister(
         personRepositorySpy,
-        profileRepositorySpy
+        profileRepositorySpy,
       ).persistProfile(it, { persisted.incrementAndGet() }, { errors.incrementAndGet() })
     }
 

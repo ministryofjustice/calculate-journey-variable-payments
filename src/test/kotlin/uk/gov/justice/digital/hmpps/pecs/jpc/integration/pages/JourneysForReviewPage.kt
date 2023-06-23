@@ -44,7 +44,7 @@ class JourneysForReviewPage : ApplicationPage() {
         "journeys",
         journey.from,
         journey.to,
-        index = index + 1
+        index = index + 1,
       )
     }
 

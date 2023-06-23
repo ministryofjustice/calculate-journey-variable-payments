@@ -14,7 +14,7 @@ class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("Journeys"),
   header = header,
   subheading = "TOTAL VOLUME BY JOURNEY",
-  dataColumns = listOf(PICK_UP, DROP_OFF, TOTAL_JOURNEY_COUNT, BILLABLE_JOURNEY_COUNT, UNIT_PRICE, TOTAL_PRICE)
+  dataColumns = listOf(PICK_UP, DROP_OFF, TOTAL_JOURNEY_COUNT, BILLABLE_JOURNEY_COUNT, UNIT_PRICE, TOTAL_PRICE),
 ) {
 
   override fun writeMove(move: Move) {}
@@ -26,11 +26,15 @@ class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(
       row.addCell(1, it.toSiteName())
       row.addCell(2, it.volume)
       row.addCell(3, it.billableJourneyCount())
-      if (it.unitPriceInPence != null && it.unitPriceInPence > 0) row.addCell(
-        4,
-        it.unitPriceInPounds(),
-        fillWhitePound
-      ) else row.addCell(4, "NOT PRESENT")
+      if (it.unitPriceInPence != null && it.unitPriceInPence > 0) {
+        row.addCell(
+          4,
+          it.unitPriceInPounds(),
+          fillWhitePound,
+        )
+      } else {
+        row.addCell(4, "NOT PRESENT")
+      }
       row.addCell(5, it.totalPriceInPounds(), fillWhitePound)
     }
   }

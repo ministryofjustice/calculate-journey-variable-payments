@@ -12,7 +12,7 @@ data class JourneyWithPrice(
   val toSiteName: String?,
   val volume: Int?,
   val unitPriceInPence: Int?,
-  val totalPriceInPence: Int?
+  val totalPriceInPence: Int?,
 ) {
   fun unitPriceInPounds() = unitPriceInPence?.let { Money(it).pounds() }
   fun totalPriceInPounds() = totalPriceInPence?.let { Money(it).pounds() }

@@ -18,14 +18,14 @@ import javax.validation.constraints.NotBlank
     Index(
       name = "audit_events_event_type_idx",
       columnList = "event_type",
-      unique = false
+      unique = false,
     ),
     Index(
       name = "audit_events_et_mdk_idx",
       columnList = "event_type, metadata_key",
-      unique = false
-    )
-  ]
+      unique = false,
+    ),
+  ],
 )
 data class AuditEvent(
   @Enumerated(EnumType.STRING)
@@ -54,7 +54,7 @@ data class AuditEvent(
     createdAt = createdAt,
     username = username,
     metadata = metadata?.toJsonString(),
-    metadataKey = metadata?.key()
+    metadataKey = metadata?.key(),
   )
 
   override fun equals(other: Any?): Boolean {

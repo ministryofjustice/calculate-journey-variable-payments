@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 data class LocationHistoryDto(val datetime: LocalDateTime, val action: String, val by: String) {
   companion object {
     fun valueOf(event: AuditEvent): LocationHistoryDto {
-
       val data = MapLocationMetadata.map(event)
 
       val action = buildString {
@@ -24,7 +23,7 @@ data class LocationHistoryDto(val datetime: LocalDateTime, val action: String, v
       return LocationHistoryDto(
         event.createdAt,
         action,
-        if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username
+        if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username,
       )
     }
   }

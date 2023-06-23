@@ -25,9 +25,9 @@ import javax.persistence.Table
     Index(
       name = "SUPPLIER_UNIQUE",
       columnList = "supplier",
-      unique = true
-    )
-  ]
+      unique = true,
+    ),
+  ],
 )
 data class PriceAdjustment(
   @Id
@@ -45,5 +45,5 @@ data class PriceAdjustment(
   val effectiveYear: Int,
 
   @Column(name = "multiplier", nullable = false)
-  val multiplier: BigDecimal
+  val multiplier: BigDecimal,
 )

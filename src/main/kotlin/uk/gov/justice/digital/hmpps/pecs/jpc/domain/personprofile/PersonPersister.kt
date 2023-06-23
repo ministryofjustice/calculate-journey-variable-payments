@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component
 @Component
 open class PersonPersister(
   private val personRepository: PersonRepository,
-  private val profileRepository: ProfileRepository
+  private val profileRepository: ProfileRepository,
 ) {
 
   open fun persistPerson(person: Person, success: () -> Unit, failure: (Throwable) -> Unit) {

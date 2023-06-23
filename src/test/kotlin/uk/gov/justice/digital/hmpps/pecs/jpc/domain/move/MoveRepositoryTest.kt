@@ -27,7 +27,7 @@ internal class MoveRepositoryTest {
       journeyJ1(moveId = move.moveId, events = listOf(eventE1(eventId = "E1", eventableId = journeyJ1().journeyId)))
     val moveModel = move.copy(
       events = listOf(eventE1(eventId = "E2", eventableId = move.moveId)),
-      journeys = listOf(journeyModel)
+      journeys = listOf(journeyModel),
     )
 
     val persistedReport = moveRepository.save(moveModel)
@@ -51,7 +51,7 @@ internal class MoveRepositoryTest {
       moveType = MoveType.STANDARD,
       supplier = Supplier.SERCO,
       pickUpDateTime = LocalDate.of(2022, 5, 2).atStartOfDay(),
-      dropOffOrCancelledDateTime = null
+      dropOffOrCancelledDateTime = null,
     )
 
     val sercoMoveMissingMoveType = moveM1().copy(
@@ -59,7 +59,7 @@ internal class MoveRepositoryTest {
       moveDate = LocalDate.of(2022, 5, 1),
       moveType = null,
       pickUpDateTime = LocalDate.of(2022, 5, 1).atStartOfDay(),
-      dropOffOrCancelledDateTime = LocalDate.of(2022, 5, 1).atStartOfDay()
+      dropOffOrCancelledDateTime = LocalDate.of(2022, 5, 1).atStartOfDay(),
     )
 
     val sercoMoveMoveTypeAndDropOffPresent = moveM1().copy(
@@ -67,7 +67,7 @@ internal class MoveRepositoryTest {
       moveDate = LocalDate.of(2022, 5, 1),
       moveType = MoveType.STANDARD,
       pickUpDateTime = LocalDate.of(2022, 5, 1).atStartOfDay(),
-      dropOffOrCancelledDateTime = LocalDate.of(2022, 5, 1).atStartOfDay()
+      dropOffOrCancelledDateTime = LocalDate.of(2022, 5, 1).atStartOfDay(),
     )
 
     val geoMoveMissingDropOff = sercoMoveMissingDropOff.copy(
@@ -81,7 +81,7 @@ internal class MoveRepositoryTest {
       moveDate = LocalDate.of(2022, 5, 1),
       moveType = null,
       pickUpDateTime = LocalDate.of(2022, 5, 1).atStartOfDay(),
-      dropOffOrCancelledDateTime = LocalDate.of(2022, 5, 1).atStartOfDay()
+      dropOffOrCancelledDateTime = LocalDate.of(2022, 5, 1).atStartOfDay(),
     )
 
     moveRepository.saveAllAndFlush(
@@ -91,7 +91,7 @@ internal class MoveRepositoryTest {
         sercoMoveMoveTypeAndDropOffPresent,
         geoMoveMissingDropOff,
         geoMoveMissingMoveType,
-      )
+      ),
     )
 
     val results = moveRepository.findCompletedCandidateReconcilableMoves(Supplier.SERCO, 2022, 5)

@@ -19,8 +19,8 @@ internal class RedirectionMovesSheetTest {
     PriceSheet.Header(
       defaultMoveDate10Sep2020,
       DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-      Supplier.SERCO
-    )
+      Supplier.SERCO,
+    ),
   )
 
   @Test
@@ -44,7 +44,7 @@ internal class RedirectionMovesSheetTest {
       "NOMIS prison ID",
       "Price",
       "Contractor billable?",
-      "Notes"
+      "Notes",
     )
 
     assertCellEquals(redirectionMovesSheet, 9, 0, "REF1")

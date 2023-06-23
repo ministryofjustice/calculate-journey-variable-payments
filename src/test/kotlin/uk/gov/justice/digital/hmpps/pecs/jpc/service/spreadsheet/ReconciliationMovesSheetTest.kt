@@ -16,7 +16,7 @@ class ReconciliationMovesSheetTest {
 
   private val sheet = ReconciliationMovesSheet(
     SXSSFWorkbook(),
-    PriceSheet.Header(date.toLocalDate(), DateRange(date.toLocalDate(), date.toLocalDate()), Supplier.GEOAMEY)
+    PriceSheet.Header(date.toLocalDate(), DateRange(date.toLocalDate(), date.toLocalDate()), Supplier.GEOAMEY),
   )
 
   private val move1 = Move(
@@ -24,13 +24,13 @@ class ReconciliationMovesSheetTest {
     updatedAt = date,
     supplier = Supplier.GEOAMEY,
     moveType = MoveType.STANDARD,
-    status = MoveStatus.completed,
+    status = MoveStatus.Completed,
     reference = "ABC12345",
     moveDate = date.toLocalDate(),
     fromNomisAgencyId = "AGENCY_ID",
     pickUpDateTime = date,
     dropOffOrCancelledDateTime = date.plusMinutes(10),
-    reportFromLocationType = LocationType.CC.name
+    reportFromLocationType = LocationType.CC.name,
   )
 
   @Test
@@ -49,14 +49,14 @@ class ReconciliationMovesSheetTest {
       "Pick up date",
       "Pick up time",
       "Drop off date",
-      "Drop off time"
+      "Drop off time",
     )
   }
 
   @Test
   fun `move data is applied and correct`() {
     sheet.writeMoves(
-      listOf(move1)
+      listOf(move1),
     )
 
     assertOnRow(
@@ -65,11 +65,11 @@ class ReconciliationMovesSheetTest {
       "ABC12345",
       "13/05/2022",
       MoveType.STANDARD,
-      MoveStatus.completed,
+      MoveStatus.Completed,
       "13/05/2022",
       "12:00",
       "13/05/2022",
-      "12:10"
+      "12:10",
     )
   }
 }

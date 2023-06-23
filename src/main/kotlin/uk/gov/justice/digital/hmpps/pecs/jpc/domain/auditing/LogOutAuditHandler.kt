@@ -13,7 +13,7 @@ class LogOutAuditHandler(
   override fun onLogoutSuccess(
     request: HttpServletRequest?,
     response: HttpServletResponse?,
-    authentication: Authentication?
+    authentication: Authentication?,
   ) {
     auditService.create(AuditableEvent.logOutEvent(authentication!!))
     defaultTargetUrl = authLogoutSuccessUri

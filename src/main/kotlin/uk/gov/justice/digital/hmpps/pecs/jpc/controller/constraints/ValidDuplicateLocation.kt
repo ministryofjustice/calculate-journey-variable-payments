@@ -10,5 +10,5 @@ import kotlin.reflect.KClass
 annotation class ValidDuplicateLocation(
   val message: String = "There is a problem, Schedule 34 location entered already exists, please enter a new schedule 34 location",
   val groups: Array<KClass<*>> = [],
-  val payload: Array<KClass<out Any>> = []
+  val payload: Array<KClass<out Any>> = [],
 )

@@ -63,7 +63,7 @@ internal class PriceImporterTest {
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = 10000,
-      effectiveYear = 2020
+      effectiveYear = 2020,
     )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
@@ -96,7 +96,7 @@ internal class PriceImporterTest {
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = 10100,
-      effectiveYear = 2019
+      effectiveYear = 2019,
     )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
@@ -116,6 +116,7 @@ internal class PriceImporterTest {
       assertThat(username).isEqualTo("_TERMINAL_")
     }
   }
+
   @Test
   internal fun `verify import interactions for geoamey_updated_price`() {
     whenever(geoameyPricesProvider.get()).thenReturn(priceSheetWithRow(2.0, "GEO FROM", "GEO TO", 101.00))
@@ -130,7 +131,7 @@ internal class PriceImporterTest {
       toLocation = toLocation,
       priceInPence = 5000,
       effectiveYear = 2019,
-      previousPrice = null
+      previousPrice = null,
     )
 
     whenever(priceRepo.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.GEOAMEY, fromLocation, toLocation, 2019)).thenReturn(oldPrice)
@@ -141,7 +142,7 @@ internal class PriceImporterTest {
       toLocation = toLocation,
       priceInPence = 10100,
       effectiveYear = 2019,
-      previousPrice = oldPrice
+      previousPrice = oldPrice,
     )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)
@@ -169,7 +170,7 @@ internal class PriceImporterTest {
       toLocation = toLocation,
       priceInPence = 5000,
       effectiveYear = 2019,
-      previousPrice = null
+      previousPrice = null,
     )
 
     whenever(priceRepo.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(Supplier.GEOAMEY, fromLocation, toLocation, 2019)).thenReturn(oldPrice)
@@ -180,7 +181,7 @@ internal class PriceImporterTest {
       toLocation = toLocation,
       priceInPence = 5000,
       effectiveYear = 2019,
-      previousPrice = oldPrice
+      previousPrice = oldPrice,
     )
 
     whenever(priceRepo.save(any())).thenReturn(priceToAudit)

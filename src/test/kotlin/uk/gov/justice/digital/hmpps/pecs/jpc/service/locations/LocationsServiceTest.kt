@@ -38,8 +38,8 @@ internal class LocationsServiceTest {
       Location(
         LocationType.AP,
         "AGENCYID",
-        "SITE NAME"
-      )
+        "SITE NAME",
+      ),
     )
 
     assertThat(service.locationAlreadyExists("agencyId", "site name")).isFalse
@@ -91,8 +91,8 @@ internal class LocationsServiceTest {
     whenever(locationRepository.save(any())).thenReturn(
       existingLocation.copy(
         locationType = LocationType.MC,
-        siteName = "SITE NAME"
-      )
+        siteName = "SITE NAME",
+      ),
     )
 
     service.setLocationDetails("agency_iD ", "site name", LocationType.MC)
@@ -114,8 +114,8 @@ internal class LocationsServiceTest {
       Location(
         LocationType.PR,
         "AGENCY_ID",
-        "SITE NAME"
-      )
+        "SITE NAME",
+      ),
     )
 
     service.setLocationDetails("agency_iD ", "site name", LocationType.PR)

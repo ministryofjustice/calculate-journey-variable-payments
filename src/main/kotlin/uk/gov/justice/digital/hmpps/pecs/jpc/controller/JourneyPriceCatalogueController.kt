@@ -26,7 +26,7 @@ private val logger = loggerFor<JourneyPriceCatalogueController>()
 @RestController
 class JourneyPriceCatalogueController(
   private val journeyPriceCatalogueService: JourneyPriceCatalogueService,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
 ) {
 
   @GetMapping(GENERATE_PRICES_SPREADSHEET)
@@ -34,9 +34,8 @@ class JourneyPriceCatalogueController(
   fun generateJourneyPriceCatalogue(
     @SessionAttribute(name = SUPPLIER_ATTRIBUTE, required = false) supplier: Supplier?,
     @SessionAttribute(name = DATE_ATTRIBUTE, required = false) movesFrom: LocalDate?,
-    response: HttpServletResponse?
+    response: HttpServletResponse?,
   ): ResponseEntity<InputStreamResource?>? {
-
     if (supplier == null || movesFrom == null) {
       logger.info("Missing session attributes, no session or session has expired.")
 

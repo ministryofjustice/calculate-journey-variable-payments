@@ -26,7 +26,7 @@ abstract class PriceSheet(
   val sheet: Sheet,
   private val header: Header,
   private val subheading: String? = null,
-  val dataColumns: List<DataColumn> = listOf()
+  val dataColumns: List<DataColumn> = listOf(),
 ) {
 
   enum class DataColumn(val label: String, val width: Int = 4500) {
@@ -57,7 +57,7 @@ abstract class PriceSheet(
     TOTAL_PRICE("Total price"),
     UNIT_PRICE("Unit price"),
     UNIT_PRICE_EXCEPTION("Unit price exception"),
-    VEHICLE_REG("Vehicle reg")
+    VEHICLE_REG("Vehicle reg"),
   }
 
   private val rowIndex: AtomicInteger = AtomicInteger(9)
@@ -245,7 +245,6 @@ abstract class PriceSheet(
    * @param cellStyle - optional CellStyle to set on the cell
    */
   protected fun <T> Row.addCell(col: Int, value: T?, cellStyle: CellStyle? = null) {
-
     // setting the cell type upfront as this is more efficient
     val cellType = when (value) {
       is String -> CellType.STRING

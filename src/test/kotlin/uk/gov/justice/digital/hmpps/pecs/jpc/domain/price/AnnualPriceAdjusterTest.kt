@@ -51,7 +51,7 @@ internal class AnnualPriceAdjusterTest {
         supplier = Supplier.GEOAMEY,
         addedAt = timeSource.dateTime(),
         multiplier = 1.5.toBigDecimal(),
-        effectiveYear = 2020
+        effectiveYear = 2020,
       )
       whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
@@ -76,7 +76,7 @@ internal class AnnualPriceAdjusterTest {
         supplier = Supplier.SERCO,
         addedAt = timeSource.dateTime(),
         multiplier = 2.0.toBigDecimal(),
-        effectiveYear = 2021
+        effectiveYear = 2021,
       )
       whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
 
@@ -107,21 +107,21 @@ internal class AnnualPriceAdjusterTest {
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = 10000,
-        effectiveYear = 2019
+        effectiveYear = 2019,
       )
 
       whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2019)).thenReturn(
         Stream.of(
-          previousYearPrice
-        )
+          previousYearPrice,
+        ),
       )
       whenever(
         priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
           any(),
           any(),
           any(),
-          any()
-        )
+          any(),
+        ),
       ).thenReturn(null)
 
       val adjusted = priceAdjuster.inflationary(lockId, Supplier.SERCO, 2020, AdjustmentMultiplier(1.5.toBigDecimal()))
@@ -140,7 +140,7 @@ internal class AnnualPriceAdjusterTest {
           lockId,
           Supplier.SERCO,
           2020,
-          AdjustmentMultiplier(1.0.toBigDecimal())
+          AdjustmentMultiplier(1.0.toBigDecimal()),
         )
       }
         .isInstanceOf(RuntimeException::class.java)
@@ -158,13 +158,13 @@ internal class AnnualPriceAdjusterTest {
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = 10000,
-        effectiveYear = 2020
+        effectiveYear = 2020,
       )
 
       whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.GEOAMEY, 2020)).thenReturn(
         Stream.of(
-          previousYearPrice
-        )
+          previousYearPrice,
+        ),
       )
 
       val adjusted =
@@ -184,7 +184,7 @@ internal class AnnualPriceAdjusterTest {
           lockId,
           Supplier.GEOAMEY,
           2020,
-          AdjustmentMultiplier(1.0.toBigDecimal())
+          AdjustmentMultiplier(1.0.toBigDecimal()),
         )
       }
         .isInstanceOf(RuntimeException::class.java)
@@ -206,7 +206,7 @@ internal class AnnualPriceAdjusterTest {
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = 10000,
-        effectiveYear = 2020
+        effectiveYear = 2020,
       )
 
       whenever(priceRepository.findBySupplierAndEffectiveYear(Supplier.SERCO, 2020)).thenReturn(Stream.of(currentPrice))
@@ -215,8 +215,8 @@ internal class AnnualPriceAdjusterTest {
           any(),
           any(),
           any(),
-          any()
-        )
+          any(),
+        ),
       ).thenReturn(null)
 
       val adjusted = priceAdjuster.volumetric(lockId, Supplier.SERCO, 2020, AdjustmentMultiplier(1.5.toBigDecimal()))
@@ -235,7 +235,7 @@ internal class AnnualPriceAdjusterTest {
           lockId,
           Supplier.SERCO,
           2020,
-          AdjustmentMultiplier(1.0.toBigDecimal())
+          AdjustmentMultiplier(1.0.toBigDecimal()),
         )
       }
         .isInstanceOf(RuntimeException::class.java)
@@ -253,14 +253,14 @@ internal class AnnualPriceAdjusterTest {
         fromLocation = fromLocation,
         toLocation = toLocation,
         priceInPence = 10000,
-        effectiveYear = 2021
+        effectiveYear = 2021,
       )
 
       whenever(
         priceRepository.findBySupplierAndEffectiveYear(
           Supplier.GEOAMEY,
-          2021
-        )
+          2021,
+        ),
       ).thenReturn(Stream.of(currentPrice))
 
       val adjusted = priceAdjuster.volumetric(lockId, Supplier.GEOAMEY, 2021, AdjustmentMultiplier(2.0.toBigDecimal()))
@@ -279,7 +279,7 @@ internal class AnnualPriceAdjusterTest {
           lockId,
           Supplier.GEOAMEY,
           2020,
-          AdjustmentMultiplier(1.0.toBigDecimal())
+          AdjustmentMultiplier(1.0.toBigDecimal()),
         )
       }
         .isInstanceOf(RuntimeException::class.java)

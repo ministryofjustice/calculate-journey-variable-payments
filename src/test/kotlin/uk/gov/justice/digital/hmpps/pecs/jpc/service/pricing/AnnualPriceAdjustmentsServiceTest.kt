@@ -62,21 +62,21 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.SERCO,
         2020,
         AdjustmentMultiplier(1.0.toBigDecimal()),
         null,
         authentication,
-        "some details"
+        "some details",
       )
 
       verify(annualPriceAdjusterSpy).inflationary(
         eq(lockId),
         eq(Supplier.SERCO),
         eq(2020),
-        eq(AdjustmentMultiplier(1.0.toBigDecimal()))
+        eq(AdjustmentMultiplier(1.0.toBigDecimal())),
       )
     }
 
@@ -89,21 +89,21 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
         null,
         authentication,
-        "some details"
+        "some details",
       )
 
       verify(annualPriceAdjusterSpy).inflationary(
         eq(lockId),
         eq(Supplier.GEOAMEY),
         eq(2021),
-        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+        eq(AdjustmentMultiplier(2.0.toBigDecimal())),
       )
     }
 
@@ -116,8 +116,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
           any(),
           eq(Supplier.GEOAMEY),
           eq(2021),
-          eq(AdjustmentMultiplier(2.0.toBigDecimal()))
-        )
+          eq(AdjustmentMultiplier(2.0.toBigDecimal())),
+        ),
       ).thenThrow(RuntimeException("something went wrong"))
 
       AnnualPriceAdjustmentsService(
@@ -125,14 +125,14 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
         null,
         authentication,
-        "some details"
+        "some details",
       )
 
       verify(monitoringService).capture("Failed INFLATION price adjustment for GEOAMEY for effective year 2021 and multiplier 2.0.")
@@ -145,8 +145,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
         PriceAdjustment(
           supplier = Supplier.GEOAMEY,
           multiplier = 2.0.toBigDecimal(),
-          effectiveYear = 2021
-        )
+          effectiveYear = 2021,
+        ),
       )
 
       whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
@@ -156,22 +156,22 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
         null,
         authentication,
-        "some audit details"
+        "some audit details",
       )
 
       verify(auditService).create(
         AuditableEvent(
           AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
           authentication.name,
-          AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "some audit details")
-        )
+          AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "some audit details"),
+        ),
       )
     }
 
@@ -183,14 +183,14 @@ internal class AnnualPriceAdjustmentsServiceTest {
           monitoringService,
           auditService,
           effectiveYear,
-          jobRunner
+          jobRunner,
         ).adjust(
           Supplier.GEOAMEY,
           effectiveYear.current() - 2,
           AdjustmentMultiplier(2.0.toBigDecimal()),
           null,
           authentication,
-          "some details"
+          "some details",
         )
       }.isInstanceOf(RuntimeException::class.java)
         .hasMessage("Price adjustments cannot be before the previous effective year ${effectiveYear.previous()}.")
@@ -208,21 +208,21 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.SERCO,
         2020,
         AdjustmentMultiplier(1.0.toBigDecimal()),
         AdjustmentMultiplier(2.0.toBigDecimal()),
         authentication,
-        "some details"
+        "some details",
       )
 
       verify(annualPriceAdjusterSpy).volumetric(
         eq(lockId),
         eq(Supplier.SERCO),
         eq(2020),
-        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+        eq(AdjustmentMultiplier(2.0.toBigDecimal())),
       )
     }
 
@@ -235,21 +235,21 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(1.0.toBigDecimal()),
         AdjustmentMultiplier(2.0.toBigDecimal()),
         authentication,
-        "some details"
+        "some details",
       )
 
       verify(annualPriceAdjusterSpy).volumetric(
         eq(lockId),
         eq(Supplier.GEOAMEY),
         eq(2021),
-        eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+        eq(AdjustmentMultiplier(2.0.toBigDecimal())),
       )
     }
 
@@ -260,8 +260,8 @@ internal class AnnualPriceAdjustmentsServiceTest {
         PriceAdjustment(
           supplier = Supplier.GEOAMEY,
           multiplier = 2.0.toBigDecimal(),
-          effectiveYear = 2021
-        )
+          effectiveYear = 2021,
+        ),
       )
       whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
 
@@ -270,22 +270,22 @@ internal class AnnualPriceAdjustmentsServiceTest {
         monitoringService,
         auditService,
         effectiveYear,
-        jobRunner
+        jobRunner,
       ).adjust(
         Supplier.GEOAMEY,
         2021,
         AdjustmentMultiplier(2.0.toBigDecimal()),
         null,
         authentication,
-        "some audit details"
+        "some audit details",
       )
 
       verify(auditService).create(
         AuditableEvent(
           AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
           authentication.name,
-          AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "some audit details")
-        )
+          AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2021, 2.0.toBigDecimal(), "some audit details"),
+        ),
       )
     }
 
@@ -297,14 +297,14 @@ internal class AnnualPriceAdjustmentsServiceTest {
           monitoringService,
           auditService,
           effectiveYear,
-          jobRunner
+          jobRunner,
         ).adjust(
           Supplier.GEOAMEY,
           effectiveYear.current() - 2,
           AdjustmentMultiplier(2.0.toBigDecimal()),
           null,
           authentication,
-          "some details"
+          "some details",
         )
       }.isInstanceOf(RuntimeException::class.java)
         .hasMessage("Price adjustments cannot be before the previous effective year ${effectiveYear.previous()}.")
@@ -321,27 +321,27 @@ internal class AnnualPriceAdjustmentsServiceTest {
       monitoringService,
       auditService,
       effectiveYear,
-      jobRunner
+      jobRunner,
     ).adjust(
       Supplier.GEOAMEY,
       2021,
       AdjustmentMultiplier(2.0.toBigDecimal()),
       AdjustmentMultiplier(3.0.toBigDecimal()),
       authentication,
-      "some details"
+      "some details",
     )
 
     verify(annualPriceAdjusterSpy).inflationary(
       eq(inflationLockId),
       eq(Supplier.GEOAMEY),
       eq(2021),
-      eq(AdjustmentMultiplier(2.0.toBigDecimal()))
+      eq(AdjustmentMultiplier(2.0.toBigDecimal())),
     )
     verify(annualPriceAdjusterSpy).volumetric(
       eq(volumetricLockId),
       eq(Supplier.GEOAMEY),
       eq(2021),
-      eq(AdjustmentMultiplier(3.0.toBigDecimal()))
+      eq(AdjustmentMultiplier(3.0.toBigDecimal())),
     )
   }
 
@@ -349,7 +349,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     val lockId = UUID.randomUUID()
 
     whenever(annualPriceAdjusterSpy.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)).thenReturn(
-      lockId
+      lockId,
     )
 
     return lockId

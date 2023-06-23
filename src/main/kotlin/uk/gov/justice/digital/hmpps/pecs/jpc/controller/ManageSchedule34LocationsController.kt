@@ -28,7 +28,7 @@ private val logger = loggerFor<ManageSchedule34LocationsController>()
 @Controller
 class ManageSchedule34LocationsController(
   private val service: LocationsService,
-  private val basmClientApiService: BasmClientApiService
+  private val basmClientApiService: BasmClientApiService,
 ) : PrimaryNavigationBar {
 
   override fun primaryNavigationChoice() = PrimaryNavigation.LOCATION
@@ -44,10 +44,12 @@ class ManageSchedule34LocationsController(
 
   @PostMapping(SEARCH_LOCATIONS)
   fun searchForLocation(
-    @Valid @ModelAttribute("form") form: SearchLocationForm,
+    @Valid
+    @ModelAttribute("form")
+    form: SearchLocationForm,
     result: BindingResult,
     model: ModelMap,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("searching for location")
 
@@ -77,15 +79,15 @@ class ManageSchedule34LocationsController(
           locationName = it.second,
           locationType = it.third,
           nomisLocationName = basmClientApiService.findNomisAgencyLocationNameBy(agencyId)
-            ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later."
-        )
+            ?: "Sorry, we are currently unable to retrieve the NOMIS Location Name. Please try again later.",
+        ),
       )
 
       model.addAttribute(
         "history",
         service.locationHistoryForAgencyId(agencyId)
           .map { history -> LocationHistoryDto.valueOf(history) }
-          .sortedByDescending { lh -> lh.datetime }
+          .sortedByDescending { lh -> lh.datetime },
       )
     }
 
@@ -94,10 +96,12 @@ class ManageSchedule34LocationsController(
 
   @PostMapping(MANAGE_LOCATION)
   fun performManageLocation(
-    @Valid @ModelAttribute("form") form: LocationForm,
+    @Valid
+    @ModelAttribute("form")
+    form: LocationForm,
     result: BindingResult,
     model: ModelMap,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): String {
     logger.info("performing manage location")
 
@@ -108,7 +112,7 @@ class ManageSchedule34LocationsController(
         "history",
         service.locationHistoryForAgencyId(form.agencyId)
           .map { history -> LocationHistoryDto.valueOf(history) }
-          .sortedByDescending { lh -> lh.datetime }
+          .sortedByDescending { lh -> lh.datetime },
       )
 
       return "manage-location"
@@ -133,13 +137,13 @@ class ManageSchedule34LocationsController(
     this.rejectValue(
       "locationName",
       "duplicate",
-      "There is a problem, Schedule 34 location entered already exists, please enter a new schedule 34 location"
+      "There is a problem, Schedule 34 location entered already exists, please enter a new schedule 34 location",
     )
   }
 
   data class SearchLocationForm(
     @get: NotBlank(message = "Please enter a schedule 34 location name")
-    val location: String? = null
+    val location: String? = null,
   )
 
   data class LocationForm(
@@ -153,7 +157,7 @@ class ManageSchedule34LocationsController(
     @get: NotNull(message = "Please enter a schedule 34 location type")
     val locationType: LocationType? = null,
 
-    val nomisLocationName: String = ""
+    val nomisLocationName: String = "",
   )
 
   companion object Routes {

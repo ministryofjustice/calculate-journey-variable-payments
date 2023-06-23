@@ -108,7 +108,7 @@ data class Journey(
 
   @Json(ignored = true)
   @Column(name = "effective_year", nullable = false)
-  val effectiveYear: Int? = null
+  val effectiveYear: Int? = null,
 ) {
   override fun toString(): String {
     return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
@@ -212,16 +212,17 @@ data class Journey(
 }
 
 enum class JourneyState() {
-  proposed,
-  in_progress,
-  rejected,
-  cancelled,
-  completed,
-  unknown;
+  Proposed,
+  InProgress,
+  Rejected,
+  Cancelled,
+  Completed,
+  Unknown,
+  ;
 
   companion object {
     fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { valueOf(value!!.lowercase()) }.getOrDefault(unknown)
+      kotlin.runCatching { JourneyState.values().first { js -> js.toString().lowercase() == value!!.lowercase() } }.getOrDefault(Unknown)
   }
 }
 

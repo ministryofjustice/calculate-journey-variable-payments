@@ -21,12 +21,12 @@ class PriceImporter(
   private val geoameyPrices: GeoameyPricesProvider,
   private val locationRepository: LocationRepository,
   private val auditService: AuditService,
-  private val supplierPricingService: SupplierPricingService
+  private val supplierPricingService: SupplierPricingService,
 ) {
 
   enum class Action {
     WARN,
-    ERROR
+    ERROR,
   }
 
   fun import(supplier: Supplier, effectiveYear: Int, action: Action? = Action.ERROR) {
@@ -50,7 +50,7 @@ class PriceImporter(
       locationRepository.findAll(),
       priceRepo,
       effectiveYear,
-      action
+      action,
     ).use { import(it) }
   }
 
@@ -60,7 +60,6 @@ class PriceImporter(
     var skipCount = 0
 
     spreadsheet.forEachRow {
-
       if (it.previousPrice != null) {
         if (it.previousPrice!!.priceInPence != it.priceInPence) {
           supplierPricingService.updatePriceForSupplier(it.previousPrice!!, it.price())

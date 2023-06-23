@@ -19,7 +19,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     supplier: Supplier,
     fromSiteName: String?,
     toSiteName: String?,
-    effectiveYear: Int
+    effectiveYear: Int,
   ): List<JourneyWithPrice> {
     val selectPricesSQL =
       """
@@ -50,7 +50,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
           toSiteName = getString("journey_to_site_name"),
           unitPriceInPence = if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
           volume = null,
-          totalPriceInPence = null
+          totalPriceInPence = null,
         )
       }
     }
@@ -64,7 +64,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     supplier: Supplier,
     startDate: LocalDate,
     endDateInclusive: LocalDate,
-    excludePriced: Boolean = true
+    excludePriced: Boolean = true,
   ): List<JourneyWithPrice> {
     val journeyWithPricesRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
       with(resultSet) {
@@ -77,7 +77,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
           toSiteName = getString("journey_to_site_name"),
           volume = getInt("volume"),
           unitPriceInPence = if (getInt("unit_price_in_pence") == 0 && wasNull()) null else getInt("unit_price_in_pence"),
-          totalPriceInPence = getInt("total_price_in_pence")
+          totalPriceInPence = getInt("total_price_in_pence"),
         )
       }
     }
@@ -118,7 +118,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       startDate.possiblePriceExceptionMonth(),
       supplier.name,
       startDate.month.value,
-      startDate.year
+      startDate.year,
     )
   }
 
@@ -127,7 +127,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
   fun journeysSummaryInDateRange(
     supplier: Supplier,
     startDate: LocalDate,
-    endDateInclusive: LocalDate
+    endDateInclusive: LocalDate,
   ): JourneysSummary {
     val journeysSummaryRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
       with(resultSet) {
@@ -136,7 +136,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
           count = getInt("journey_count"),
           totalPriceInPence = getInt("total_price_in_pence"),
           countWithoutLocations = getInt("count_without_locations"),
-          countUnpriced = getInt("count_unpriced")
+          countUnpriced = getInt("count_unpriced"),
         )
       }
     }
@@ -166,7 +166,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       startDate.possiblePriceExceptionMonth(),
       supplier.name,
       startDate.month.value,
-      startDate.year
+      startDate.year,
     )[0]
   }
 }

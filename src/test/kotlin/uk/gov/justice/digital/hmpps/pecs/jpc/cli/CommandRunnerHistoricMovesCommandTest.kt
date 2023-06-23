@@ -14,7 +14,7 @@ import java.time.LocalDate
 
 @SpringBootTest(
   args = ["--process-historic-moves", "--supplier=serco", "--from=2021-01-01", "--to=2021-01-01"],
-  webEnvironment = WebEnvironment.NONE
+  webEnvironment = WebEnvironment.NONE,
 )
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
@@ -34,7 +34,7 @@ class CommandRunnerHistoricMovesCommandTest {
     verify(historicMovesCommand).process(
       LocalDate.of(2021, 1, 1),
       LocalDate.of(2021, 1, 1),
-      Supplier.SERCO
+      Supplier.SERCO,
     )
 
     verifyNoInteractions(bulkPriceImportCommand)

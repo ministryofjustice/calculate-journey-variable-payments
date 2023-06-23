@@ -18,7 +18,7 @@ class PersonTest {
       lastName = "SKYWALKER",
       dateOfBirth = LocalDate.of(1980, 4, 28),
       gender = "MALE",
-      ethnicity = "JEDI"
+      ethnicity = "JEDI",
     )
 
     assertThat(person.toString().uppercase())
@@ -29,7 +29,7 @@ class PersonTest {
         person.lastName,
         person.dateOfBirth.toString(),
         person.gender,
-        person.ethnicity
+        person.ethnicity,
       )
   }
 }

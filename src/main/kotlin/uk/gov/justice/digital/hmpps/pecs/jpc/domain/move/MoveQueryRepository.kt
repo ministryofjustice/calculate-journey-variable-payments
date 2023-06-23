@@ -30,7 +30,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       rowMapper,
       supplier.name,
       startDate.month.value,
-      startDate.year
+      startDate.year,
     )[0]
   }
 
@@ -38,7 +38,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     supplier: Supplier,
     startDate: LocalDate,
     endDateInclusive: LocalDate,
-    totalMoves: Int
+    totalMoves: Int,
   ): List<MovesSummary> {
     val movesSummaryRowMapper = RowMapper { resultSet: ResultSet, _: Int ->
       with(resultSet) {
@@ -48,7 +48,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
           percentage = count.toDouble() / totalMoves,
           volume = count,
           volumeUnpriced = getInt("count_unpriced"),
-          totalPriceInPence = getInt("total_price_in_pence")
+          totalPriceInPence = getInt("total_price_in_pence"),
         )
       }
     }
@@ -78,7 +78,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       startDate.possiblePriceExceptionMonth(),
       supplier.name,
       startDate.month.value,
-      startDate.year
+      startDate.year,
     )
   }
 
@@ -138,7 +138,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
         reportFromLocationType = getString("report_from_location_type"),
         reportToLocationType = getString("report_to_location_type"),
         cancellationReason = getString("cancellation_reason"),
-        cancellationReasonComment = getString("cancellation_reason_comment")
+        cancellationReasonComment = getString("cancellation_reason_comment"),
       )
 
       val personId = getString("person_id")
@@ -153,7 +153,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
           lastName = getString("last_name"),
           ethnicity = getString("ethnicity"),
           gender = getString("gender"),
-          dateOfBirth = getDate("date_of_birth")?.toLocalDate()
+          dateOfBirth = getDate("date_of_birth")?.toLocalDate(),
         )
       }
 
@@ -179,7 +179,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
           billable = getBoolean("billable"),
           notes = getString("journey_notes"),
           priceInPence = if (getInt("price_in_pence") == 0 && wasNull()) null else getInt("price_in_pence"),
-          effectiveYear = getInt("effective_year")
+          effectiveYear = getInt("effective_year"),
         )
       }
 
@@ -197,7 +197,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       supplier.name,
       inMonth.value,
       moveId,
-      supplier.name
+      supplier.name,
     ).groupBy { it.move.moveId }
 
     return movePersonJourney.keys.map { k -> movePersonJourney.getValue(k).move() }.firstOrNull()
@@ -209,7 +209,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     startDate: LocalDate,
     endDateInclusive: LocalDate,
     limit: Int = 50,
-    offset: Long = 0
+    offset: Long = 0,
   ): List<Move> {
     val movesWithPersonAndJourneys = jdbcTemplate.query(
       "$moveJourneySelectSQL where m.supplier = ? and m.move_month = ? and m.move_year = ? and m.move_type = ? and m.drop_off_or_cancelled is not null " +
@@ -244,7 +244,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       startDate.possiblePriceExceptionMonth(),
       supplier.name,
       Timestamp.valueOf(startDate.atStartOfDay()),
-      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay())
+      Timestamp.valueOf(endDateInclusive.plusDays(1).atStartOfDay()),
     ).groupBy { it.move.moveId }
 
     return movesWithPersonAndJourneys.keys.map { k ->
@@ -256,6 +256,6 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
 
   fun List<MovePersonJourney>.move() = this[0].move.copy(
     journeys = this.mapNotNull { it.journey },
-    person = this[0].person
+    person = this[0].person,
   )
 }

@@ -20,7 +20,7 @@ internal class ReportJourneyTest {
 
   val move = reportMoveFactory(
     events = listOf(moveAcceptEvent, moveRedirectEvent, moveCancelEvent),
-    journeys = listOf(reportJourneyFactory(events = listOf(journeyStartEvent, journeyCancelEvent)))
+    journeys = listOf(reportJourneyFactory(events = listOf(journeyStartEvent, journeyCancelEvent))),
   )
 
   @Test
@@ -45,8 +45,8 @@ internal class ReportJourneyTest {
       move.getEvents(
         EventType.MOVE_ACCEPT,
         EventType.MOVE_CANCEL,
-        EventType.JOURNEY_START
-      )
+        EventType.JOURNEY_START,
+      ),
     ).containsExactlyInAnyOrder(moveAcceptEvent, moveCancelEvent, journeyStartEvent)
   }
 }

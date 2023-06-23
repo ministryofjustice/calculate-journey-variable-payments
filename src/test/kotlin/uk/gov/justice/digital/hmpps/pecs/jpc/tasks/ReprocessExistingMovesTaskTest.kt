@@ -51,7 +51,7 @@ class ReprocessExistingMovesTaskTest {
       service,
       moveService,
       { LocalDateTime.of(2020, 11, 1, 0, 0) },
-      monitoringService
+      monitoringService,
     ).execute()
 
     verifyProcessingCalled(range(EffectiveYear.startOfContract(), date(2020, 9, 30)), Supplier.SERCO)

@@ -35,7 +35,7 @@ private val logger = loggerFor<AnnualPriceAdjustmentsController>()
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class AnnualPriceAdjustmentsController(
   private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
-  private val actualEffectiveYear: EffectiveYear
+  private val actualEffectiveYear: EffectiveYear,
 ) : PrimaryNavigationBar {
 
   override fun primaryNavigationChoice() = PrimaryNavigation.PRICE
@@ -63,12 +63,14 @@ class AnnualPriceAdjustmentsController(
 
   @PostMapping(ANNUAL_PRICE_ADJUSTMENT)
   fun applyAnnualPriceAdjustment(
-    @Valid @ModelAttribute("form") form: AnnualPriceAdjustmentForm,
+    @Valid
+    @ModelAttribute("form")
+    form: AnnualPriceAdjustmentForm,
     result: BindingResult,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     redirectAttributes: RedirectAttributes,
-    authentication: Authentication?
+    authentication: Authentication?,
   ): Any {
     logger.info("posting annual price adjustment")
 
@@ -92,7 +94,7 @@ class AnnualPriceAdjustmentsController(
       inflationary = mayBeInflationaryRate,
       volumetric = mayBeVolumetricRate.takeIfNotNullOrZero(),
       authentication = authentication,
-      details = form.details
+      details = form.details,
     )
 
     return "redirect:/manage-journey-price-catalogue"
@@ -123,7 +125,7 @@ class AnnualPriceAdjustmentsController(
 
     @get: NotBlank(message = "Enter details upto 255 characters")
     @get: Length(max = 255, message = "Enter details upto 255 characters")
-    val details: String? = null
+    val details: String? = null,
   ) {
     fun mayBeInflationaryRate() =
       inflationaryRate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
@@ -141,7 +143,7 @@ data class PriceAdjustmentHistoryDto(
   val datetime: LocalDateTime,
   val action: String,
   val by: String,
-  val details: String
+  val details: String,
 ) {
   companion object {
     /**
@@ -159,7 +161,7 @@ data class PriceAdjustmentHistoryDto(
         event.createdAt,
         "$type price adjustment by rate of ${data.multiplier} for contractual year ${data.effectiveYear}",
         if (AuditableEvent.isSystemGenerated(event)) "SYSTEM" else event.username,
-        data.details
+        data.details,
       )
     }
   }

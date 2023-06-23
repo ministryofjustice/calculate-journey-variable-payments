@@ -15,8 +15,8 @@ internal class AnnualPriceAdjustmentMetadataTest {
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         LocalDateTime.now(),
         "username",
-        AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5.toBigDecimal(), "serco details")
-      )
+        AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5.toBigDecimal(), "serco details"),
+      ),
     )
 
     with(metadata) {
@@ -34,8 +34,8 @@ internal class AnnualPriceAdjustmentMetadataTest {
         AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT,
         LocalDateTime.now(),
         "username",
-        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2020, 2.0.toBigDecimal(), "geo details")
-      )
+        AnnualPriceAdjustmentMetadata(Supplier.GEOAMEY, 2020, 2.0.toBigDecimal(), "geo details"),
+      ),
     )
 
     with(metadata) {
@@ -54,8 +54,8 @@ internal class AnnualPriceAdjustmentMetadataTest {
           AuditEventType.JOURNEY_PRICE,
           LocalDateTime.now(),
           "username",
-          AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5.toBigDecimal(), "serco details")
-        )
+          AnnualPriceAdjustmentMetadata(Supplier.SERCO, 2019, 1.5.toBigDecimal(), "serco details"),
+        ),
       )
     }.isInstanceOf(IllegalArgumentException::class.java)
   }

@@ -11,7 +11,7 @@ class LogInAuditHandler(private val auditService: AuditService) :
   override fun onAuthenticationSuccess(
     request: HttpServletRequest?,
     response: HttpServletResponse?,
-    authentication: Authentication?
+    authentication: Authentication?,
   ) {
     auditService.create(AuditableEvent.logInEvent(authentication!!))
     super.onAuthenticationSuccess(request, response, authentication)

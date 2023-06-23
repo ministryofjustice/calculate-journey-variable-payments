@@ -14,7 +14,7 @@ private val logger = loggerFor<ImportPricesService>()
 @Service
 class ImportPricesService(
   private val priceImporter: PriceImporter,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
 ) {
   fun importPricesFor(supplier: Supplier, year: Int, action: PriceImporter.Action? = PriceImporter.Action.ERROR) {
     logger.info("Attempting import of prices")

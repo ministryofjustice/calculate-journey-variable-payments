@@ -28,7 +28,7 @@ class StandardReportReaderParserTest(@Autowired val reportReaderParser: Standard
 
     StandardStreamingReportParser { StringReader(profiles) }.forEach(
       "_",
-      { Profile.fromJson(it) }
+      { Profile.fromJson(it) },
     ) {
       parsedProfiles += it
     }
@@ -37,12 +37,12 @@ class StandardReportReaderParserTest(@Autowired val reportReaderParser: Standard
       Profile(
         profileId = "PR1",
         updatedAt = LocalDate.of(2022, 2, 9).atStartOfDay(),
-        personId = "PE1"
+        personId = "PE1",
       ),
       Profile(
         profileId = "PR2",
         updatedAt = LocalDate.of(2022, 2, 9).atStartOfDay(),
-        personId = "PE2"
+        personId = "PE2",
       ),
     )
   }
@@ -53,7 +53,7 @@ class StandardReportReaderParserTest(@Autowired val reportReaderParser: Standard
 
     reportReaderParser.forEach(
       "2022/01/02/2022-01-02-profiles.jsonl",
-      { Profile.fromJson(it) }
+      { Profile.fromJson(it) },
     ) {
       parsedProfiles += it
     }
@@ -62,17 +62,17 @@ class StandardReportReaderParserTest(@Autowired val reportReaderParser: Standard
       Profile(
         profileId = "PR1",
         updatedAt = LocalDateTime.of(2022, 1, 2, 0, 0, 0),
-        personId = "PE1"
+        personId = "PE1",
       ),
       Profile(
         profileId = "PR2",
         updatedAt = LocalDateTime.of(2022, 1, 2, 0, 0, 0),
-        personId = "PE2"
+        personId = "PE2",
       ),
       Profile(
         profileId = "PR3",
         updatedAt = LocalDateTime.of(2022, 1, 2, 0, 0, 0),
-        personId = "PE3"
+        personId = "PE3",
       ),
     )
   }

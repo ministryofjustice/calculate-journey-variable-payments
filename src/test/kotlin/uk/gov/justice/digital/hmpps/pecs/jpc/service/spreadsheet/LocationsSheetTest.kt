@@ -21,8 +21,8 @@ internal class LocationsSheetTest {
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-        Supplier.SERCO
-      )
+        Supplier.SERCO,
+      ),
     )
 
     locationsSheet.write(Stream.of(location1, location2))

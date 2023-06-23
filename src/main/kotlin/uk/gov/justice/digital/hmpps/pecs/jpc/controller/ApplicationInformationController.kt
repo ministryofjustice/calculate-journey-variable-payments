@@ -30,7 +30,7 @@ class ApplicationInformationController(
   private val annualPriceAdjustmentsService: AnnualPriceAdjustmentsService,
   private val effectiveYear: EffectiveYear,
   private val reportsService: ImportReportsService,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
 ) {
 
   @GetMapping(path = ["/info"])
@@ -50,7 +50,7 @@ class ApplicationInformationController(
             "If inflationary adjustments have been made for the current year, please re-apply them."
         isPricingDataIsOutByTwoDays() -> "The service may be missing pricing data, please contact the Book a secure move team."
         else -> null
-      }
+      },
     )
   }
 

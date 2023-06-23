@@ -24,7 +24,7 @@ internal fun BindingResult.rejectIfContainsInvalidCharacters(value: String, fiel
     this.rejectValue(
       field,
       errorCode,
-      "The following characters ${XSS_CHARACTERS.joinToString(separator = "', '", prefix = "'", postfix = "'")} are not allowed."
+      "The following characters ${XSS_CHARACTERS.joinToString(separator = "', '", prefix = "'", postfix = "'")} are not allowed.",
     )
   }
 }

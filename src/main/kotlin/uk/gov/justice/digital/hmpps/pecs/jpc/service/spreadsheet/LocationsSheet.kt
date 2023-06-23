@@ -11,7 +11,7 @@ import java.util.stream.Stream
 class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(
   sheet = workbook.createSheet("Locations"),
   header = header,
-  dataColumns = listOf(NOMIS_AGENCY_ID, NAME, LOCATION_TYPE)
+  dataColumns = listOf(NOMIS_AGENCY_ID, NAME, LOCATION_TYPE),
 ) {
   override fun writeMove(move: Move) {}
 

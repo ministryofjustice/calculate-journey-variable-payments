@@ -28,8 +28,8 @@ class CancelledMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
     CANCELLATION_TIME,
     NOMIS_PRISON_ID,
     PRICE,
-    NOTES
-  )
+    NOTES,
+  ),
 ) {
 
   override fun writeMove(move: Move) = writeMoveRow(move, false)

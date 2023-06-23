@@ -27,8 +27,8 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Journey priced at £11.00. Effective from 2020 to 2021.",
-        "SYSTEM"
-      )
+        "SYSTEM",
+      ),
     )
   }
 
@@ -44,8 +44,8 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Journey priced at £14.50. Effective from 2021 to 2022.",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -58,7 +58,7 @@ internal class PriceHistoryDtoTest {
       "to_agency_id",
       2021,
       Money(1450).pounds(),
-      Money(1650).pounds()
+      Money(1650).pounds(),
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
@@ -67,8 +67,8 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Price changed from £16.50 to £14.50. Effective from 2021 to 2022.",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -81,8 +81,8 @@ internal class PriceHistoryDtoTest {
           AuditEventType.LOCATION,
           LocalDateTime.now(),
           "Jane",
-          MapLocationMetadata("agency_id", "site name", LocationType.CC)
-        )
+          MapLocationMetadata("agency_id", "site name", LocationType.CC),
+        ),
       )
     }.isInstanceOf(RuntimeException::class.java)
   }
@@ -97,7 +97,7 @@ internal class PriceHistoryDtoTest {
     assertThatThrownBy {
       PriceHistoryDto.valueOf(
         Supplier.GEOAMEY,
-        priceEvent
+        priceEvent,
       )
     }.isInstanceOf(RuntimeException::class.java)
   }
@@ -112,7 +112,7 @@ internal class PriceHistoryDtoTest {
       effectiveYear = 2021,
       oldPrice = Money(1000).pounds(),
       newPrice = Money(2000).pounds(),
-      multiplier = 2.0.toBigDecimal()
+      multiplier = 2.0.toBigDecimal(),
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
@@ -121,8 +121,8 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Price adjusted from £10.00 to £20.00 with blended rate multiplier 2.0. Effective from 2021 to 2022.",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -137,7 +137,7 @@ internal class PriceHistoryDtoTest {
       oldPrice = Money(1000).pounds(),
       newPrice = Money(2000).pounds(),
       exceptionMonth = Month.SEPTEMBER.toString(),
-      exceptionDeleted = false
+      exceptionDeleted = false,
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
@@ -146,8 +146,8 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Price exception of £20.00 for SEPTEMBER. Effective year 2021 to 2022.",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 
@@ -162,7 +162,7 @@ internal class PriceHistoryDtoTest {
       oldPrice = Money(1000).pounds(),
       newPrice = Money(2000).pounds(),
       exceptionMonth = Month.SEPTEMBER.toString(),
-      exceptionDeleted = true
+      exceptionDeleted = true,
     )
     val priceEvent = AuditEvent(AuditEventType.JOURNEY_PRICE, datetime, "Jane", priceMetadata)
     val history = PriceHistoryDto.valueOf(Supplier.GEOAMEY, priceEvent)
@@ -171,8 +171,8 @@ internal class PriceHistoryDtoTest {
       PriceHistoryDto(
         datetime,
         "Price exception of £20.00 for SEPTEMBER removed. Effective year 2021 to 2022.",
-        "Jane"
-      )
+        "Jane",
+      ),
     )
   }
 }

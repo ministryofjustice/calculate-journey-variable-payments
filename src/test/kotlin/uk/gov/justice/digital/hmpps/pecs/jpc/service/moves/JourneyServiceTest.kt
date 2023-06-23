@@ -26,8 +26,8 @@ internal class JourneyServiceTest {
         Supplier.SERCO,
         startOfMonth,
         endOfMonth,
-        true
-      )
+        true,
+      ),
     ).thenReturn(
       listOf(
         journey(fromAgencyId = "C", toAgencyId = "D"),
@@ -36,7 +36,7 @@ internal class JourneyServiceTest {
         journey(fromAgencyId = "A", toAgencyId = "D"),
         journey(fromAgencyId = "Z", toAgencyId = "D"),
         journey(fromAgencyId = "Z", toAgencyId = "X"),
-      )
+      ),
     )
 
     assertThat(service.distinctJourneysExcludingPriced(Supplier.SERCO, startOfMonth)).containsExactly(
@@ -56,8 +56,8 @@ internal class JourneyServiceTest {
         Supplier.SERCO,
         startOfMonth,
         endOfMonth,
-        true
-      )
+        true,
+      ),
     ).thenReturn(
       listOf(
         journey(fromAgencyId = "C", toAgencyId = "D"),
@@ -66,7 +66,7 @@ internal class JourneyServiceTest {
         journey(fromAgencyId = "A", toAgencyId = "D"),
         journey(fromAgencyId = "X", fromSiteName = "A SITE NAME", "Z"),
         journey(fromAgencyId = "Z", fromSiteName = "A", "X", "A SITE NAME"),
-      )
+      ),
     )
 
     assertThat(service.distinctJourneysExcludingPriced(Supplier.SERCO, startOfMonth)).containsExactly(
@@ -87,7 +87,7 @@ internal class JourneyServiceTest {
     fromAgencyId: String,
     fromSiteName: String? = null,
     toAgencyId: String,
-    toSiteName: String? = null
+    toSiteName: String? = null,
   ) =
     JourneyWithPrice(fromAgencyId, null, fromSiteName, toAgencyId, null, toSiteName, null, null, null)
 }

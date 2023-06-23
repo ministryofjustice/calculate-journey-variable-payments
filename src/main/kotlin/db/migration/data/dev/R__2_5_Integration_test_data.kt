@@ -45,7 +45,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     val fromAgencyId: String,
     val toPrimaryKey: UUID,
     val toAgencyId: String,
-    val amount: Money
+    val amount: Money,
   )
 
   override fun migrate(context: Context) {
@@ -67,13 +67,13 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
 
       val journey = create(
         journey(move, fromAgencyId = priced?.fromAgencyId ?: "PRISON1", priced?.toAgencyId ?: "PRISON2"),
-        template
+        template,
       ).let {
         it.copy(
           events = listOf(
             create(journeyStartEvent(it, details = mapOf("vehicle_reg" to "ABDCEFG")), template),
-            create(journeyCompleteEvent(it, details = mapOf("vehicle_reg" to "HIJKLMN")), template)
-          )
+            create(journeyCompleteEvent(it, details = mapOf("vehicle_reg" to "HIJKLMN")), template),
+          ),
         )
       }
 
@@ -86,7 +86,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           priced.amount.pence,
           Supplier.SERCO.name,
           priced.fromPrimaryKey,
-          priced.toPrimaryKey
+          priced.toPrimaryKey,
         )
       }
 
@@ -97,11 +97,11 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       mapOf(
         "SM1" to "PR1",
         "SM2" to "PR2",
-        "SM3" to "PR3"
+        "SM3" to "PR3",
       ).forEach {
         create(
           move(moveId = it.key, profileId = it.value, fromAgencyId = "PRISON1", toAgencyId = "PRISON2"),
-          template
+          template,
         ).also { move ->
           createMoveEventsAndJourney(move).failMigrationIfNotMoveType(MoveType.STANDARD)
         }
@@ -115,9 +115,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           profileId = "PR1",
           fromAgencyId = "PRISON1",
           toAgencyId = "POLICE1",
-          date = startOfPreviousMonth.minusMonths(1)
+          date = startOfPreviousMonth.minusMonths(1),
         ),
-        template
+        template,
       ).also { move ->
         createMoveEventsAndJourney(
           move,
@@ -126,8 +126,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             fromAgencyId = "PRISON1",
             toPrimaryKey = POLICE1_PRIMARY_KEY,
             toAgencyId = "POLICE1",
-            amount = Money.valueOf("100.00")
-          )
+            amount = Money.valueOf("100.00"),
+          ),
         ).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
     }
@@ -139,9 +139,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           profileId = "PR2",
           fromAgencyId = "PRISON1",
           toAgencyId = "PRISON2",
-          date = startOfPreviousMonth.minusYears(2)
+          date = startOfPreviousMonth.minusYears(2),
         ),
-        template
+        template,
       ).also {
         createMoveEventsAndJourney(it).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
@@ -154,9 +154,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           profileId = "PR1",
           fromAgencyId = "PRISON1",
           toAgencyId = "POLICE1",
-          date = startOfPreviousMonth.minusYears(2)
+          date = startOfPreviousMonth.minusYears(2),
         ),
-        template
+        template,
       ).also { move ->
         createMoveEventsAndJourney(
           move,
@@ -165,8 +165,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             fromAgencyId = "PRISON1",
             toPrimaryKey = POLICE1_PRIMARY_KEY,
             toAgencyId = "POLICE1",
-            amount = Money.valueOf("50.00")
-          )
+            amount = Money.valueOf("50.00"),
+          ),
         ).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
     }
@@ -191,15 +191,15 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           profileId = it.value,
           fromAgencyId = "FROM_AGENCY",
           toAgencyId = "TO_AGENCY",
-          type = MoveType.REDIRECTION
+          type = MoveType.REDIRECTION,
         ),
-        template
+        template,
       ).also { move ->
         move.copy(
           events = listOf(
             create(moveStartEvent(move), template),
             create(moveRedirectEvent(move), template),
-            create(moveCompleteEvent(move), template)
+            create(moveCompleteEvent(move), template),
           ),
           journeys = listOf(
             create(
@@ -207,13 +207,13 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 move,
                 fromAgencyId = "FROM_AGENCY",
                 toAgencyId = "STOPOVER_AGENCY",
-                state = JourneyState.cancelled,
-                dropOff = null
+                state = JourneyState.Cancelled,
+                dropOff = null,
               ),
-              template
+              template,
             ),
-            create(journey(move, fromAgencyId = "STOPOVER_AGENCY", toAgencyId = "TO_AGENCY"), template)
-          )
+            create(journey(move, fromAgencyId = "STOPOVER_AGENCY", toAgencyId = "TO_AGENCY"), template),
+          ),
         ).failMigrationIfNotMoveType(MoveType.REDIRECTION)
       }
     }
@@ -232,16 +232,16 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           fromAgencyId = "FROM_AGENCY",
           toAgencyId = "TO_AGENCY",
           type = MoveType.LONG_HAUL,
-          days = 1
+          days = 1,
         ),
-        template
+        template,
       ).also { move ->
         move.copy(
           events = listOf(
             create(moveStartEvent(move), template),
             create(moveCompleteEvent(move), template),
             create(moveLodgingStartEvent(move), template),
-            create(moveLodgingEndEvent(move), template)
+            create(moveLodgingEndEvent(move), template),
           ),
           journeys = listOf(
             create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "STOPOVER_AGENCY"), template),
@@ -251,11 +251,11 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 fromAgencyId = "STOPOVER_AGENCY",
                 toAgencyId = "TO_AGENCY",
                 pickUp = move.pickUpDateTime?.plusDays(1),
-                dropOff = move.dropOffOrCancelledDateTime
+                dropOff = move.dropOffOrCancelledDateTime,
               ),
-              template
-            )
-          )
+              template,
+            ),
+          ),
         ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
       }
     }
@@ -274,15 +274,15 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           fromAgencyId = "FROM_AGENCY",
           toAgencyId = "TO_AGENCY",
           type = MoveType.LOCKOUT,
-          days = 1
+          days = 1,
         ),
-        template
+        template,
       ).also { move ->
         move.copy(
           events = listOf(
             create(moveStartEvent(move), template),
             create(moveCompleteEvent(move), template),
-            create(moveLockoutEvent(move), template)
+            create(moveLockoutEvent(move), template),
           ),
           journeys = listOf(
             create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "LOCKOUT_AGENCY"), template),
@@ -292,11 +292,11 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 fromAgencyId = "LOCKOUT_AGENCY",
                 toAgencyId = "TO_AGENCY",
                 pickUp = move.pickUpDateTime?.plusDays(1),
-                dropOff = move.dropOffOrCancelledDateTime
+                dropOff = move.dropOffOrCancelledDateTime,
               ),
-              template
-            )
-          )
+              template,
+            ),
+          ),
         ).failMigrationIfNotMoveType(MoveType.LOCKOUT)
       }
     }
@@ -315,14 +315,14 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           fromAgencyId = "FROM_AGENCY",
           toAgencyId = "TO_AGENCY4",
           type = MoveType.MULTI,
-          days = 1
+          days = 1,
         ),
-        template
+        template,
       ).also { move ->
         move.copy(
           events = listOf(
             create(moveStartEvent(move), template),
-            create(moveCompleteEvent(move), template)
+            create(moveCompleteEvent(move), template),
           ),
           journeys = listOf(
             create(journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY2"), template),
@@ -331,10 +331,10 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 move,
                 fromAgencyId = "FROM_AGENCY2",
                 toAgencyId = "TO_AGENCY3",
-                state = JourneyState.cancelled,
-                dropOff = null
+                state = JourneyState.Cancelled,
+                dropOff = null,
               ),
-              template
+              template,
             ),
             create(
               journey(
@@ -342,11 +342,11 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
                 fromAgencyId = "FROM_AGENCY2",
                 toAgencyId = "TO_AGENCY4",
                 pickUp = move.pickUpDateTime?.plusDays(1),
-                dropOff = move.dropOffOrCancelledDateTime
+                dropOff = move.dropOffOrCancelledDateTime,
               ),
-              template
-            )
-          )
+              template,
+            ),
+          ),
         ).failMigrationIfNotMoveType(MoveType.MULTI)
       }
     }
@@ -366,21 +366,21 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           toAgencyId = "TO_AGENCY",
           type = MoveType.CANCELLED,
           cancellationReason = Move.CANCELLATION_REASON_CANCELLED_BY_PMU,
-          status = MoveStatus.cancelled
+          status = MoveStatus.Cancelled,
         ),
-        template
+        template,
       ).also { move ->
         move.copy(
           events = listOf(
             create(moveAcceptEvent(move), template),
-            create(moveCancelEvent(move), template)
+            create(moveCancelEvent(move), template),
           ),
           journeys = listOf(
             create(
-              journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.cancelled),
-              template
-            )
-          )
+              journey(move, fromAgencyId = "FROM_AGENCY", toAgencyId = "TO_AGENCY", state = JourneyState.Cancelled),
+              template,
+            ),
+          ),
         ).failMigrationIfNotMoveType(MoveType.CANCELLED)
       }
     }
@@ -413,7 +413,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       move.updatedAt,
       move.cancellationReason,
       move.moveMonth,
-      move.moveYear
+      move.moveYear,
     )
 
     return move
@@ -435,7 +435,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       journey.supplier.name,
       journey.toNomisAgencyId,
       journey.updatedAt,
-      journey.vehicleRegistrations()
+      journey.vehicleRegistrations(),
     )
 
     return journey
@@ -453,7 +453,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       event.supplier?.name,
       event.type,
       event.updatedAt,
-      event.details?.let { JpaDetailsConverter().convertToDatabaseColumn(it) }
+      event.details?.let { JpaDetailsConverter().convertToDatabaseColumn(it) },
     )
 
     return event
@@ -472,7 +472,7 @@ private fun move(
   days: Long = 0,
   date: LocalDate = startOfPreviousMonth,
   cancellationReason: String? = null,
-  status: MoveStatus = MoveStatus.completed
+  status: MoveStatus = MoveStatus.Completed,
 ) = Move(
   dropOffOrCancelledDateTime = date.plusDays(days).atStartOfDay().plusHours(12),
   fromNomisAgencyId = fromAgencyId,
@@ -489,7 +489,7 @@ private fun move(
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
   updatedAt = date.atStartOfDay(),
-  cancellationReason = cancellationReason
+  cancellationReason = cancellationReason,
 )
 
 private val moveSql = """
@@ -540,7 +540,7 @@ private fun moveEvent(
   move: Move,
   supplier: Supplier = Supplier.SERCO,
   type: String,
-  occurredAt: LocalDateTime? = null
+  occurredAt: LocalDateTime? = null,
 ) = Event(
   details = emptyMap(),
   eventId = "ME" + UUID.randomUUID().toString(),
@@ -559,9 +559,9 @@ private fun journey(
   fromAgencyId: String,
   toAgencyId: String,
   supplier: Supplier = Supplier.SERCO,
-  state: JourneyState = JourneyState.completed,
+  state: JourneyState = JourneyState.Completed,
   pickUp: LocalDateTime? = move.pickUpDateTime,
-  dropOff: LocalDateTime? = move.dropOffOrCancelledDateTime
+  dropOff: LocalDateTime? = move.dropOffOrCancelledDateTime,
 ) = Journey(
   billable = true,
   clientTimeStamp = move.pickUpDateTime?.toLocalDate()?.atStartOfDay() ?: startOfPreviousMonth.atStartOfDay(),
@@ -576,7 +576,7 @@ private fun journey(
   supplier = supplier,
   toNomisAgencyId = toAgencyId,
   updatedAt = move.pickUpDateTime?.toLocalDate()?.atStartOfDay() ?: startOfPreviousMonth.atStartOfDay(),
-  vehicleRegistration = "ABCDEFG"
+  vehicleRegistration = "ABCDEFG",
 )
 
 private val journeySql = """
@@ -602,7 +602,7 @@ private val journeySql = """
 private fun journeyStartEvent(
   journey: Journey,
   supplier: Supplier = Supplier.SERCO,
-  details: Map<String, Any> = emptyMap()
+  details: Map<String, Any> = emptyMap(),
 ) = Event(
   details = details,
   eventId = "JE" + UUID.randomUUID().toString(),
@@ -619,7 +619,7 @@ private fun journeyStartEvent(
 private fun journeyCompleteEvent(
   journey: Journey,
   supplier: Supplier = Supplier.SERCO,
-  details: Map<String, Any> = emptyMap()
+  details: Map<String, Any> = emptyMap(),
 ) = Event(
   details = details,
   eventId = "JE" + UUID.randomUUID().toString(),

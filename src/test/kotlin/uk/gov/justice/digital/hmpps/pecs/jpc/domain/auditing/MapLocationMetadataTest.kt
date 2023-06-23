@@ -51,7 +51,7 @@ internal class MapLocationMetadataTest {
     val existingLocation = Location(LocationType.PR, "AGENCY_ID", "OLD SITE NAME")
     val metadata = MapLocationMetadata.remap(
       existingLocation,
-      existingLocation.copy(siteName = "NEW SITE NAME", locationType = LocationType.AP)
+      existingLocation.copy(siteName = "NEW SITE NAME", locationType = LocationType.AP),
     )
 
     assertThat(metadata.nomisId).isEqualTo("AGENCY_ID")

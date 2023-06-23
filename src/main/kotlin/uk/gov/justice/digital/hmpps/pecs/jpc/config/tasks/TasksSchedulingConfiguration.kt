@@ -18,7 +18,7 @@ class TasksSchedulingConfiguration(
   val importReportsDataTask: ImportReportsDataTask,
   val previousDaysLocationMapping: PreviousDaysLocationMappingTask,
   val backfillReports: BackfillReportsTask,
-  val reprocessExistingMovesTask: ReprocessExistingMovesTask
+  val reprocessExistingMovesTask: ReprocessExistingMovesTask,
 ) {
 
   @Scheduled(cron = "\${CRON_IMPORT_REPORTS}")

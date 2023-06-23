@@ -18,8 +18,8 @@ internal class LockoutMovesSheetTest {
     PriceSheet.Header(
       defaultMoveDate10Sep2020,
       DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-      Supplier.SERCO
-    )
+      Supplier.SERCO,
+    ),
   )
 
   @Test
@@ -43,7 +43,7 @@ internal class LockoutMovesSheetTest {
       "NOMIS prison ID",
       "Price",
       "Contractor billable?",
-      "Notes"
+      "Notes",
     )
 
     assertOnMove()

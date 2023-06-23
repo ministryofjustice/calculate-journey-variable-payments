@@ -20,7 +20,8 @@ enum class LocationType(val label: String) {
   PR("Prison"),
   PS("Police"),
   SCH("SCH"),
-  STC("STC");
+  STC("STC"),
+  ;
 
   companion object {
     /**

@@ -25,7 +25,7 @@ class PricesSpreadsheet(
   supplierLocations: List<Location>,
   private val pricesRepository: PriceRepository,
   private val effectiveYear: Int,
-  private val action: PriceImporter.Action? = PriceImporter.Action.ERROR
+  private val action: PriceImporter.Action? = PriceImporter.Action.ERROR,
 ) : Closeable {
 
   private val logger = loggerFor<PricesSpreadsheet>()
@@ -81,7 +81,7 @@ class PricesSpreadsheet(
       fromLocation = fromLocation,
       toLocation = toLocation,
       priceInPence = price,
-      effectiveYear = effectiveYear
+      effectiveYear = effectiveYear,
     )
   }
 
@@ -90,7 +90,7 @@ class PricesSpreadsheet(
       supplier,
       fromLocation,
       toLocation,
-      effectiveYear
+      effectiveYear,
     )
       .also { logger.debug("Found existing price for '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier") }
   }
@@ -100,8 +100,8 @@ class PricesSpreadsheet(
       supplier,
       row.rowNum + ROW_OFFSET,
       error.cause?.cause
-        ?: error
-    )
+        ?: error,
+    ),
   )
 
   /**

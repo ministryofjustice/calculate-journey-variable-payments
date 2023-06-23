@@ -25,9 +25,9 @@ import javax.persistence.Table
     Index(
       name = "price_id_month_index",
       columnList = "price_id, month",
-      unique = true
-    )
-  ]
+      unique = true,
+    ),
+  ],
 )
 data class PriceException(
   @Id

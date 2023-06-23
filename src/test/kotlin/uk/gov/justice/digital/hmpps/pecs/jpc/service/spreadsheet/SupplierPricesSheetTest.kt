@@ -20,7 +20,7 @@ internal class SupplierPricesSheetTest {
   private val header: PriceSheet.Header = PriceSheet.Header(
     defaultMoveDate10Sep2020,
     DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-    Supplier.SERCO
+    Supplier.SERCO,
   )
 
   private val supplierPricesSheet: SupplierPricesSheet = SupplierPricesSheet(SXSSFWorkbook(), header)
@@ -33,7 +33,7 @@ internal class SupplierPricesSheetTest {
       location("FROM SITE A"),
       location("TO SITE A"),
       20059,
-      effectiveYear = 2020
+      effectiveYear = 2020,
     ).addException(Month.FEBRUARY, Money(20060))
 
     val price2 = Price(
@@ -42,7 +42,7 @@ internal class SupplierPricesSheetTest {
       location("FROM SITE B"),
       location("TO SITE B"),
       10024,
-      effectiveYear = 2020
+      effectiveYear = 2020,
     ).addException(Month.SEPTEMBER, Money(20024))
 
     supplierPricesSheet.write(Stream.of(price1, price2), mapOf(price2.id to listOf(price2.exceptions().first())))

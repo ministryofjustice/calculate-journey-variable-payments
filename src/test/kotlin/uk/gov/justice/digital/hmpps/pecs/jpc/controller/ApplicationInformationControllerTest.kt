@@ -28,7 +28,7 @@ import java.time.LocalDate
 @ContextConfiguration(classes = [TestConfig::class])
 class ApplicationInformationControllerTest(
   @Autowired private val wac: WebApplicationContext,
-  @Autowired private val timesource: TimeSource
+  @Autowired private val timesource: TimeSource,
 ) {
 
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()

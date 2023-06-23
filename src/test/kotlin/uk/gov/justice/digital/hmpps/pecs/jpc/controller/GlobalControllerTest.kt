@@ -15,8 +15,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 @TestPropertySource(
   properties = [
     "HMPPS_AUTH_BASE_URI=http://fake_auth_base_url",
-    "FEEDBACK_URL=http://fake_feedback_url"
-  ]
+    "FEEDBACK_URL=http://fake_feedback_url",
+  ],
 )
 class GlobalControllerTest(@Autowired val controller: GlobalController) {
 

@@ -63,12 +63,11 @@ internal class InMemoryReportParserTest {
 
   @Test
   fun `Get import moves should return all moves`() {
-
     val moves = InMemoryReportParser.parseAsMoves(moveReports())
     assertThat(moves.map { it.moveId }).containsExactly("M1", "M2", "M3", "M4", "M5")
 
     // M1 should be complete
-    assertThat(MoveStatus.completed).isEqualTo(moves.find { it.moveId == "M1" }?.status)
+    assertThat(MoveStatus.Completed).isEqualTo(moves.find { it.moveId == "M1" }?.status)
   }
 
   @Test
@@ -83,7 +82,6 @@ internal class InMemoryReportParserTest {
 
   @Test
   fun `parse move ids to journeys`() {
-
     val journeys = InMemoryReportParser.parseAsMoveIdToJourneys(journeyReports())
 
     // Journeys should be grouped by the 3 unique move ids (with non completed/cancelled filtered)
@@ -118,7 +116,7 @@ internal class InMemoryReportParserTest {
     val movesWithJourneysAndEvents = InMemoryReportParser.parseMovesJourneysEvents(
       moveFiles = moveReports(),
       journeyFiles = journeyReports(),
-      eventFiles = eventReports()
+      eventFiles = eventReports(),
     )
 
     val move1 = movesWithJourneysAndEvents.find { it.moveId == "M1" }!!

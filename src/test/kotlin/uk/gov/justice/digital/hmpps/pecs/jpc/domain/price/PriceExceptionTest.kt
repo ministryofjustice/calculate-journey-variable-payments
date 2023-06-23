@@ -13,10 +13,10 @@ internal class PriceExceptionTest {
     assertDoesNotThrow { PriceException(price = mock(), month = 1, priceInPence = 1) }
 
     assertThatThrownBy { PriceException(price = mock(), month = 1, priceInPence = 0) }.isInstanceOf(
-      IllegalArgumentException::class.java
+      IllegalArgumentException::class.java,
     )
     assertThatThrownBy { PriceException(price = mock(), month = 1, priceInPence = -1) }.isInstanceOf(
-      IllegalArgumentException::class.java
+      IllegalArgumentException::class.java,
     )
   }
 
@@ -30,14 +30,14 @@ internal class PriceExceptionTest {
       PriceException(
         price = mock(),
         month = 0,
-        priceInPence = 1
+        priceInPence = 1,
       )
     }.isInstanceOf(DateTimeException::class.java)
     assertThatThrownBy {
       PriceException(
         price = mock(),
         month = 13,
-        priceInPence = 1
+        priceInPence = 1,
       )
     }.isInstanceOf(DateTimeException::class.java)
   }

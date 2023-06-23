@@ -18,6 +18,8 @@ class MonitoringService {
     if (Sentry.isEnabled()) {
       Sentry.captureMessage(message)
       logger.warn(message)
-    } else logger.warn("Monitoring is disabled, ignoring message $message.")
+    } else {
+      logger.warn("Monitoring is disabled, ignoring message $message.")
+    }
   }
 }

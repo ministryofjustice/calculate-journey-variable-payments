@@ -51,7 +51,7 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
     supplier: Supplier,
     fromSiteName: String?,
     toSiteName: String?,
-    effectiveYear: Int
+    effectiveYear: Int,
   ): List<JourneyWithPrice> {
     logger.info("Fetching prices for $supplier, from site '${fromSiteName.orEmpty()}', to site name '${toSiteName.orEmpty()}' for effective year $effectiveYear")
 
@@ -59,7 +59,7 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
       supplier,
       fromSiteName?.trim()?.uppercase(),
       toSiteName?.trim()?.uppercase(),
-      effectiveYear
+      effectiveYear,
     ).also {
       logger.info("Retrieved ${it.size} prices for $supplier, from site '${fromSiteName.orEmpty()}', to site name '${toSiteName.orEmpty()}' for effective year $effectiveYear")
     }

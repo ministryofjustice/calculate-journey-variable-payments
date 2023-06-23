@@ -52,7 +52,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
       longHaulMoveLHM1(),
       lockoutMoveLM1(),
       multiMoveMM1(),
-      cancelledMoveCM1()
+      cancelledMoveCM1(),
     ).forEach { move -> verifyDetailsOf(move, currentDate.previousMonth(), currentDate.previousMonthYear()) }
   }
 
@@ -73,7 +73,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
       redirectMoveM20(),
       lockoutMoveM40(),
       multiMoveM50(),
-      cancelledMoveM60()
+      cancelledMoveM60(),
     ).forEach { move -> verifyDetailsOf(move, Month.DECEMBER, Year.of(2020)) }
   }
 

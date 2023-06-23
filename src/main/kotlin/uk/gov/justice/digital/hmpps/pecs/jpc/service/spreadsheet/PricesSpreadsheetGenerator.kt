@@ -30,7 +30,7 @@ class PricesSpreadsheetGenerator(
   @Autowired private val locationRepository: LocationRepository,
   @Autowired private val supplierPrices: SupplierPrices,
   @Autowired private val priceExceptionRepository: PriceExceptionRepository,
-  @Value("\${FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES}") private val includeReconciliationMoves: Boolean = false
+  @Value("\${FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES}") private val includeReconciliationMoves: Boolean = false,
 ) {
 
   internal fun generate(supplier: Supplier, startDate: LocalDate): File {
@@ -65,13 +65,13 @@ class PricesSpreadsheetGenerator(
 
       SupplierPricesSheet(
         workbook,
-        header
+        header,
       ).also {
         logger.info("Adding $supplier prices for effective year ${effectiveYearForDate(startDate)}.")
       }.apply {
         write(
           supplierPrices.get(supplier, effectiveYearForDate(startDate)),
-          priceExceptionRepository.findAll().groupBy { it.price.id }
+          priceExceptionRepository.findAll().groupBy { it.price.id },
         )
       }
 

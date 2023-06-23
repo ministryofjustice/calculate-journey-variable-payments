@@ -40,12 +40,12 @@ internal class PricesSpreadsheetGeneratorTest {
       timeSource.dateTime(),
       Supplier.GEOAMEY,
       moveType,
-      MoveStatus.completed,
+      MoveStatus.Completed,
       "$moveType", // this is used to verify the correct move type is put into the correct spreadsheet tab
       timeSource.date(),
       "FROM$id",
-      "PR"
-    )
+      "PR",
+    ),
   )
 
   private val moveService: MoveService = mock {
@@ -69,7 +69,7 @@ internal class PricesSpreadsheetGeneratorTest {
     } doReturn createMoveList(6, MoveType.CANCELLED)
     on { it.moveTypeSummaries(any(), any()) } doReturn MoveTypeSummaries(
       1,
-      listOf(MovesSummary(MoveType.STANDARD, 1.0, 1, 0, 12345))
+      listOf(MovesSummary(MoveType.STANDARD, 1.0, 1, 0, 12345)),
     )
     on { it.candidateReconciliations(any(), any()) } doReturn createMoveList(7, MoveType.STANDARD)
   }
@@ -84,8 +84,8 @@ internal class PricesSpreadsheetGeneratorTest {
         "To 1",
         1,
         12345,
-        12345
-      )
+        12345,
+      ),
     )
   }
   private val locations =
@@ -101,8 +101,8 @@ internal class PricesSpreadsheetGeneratorTest {
           locations[1],
           12345,
           timeSource.dateTime(),
-          2020
-        )
+          2020,
+        ),
       )
     }
 
@@ -115,7 +115,7 @@ internal class PricesSpreadsheetGeneratorTest {
     locationRepository,
     supplierPrices,
     priceExceptionRepository,
-    true
+    true,
   )
 
   @Test
@@ -157,7 +157,7 @@ internal class PricesSpreadsheetGeneratorTest {
       "Journeys" to null,
       "JPC Price book" to null,
       "Locations" to null,
-      "Reconciliation Moves" to MoveType.STANDARD.toString()
+      "Reconciliation Moves" to MoveType.STANDARD.toString(),
     ).forEach { (sheetName, maybeMoveRef) ->
       val sheet = workbook.getSheet(sheetName)
 

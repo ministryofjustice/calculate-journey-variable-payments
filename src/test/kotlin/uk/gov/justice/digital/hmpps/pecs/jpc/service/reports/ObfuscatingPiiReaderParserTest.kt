@@ -21,8 +21,8 @@ class ObfuscatingPiiReaderParserTest {
           prisonNumber = prisonNumber,
           firstName = firstName,
           lastName = lastName,
-          ethnicity = ethnicity
-        )
+          ethnicity = ethnicity,
+        ),
       )
     }.forEach("_", { Person.fromJson(it) }) { obfuscatedPerson ->
       assertThat(obfuscatedPerson.dateOfBirth).isEqualTo(LocalDate.of(1800, 1, 1))

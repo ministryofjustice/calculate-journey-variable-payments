@@ -7,7 +7,7 @@ data class MovesSummary(
   val percentage: Double = 0.0,
   val volume: Int = 0,
   val volumeUnpriced: Int = 0,
-  val totalPriceInPence: Int = 0
+  val totalPriceInPence: Int = 0,
 ) {
   val totalPriceInPounds = Money(totalPriceInPence).pounds()
 }

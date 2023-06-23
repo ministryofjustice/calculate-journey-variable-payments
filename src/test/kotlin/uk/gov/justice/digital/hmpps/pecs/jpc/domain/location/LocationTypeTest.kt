@@ -26,7 +26,7 @@ internal class LocationTypeTest {
       Arguments.of("Prison", " prisOn ", "PRISON", LocationType.PR),
       Arguments.of("Probation", " proBation ", "PROBATION", LocationType.PB),
       Arguments.of("sch", " sCh ", "SCH", LocationType.SCH),
-      Arguments.of("stc", " stC ", "STC", LocationType.STC)
+      Arguments.of("stc", " stC ", "STC", LocationType.STC),
     )
 
   @ParameterizedTest
@@ -35,7 +35,7 @@ internal class LocationTypeTest {
     exact: String,
     mixedCaseAndWhiteSpace: String,
     allUpperCase: String,
-    expected: LocationType
+    expected: LocationType,
   ) {
     assertThat(LocationType.map(exact)).isEqualTo(expected)
     assertThat(LocationType.map(mixedCaseAndWhiteSpace)).isEqualTo(expected)

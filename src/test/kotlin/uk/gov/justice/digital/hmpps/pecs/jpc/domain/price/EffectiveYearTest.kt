@@ -77,7 +77,7 @@ internal class EffectiveYearTest {
         6 to 2021,
         7 to 2021,
         8 to 2021,
-      )
+      ),
     )
   }
 
@@ -97,7 +97,7 @@ internal class EffectiveYearTest {
         6 to 2022,
         7 to 2022,
         8 to 2022,
-      )
+      ),
     )
   }
 

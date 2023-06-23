@@ -23,8 +23,8 @@ class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(
     PERCENTAGE,
     MOVE_VOLUME,
     MOVE_VOLUME_WITHOUT_PRICES,
-    PRICE
-  )
+    PRICE,
+  ),
 ) {
 
   private val fontBlackArialItalic = sheet.workbook.createFont().apply {

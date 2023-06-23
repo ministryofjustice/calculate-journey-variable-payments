@@ -14,7 +14,7 @@ private val logger = loggerFor<ReportImporter>()
 open class ReportImporter(
   @Autowired private val provider: ReportingProvider,
   @Autowired private val monitoringService: MonitoringService,
-  @Autowired private val streamingReportParser: StreamingReportParser
+  @Autowired private val streamingReportParser: StreamingReportParser,
 ) {
 
   open fun importMovesJourneysEventsOn(date: LocalDate) = importMovesJourneysEvents(date, date)

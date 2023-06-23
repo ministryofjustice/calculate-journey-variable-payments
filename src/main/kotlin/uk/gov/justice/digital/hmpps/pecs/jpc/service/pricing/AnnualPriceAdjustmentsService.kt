@@ -31,12 +31,12 @@ class AnnualPriceAdjustmentsService(
   private val monitoringService: MonitoringService,
   private val auditService: AuditService,
   private val actualEffectiveYear: EffectiveYear,
-  private val jobRunner: JobRunner
+  private val jobRunner: JobRunner,
 ) {
 
   enum class AdjustmentType {
     INFLATION,
-    VOLUME
+    VOLUME,
   }
 
   /**
@@ -50,7 +50,7 @@ class AnnualPriceAdjustmentsService(
     volumetric: AdjustmentMultiplier? = null,
     authentication: Authentication?,
     details: String,
-    force: Boolean = false
+    force: Boolean = false,
   ) {
     logger.info("Annual Price Adjustment request received. Force [$force]")
     if (!force && suppliedEffective < actualEffectiveYear.previous()) {
@@ -70,10 +70,10 @@ class AnnualPriceAdjustmentsService(
             suppliedEffective,
             volumetric,
             authentication,
-            details
+            details,
           )
         }
-      } ?: { }
+      } ?: { },
     )
   }
 
@@ -86,7 +86,7 @@ class AnnualPriceAdjustmentsService(
     multiplier: AdjustmentMultiplier,
     authentication: Authentication?,
     details: String,
-    callback: () -> Unit = { }
+    callback: () -> Unit = { },
   ) {
     logger.info("Queueing inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
 
@@ -97,7 +97,7 @@ class AnnualPriceAdjustmentsService(
       authentication,
       details,
       AdjustmentType.INFLATION,
-      callback
+      callback,
     )
 
     logger.info("Queued inflationary price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
@@ -111,7 +111,7 @@ class AnnualPriceAdjustmentsService(
     suppliedEffective: Int,
     multiplier: AdjustmentMultiplier,
     authentication: Authentication?,
-    details: String
+    details: String,
   ) {
     logger.info("Queuing volumetric price adjustment for $supplier for effective year $suppliedEffective using multiplier ${multiplier.value}.")
 
@@ -127,35 +127,36 @@ class AnnualPriceAdjustmentsService(
     authentication: Authentication?,
     details: String,
     type: AdjustmentType,
-    callback: () -> Unit = { }
+    callback: () -> Unit = { },
   ) {
     val lockId = annualPriceAdjuster.attemptLockForPriceAdjustment(supplier, multiplier, effectiveYear)
 
     jobRunner.run("$type price adjustment") {
       Result.runCatching {
-        if (type == AdjustmentType.INFLATION)
+        if (type == AdjustmentType.INFLATION) {
           annualPriceAdjuster.inflationary(
             lockId,
             supplier,
             effectiveYear,
-            multiplier
+            multiplier,
           ).also {
             annualPriceAdjuster.releaseLockForPriceAdjustment(lockId)
             callback.invoke()
           }
-        else
+        } else {
           annualPriceAdjuster.volumetric(
             lockId,
             supplier,
             effectiveYear,
-            multiplier
+            multiplier,
           ).also {
             annualPriceAdjuster.releaseLockForPriceAdjustment(lockId)
           }
+        }
       }.onFailure {
         logger.error(
           "Failed $type price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.",
-          it
+          it,
         )
 
         monitoringService.capture("Failed $type price adjustment for $supplier for effective year $effectiveYear and multiplier ${multiplier.value}.")
@@ -167,8 +168,8 @@ class AnnualPriceAdjustmentsService(
             effectiveYear,
             multiplier,
             authentication,
-            details
-          )
+            details,
+          ),
         )
       }
     }

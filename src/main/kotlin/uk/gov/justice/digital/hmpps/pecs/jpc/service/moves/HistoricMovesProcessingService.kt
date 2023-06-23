@@ -24,7 +24,7 @@ private val logger = loggerFor<HistoricMovesProcessingService>()
 class HistoricMovesProcessingService(
   private val moveQueryRepository: MoveQueryRepository,
   private val movePersister: MovePersister,
-  private val timeSource: TimeSource
+  private val timeSource: TimeSource,
 ) {
 
   /**
@@ -38,7 +38,7 @@ class HistoricMovesProcessingService(
     return moveQueryRepository.allMovesInDateRange(
       supplier,
       dateRange.start,
-      dateRange.endInclusive
+      dateRange.endInclusive,
     ).also { existingMoves ->
       logger.info("Processing ${existingMoves.size} historic moves in range ${dateRange.start} to ${dateRange.endInclusive} for $supplier")
     }

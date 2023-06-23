@@ -20,7 +20,7 @@ private val billyTheKid =
     firstNames = "Billy the",
     lastName = "Kid",
     dateOfBirth = LocalDate.of(1980, 12, 25),
-    gender = "male"
+    gender = "male",
   )
 
 private val bonnieElizabeth =
@@ -31,7 +31,7 @@ private val bonnieElizabeth =
     firstNames = "Bonnie Elizabeth",
     lastName = "Parker",
     dateOfBirth = LocalDate.of(1910, 10, 1),
-    gender = "female"
+    gender = "female",
   )
 
 private val ronnieBiggs =
@@ -42,7 +42,7 @@ private val ronnieBiggs =
     firstNames = "Ronnie",
     lastName = "Biggs",
     dateOfBirth = LocalDate.of(1929, 8, 8),
-    gender = "male"
+    gender = "male",
   )
 
 private val fredBloggs =
@@ -53,7 +53,7 @@ private val fredBloggs =
     firstNames = "Fred",
     lastName = "Bloggs",
     dateOfBirth = LocalDate.of(1950, 4, 12),
-    gender = "male"
+    gender = "male",
   )
 
 private val janeBloggs =
@@ -64,7 +64,7 @@ private val janeBloggs =
     firstNames = "Jane",
     lastName = "Bloggs",
     dateOfBirth = LocalDate.of(1961, 10, 22),
-    gender = "female"
+    gender = "female",
   )
 
 private val donaldDuck =
@@ -75,7 +75,7 @@ private val donaldDuck =
     firstNames = "Donald",
     lastName = "Duck",
     dateOfBirth = LocalDate.of(1940, 9, 27),
-    gender = "male"
+    gender = "male",
   )
 
 private val professorMoriarty =
@@ -86,7 +86,7 @@ private val professorMoriarty =
     firstNames = "Professor",
     lastName = "Moriarty",
     dateOfBirth = LocalDate.of(1880, 7, 10),
-    gender = "male"
+    gender = "male",
   )
 
 object Dec2020MoveData {
@@ -97,7 +97,7 @@ object Dec2020MoveData {
       updatedAt = LocalDateTime.now(),
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.STANDARD,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "STANDARDMOVE2",
       fromNomisAgencyId = "PRISON3",
       fromSiteName = "PRISON THREE",
@@ -114,8 +114,8 @@ object Dec2020MoveData {
         firstNames = "Clyde Chestnut",
         lastName = "Barrow",
         dateOfBirth = LocalDate.of(1909, 3, 24),
-        gender = "male"
-      )
+        gender = "male",
+      ),
     )
 
   fun longHaulMoveM30() =
@@ -124,7 +124,7 @@ object Dec2020MoveData {
       updatedAt = LocalDateTime.now(),
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.LONG_HAUL,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "LONGMOVE",
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
@@ -134,7 +134,7 @@ object Dec2020MoveData {
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 3, 12, 0),
       dropOffOrCancelledDateTime = LocalDateTime.of(2020, 12, 4, 11, 20),
-      person = billyTheKid
+      person = billyTheKid,
     )
 
   fun redirectMoveM20() =
@@ -143,7 +143,7 @@ object Dec2020MoveData {
       updatedAt = LocalDateTime.now(),
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.REDIRECTION,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "REDIRMOVE",
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
@@ -153,7 +153,7 @@ object Dec2020MoveData {
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 2, 10, 20),
       dropOffOrCancelledDateTime = LocalDateTime.of(2020, 12, 2, 14, 20),
-      person = bonnieElizabeth
+      person = bonnieElizabeth,
     )
 
   fun lockoutMoveM40() =
@@ -162,7 +162,7 @@ object Dec2020MoveData {
       updatedAt = LocalDateTime.now(),
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.LOCKOUT,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "LOCKMOVE",
       fromNomisAgencyId = "COURT1",
       fromSiteName = "COURT ONE",
@@ -172,7 +172,7 @@ object Dec2020MoveData {
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 4, 10, 20),
       dropOffOrCancelledDateTime = LocalDateTime.of(2020, 12, 5, 10, 20),
-      person = bonnieElizabeth
+      person = bonnieElizabeth,
     )
 
   fun multiMoveM50() =
@@ -181,7 +181,7 @@ object Dec2020MoveData {
       updatedAt = LocalDateTime.now(),
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.MULTI,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "MULTIMOVE",
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
@@ -191,7 +191,7 @@ object Dec2020MoveData {
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 5, 10, 20),
       dropOffOrCancelledDateTime = LocalDateTime.of(2020, 12, 6, 10, 20),
-      person = billyTheKid
+      person = billyTheKid,
     )
 
   fun cancelledMoveM60() =
@@ -200,7 +200,7 @@ object Dec2020MoveData {
       updatedAt = LocalDateTime.now(),
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.CANCELLED,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "CANCELLED_BEFORE_3PM",
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
@@ -210,7 +210,7 @@ object Dec2020MoveData {
       reportToLocationType = "prison",
       pickUpDateTime = null,
       dropOffOrCancelledDateTime = LocalDateTime.of(2020, 12, 6, 14, 59),
-      person = billyTheKid
+      person = billyTheKid,
     )
 }
 
@@ -228,7 +228,7 @@ object SercoPreviousMonthMoveData {
       updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.STANDARD,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "STANDARDSM1",
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
@@ -238,7 +238,7 @@ object SercoPreviousMonthMoveData {
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
-      person = billyTheKid
+      person = billyTheKid,
     )
 
   fun redirectMoveRM1() =
@@ -247,7 +247,7 @@ object SercoPreviousMonthMoveData {
       updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.REDIRECTION,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "REDIRECTIONRM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
@@ -257,7 +257,7 @@ object SercoPreviousMonthMoveData {
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
-      person = ronnieBiggs
+      person = ronnieBiggs,
     )
 
   fun longHaulMoveLHM1() =
@@ -266,7 +266,7 @@ object SercoPreviousMonthMoveData {
       updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.LONG_HAUL,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "LONG_HAULLHM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
@@ -276,7 +276,7 @@ object SercoPreviousMonthMoveData {
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
-      person = fredBloggs
+      person = fredBloggs,
     )
 
   fun lockoutMoveLM1() =
@@ -285,7 +285,7 @@ object SercoPreviousMonthMoveData {
       updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.LOCKOUT,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "LOCKOUTLM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
@@ -295,7 +295,7 @@ object SercoPreviousMonthMoveData {
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
-      person = janeBloggs
+      person = janeBloggs,
     )
 
   fun multiMoveMM1() =
@@ -304,7 +304,7 @@ object SercoPreviousMonthMoveData {
       updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.MULTI,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "MULTIMM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
@@ -314,7 +314,7 @@ object SercoPreviousMonthMoveData {
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
-      person = donaldDuck
+      person = donaldDuck,
     )
 
   fun cancelledMoveCM1() =
@@ -323,7 +323,7 @@ object SercoPreviousMonthMoveData {
       updatedAt = startOfPreviousMonth.atStartOfDay(),
       supplier = Supplier.SERCO,
       moveType = MoveType.CANCELLED,
-      status = MoveStatus.completed,
+      status = MoveStatus.Completed,
       reference = "CANCELLEDCM1",
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
@@ -333,7 +333,7 @@ object SercoPreviousMonthMoveData {
       reportToLocationType = "prison",
       pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
       dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
-      person = professorMoriarty
+      person = professorMoriarty,
     )
 
   fun standardMoveSM4() =
@@ -343,7 +343,7 @@ object SercoPreviousMonthMoveData {
         updatedAt = moveDate.atStartOfDay(),
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
-        status = MoveStatus.completed,
+        status = MoveStatus.Completed,
         reference = "STANDARDSM4",
         fromNomisAgencyId = "PRISON1",
         fromSiteName = "PRISON ONE",

@@ -32,7 +32,7 @@ internal class StandardMovesSheetTest {
     assertThat(sms.sheet.getRow(4).getCell(0).stringCellValue.uppercase()).isEqualTo(supplier.name)
     assertOnSubheading(
       sms,
-      "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)"
+      "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",
     )
     assertOnColumnDataHeadings(
       sms,
@@ -47,7 +47,7 @@ internal class StandardMovesSheetTest {
       "Drop off time",
       "Vehicle reg",
       "NOMIS prison ID",
-      "Price"
+      "Price",
     )
   }
 
@@ -58,8 +58,8 @@ internal class StandardMovesSheetTest {
       PriceSheet.Header(
         defaultMoveDate10Sep2020,
         DateRange(defaultMoveDate10Sep2020, defaultMoveDate10Sep2020),
-        Supplier.SERCO
-      )
+        Supplier.SERCO,
+      ),
     )
 
     val move = moveM1(journeys = listOf(journeyJ1()))

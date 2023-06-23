@@ -20,14 +20,16 @@ data class DateRange(override val start: LocalDate, override val endInclusive: L
   private tailrec fun recurse(ranges: List<DateRange>): List<DateRange> {
     val last = ranges.last()
 
-    return if (last.endInclusive == endInclusive || last.endInclusive.isAfter(endInclusive))
+    return if (last.endInclusive == endInclusive || last.endInclusive.isAfter(endInclusive)) {
       return ranges.subList(0, ranges.size - 1).toMutableList() + DateRange(endInclusive.startOfMonth(), endInclusive)
-    else recurse(
-      ranges.toMutableList() + DateRange(
-        last.start.plusMonths(1).startOfMonth(),
-        last.start.plusMonths(1).endOfMonth()
+    } else {
+      recurse(
+        ranges.toMutableList() + DateRange(
+          last.start.plusMonths(1).startOfMonth(),
+          last.start.plusMonths(1).endOfMonth(),
+        ),
       )
-    )
+    }
   }
 
   private fun LocalDate.startOfMonth(): LocalDate = this.withDayOfMonth(1)

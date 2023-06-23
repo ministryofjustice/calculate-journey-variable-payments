@@ -10,5 +10,5 @@ import kotlin.reflect.KClass
 annotation class ValidJourneySearch(
   val message: String = "Please choose a pick up or drop off location",
   val groups: Array<KClass<*>> = [],
-  val payload: Array<KClass<out Any>> = []
+  val payload: Array<KClass<out Any>> = [],
 )

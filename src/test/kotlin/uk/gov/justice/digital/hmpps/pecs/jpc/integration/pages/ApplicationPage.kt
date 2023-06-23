@@ -15,7 +15,8 @@ import java.time.Duration
  */
 abstract class ApplicationPage : FluentPage() {
 
-  val logger = loggerFor <ApplicationPage>()
+  val logger = loggerFor<ApplicationPage>()
+
   /**
    * Helper method to assist with attachment downloads.
    */

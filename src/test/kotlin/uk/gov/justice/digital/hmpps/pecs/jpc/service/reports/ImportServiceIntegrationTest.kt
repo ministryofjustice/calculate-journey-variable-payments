@@ -35,7 +35,7 @@ class ImportServiceIntegrationTest(
   @Autowired private val moveRepository: MoveRepository,
   @Autowired private val journeyRepository: JourneyRepository,
   @Autowired private val peopleRepository: ProfileRepository,
-  @Autowired private val profileRepository: ProfileRepository
+  @Autowired private val profileRepository: ProfileRepository,
 ) {
 
   @MockBean
@@ -109,12 +109,12 @@ class ImportServiceIntegrationTest(
 
     importReportsService.importAllReportsOn(LocalDate.of(2021, 5, 7))
 
-    assertThat(moveRepository.findById(bookedMoveToBeCancelledIdentifier).get().status).isEqualTo(MoveStatus.booked)
+    assertThat(moveRepository.findById(bookedMoveToBeCancelledIdentifier).get().status).isEqualTo(MoveStatus.Booked)
     assertThat(journeyRepository.findAllByMoveId(bookedMoveToBeCancelledIdentifier)).isEmpty()
 
     importReportsService.importAllReportsOn(LocalDate.of(2021, 5, 26))
 
-    assertThat(moveRepository.findById(bookedMoveToBeCancelledIdentifier).get().status).isEqualTo(MoveStatus.cancelled)
+    assertThat(moveRepository.findById(bookedMoveToBeCancelledIdentifier).get().status).isEqualTo(MoveStatus.Cancelled)
     assertThat(journeyRepository.findAllByMoveId(bookedMoveToBeCancelledIdentifier)).hasSize(1)
   }
 
@@ -148,7 +148,7 @@ class ImportServiceIntegrationTest(
 
     val processedMoveCount = historicMovesProcessingService.process(
       DateRange(LocalDate.of(2020, 12, 1), LocalDate.of(2020, 12, 6)),
-      Supplier.GEOAMEY
+      Supplier.GEOAMEY,
     )
 
     assertThat(processedMoveCount).isEqualTo(9)

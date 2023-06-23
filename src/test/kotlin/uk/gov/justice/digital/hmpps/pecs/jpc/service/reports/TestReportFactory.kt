@@ -44,7 +44,7 @@ fun reportMoveFactory(
   moveId: String = defaultMoveId,
   supplier: Supplier = defaultSupplierSerco,
   profileId: String = defaultProfileId,
-  status: MoveStatus = MoveStatus.completed,
+  status: MoveStatus = MoveStatus.Completed,
   fromLocation: String = fromPrisonNomisAgencyId(),
   fromLocationType: String = "prison",
   toLocation: String = toCourtNomisAgencyId(),
@@ -52,7 +52,7 @@ fun reportMoveFactory(
   cancellationReason: String = "",
   date: LocalDate = defaultDate,
   events: List<Event> = listOf(),
-  journeys: List<Journey> = listOf()
+  journeys: List<Journey> = listOf(),
 ): Move {
   val move = Move(
     moveId = moveId,
@@ -71,7 +71,7 @@ fun reportMoveFactory(
     dropOffOrCancelledDateTime = null,
     moveType = null,
     events = events,
-    journeys = journeys
+    journeys = journeys,
   )
   return move
 }
@@ -86,13 +86,13 @@ fun reportPersonFactory(personId: String = defaultPersonId): Person {
     lastName = "Kid",
     dateOfBirth = LocalDate.of(1980, 12, 25),
     ethnicity = "White American",
-    gender = "male"
+    gender = "male",
   )
 }
 
 fun profileFactory(
   profileId: String = defaultProfileId,
-  personId: String = defaultPersonId
+  personId: String = defaultPersonId,
 ): Profile {
   return Profile(profileId, defaultDateTime, personId)
 }
@@ -103,7 +103,7 @@ fun moveEventFactory(
   type: String = EventType.MOVE_CANCEL.value,
   supplier: Supplier = defaultSupplierSerco,
   occurredAt: LocalDateTime = defaultDateTime,
-  notes: String = ""
+  notes: String = "",
 ): Event {
   val event = Event(
     eventId = eventId,
@@ -115,7 +115,7 @@ fun moveEventFactory(
     details = mapOf("string_key" to "string_val", "int_key" to 3, "bool_key" to true),
     occurredAt = occurredAt,
     recordedAt = defaultDateTime,
-    notes = notes
+    notes = notes,
   )
   return event
 }
@@ -123,14 +123,14 @@ fun moveEventFactory(
 fun reportJourneyFactory(
   journeyId: String = defaultJourneyId,
   moveId: String = defaultMoveId,
-  state: JourneyState = JourneyState.completed,
+  state: JourneyState = JourneyState.Completed,
   supplier: Supplier = defaultSupplierSerco,
   billable: Boolean = false,
   fromLocation: String = fromPrisonNomisAgencyId(),
   toLocation: String = toCourtNomisAgencyId(),
   vehicleRegistration: String? = "UHE-92",
   effectiveYear: Int? = null,
-  events: List<Event> = listOf()
+  events: List<Event> = listOf(),
 
 ): Journey {
   val journey = Journey(
@@ -145,7 +145,7 @@ fun reportJourneyFactory(
     fromNomisAgencyId = fromLocation,
     toNomisAgencyId = toLocation,
     effectiveYear = effectiveYear,
-    events = events
+    events = events,
   )
   return journey
 }
@@ -156,7 +156,7 @@ fun journeyEventFactory(
   type: String = EventType.JOURNEY_START.value,
   supplier: Supplier = defaultSupplierSerco,
   occurredAt: LocalDateTime = defaultDateTime,
-  notes: String = ""
+  notes: String = "",
 ): Event {
   val event = Event(
     eventId = journeyEventId,
@@ -168,7 +168,7 @@ fun journeyEventFactory(
     details = null,
     occurredAt = occurredAt,
     recordedAt = defaultDateTime,
-    notes = notes
+    notes = notes,
   )
   return event
 }

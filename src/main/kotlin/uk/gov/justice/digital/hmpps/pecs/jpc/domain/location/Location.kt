@@ -33,7 +33,7 @@ data class Location(
 
   @Id
   @Column(name = "location_id", nullable = false)
-  val id: UUID = UUID.randomUUID()
+  val id: UUID = UUID.randomUUID(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

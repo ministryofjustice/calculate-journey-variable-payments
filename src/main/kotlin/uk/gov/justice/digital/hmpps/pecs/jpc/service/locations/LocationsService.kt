@@ -17,7 +17,7 @@ import java.time.ZoneOffset
 class LocationsService(
   private val locationRepository: LocationRepository,
   private val timeSource: TimeSource,
-  private val auditService: AuditService
+  private val auditService: AuditService,
 ) {
 
   fun findLocationBySiteName(locationName: String): Location? =
@@ -63,9 +63,9 @@ class LocationsService(
           sanitizedAgencyId,
           sanitisedLocationName,
           timeSource.dateTime(),
-          timeSource.dateTime()
-        ).copy()
-      )
+          timeSource.dateTime(),
+        ).copy(),
+      ),
     ).let { e -> auditService.create(e) }
   }
 

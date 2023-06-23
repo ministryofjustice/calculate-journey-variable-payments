@@ -15,9 +15,9 @@ class JourneyTest {
         vehicleRegistration = "JOURNEY_REG",
         events = listOf(
           journeyEventJE1(eventType = EventType.JOURNEY_START),
-          journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE)
-        )
-      )
+          journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE),
+        ),
+      ),
     ) {
       assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_REG")
     }
@@ -30,9 +30,9 @@ class JourneyTest {
         vehicleRegistration = "JOURNEY_REG",
         events = listOf(
           journeyEventJE1(eventType = EventType.JOURNEY_START, details = mapOf("vehicle_reg" to "JOURNEY_START_REG")),
-          journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE)
-        )
-      )
+          journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE),
+        ),
+      ),
     ) {
       assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_START_REG")
     }
@@ -45,9 +45,9 @@ class JourneyTest {
         vehicleRegistration = "JOURNEY_REG",
         events = listOf(
           journeyEventJE1(eventType = EventType.JOURNEY_START),
-          journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE, details = mapOf("vehicle_reg" to "JOURNEY_COMPLETE_REG"))
-        )
-      )
+          journeyEventJE1(eventId = "JE2", eventType = EventType.JOURNEY_COMPLETE, details = mapOf("vehicle_reg" to "JOURNEY_COMPLETE_REG")),
+        ),
+      ),
     ) {
       assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_COMPLETE_REG")
     }
@@ -63,10 +63,10 @@ class JourneyTest {
           journeyEventJE1(
             eventId = "JE2",
             eventType = EventType.JOURNEY_COMPLETE,
-            details = mapOf("vehicle_reg" to "JOURNEY_COMPLETE_REG")
-          )
-        )
-      )
+            details = mapOf("vehicle_reg" to "JOURNEY_COMPLETE_REG"),
+          ),
+        ),
+      ),
     ) {
       assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_START_REG, JOURNEY_COMPLETE_REG")
     }
@@ -82,10 +82,10 @@ class JourneyTest {
           journeyEventJE1(
             eventId = "JE2",
             eventType = EventType.JOURNEY_COMPLETE,
-            details = mapOf("vehicle_reg" to "SAME_JOURNEY_EVENT_REG")
-          )
-        )
-      )
+            details = mapOf("vehicle_reg" to "SAME_JOURNEY_EVENT_REG"),
+          ),
+        ),
+      ),
     ) {
       assertThat(vehicleRegistrations()).isEqualTo("SAME_JOURNEY_EVENT_REG")
     }
@@ -99,15 +99,15 @@ class JourneyTest {
     val journeyCompleteEvent = journeyEventJE1(
       eventId = "JE2",
       eventType = EventType.JOURNEY_COMPLETE,
-      details = mapOf("vehicle_reg" to "JOURNEY_COMPLETE_REG",),
-      occurredAt = journeyStartEvent.occurredAt.plusMinutes(1)
+      details = mapOf("vehicle_reg" to "JOURNEY_COMPLETE_REG"),
+      occurredAt = journeyStartEvent.occurredAt.plusMinutes(1),
     )
 
     with(
       journeyJ1(
         vehicleRegistration = "JOURNEY_REG",
-        events = listOf(journeyCompleteEvent, journeyStartEvent)
-      )
+        events = listOf(journeyCompleteEvent, journeyStartEvent),
+      ),
     ) {
       assertThat(vehicleRegistrations()).isEqualTo("JOURNEY_START_REG, JOURNEY_COMPLETE_REG")
     }

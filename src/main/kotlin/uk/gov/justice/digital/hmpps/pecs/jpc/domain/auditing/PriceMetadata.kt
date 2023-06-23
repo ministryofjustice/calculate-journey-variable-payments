@@ -50,7 +50,7 @@ data class PriceMetadata(
     price.fromLocation.nomisAgencyId,
     price.toLocation.nomisAgencyId,
     price.effectiveYear,
-    newPrice = price.price().pounds()
+    newPrice = price.price().pounds(),
   )
 
   private constructor(price: Price, exception: Month, exceptionAmount: Money, deleted: Boolean = false) : this(
@@ -61,7 +61,7 @@ data class PriceMetadata(
     oldPrice = price.price().pounds(),
     newPrice = exceptionAmount.pounds(),
     exceptionMonth = exception.name,
-    exceptionDeleted = deleted
+    exceptionDeleted = deleted,
   )
 
   private constructor(old: Money, new: Price) : this(
@@ -70,7 +70,7 @@ data class PriceMetadata(
     toNomisId = new.toLocation.nomisAgencyId,
     effectiveYear = new.effectiveYear,
     newPrice = new.price().pounds(),
-    oldPrice = old.pounds()
+    oldPrice = old.pounds(),
   )
 
   private constructor(old: Money, new: Price, multiplier: AdjustmentMultiplier) : this(
@@ -99,10 +99,11 @@ data class PriceMetadata(
     fun removeException(price: Price, month: Month, amount: Money): PriceMetadata = PriceMetadata(price, month, amount, true)
 
     fun map(event: AuditEvent): PriceMetadata {
-      return if (event.eventType == AuditEventType.JOURNEY_PRICE)
+      return if (event.eventType == AuditEventType.JOURNEY_PRICE) {
         Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<PriceMetadata>(event.metadata!!)!!
-      else
+      } else {
         throw IllegalArgumentException("Audit event type is not a price event.")
+      }
     }
 
     fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) =

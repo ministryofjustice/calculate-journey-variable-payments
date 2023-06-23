@@ -15,7 +15,11 @@ class FindMovePage : ApplicationPage() {
   private lateinit var findMoveSubmit: FluentWebElement
 
   fun findBy(move: Move) {
-    referenceInput.fill().withText(move.reference)
+    referenceInput.write(move.reference)
     findMoveSubmit.submit()
+  }
+
+  fun searchReady(): Boolean {
+    return referenceInput.displayed() && findMoveSubmit.displayed()
   }
 }

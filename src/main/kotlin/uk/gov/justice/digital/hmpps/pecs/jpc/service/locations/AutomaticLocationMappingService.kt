@@ -26,7 +26,7 @@ class AutomaticLocationMappingService(
   private val locationRepository: LocationRepository,
   private val timeSource: TimeSource,
   private val auditService: AuditService,
-  private val monitoringService: MonitoringService
+  private val monitoringService: MonitoringService,
 ) {
 
   fun mapIfNotPresentLocationsCreatedOn(date: LocalDate) {
@@ -40,8 +40,8 @@ class AutomaticLocationMappingService(
                   it.locationType,
                   it.agencyId.uppercase().trim(),
                   it.name.uppercase().trim(),
-                  timeSource.dateTime()
-                )
+                  timeSource.dateTime(),
+                ),
               ).also { newLocation ->
                 auditService.create(AuditableEvent.autoMapLocation(newLocation))
 

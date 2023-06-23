@@ -39,12 +39,12 @@ private val logger = loggerFor<MaintainSupplierPricingController>()
   SUPPLIER_ATTRIBUTE,
   PICK_UP_ATTRIBUTE,
   DROP_OFF_ATTRIBUTE,
-  DATE_ATTRIBUTE
+  DATE_ATTRIBUTE,
 )
 @PreAuthorize("hasRole('PECS_MAINTAIN_PRICE')")
 class MaintainSupplierPricingController(
   @Autowired val supplierPricingService: SupplierPricingService,
-  @Autowired val actualEffectiveYear: EffectiveYear
+  @Autowired val actualEffectiveYear: EffectiveYear,
 ) : PrimaryNavigationBar {
 
   override fun primaryNavigationChoice() = PrimaryNavigation.PRICE
@@ -77,7 +77,7 @@ class MaintainSupplierPricingController(
     val exceptionMonth: String? = null,
     val effectiveYear: Int? = null,
     @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
-    val exceptionPrice: String? = null
+    val exceptionPrice: String? = null,
   ) {
     val months: List<PriceExceptionMonth> = effectiveYear?.let {
       ordinalMonthsAndYearForSeptemberToAugust(effectiveYear).map { (month, year) ->
@@ -85,7 +85,7 @@ class MaintainSupplierPricingController(
           Month.of(month),
           existingExceptions.containsKey(month),
           year,
-          existingExceptions[month]
+          existingExceptions[month],
         )
       }
     } ?: listOf()
@@ -96,14 +96,14 @@ class MaintainSupplierPricingController(
     val month: String,
     val alreadySelected: Boolean,
     val year: Int,
-    val amount: Money?
+    val amount: Money?,
   ) {
     constructor(month: Month, alreadySelected: Boolean, year: Int, amount: Money?) : this(
       month.name,
       month.name.titleCased(),
       alreadySelected,
       year,
-      amount
+      amount,
     )
   }
 
@@ -112,7 +112,7 @@ class MaintainSupplierPricingController(
     @PathVariable moveId: String,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("getting add price for move $moveId")
 
@@ -125,7 +125,7 @@ class MaintainSupplierPricingController(
           supplier,
           fromAgencyId,
           toAgencyId,
-          effectiveYear
+          effectiveYear,
         )
 
       model.apply {
@@ -142,11 +142,13 @@ class MaintainSupplierPricingController(
 
   @PostMapping(ADD_PRICE)
   fun addPrice(
-    @Valid @ModelAttribute("form") form: PriceForm,
+    @Valid
+    @ModelAttribute("form")
+    form: PriceForm,
     result: BindingResult,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("adding price for move $supplier")
 
@@ -159,7 +161,7 @@ class MaintainSupplierPricingController(
     if (result.hasErrors()) {
       model.addAttribute(
         "warnings",
-        getWarningTexts(supplier, model.getSelectedEffectiveYear(), fromAgencyId, toAgencyId)
+        getWarningTexts(supplier, model.getSelectedEffectiveYear(), fromAgencyId, toAgencyId),
       )
 
       model.addContractStartAndEndDates()
@@ -172,7 +174,7 @@ class MaintainSupplierPricingController(
       fromAgencyId,
       toAgencyId,
       price!!,
-      effectiveYear
+      effectiveYear,
     )
 
     redirectAttributes.showPriceCreatedMessageOnRedirect(form)
@@ -193,7 +195,7 @@ class MaintainSupplierPricingController(
   fun updatePrice(
     @PathVariable moveId: String,
     model: ModelMap,
-    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
   ): String {
     logger.info("getting update price for move $moveId")
 
@@ -205,7 +207,7 @@ class MaintainSupplierPricingController(
       supplier,
       fromAgencyId,
       toAgencyId,
-      effectiveYear
+      effectiveYear,
     ) ?: throw RuntimeException("No matching price found for $supplier")
 
     if (actualEffectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())) {
@@ -221,8 +223,8 @@ class MaintainSupplierPricingController(
             moveId,
             price.exceptions,
             exceptionPrice = "0.00",
-            effectiveYear = getSelectedEffectiveYear()
-          )
+            effectiveYear = getSelectedEffectiveYear(),
+          ),
         )
         addContractStartAndEndDates()
       }
@@ -241,11 +243,13 @@ class MaintainSupplierPricingController(
 
   @PostMapping(UPDATE_PRICE)
   fun updatePrice(
-    @Valid @ModelAttribute("form") form: PriceForm,
+    @Valid
+    @ModelAttribute("form")
+    form: PriceForm,
     result: BindingResult,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("updating price for move $supplier")
 
@@ -264,7 +268,7 @@ class MaintainSupplierPricingController(
         addAttribute("existingExceptions", existingExceptions(existingPrice.exceptions, getSelectedEffectiveYear()))
         addAttribute(
           "exceptionsForm",
-          PriceExceptionForm(form.moveId, existingPrice.exceptions, effectiveYear = getSelectedEffectiveYear())
+          PriceExceptionForm(form.moveId, existingPrice.exceptions, effectiveYear = getSelectedEffectiveYear()),
         )
         addContractStartAndEndDates()
       }
@@ -278,7 +282,7 @@ class MaintainSupplierPricingController(
         from,
         to,
         price!!,
-        model.getSelectedEffectiveYear()
+        model.getSelectedEffectiveYear(),
       )
     }
 
@@ -298,21 +302,27 @@ class MaintainSupplierPricingController(
 
   private fun existingExceptions(existingExceptions: Map<Int, Money>, effectiveYear: Int) =
     ordinalMonthsAndYearForSeptemberToAugust(effectiveYear).mapNotNull { (month, year) ->
-      if (existingExceptions.containsKey(month)) PriceExceptionMonth(
-        Month.of(month),
-        existingExceptions.containsKey(month),
-        year,
-        existingExceptions[month]
-      ) else null
+      if (existingExceptions.containsKey(month)) {
+        PriceExceptionMonth(
+          Month.of(month),
+          existingExceptions.containsKey(month),
+          year,
+          existingExceptions[month],
+        )
+      } else {
+        null
+      }
     }
 
   @PostMapping(ADD_PRICE_EXCEPTION)
   fun addPriceException(
-    @Valid @ModelAttribute("exceptionsForm") form: PriceExceptionForm,
+    @Valid
+    @ModelAttribute("exceptionsForm")
+    form: PriceExceptionForm,
     result: BindingResult,
     model: ModelMap,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): Any {
     logger.info("Adding price exception")
 
@@ -323,8 +333,9 @@ class MaintainSupplierPricingController(
 
     val existingPrice = supplierPricingService.maybePrice(
       supplier,
-      fromAgencyId, toAgencyId,
-      model.getSelectedEffectiveYear()
+      fromAgencyId,
+      toAgencyId,
+      model.getSelectedEffectiveYear(),
     )!!
 
     if (existingPrice.amount == price) result.rejectValue("exceptionPrice", "Invalid price")
@@ -339,8 +350,9 @@ class MaintainSupplierPricingController(
       supplier,
       fromAgencyId,
       toAgencyId,
-      model.getSelectedEffectiveYear(), Month.valueOf(form.exceptionMonth!!),
-      price!!
+      model.getSelectedEffectiveYear(),
+      Month.valueOf(form.exceptionMonth!!),
+      price!!,
     )
 
     redirectAttributes.apply {
@@ -360,7 +372,7 @@ class MaintainSupplierPricingController(
     month: String,
     model: ModelMap,
     redirectAttributes: RedirectAttributes,
-    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier
+    @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
   ): Any {
     val price = agencyIds(moveId).run {
       supplierPricingService.removePriceException(
@@ -368,7 +380,7 @@ class MaintainSupplierPricingController(
         this.first,
         this.second,
         model.getSelectedEffectiveYear(),
-        Month.valueOf(month)
+        Month.valueOf(month),
       )
     }
 
@@ -386,13 +398,14 @@ class MaintainSupplierPricingController(
     this.addFlashAttribute("flashError", attribute)
 
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
-    if (selectedEffectiveYear >= actualEffectiveYear.current())
+    if (selectedEffectiveYear >= actualEffectiveYear.current()) {
       return listOf(Warning.standard(supplier, selectedEffectiveYear))
+    }
 
     supplierPricingService.maybePrice(supplier, from, to, actualEffectiveYear.current())?.let {
       return listOf(
         Warning.beforeWithCurrentPrice(actualEffectiveYear.current()),
-        Warning.before(selectedEffectiveYear)
+        Warning.before(selectedEffectiveYear),
       )
     }
 

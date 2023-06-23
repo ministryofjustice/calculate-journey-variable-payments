@@ -55,7 +55,7 @@ internal class ChooseSupplierFilterTest {
       "/health/liveness",
       "/health/readiness",
       "/info",
-    ]
+    ],
   )
   internal fun `filter does not redirect to choose supplier when no supplier selected for excluded URIs`(uri: String) {
     whenever(request.session).thenReturn(session)

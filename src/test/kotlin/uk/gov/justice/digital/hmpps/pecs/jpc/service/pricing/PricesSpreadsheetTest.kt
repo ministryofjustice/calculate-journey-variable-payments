@@ -137,8 +137,8 @@ internal class PricesSpreadsheetTest {
           Supplier.GEOAMEY,
           fromLocation,
           toLocation,
-          2020
-        )
+          2020,
+        ),
       ).thenReturn(price)
 
       assertThatThrownBy { spreadsheet.mapToPrice(row) }
@@ -153,12 +153,12 @@ internal class PricesSpreadsheetTest {
           Supplier.GEOAMEY,
           fromLocation,
           toLocation,
-          2020
-        )
+          2020,
+        ),
       ).thenReturn(price)
 
       whenever(
-        price.priceInPence
+        price.priceInPence,
       ).thenReturn(500)
 
       val mappedPrice = warnSpreadsheet.mapToPrice(row)

@@ -157,7 +157,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
         Journey("FROM_AGENCY2", "TO_AGENCY3"),
         Journey("FROM_AGENCY2", "TO_AGENCY4"),
         Journey("LOCKOUT_AGENCY", "TO_AGENCY"),
-        Journey("STOPOVER_AGENCY", "TO_AGENCY")
+        Journey("STOPOVER_AGENCY", "TO_AGENCY"),
       )
       .chooseLocationToMap("STOPOVER_AGENCY")
 

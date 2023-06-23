@@ -22,7 +22,7 @@ data class MapLocationMetadata(
   val oldName: String? = null,
 
   @Json(name = "old_type", index = 5, serializeNull = false)
-  val oldType: LocationType? = null
+  val oldType: LocationType? = null,
 ) : Metadata {
   private constructor(location: Location) : this(location.nomisAgencyId, location.siteName, location.locationType)
 
@@ -31,7 +31,7 @@ data class MapLocationMetadata(
     newName = if (old.siteName != new.siteName) new.siteName else null,
     oldName = if (old.siteName != new.siteName) old.siteName else null,
     newType = if (old.locationType != new.locationType) new.locationType else null,
-    oldType = if (old.locationType != new.locationType) old.locationType else null
+    oldType = if (old.locationType != new.locationType) old.locationType else null,
   )
 
   init {
@@ -50,10 +50,11 @@ data class MapLocationMetadata(
     }
 
     fun map(event: AuditEvent): MapLocationMetadata {
-      return if (event.eventType == AuditEventType.LOCATION)
+      return if (event.eventType == AuditEventType.LOCATION) {
         Klaxon().parse<MapLocationMetadata>(event.metadata!!)!!
-      else
+      } else {
         throw IllegalArgumentException("Audit event type is not a location event.")
+      }
     }
 
     fun key(agencyId: String) = agencyId.trim().uppercase()

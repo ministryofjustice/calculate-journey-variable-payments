@@ -15,7 +15,7 @@ import java.time.Month
 class MoveService(
   private val moveQueryRepository: MoveQueryRepository,
   private val moveRepository: MoveRepository,
-  private val eventRepository: EventRepository
+  private val eventRepository: EventRepository,
 ) {
 
   fun moveWithPersonJourneysAndEvents(moveId: String, supplier: Supplier, inMonth: Month): Move? {
@@ -80,7 +80,7 @@ data class MoveTypeSummaries(val count: Int, val movesSummaries: List<MovesSumma
         sumOf { it.percentage },
         sumOf { it.volume },
         sumOf { it.volumeUnpriced },
-        sumOf { it.totalPriceInPence }
+        sumOf { it.totalPriceInPence },
       )
     }
   }

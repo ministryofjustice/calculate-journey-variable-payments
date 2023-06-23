@@ -23,7 +23,7 @@ class ChooseSupplierFilter : OncePerRequestFilter() {
     CHOOSE_SUPPLIER_URL,
     "$CHOOSE_SUPPLIER_URL/geoamey",
     "$CHOOSE_SUPPLIER_URL/serco",
-    GENERATE_PRICES_SPREADSHEET // Allowed otherwise result of redirect ends up in the downloaded file.
+    GENERATE_PRICES_SPREADSHEET, // Allowed otherwise result of redirect ends up in the downloaded file.
   )
 
   private val allowedStaticResources = arrayOf(
@@ -31,7 +31,7 @@ class ChooseSupplierFilter : OncePerRequestFilter() {
     ".svg",
     ".png",
     ".ico",
-    ".js"
+    ".js",
   )
 
   override fun shouldNotFilter(request: HttpServletRequest): Boolean {

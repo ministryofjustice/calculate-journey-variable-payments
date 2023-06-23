@@ -84,7 +84,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         model {
           attribute(
             "form",
-            AnnualPriceAdjustmentsController.AnnualPriceAdjustmentForm("0.0", "0.0")
+            AnnualPriceAdjustmentsController.AnnualPriceAdjustmentForm("0.0", "0.0"),
           )
         }
       }
@@ -218,7 +218,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
       setOf(
         "special characters @#$%%^&*()_",
         "special characters `~{}[]:;',./?",
-        "inflation rate of 1.123456789012345"
+        "inflation rate of 1.123456789012345",
       ).forEach { allowedCharacters ->
         mockMvc.post("/annual-price-adjustment") {
           session = mockSession
@@ -236,7 +236,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
           anyOrNull(),
           anyOrNull(),
           eq(allowedCharacters),
-          eq(false)
+          eq(false),
         )
 
         verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -261,7 +261,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         anyOrNull(),
         anyOrNull(),
         eq("some details"),
-        eq(false)
+        eq(false),
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -285,7 +285,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         anyOrNull(),
         anyOrNull(),
         eq("some details"),
-        eq(false)
+        eq(false),
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -312,7 +312,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         eq(AdjustmentMultiplier("2.0".toBigDecimal())),
         anyOrNull(),
         eq("some details"),
-        eq(false)
+        eq(false),
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())
@@ -336,7 +336,7 @@ class AnnualPriceAdjustmentsControllerTest(@Autowired private val wac: WebApplic
         eq(AdjustmentMultiplier("-2.0".toBigDecimal())),
         anyOrNull(),
         eq("some details"),
-        eq(false)
+        eq(false),
       )
 
       verify(adjustmentsService, never()).adjustmentsHistoryFor(any())

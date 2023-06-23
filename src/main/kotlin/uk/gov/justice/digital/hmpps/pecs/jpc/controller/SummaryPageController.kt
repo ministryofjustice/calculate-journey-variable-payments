@@ -42,13 +42,13 @@ private val logger = loggerFor<SummaryPageController>()
   SUPPLIER_ATTRIBUTE,
   DATE_ATTRIBUTE,
   START_OF_MONTH_DATE_ATTRIBUTE,
-  END_OF_MONTH_DATE_ATTRIBUTE
+  END_OF_MONTH_DATE_ATTRIBUTE,
 )
 class SummaryPageController(
   @Autowired val moveService: MoveService,
   @Autowired val journeyService: JourneyService,
   @Autowired val timeSource: TimeSource,
-  @Autowired val actualEffectiveYear: EffectiveYear
+  @Autowired val actualEffectiveYear: EffectiveYear,
 ) : PrimaryNavigationBar {
 
   override fun primaryNavigationChoice() = PrimaryNavigation.SUMMARY
@@ -94,9 +94,11 @@ class SummaryPageController(
   @RequestMapping("$MOVES_BY_TYPE_URL/{moveTypeString}")
   fun movesByType(
     @PathVariable moveTypeString: String,
-    @ModelAttribute(name = START_OF_MONTH_DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
+    @ModelAttribute(name = START_OF_MONTH_DATE_ATTRIBUTE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    startOfMonth: LocalDate,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    model: ModelMap
+    model: ModelMap,
   ): String {
     logger.info("moves by type $moveTypeString")
 
@@ -110,8 +112,8 @@ class SummaryPageController(
         MonthsWidget(
           (startOfMonth),
           nextMonth = (startOfMonth.plusMonths(1)),
-          previousMonth = (startOfMonth.minusMonths(1))
-        )
+          previousMonth = (startOfMonth.minusMonths(1)),
+        ),
       )
       addAttribute("summary", moveTypeSummary.movesSummary)
       addAttribute("moves", moves)
@@ -125,7 +127,7 @@ class SummaryPageController(
   fun moves(
     @PathVariable moveId: String,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    model: ModelMap
+    model: ModelMap,
   ): ModelAndView {
     logger.info("$supplier move $moveId")
 
@@ -142,7 +144,9 @@ class SummaryPageController(
 
   @RequestMapping(JOURNEYS_URL)
   fun journeys(
-    @ModelAttribute(name = DATE_ATTRIBUTE) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startOfMonth: LocalDate,
+    @ModelAttribute(name = DATE_ATTRIBUTE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    startOfMonth: LocalDate,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     @ModelAttribute(name = "flashAttrMappedLocationName") locationName: String?,
     @ModelAttribute(name = "flashAttrMappedAgencyId") agencyId: String?,
@@ -169,10 +173,12 @@ class SummaryPageController(
   fun dashboard(
     @RequestParam(
       name = DATE_ATTRIBUTE,
-      required = false
-    ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) requestParamStartOfMonth: LocalDate?,
+      required = false,
+    )
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    requestParamStartOfMonth: LocalDate?,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
-    model: ModelMap
+    model: ModelMap,
   ): Any {
     logger.info("dashboard for $supplier")
 
@@ -193,8 +199,8 @@ class SummaryPageController(
         MonthsWidget(
           (startOfMonth),
           nextMonth = (startOfMonth.plusMonths(1)),
-          previousMonth = (startOfMonth.minusMonths(1))
-        )
+          previousMonth = (startOfMonth.minusMonths(1)),
+        ),
       )
       addAttribute("summary", countAndSummaries.summary())
       addAttribute("journeysSummary", journeysSummary)
@@ -214,7 +220,13 @@ class SummaryPageController(
   data class JumpToMonthForm(@ValidMonthYear val date: String)
 
   @PostMapping(SELECT_MONTH_URL)
-  fun jumpToMonth(@Valid @ModelAttribute("form") form: JumpToMonthForm, result: BindingResult, model: ModelMap): Any {
+  fun jumpToMonth(
+    @Valid
+    @ModelAttribute("form")
+    form: JumpToMonthForm,
+    result: BindingResult,
+    model: ModelMap,
+  ): Any {
     if (result.hasErrors()) {
       return "select-month"
     }
@@ -236,11 +248,13 @@ class SummaryPageController(
 
   @PostMapping(FIND_MOVE_URL)
   fun performFindMove(
-    @Valid @ModelAttribute("form") form: FindMoveForm,
+    @Valid
+    @ModelAttribute("form")
+    form: FindMoveForm,
     @ModelAttribute(name = SUPPLIER_ATTRIBUTE) supplier: Supplier,
     result: BindingResult,
     model: ModelMap,
-    redirectAttributes: RedirectAttributes
+    redirectAttributes: RedirectAttributes,
   ): String {
     logger.info("finding move")
 
