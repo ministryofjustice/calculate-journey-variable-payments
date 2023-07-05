@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.8.8"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.9.1"
   kotlin("plugin.spring") version "1.8.22"
   kotlin("plugin.jpa") version "1.8.22"
   kotlin("plugin.allopen") version "1.8.22"
@@ -33,7 +33,8 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-oauth2-resource-server",
     "org.springframework.boot:spring-boot-starter-webflux",
     "org.springframework.session:spring-session-jdbc:2.7.0",
-    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE"
+    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE",
+    "com.google.code.findbugs:jsr305:3.0.2"
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
