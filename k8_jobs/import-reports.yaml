@@ -15,6 +15,7 @@ spec:
       ttlSecondsAfterFinished: 100
       template:
         spec:
+          serviceAccountName: calculate-journey-variable-payments
           containers:
             - name: import-report-feed-placeholder
               image: quay.io/hmpps/calculate-journey-variable-payments:latest
