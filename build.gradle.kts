@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.9.3"
-  kotlin("plugin.spring") version "1.8.22"
-  kotlin("plugin.jpa") version "1.8.22"
-  kotlin("plugin.allopen") version "1.8.22"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.10.0"
+  kotlin("plugin.spring") version "1.9.0"
+  kotlin("plugin.jpa") version "1.9.0"
+  kotlin("plugin.allopen") version "1.9.0"
 }
 
 allOpen {
@@ -20,7 +20,7 @@ dependencies {
   val shedlockVersion = "4.42.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.279",
+    "com.amazonaws:aws-java-sdk-s3:1.12.533",
     "io.sentry:sentry-spring-boot-starter:6.4.2",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",

@@ -26,6 +26,7 @@ spec:
         app: {{ template "app.name" . }}
         release: {{ .Release.Name }}
     spec:
+      serviceAccountName: calculate-journey-variable-payments
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config.aws
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider
-import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
@@ -33,10 +32,8 @@ class S3ProviderConfiguration {
   fun jpcAmazonS3(
     @Value("\${resources.endpoint.url:}") endpoint: String,
     @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
-    @Value("\${JPC_AWS_ACCESS_KEY_ID:}") accessKey: String,
-    @Value("\${JPC_AWS_SECRET_ACCESS_KEY:}") secretKey: String,
   ): AmazonS3 {
-    return amazonS3(endpoint, region, accessKey, secretKey)
+    return amazonS3(endpoint, region)
   }
 
   @Bean
@@ -44,13 +41,11 @@ class S3ProviderConfiguration {
   fun basmAmazonS3(
     @Value("\${resources.endpoint.url:}") endpoint: String,
     @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
-    @Value("\${BASM_AWS_ACCESS_KEY_ID:}") accessKey: String,
-    @Value("\${BASM_AWS_SECRET_ACCESS_KEY:}") secretKey: String,
   ): AmazonS3 {
-    return amazonS3(endpoint, region, accessKey, secretKey)
+    return amazonS3(endpoint, region)
   }
 
-  private fun amazonS3(endpoint: String, region: String, accessKey: String, secretKey: String): AmazonS3 {
+  private fun amazonS3(endpoint: String, region: String): AmazonS3 {
     logger.info("Using AWS configuration.")
     val builder = if (endpoint.isNotEmpty()) {
       // Localstack
@@ -60,13 +55,12 @@ class S3ProviderConfiguration {
         .withEndpointConfiguration(AwsClientBuilder.EndpointConfiguration(endpoint, region))
     } else {
       // Real AWS S3
-      logger.info("****Using Real S3 with access key: $accessKey*****")
+      logger.info("****Using Real S3 with IRSA****")
 
-      val awsCreds = BasicAWSCredentials(accessKey, secretKey)
       AmazonS3ClientBuilder.standard()
         .withRegion(region)
         .withCredentials(
-          AWSStaticCredentialsProvider(awsCreds),
+          DefaultAWSCredentialsProviderChain(),
         )
     }
 
