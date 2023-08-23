@@ -58,16 +58,6 @@ spec:
                       key: database_password
                 - name: APP_DB_URL
                   value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?user=$(DB_USERNAME)&password=$(DB_PASSWORD)"
-                - name: JPC_AWS_ACCESS_KEY_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: calculate-journey-variable-payments-bucket
-                      key: access_key_id
-                - name: JPC_AWS_SECRET_ACCESS_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: calculate-journey-variable-payments-bucket
-                      key: secret_access_key
                 - name: JPC_BUCKET_NAME
                   valueFrom:
                     secretKeyRef:
@@ -78,16 +68,6 @@ spec:
                     secretKeyRef:
                       name: calculate-journey-variable-payments
                       key: BASM_BUCKET_NAME
-                - name: BASM_AWS_ACCESS_KEY_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: calculate-journey-variable-payments
-                      key: BASM_AWS_ACCESS_KEY_ID
-                - name: BASM_AWS_SECRET_ACCESS_KEY
-                  valueFrom:
-                    secretKeyRef:
-                      name: calculate-journey-variable-payments
-                      key: BASM_AWS_SECRET_ACCESS_KEY
                 - name: HMPPS_AUTH_BASE_URI
                   value: "https://sign-in-placeholder.hmpps.service.justice.gov.uk/auth"
                 - name: HMPPS_AUTH_REDIRECT_BASE_URI

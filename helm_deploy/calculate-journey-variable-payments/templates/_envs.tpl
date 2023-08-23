@@ -58,18 +58,6 @@ env:
   - name: IMPORT_FILES_PRICES_GEO
     value: "geoamey_prices.xlsx"
 
-  - name: JPC_AWS_ACCESS_KEY_ID
-    valueFrom:
-      secretKeyRef:
-        name: {{ template "app.name" . }}-bucket
-        key: access_key_id
-
-  - name: JPC_AWS_SECRET_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ template "app.name" . }}-bucket
-        key: secret_access_key
-
   - name: JPC_BUCKET_NAME
     valueFrom:
       secretKeyRef:
@@ -81,18 +69,6 @@ env:
       secretKeyRef:
         name: {{ template "app.name" . }}
         key: BASM_BUCKET_NAME
-
-  - name: BASM_AWS_ACCESS_KEY_ID
-    valueFrom:
-      secretKeyRef:
-        name: {{ template "app.name" . }}
-        key: BASM_AWS_ACCESS_KEY_ID
-
-  - name: BASM_AWS_SECRET_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        name: {{ template "app.name" . }}
-        key: BASM_AWS_SECRET_ACCESS_KEY
 
   - name: HMPPS_AUTH_BASE_URI
     value: "{{ .Values.env.HMPPS_AUTH_BASE_URI }}"
