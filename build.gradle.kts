@@ -20,7 +20,8 @@ dependencies {
   val shedlockVersion = "4.42.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.533",
+    "com.amazonaws:aws-java-sdk-s3:1.12.534",
+    "com.amazonaws:aws-java-sdk-sts:1.12.534",
     "io.sentry:sentry-spring-boot-starter:6.4.2",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
