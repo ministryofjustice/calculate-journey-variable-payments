@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config.aws
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.auth.WebIdentityTokenCredentialsProvider
 import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.s3.AmazonS3
