@@ -71,7 +71,7 @@ spec:
                 - name: HMPPS_AUTH_BASE_URI
                   value: "https://sign-in-placeholder.hmpps.service.justice.gov.uk/auth"
                 - name: HMPPS_AUTH_REDIRECT_BASE_URI
-                  value: "https://calculate-journey-variable-payments-placeholder.apps.live-1.cloud-platform.service.justice.gov.uk"
+                  value: "https://calculate-journey-variable-payments-placeholder.apps.cloud-platform.service.justice.gov.uk"
                 - name: HMPPS_AUTH_CLIENT_ID
                   valueFrom:
                     secretKeyRef:
@@ -98,7 +98,7 @@ spec:
                 - name: SENTRY_ENVIRONMENT
                   value: "dev"
                 - name: BASM_API_BASE_URL
-                  value: "https://hmpps-book-secure-move-api-staging.apps.live-1.cloud-platform.service.justice.gov.uk"
+                  value: "https://hmpps-book-secure-move-api-staging.apps.cloud-platform.service.justice.gov.uk"
                 - name: FEEDBACK_URL
                   valueFrom:
                     secretKeyRef:
