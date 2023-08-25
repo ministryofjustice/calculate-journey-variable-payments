@@ -67,8 +67,8 @@ env:
   - name: BASM_BUCKET_NAME
     valueFrom:
       secretKeyRef:
-        name: {{ template "app.name" . }}
-        key: BASM_BUCKET_NAME
+        name: basm-reporting-bucket
+        key: bucket_name
 
   - name: HMPPS_AUTH_BASE_URI
     value: "{{ .Values.env.HMPPS_AUTH_BASE_URI }}"

@@ -67,8 +67,8 @@ spec:
                 - name: BASM_BUCKET_NAME
                   valueFrom:
                     secretKeyRef:
-                      name: calculate-journey-variable-payments
-                      key: BASM_BUCKET_NAME
+                      name: basm-reporting-bucket
+                      key: bucket_name
                 - name: HMPPS_AUTH_BASE_URI
                   value: "https://sign-in-placeholder.hmpps.service.justice.gov.uk/auth"
                 - name: HMPPS_AUTH_REDIRECT_BASE_URI
