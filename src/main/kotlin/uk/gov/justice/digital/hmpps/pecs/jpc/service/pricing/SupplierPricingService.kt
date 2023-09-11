@@ -169,7 +169,7 @@ class SupplierPricingService(
   }
 
   private fun failIfOutsideOfPriceChangeWindow(effectiveYear: Int) {
-    if (!actualEffectiveYear.canAddOrUpdatePrices(effectiveYear)) throw RuntimeException("Price changes can longer be made, change is outside of price change window.")
+    if (!actualEffectiveYear.canAddOrUpdatePrices(effectiveYear)) throw RuntimeException("Price changes can no longer be made, change is outside of price change window.")
   }
 
   private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =

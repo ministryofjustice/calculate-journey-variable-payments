@@ -57,7 +57,7 @@ internal class SupplierPricingServiceTest {
   )
   private val priceCaptor = argumentCaptor<Price>()
   private val eventCaptor = argumentCaptor<AuditableEvent>()
-  private val actualEffectYear: EffectiveYear = EffectiveYear({ effectiveYearDate })
+  private val actualEffectYear: EffectiveYear = EffectiveYear { effectiveYearDate }
 
   private val service: SupplierPricingService =
     SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService, actualEffectYear)
@@ -134,7 +134,7 @@ internal class SupplierPricingServiceTest {
         effectiveYear - 2,
       )
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -286,7 +286,7 @@ internal class SupplierPricingServiceTest {
         effectiveYear - 2,
       )
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -358,7 +358,7 @@ internal class SupplierPricingServiceTest {
     assertThatThrownBy {
       service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, SEPTEMBER, Money.valueOf("20.00"))
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
   }
 
   @Test
@@ -406,7 +406,7 @@ internal class SupplierPricingServiceTest {
     assertThatThrownBy {
       service.removePriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, JULY)
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
   }
 
   @Test

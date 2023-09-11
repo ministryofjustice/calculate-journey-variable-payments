@@ -3,11 +3,13 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 import org.junit.jupiter.api.Test
 import org.openqa.selenium.support.ui.FluentWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AnnualPriceAdjustment
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
+import java.time.LocalDate
 
 internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
@@ -16,7 +18,7 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
   private val inflationary = "Inflationary"
 
   // This will break in September, fix test to get current CY or otherwise fix up time providers in tests.
-  private val year = 2022
+  private val year = effectiveYearForDate(LocalDate.now())
 
   @Test
   fun `apply annual price adjustments`() {

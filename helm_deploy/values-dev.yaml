@@ -21,7 +21,7 @@ ingress:
   enabled: true
   enable_whitelist: false
   hosts:
-    - host: calculate-journey-variable-payments-dev.apps.live-1.cloud-platform.service.justice.gov.uk
+    - host: calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk
 #      cert_secret: calculate-journey-variable-payments-cert
   path: /
   aws_weight: "100"
@@ -29,12 +29,12 @@ ingress:
 env:
   JAVA_OPTS: "-Xmx1024m"
   HMPPS_AUTH_BASE_URI: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
-  HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.live-1.cloud-platform.service.justice.gov.uk"
+  HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk"
   CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 13 * * ?"
   CRON_IMPORT_REPORTS: "-"
   CRON_BACKFILL_REPORTS: "-"
   CRON_REPROCESS_EXISTING_MOVES: "-"
   SENTRY_ENVIRONMENT: dev
-  BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-staging.apps.live-1.cloud-platform.service.justice.gov.uk"
+  BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-staging.apps.cloud-platform.service.justice.gov.uk"
   FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "true"
   IMPORT_REPORTS_BACKDATE_ENABLED: "true"
