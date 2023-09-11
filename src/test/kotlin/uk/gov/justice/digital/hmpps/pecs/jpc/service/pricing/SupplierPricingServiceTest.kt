@@ -58,7 +58,7 @@ internal class SupplierPricingServiceTest {
   )
   private val priceCaptor = argumentCaptor<Price>()
   private val eventCaptor = argumentCaptor<AuditableEvent>()
-  private val actualEffectYear: EffectiveYear = EffectiveYear({ effectiveYearDate })
+  private val actualEffectYear: EffectiveYear = EffectiveYear { effectiveYearDate }
 
   private val service: SupplierPricingService =
     SupplierPricingService(locationRepository, priceRepository, annualPriceAdjuster, auditService, actualEffectYear)

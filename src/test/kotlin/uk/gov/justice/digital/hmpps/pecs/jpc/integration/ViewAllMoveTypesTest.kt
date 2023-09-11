@@ -31,7 +31,7 @@ import java.time.Year
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class ViewAllMoveTypesTest : IntegrationTest() {
 
-  private val currentDate = LocalDate.now()
+  private val currentDate = LocalDate.of(2023, Month.DECEMBER, 25)
 
   private val year = Year.now()
 

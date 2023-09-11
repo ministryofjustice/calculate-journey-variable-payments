@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.util.UUID
 
 /**
@@ -33,6 +34,8 @@ import java.util.UUID
 class R__2_5_Integration_test_data : BaseJavaMigration() {
 
   private val logger = LoggerFactory.getLogger(javaClass)
+
+  private val now = LocalDateTime.of(2023, Month.DECEMBER, 25, 12, 0)
 
   companion object {
     val PRISON1_PRIMARY_KEY: UUID = UUID.fromString("709fbee3-7fe6-4584-a8dc-f12481165bfa")
@@ -81,7 +84,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         template.update(
           priceSql,
           UUID.randomUUID(),
-          LocalDateTime.now(),
+          now,
           journey.effectiveYear,
           priced.amount.pence,
           Supplier.SERCO.name,
@@ -460,7 +463,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
   }
 }
 
-private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
+private val startOfPreviousMonth = LocalDate.of(2023, Month.DECEMBER, 25).minusMonths(1).withDayOfMonth(1)
 
 private fun move(
   moveId: String,
