@@ -28,9 +28,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.FakeAuthentication
 import java.time.LocalDateTime
+import java.time.Month.DECEMBER
 import java.time.Month.JANUARY
 import java.time.Month.JULY
-import java.time.Month.NOVEMBER
 import java.time.Month.SEPTEMBER
 
 @ExtendWith(FakeAuthentication::class)
@@ -38,7 +38,7 @@ internal class SupplierPricingServiceTest {
 
   private val annualPriceAdjuster: AnnualPriceAdjuster = mock()
   private val auditService: AuditService = mock()
-  private val effectiveYearDate = LocalDateTime.of(2022, NOVEMBER, 10, 12, 0)
+  private val effectiveYearDate = LocalDateTime.of(2022, DECEMBER, 25, 12, 0)
   private val effectiveYear = effectiveYearForDate(effectiveYearDate.toLocalDate())
   private val fromLocation: Location =
     Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")

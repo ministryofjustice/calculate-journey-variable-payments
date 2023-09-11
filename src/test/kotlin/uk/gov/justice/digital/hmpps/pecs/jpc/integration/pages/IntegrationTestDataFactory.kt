@@ -7,7 +7,10 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.Year
+
+private val now = LocalDateTime.of(2023, Month.DECEMBER, 25, 12, 0)
 
 /**
  * The integration test data comes from the DEV Spring Profile data loaded via the database migration scripts at startup.
@@ -15,7 +18,7 @@ import java.time.Year
 private val billyTheKid =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER1",
     firstNames = "Billy the",
     lastName = "Kid",
@@ -26,7 +29,7 @@ private val billyTheKid =
 private val bonnieElizabeth =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER3",
     firstNames = "Bonnie Elizabeth",
     lastName = "Parker",
@@ -37,7 +40,7 @@ private val bonnieElizabeth =
 private val ronnieBiggs =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER4",
     firstNames = "Ronnie",
     lastName = "Biggs",
@@ -48,7 +51,7 @@ private val ronnieBiggs =
 private val fredBloggs =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER5",
     firstNames = "Fred",
     lastName = "Bloggs",
@@ -59,7 +62,7 @@ private val fredBloggs =
 private val janeBloggs =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER6",
     firstNames = "Jane",
     lastName = "Bloggs",
@@ -70,7 +73,7 @@ private val janeBloggs =
 private val donaldDuck =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER7",
     firstNames = "Donald",
     lastName = "Duck",
@@ -81,7 +84,7 @@ private val donaldDuck =
 private val professorMoriarty =
   Person(
     personId = "_",
-    updatedAt = LocalDateTime.now(),
+    updatedAt = now,
     prisonNumber = "PRISONER8",
     firstNames = "Professor",
     lastName = "Moriarty",
@@ -94,7 +97,7 @@ object Dec2020MoveData {
   fun standardMoveM4() =
     Move(
       moveId = "M4",
-      updatedAt = LocalDateTime.now(),
+      updatedAt = now,
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.STANDARD,
       status = MoveStatus.completed,
@@ -109,7 +112,7 @@ object Dec2020MoveData {
       dropOffOrCancelledDateTime = LocalDateTime.of(2020, 12, 1, 12, 20),
       person = Person(
         personId = "_",
-        updatedAt = LocalDateTime.now(),
+        updatedAt = now,
         prisonNumber = "PRISONER2",
         firstNames = "Clyde Chestnut",
         lastName = "Barrow",
@@ -121,7 +124,7 @@ object Dec2020MoveData {
   fun longHaulMoveM30() =
     Move(
       moveId = "M30",
-      updatedAt = LocalDateTime.now(),
+      updatedAt = now,
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.LONG_HAUL,
       status = MoveStatus.completed,
@@ -140,7 +143,7 @@ object Dec2020MoveData {
   fun redirectMoveM20() =
     Move(
       moveId = "M20",
-      updatedAt = LocalDateTime.now(),
+      updatedAt = now,
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.REDIRECTION,
       status = MoveStatus.completed,
@@ -159,7 +162,7 @@ object Dec2020MoveData {
   fun lockoutMoveM40() =
     Move(
       moveId = "M40",
-      updatedAt = LocalDateTime.now(),
+      updatedAt = now,
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.LOCKOUT,
       status = MoveStatus.completed,
@@ -178,7 +181,7 @@ object Dec2020MoveData {
   fun multiMoveM50() =
     Move(
       moveId = "M50",
-      updatedAt = LocalDateTime.now(),
+      updatedAt = now,
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.MULTI,
       status = MoveStatus.completed,
@@ -197,7 +200,7 @@ object Dec2020MoveData {
   fun cancelledMoveM60() =
     Move(
       moveId = "M60",
-      updatedAt = LocalDateTime.now(),
+      updatedAt = now,
       supplier = Supplier.GEOAMEY,
       moveType = MoveType.CANCELLED,
       status = MoveStatus.completed,
@@ -216,7 +219,7 @@ object Dec2020MoveData {
 
 object SercoPreviousMonthMoveData {
 
-  private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
+  private val startOfPreviousMonth = LocalDate.from(now).minusMonths(1).withDayOfMonth(1)
 
   private const val startHoursOffset = 10L
 
