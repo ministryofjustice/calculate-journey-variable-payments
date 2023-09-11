@@ -20,10 +20,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.ReportImporter
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.StandardStreamingReportParser
 import java.io.InputStreamReader
-import java.time.Clock
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.Month
 import javax.sql.DataSource
 
 @TestConfiguration
@@ -41,7 +39,7 @@ class TestConfig {
     JourneyQueryRepository(JdbcTemplate(dataSource))
 
   @Bean
-  fun timeSource() = TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
+  fun timeSource() = TimeSource { LocalDateTime.of(2022, Month.SEPTEMBER, 10, 12, 0) }
 
   @Bean
   fun dataSource(): DataSource = DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()

@@ -30,6 +30,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.FakeAuthentication
 import java.time.LocalDateTime
 import java.time.Month.JANUARY
 import java.time.Month.JULY
+import java.time.Month.NOVEMBER
 import java.time.Month.SEPTEMBER
 
 @ExtendWith(FakeAuthentication::class)
@@ -37,7 +38,7 @@ internal class SupplierPricingServiceTest {
 
   private val annualPriceAdjuster: AnnualPriceAdjuster = mock()
   private val auditService: AuditService = mock()
-  private val effectiveYearDate = LocalDateTime.now()
+  private val effectiveYearDate = LocalDateTime.of(2022, NOVEMBER, 10, 12, 0)
   private val effectiveYear = effectiveYearForDate(effectiveYearDate.toLocalDate())
   private val fromLocation: Location =
     Location(locationType = LocationType.PR, nomisAgencyId = "PRISON", siteName = "from site")
@@ -134,7 +135,7 @@ internal class SupplierPricingServiceTest {
         effectiveYear - 2,
       )
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -286,7 +287,7 @@ internal class SupplierPricingServiceTest {
         effectiveYear - 2,
       )
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
 
     verify(priceRepository, never()).save(any())
   }
@@ -358,7 +359,7 @@ internal class SupplierPricingServiceTest {
     assertThatThrownBy {
       service.addPriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, SEPTEMBER, Money.valueOf("20.00"))
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
   }
 
   @Test
@@ -406,7 +407,7 @@ internal class SupplierPricingServiceTest {
     assertThatThrownBy {
       service.removePriceException(Supplier.SERCO, "FROM", "TO", effectiveYear - 2, JULY)
     }.isInstanceOf(RuntimeException::class.java)
-      .hasMessage("Price changes can longer be made, change is outside of price change window.")
+      .hasMessage("Price changes can no longer be made, change is outside of price change window.")
   }
 
   @Test
