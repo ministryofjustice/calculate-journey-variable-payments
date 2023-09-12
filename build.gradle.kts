@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.10.0"
-  kotlin("plugin.spring") version "1.9.0"
-  kotlin("plugin.jpa") version "1.9.0"
-  kotlin("plugin.allopen") version "1.9.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.11.1"
+  kotlin("plugin.spring") version "1.9.10"
+  kotlin("plugin.jpa") version "1.9.10"
+  kotlin("plugin.allopen") version "1.9.10"
 }
 
 allOpen {
@@ -17,12 +17,12 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "4.42.0"
+  val shedlockVersion = "4.46.0"
   listOf(
     "com.beust:klaxon:5.6",
     "com.amazonaws:aws-java-sdk-s3:1.12.534",
     "com.amazonaws:aws-java-sdk-sts:1.12.534",
-    "io.sentry:sentry-spring-boot-starter:6.4.2",
+    "io.sentry:sentry-spring-boot-starter:6.29.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0",
@@ -33,21 +33,21 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-oauth2-client",
     "org.springframework.boot:spring-boot-starter-oauth2-resource-server",
     "org.springframework.boot:spring-boot-starter-webflux",
-    "org.springframework.session:spring-session-jdbc:2.7.0",
-    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.4.RELEASE",
+    "org.springframework.session:spring-session-jdbc:2.7.3",
+    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.5.RELEASE",
     "com.google.code.findbugs:jsr305:3.0.2"
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
   constraints {
-    implementation("org.apache.groovy:groovy:4.0.2") {
+    implementation("org.apache.groovy:groovy:4.0.14") {
       because("previous transitive version 4.0.0 pulled in by Thymeleaf has CVE-2020-17521")
     }
   }
 
   // Test versions
   val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.10.0"
+  val seleniumVersion = "4.12.0"
   listOf(
     "com.github.tomakehurst:wiremock-standalone:2.27.2",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
@@ -65,7 +65,7 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.11.0",
-    "com.squareup.okhttp3:okhttp:4.10.0"
+    "com.squareup.okhttp3:okhttp:4.11.0"
   ).forEach { testImplementation(it) }
   constraints {
     implementation(" org.apache.commons:commons-text:1.10.0") {
@@ -74,7 +74,7 @@ dependencies {
   }
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.5.4")
+  runtimeOnly("org.postgresql:postgresql:42.6.0")
 }
 
 java {
