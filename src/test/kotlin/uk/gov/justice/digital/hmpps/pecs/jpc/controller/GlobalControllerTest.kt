@@ -23,7 +23,7 @@ class GlobalControllerTest(@Autowired val controller: GlobalController) {
   @Test
   fun `retrieval of global attributes`() {
     assertThat(controller.hmppsUrl()).isEqualTo("http://fake_auth_base_url")
-    assertThat(controller.manageYourDetailsUrl()).isEqualTo("http://fake_auth_base_url/account-details")
+    assertThat(controller.manageYourDetailsUrl()).isEqualTo("http://fake_auth_base_url/auth/account-details")
     assertThat(controller.feedbackUrl()).isEqualTo("http://fake_feedback_url")
   }
 }

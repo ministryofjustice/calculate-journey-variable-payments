@@ -70,7 +70,7 @@ spec:
                       name: basm-reporting-bucket
                       key: bucket_name
                 - name: HMPPS_AUTH_BASE_URI
-                  value: "https://sign-in-placeholder.hmpps.service.justice.gov.uk/auth"
+                  value: "https://sign-in-placeholder.hmpps.service.justice.gov.uk"
                 - name: HMPPS_AUTH_REDIRECT_BASE_URI
                   value: "https://calculate-journey-variable-payments-placeholder.apps.cloud-platform.service.justice.gov.uk"
                 - name: HMPPS_AUTH_CLIENT_ID

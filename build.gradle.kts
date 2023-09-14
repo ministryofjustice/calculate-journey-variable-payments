@@ -25,7 +25,7 @@ dependencies {
     "io.sentry:sentry-spring-boot-starter:6.29.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
-    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.2",
+    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.1",
     "org.apache.poi:poi-ooxml:5.2.2",
     "org.flywaydb:flyway-core",
     "org.springframework.boot:spring-boot-starter-data-jpa",
@@ -34,7 +34,7 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-oauth2-resource-server",
     "org.springframework.boot:spring-boot-starter-webflux",
     "org.springframework.session:spring-session-jdbc:2.7.3",
-    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.1.2.RELEASE",
+    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.5.RELEASE",
     "com.google.code.findbugs:jsr305:3.0.2"
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
