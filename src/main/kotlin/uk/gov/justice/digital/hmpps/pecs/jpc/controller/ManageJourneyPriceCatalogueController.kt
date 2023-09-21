@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
@@ -16,7 +17,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints.ValidJourney
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.moves.JourneyService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
-import javax.validation.Valid
 
 /**
  * Controller to manage flows around journey pricing. This is accessed from the main menu link 'Manage Journey Price Catalogue'.

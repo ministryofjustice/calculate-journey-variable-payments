@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 
+import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,7 +37,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultSupplierSerc
 import java.time.Duration
 import java.time.LocalDate
 import java.time.Month
-import javax.servlet.http.Cookie
 
 @SpringBootTest
 @AutoConfigureMockMvc

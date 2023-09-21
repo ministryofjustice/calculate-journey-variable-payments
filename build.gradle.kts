@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "4.11.1"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.4.1"
   kotlin("plugin.spring") version "1.9.10"
   kotlin("plugin.jpa") version "1.9.10"
   kotlin("plugin.allopen") version "1.9.10"
@@ -17,11 +17,11 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "4.46.0"
+  val shedlockVersion = "5.8.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.534",
-    "com.amazonaws:aws-java-sdk-sts:1.12.534",
+    "com.amazonaws:aws-java-sdk-s3:1.12.555",
+    "com.amazonaws:aws-java-sdk-sts:1.12.555",
     "io.sentry:sentry-spring-boot-starter:6.29.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
@@ -33,27 +33,22 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-oauth2-client",
     "org.springframework.boot:spring-boot-starter-oauth2-resource-server",
     "org.springframework.boot:spring-boot-starter-webflux",
-    "org.springframework.session:spring-session-jdbc:2.7.3",
-    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.0.5.RELEASE",
-    "com.google.code.findbugs:jsr305:3.0.2"
+    "org.springframework.session:spring-session-jdbc",
+    "org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.1.2.RELEASE",
+    "com.google.code.findbugs:jsr305:3.0.2",
+    "com.microsoft.azure:applicationinsights-logging-logback:2.6.4"
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
-
-  constraints {
-    implementation("org.apache.groovy:groovy:4.0.14") {
-      because("previous transitive version 4.0.0 pulled in by Thymeleaf has CVE-2020-17521")
-    }
-  }
 
   // Test versions
   val fluentleniumVersion = "5.0.4"
   val seleniumVersion = "4.12.0"
   listOf(
-    "com.github.tomakehurst:wiremock-standalone:2.27.2",
+    "org.wiremock:wiremock:3.1.0",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
-    "org.mockito:mockito-inline:4.11.0",
+    "org.mockito:mockito-inline:5.2.0",
     "org.seleniumhq.selenium:htmlunit-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
@@ -67,18 +62,14 @@ dependencies {
     "com.squareup.okhttp3:mockwebserver:4.11.0",
     "com.squareup.okhttp3:okhttp:4.11.0"
   ).forEach { testImplementation(it) }
-  constraints {
-    implementation(" org.apache.commons:commons-text:1.10.0") {
-      because("previous transitive version 1.9.0 pulled in by Fluentlenium has CVE-2022-42889")
-    }
-  }
+
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
   runtimeOnly("org.postgresql:postgresql:42.6.0")
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(20))
 }
 
 tasks {
@@ -89,7 +80,7 @@ tasks {
 
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "17"
+      jvmTarget = "20"
     }
   }
 

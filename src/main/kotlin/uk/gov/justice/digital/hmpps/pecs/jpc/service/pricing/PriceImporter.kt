@@ -61,8 +61,8 @@ class PriceImporter(
 
     spreadsheet.forEachRow {
       if (it.previousPrice != null) {
-        if (it.previousPrice!!.priceInPence != it.priceInPence) {
-          supplierPricingService.updatePriceForSupplier(it.previousPrice!!, it.price())
+        if (it.previousPrice.priceInPence != it.priceInPence) {
+          supplierPricingService.updatePriceForSupplier(it.previousPrice, it.price())
           // auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
           updateCount++
         } else {

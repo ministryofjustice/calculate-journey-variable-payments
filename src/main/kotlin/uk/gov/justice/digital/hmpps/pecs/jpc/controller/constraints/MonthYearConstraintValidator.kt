@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.controller.constraints
 
+import jakarta.validation.ConstraintValidator
+import jakarta.validation.ConstraintValidatorContext
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
-import javax.validation.ConstraintValidator
-import javax.validation.ConstraintValidatorContext
 
 class MonthYearConstraintValidator : ConstraintValidator<ValidMonthYear?, String?> {
   override fun initialize(arg0: ValidMonthYear?) {}

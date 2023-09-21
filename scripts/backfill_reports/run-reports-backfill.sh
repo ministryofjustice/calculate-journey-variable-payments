@@ -64,5 +64,5 @@ else
 		  exit 1;;
   esac
 
-  kubectl -n "$NAMESPACE" exec "$POD" -- java -Xmx2048m -jar app.jar --spring.main.web-application-type=none --report-import --from="$DATE_FROM" --to="$DATE_TO"
+  kubectl -n "$NAMESPACE" exec "$POD" -- java -Xmx2048m -jar app.jar --spring.main.web-application-type=none --report-import --from="$DATE_FROM" --to="$DATE_TO" -D AWS_DEFAULT_REGION="eu-west-2"
 fi

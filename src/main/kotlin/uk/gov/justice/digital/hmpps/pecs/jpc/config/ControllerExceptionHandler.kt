@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.servlet.ModelAndView
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.MonitoringService
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
-import javax.servlet.http.HttpServletRequest
 
 private val logger = loggerFor<ControllerExceptionHandler>()
 
