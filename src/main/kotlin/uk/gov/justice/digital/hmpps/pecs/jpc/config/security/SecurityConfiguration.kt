@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -19,11 +20,10 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.session.FindByIndexNameSessionRepository
 import org.springframework.session.Session
 import org.springframework.session.security.SpringSessionBackedSessionRegistry
-import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
+import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogInAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogOutAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
@@ -36,7 +36,8 @@ private val logger = loggerFor<SecurityConfiguration<*>>()
  */
 @EnableWebSecurity
 @ConditionalOnWebApplication
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
+@Configuration
 class SecurityConfiguration<S : Session> {
 
   @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
@@ -52,35 +53,21 @@ class SecurityConfiguration<S : Session> {
   @Autowired
   private lateinit var auditService: AuditService
 
-  @Autowired
-  private lateinit var sessionRegistry: SpringSessionBackedSessionRegistry<S>
-
-  @Autowired
-  private lateinit var userService: OAuth2UserService<OAuth2UserRequest, OAuth2User>
-
-  @Autowired
-  private lateinit var loginHandler: LogInAuditHandler
-
-  @Autowired
-  private lateinit var logoutHandler: LogOutAuditHandler
-
   @Bean
   @Throws(Exception::class)
   fun filterChain(http: HttpSecurity): SecurityFilterChain? {
     return http
-      .authorizeHttpRequests {
-        it
-          .requestMatchers(AntPathRequestMatcher("/health/**")).permitAll()
-          .requestMatchers(AntPathRequestMatcher("/info")).permitAll()
+      .authorizeHttpRequests { auth ->
+        auth
+          .requestMatchers("/health/**", "/info").permitAll()
           .anyRequest().hasRole("PECS_JPC")
       }
       .sessionManagement {
-        it
-          .invalidSessionUrl(ssoLogoutUri())
+        it.invalidSessionUrl(ssoLogoutUri())
           .sessionAuthenticationErrorUrl(ssoLogoutUri())
           .sessionConcurrency { concurrency ->
             concurrency
-              .sessionRegistry(sessionRegistry)
+              .sessionRegistry(clusteredConcurrentSessionRegistry())
               .maximumSessions(1)
           }
       }
@@ -88,10 +75,10 @@ class SecurityConfiguration<S : Session> {
         it.accessDeniedHandler(accessDeniedHandler())
       }
       .oauth2Login {
-        it.userInfoEndpoint { userService }.failureUrl(ssoLogoutUri()).successHandler(loginHandler)
+        it.userInfoEndpoint { oAuth2UserService() }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
       }
       .logout {
-        it.logoutSuccessHandler(logoutHandler)
+        it.logoutSuccessHandler(logOutHandler())
           .logoutSuccessUrl(ssoLogoutUri())
       }
       .build()
