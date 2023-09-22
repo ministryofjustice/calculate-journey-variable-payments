@@ -58,6 +58,7 @@ dependencies {
     "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-chromium-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-manager:$seleniumVersion",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.11.0",
