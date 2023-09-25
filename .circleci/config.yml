@@ -117,7 +117,7 @@ workflows:
           name: test_build_docker
           publish: false
           requires:
-            - build
+            - validate
           filters:
             branches:
               ignore:
