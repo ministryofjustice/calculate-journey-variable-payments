@@ -114,6 +114,15 @@ workflows:
           requires:
             - validate
       - hmpps/build_docker:
+          name: test_build_docker
+          publish: false
+          requires:
+            - build
+          filters:
+            branches:
+              ignore:
+                - main
+      - hmpps/build_docker:
           name: build_docker
           filters:
             branches:
