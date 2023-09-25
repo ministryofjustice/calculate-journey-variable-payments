@@ -1,12 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.health
 
-import com.microsoft.applicationinsights.extensibility.ContextInitializer
+import com.microsoft.applicationinsights.extensibility.context.ComponentContext
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.info.BuildProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.event.EventListener
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.util.concurrent.ConcurrentHashMap
 
 private val logger = loggerFor<VersionOutputter>()
 
@@ -21,5 +22,7 @@ class VersionOutputter(buildProperties: BuildProperties) {
   }
 
   @Bean
-  fun versionContextInitializer() = ContextInitializer { it.component.setVersion(version) }
+  fun versionContextInitializer() {
+    ComponentContext(ConcurrentHashMap()).setVersion(version)
+  }
 }

@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.config.interceptors
 
+import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import java.time.Duration
-import javax.servlet.http.Cookie
 
 class SessionCookieInterceptorTest {
 

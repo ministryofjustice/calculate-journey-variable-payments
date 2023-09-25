@@ -24,9 +24,6 @@ object MoveFilterer {
    * It must have a cancellation reason of cancelled_by_pmu and have been cancelled after 3pm the day before the move date
    */
   fun isCancelledBillableMove(move: Move): Boolean {
-    println(move.status)
-    println(MoveStatus.cancelled)
-    println(move.status == MoveStatus.cancelled)
     return move.status == MoveStatus.cancelled &&
       CANCELLATION_REASON_CANCELLED_BY_PMU == move.cancellationReason &&
       move.reportFromLocationType == "prison" &&
