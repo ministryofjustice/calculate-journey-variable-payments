@@ -28,7 +28,9 @@ class MovePersister(
    * Returns the total number of successfully persisted moves.
    */
   fun persist(moves: List<Move>): Int {
-    var counter = 0
+    var mCounter = 0
+    var jCounter = 0
+    var eCounter = 0
     val movesToSave = mutableListOf<Move>()
     val journeysToSave = mutableListOf<Journey>()
     val eventsToSave = mutableListOf<Event>()
@@ -97,7 +99,11 @@ class MovePersister(
           eventsToSave += moveEvents + journeyEvents
 
           Result.runCatching { save() }
-            .onSuccess { counter++ }
+            .onSuccess {
+              mCounter++
+              jCounter += journeysToSave.size
+              eCounter += eventsToSave.size
+            }
             .onFailure {
               logger.error("Error inserting move '${moveToSave.reference}': ${it.stackTraceToString()}")
 
@@ -105,19 +111,21 @@ class MovePersister(
               journeysToSave.clear()
               eventsToSave.clear()
 
-              if (counter > 0) counter--
+              if (mCounter > 0) mCounter--
             }
 
-          if (counter % 500 == 0) {
-            logger.info("Persisted $counter moves ...")
+          if (mCounter % 500 == 0) {
+            logger.info("Persisted $mCounter moves ...")
           }
         }
       }.onFailure { logger.warn("Error inserting moves: ${it.message}") }
     }
 
-    logger.info("Persisted $counter moves out of total ${moves.size}.")
+    logger.info("Persisted $mCounter moves out of total ${moves.size}.")
+    logger.info("Persisted $jCounter journeys.")
+    logger.info("Persisted $eCounter events.")
 
-    return counter
+    return mCounter
   }
 
   fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {

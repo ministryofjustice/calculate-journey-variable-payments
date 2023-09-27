@@ -49,6 +49,9 @@ env:
   - name: AWS_DEFAULT_REGION
     value: "eu-west-2"
 
+  - name: AWS_REGION
+    value: "eu-west-2"
+
   - name: IMPORT_FILES_LOCATIONS
     value: "schedule_34_locations.xlsx"
 
