@@ -165,6 +165,7 @@ enum class EventType(val value: String) {
   MOVE_LOCKOUT("MoveLockout"),
   MOVE_LODGING_START("MoveLodgingStart"),
   MOVE_LODGING_END("MoveLodgingEnd"),
+  MOVE_OVERNIGHT_LODGE("MoveOvernightLodge"),
   MOVE_REDIRECT("MoveRedirect"),
   MOVE_REQUESTED("MoveRequested"),
   JOURNEY_CREATE("JourneyCreate"),
