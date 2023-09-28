@@ -133,7 +133,6 @@ workflows:
           env: "dev"
           context:
             - hmpps-common-vars
-            - calculate-journey-variable-payments-dev-live
           filters:
             branches:
               only:
@@ -152,7 +151,6 @@ workflows:
           context:
             - hmpps-common-vars
             - calculate-journey-variable-payments-preprod
-            - calculate-journey-variable-payments-preprod-live
           requires:
             - request-preprod-approval
       - request-prod-approval:
@@ -165,7 +163,6 @@ workflows:
           context:
             - hmpps-common-vars
             - calculate-journey-variable-payments-prod
-            - calculate-journey-variable-payments-prod-live
           requires:
             - request-prod-approval
 
