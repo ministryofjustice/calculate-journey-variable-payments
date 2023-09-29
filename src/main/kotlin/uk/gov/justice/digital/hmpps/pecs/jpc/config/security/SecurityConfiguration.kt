@@ -59,7 +59,7 @@ class SecurityConfiguration<S : Session> {
     return http
       .authorizeHttpRequests { auth ->
         auth
-          .requestMatchers("/health/**", "/info", "/find-move").permitAll()
+          .requestMatchers("/health/**", "/info").permitAll()
           .anyRequest().hasRole("PECS_JPC")
       }
       .sessionManagement {
