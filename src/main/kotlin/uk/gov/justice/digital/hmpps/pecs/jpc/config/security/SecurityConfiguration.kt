@@ -124,7 +124,7 @@ class SecurityConfiguration<S : Session> {
     }
   }
 
-  private fun ssoLogoutUri() = authLogoutSuccessUri.plus("/sign-out")
+  private fun ssoLogoutUri() = authLogoutSuccessUri.plus("/auth/sign-out")
 
   @Bean
   fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? {
