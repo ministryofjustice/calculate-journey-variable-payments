@@ -31,6 +31,8 @@ services:
       - $PWD/localstack:/docker-entrypoint-initaws.d
 
   hmpps-auth:
+    depends_on:
+      - hmpps-external-users-api
     image: quay.io/hmpps/hmpps-auth:latest
     container_name: hmpps-auth
     ports:
@@ -40,6 +42,20 @@ services:
     environment:
       - SERVER_PORT=9090
       - SPRING_PROFILES_ACTIVE=dev
+
+  hmpps-external-users-api:
+    image: quay.io/hmpps/hmpps-external-users-api:latest
+    container_name: hmpps-external-users-api
+    ports:
+      - "8089:8089"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/health/ping"]
+    environment:
+      - SERVER_PORT=8089
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres
+      - API_BASE_URL_OAUTH=http://hmpps-auth:9090/auth
+      - SPRING_R2DBC_URL=r2dbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
+      - SPRING_FLYWAY_URL=jdbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
 
   hmpps-book-secure-move-api:
     image: rodolpheche/wiremock:latest
