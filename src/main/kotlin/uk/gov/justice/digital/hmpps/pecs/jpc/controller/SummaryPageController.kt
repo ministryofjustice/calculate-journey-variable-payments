@@ -260,15 +260,19 @@ class SummaryPageController(
 
     val moveRef = form.reference.uppercase().trim()
     if (!moveRef.matches("[A-Za-z0-9]+".toRegex())) {
-      model.addAttribute("noResultFor", "invalid-reference")
-      return "redirect:$FIND_MOVE_URL?no-results-for=invalid-reference"
+      redirectAttributes.addAttribute("noResultFor", "invalid-reference")
+      return "redirect:$FIND_MOVE_URL"
     }
 
     val maybeMove = moveService.findMoveByReferenceAndSupplier(moveRef, supplier)
 
     val uri =
-      maybeMove?.let { "$MOVES_URL/${it.moveId}" } ?: "$FIND_MOVE_URL?no-results-for=${form.reference}"
-    model.addAttribute("noResultFor", form.reference)
+      if (maybeMove != null) {
+        "$MOVES_URL/${maybeMove.moveId}"
+      } else {
+        redirectAttributes.addAttribute("noResultFor", form.reference)
+        FIND_MOVE_URL
+      }
     return "redirect:$uri"
   }
 

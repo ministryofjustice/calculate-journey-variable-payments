@@ -166,7 +166,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
       session = mockSession
       param("reference", "nonexistentref")
     }
-      .andExpect { redirectedUrl("/find-move/?no-results-for=nonexistentref") }
+      .andExpect { redirectedUrl("/find-move?noResultFor=nonexistentref") }
       .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("NONEXISTENTREF", defaultSupplierSerco)
@@ -180,7 +180,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
       session = mockSession
       param("reference", "select * from moves")
     }
-      .andExpect { redirectedUrl("/find-move/?no-results-for=invalid-reference") }
+      .andExpect { redirectedUrl("/find-move?noResultFor=invalid-reference") }
       .andExpect { status { is3xxRedirection() } }
 
     verifyNoMoreInteractions(moveService)
@@ -194,7 +194,7 @@ class SummaryPageControllerTest(@Autowired private val wac: WebApplicationContex
       session = mockSession
       param("reference", "REF1")
     }
-      .andExpect { redirectedUrl("/find-move/?no-results-for=REF1") }
+      .andExpect { redirectedUrl("/find-move?noResultFor=REF1") }
       .andExpect { status { is3xxRedirection() } }
 
     verify(moveService).findMoveByReferenceAndSupplier("REF1", defaultSupplierSerco)

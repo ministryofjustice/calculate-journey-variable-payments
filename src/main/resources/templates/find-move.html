@@ -17,11 +17,9 @@
 
 
     <form th:action="@{/find-move}" th:object="${form}" method="post">
-
-        <div class="govuk-form-group" th:classappend="${#fields.hasErrors('*')} ? 'govuk-form-group--error'">
-          <div th:switch="${noResultFor}">
-                <p th:case="${null}"></p>
-                <p th:case="'invalid-reference'" class="govuk-error-message">
+        <div class="govuk-form-group" th:classappend="${param.noResultFor != null} ? 'govuk-form-group--error'">
+          <div th:switch="${{param.noResultFor}}" th:unless="${param.noResultFor == null}">
+            <p th:case="'invalid-reference'" class="govuk-error-message">
                     <span class="govuk-visually-hidden">Error:</span> Please enter a valid move reference ID
                 </p>
                 <p th:case="*" class="govuk-error-message">
