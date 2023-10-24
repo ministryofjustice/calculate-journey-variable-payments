@@ -51,7 +51,6 @@ jobs:
           - SPRING_PROFILES_ACTIVE=dev,local-postgres
           - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:7432/auth-db
       - image: quay.io/hmpps/hmpps-external-users-api:latest
-        container_name: hmpps-external-users-api
         environment:
           - SERVER_PORT=8089
           - SPRING_PROFILES_ACTIVE=dev,local-postgres
