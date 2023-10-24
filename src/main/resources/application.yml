@@ -29,8 +29,8 @@ spring:
           hmpps:
             authorization-uri: ${HMPPS_AUTH_BASE_URI}/auth/oauth/authorize
             token-uri: ${HMPPS_AUTH_BASE_URI}/auth/oauth/token
-            user-info-uri: ${HMPPS_AUTH_BASE_URI}/users/me
-            user-name-attribute: name
+            user-info-uri: ${HMPPS_MANAGE_USERS_BASE_URI}/users/me
+            user-name-attribute: username
         registration:
           hmpps:
             client-id: ${HMPPS_AUTH_CLIENT_ID}

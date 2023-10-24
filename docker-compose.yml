@@ -14,6 +14,17 @@ services:
       POSTGRES_PASSWORD: letmein
     command: -p 5433
 
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    restart: always
+    ports:
+      - "7432:5432"
+    environment:
+      - POSTGRES_PASSWORD=admin_password
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=auth-db
+
   localstack:
     image: localstack/localstack:1.2.0
     container_name: localstack
@@ -31,21 +42,24 @@ services:
       - $PWD/localstack:/docker-entrypoint-initaws.d
 
   hmpps-auth:
-    depends_on:
-      - hmpps-external-users-api
     image: quay.io/hmpps/hmpps-auth:latest
     container_name: hmpps-auth
+    depends_on:
+      - auth-db
     ports:
       - "9090:9090"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
     environment:
       - SERVER_PORT=9090
-      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
 
   hmpps-external-users-api:
     image: quay.io/hmpps/hmpps-external-users-api:latest
     container_name: hmpps-external-users-api
+    depends_on:
+      - hmpps-auth
     ports:
       - "8089:8089"
     healthcheck:
@@ -56,6 +70,24 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:9090/auth
       - SPRING_R2DBC_URL=r2dbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
       - SPRING_FLYWAY_URL=jdbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
+
+  hmpps-manage-users-api:
+    image: quay.io/hmpps/hmpps-manage-users-api:latest
+    container_name: hmpps-manage-users-api
+    depends_on:
+      - hmpps-external-users-api
+    ports:
+      - "9091:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - HMPPS-AUTH_ENDPOINT_URL=http://hmpps-auth:9090/auth
+      - EXTERNAL-USERS_ENDPOINT_URL=http://hmpps-external-users-api:8089
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
+      - DELIUS_ENDPOINT_URL=http://community-api:8080
+      - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:9090/auth/oauth/token
 
   hmpps-book-secure-move-api:
     image: rodolpheche/wiremock:latest
