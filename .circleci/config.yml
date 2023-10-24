@@ -58,8 +58,6 @@ jobs:
           - SPRING_R2DBC_URL=r2dbc:postgresql://localhost:7432/auth-db?sslmode=prefer
           - SPRING_FLYWAY_URL=jdbc:postgresql://localhost:7432/auth-db?sslmode=prefer
       - image: quay.io/hmpps/hmpps-manage-users-api:latest
-        depends_on:
-          - hmpps-external-users-api
         environment:
           - SERVER_PORT=8080
           - SPRING_PROFILES_ACTIVE=dev
