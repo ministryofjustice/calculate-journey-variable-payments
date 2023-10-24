@@ -65,7 +65,7 @@ internal class ApplicationSecurityTest(@Autowired private val wac: WebApplicatio
     mockMvc.get("/") { session = mockSession }
       .andExpect { status { is3xxRedirection() } }
       .andExpect { unauthenticated() }
-      .andExpect { request { redirectedUrl("http://fake_auth_redirect_url/sign-out") } }
+      .andExpect { request { redirectedUrl("http://fake_auth_redirect_url/auth/sign-out") } }
 
     assertThat(mockSession.isInvalid).isTrue
   }

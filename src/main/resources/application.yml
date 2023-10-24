@@ -27,10 +27,10 @@ spring:
       client:
         provider:
           hmpps:
-            authorization-uri: ${HMPPS_AUTH_BASE_URI}/oauth/authorize
-            token-uri: ${HMPPS_AUTH_BASE_URI}/oauth/token
-            user-info-uri: ${HMPPS_AUTH_BASE_URI}/api/user/me
-            user-name-attribute: name
+            authorization-uri: ${HMPPS_AUTH_BASE_URI}/auth/oauth/authorize
+            token-uri: ${HMPPS_AUTH_BASE_URI}/auth/oauth/token
+            user-info-uri: ${HMPPS_MANAGE_USERS_BASE_URI}/users/me
+            user-name-attribute: username
         registration:
           hmpps:
             client-id: ${HMPPS_AUTH_CLIENT_ID}
@@ -42,7 +42,7 @@ spring:
 
       resourceserver:
         jwt:
-          issuer-uri: ${HMPPS_AUTH_BASE_URI}/issuer
+          issuer-uri: ${HMPPS_AUTH_BASE_URI}/auth/issuer
 
   flyway:
     locations: classpath:/db/migration/ddl,classpath:/db/migration/dml
