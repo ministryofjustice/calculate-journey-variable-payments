@@ -29,6 +29,7 @@ ingress:
 env:
   JAVA_OPTS: "-Xmx1024m"
   HMPPS_AUTH_BASE_URI: "https://sign-in-preprod.hmpps.service.justice.gov.uk"
+  HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
   HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-preprod.apps.cloud-platform.service.justice.gov.uk"
   CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 3 * * ?"
   CRON_IMPORT_REPORTS: "-"
