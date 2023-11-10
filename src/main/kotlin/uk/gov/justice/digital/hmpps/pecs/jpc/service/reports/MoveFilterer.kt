@@ -33,11 +33,11 @@ object MoveFilterer {
       move.events.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
       (
         CANCELLATION_REASON_INCOMPLETE_PER == move.cancellationReason ||
-        (
-          CANCELLATION_REASON_CANCELLED_BY_PMU == move.cancellationReason &&
-          move.moveDate?.let { move.events.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(it) } ?: false
+          (
+            CANCELLATION_REASON_CANCELLED_BY_PMU == move.cancellationReason &&
+              move.moveDate?.let { move.events.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(it) } ?: false
+            )
         )
-      )
   }
 
   private fun List<Event>.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(moveDate: LocalDate) =
