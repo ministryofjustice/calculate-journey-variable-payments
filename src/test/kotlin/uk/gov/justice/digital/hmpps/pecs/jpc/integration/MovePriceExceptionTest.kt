@@ -24,7 +24,7 @@ import java.time.Year
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class MovePriceExceptionTest : IntegrationTest() {
 
-  private val currentDate = LocalDate.now()
+  private val currentDate = LocalDate.of(2022, 5, 5)
 
   private val date = currentDate.minusMonths(2)
 
