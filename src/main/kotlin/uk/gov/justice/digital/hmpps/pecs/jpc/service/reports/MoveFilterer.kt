@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move.Companion.CANCELLATION_REASON_CANCELLED_BY_PMU
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move.Companion.CANCELLATION_REASON_INCOMPLETE_PER
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
@@ -25,13 +26,18 @@ object MoveFilterer {
    */
   fun isCancelledBillableMove(move: Move): Boolean {
     return move.status == MoveStatus.cancelled &&
-      CANCELLATION_REASON_CANCELLED_BY_PMU == move.cancellationReason &&
       move.reportFromLocationType == "prison" &&
       move.toNomisAgencyId != null &&
       move.reportToLocationType == "prison" &&
       move.events.hasEventType(EventType.MOVE_ACCEPT) && // it was previously accepted
       move.events.hasEventType(EventType.MOVE_CANCEL) && // it was cancelled
-      move.moveDate?.let { move.events.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(it) } ?: false
+      (
+        CANCELLATION_REASON_INCOMPLETE_PER == move.cancellationReason ||
+          (
+            CANCELLATION_REASON_CANCELLED_BY_PMU == move.cancellationReason &&
+              move.moveDate?.let { move.events.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(it) } ?: false
+            )
+        )
   }
 
   private fun List<Event>.hasMoveCancelEventDayBeforeMoveStartsAndAfter3pm(moveDate: LocalDate) =

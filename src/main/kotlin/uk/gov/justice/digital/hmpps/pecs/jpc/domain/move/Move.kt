@@ -166,6 +166,7 @@ data class Move(
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     const val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
+    const val CANCELLATION_REASON_INCOMPLETE_PER = "incomplete_per"
 
     fun fromJson(json: String): Move? {
       return Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
