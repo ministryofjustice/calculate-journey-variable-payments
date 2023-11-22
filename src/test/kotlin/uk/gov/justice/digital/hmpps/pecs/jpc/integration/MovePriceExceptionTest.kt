@@ -26,7 +26,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
   private val currentDate = LocalDate.now()
 
-  private val date = currentDate.minusMonths(2)
+  private val date = standardMoveSM4().moveDate!!
 
   private val month = date.month
 
