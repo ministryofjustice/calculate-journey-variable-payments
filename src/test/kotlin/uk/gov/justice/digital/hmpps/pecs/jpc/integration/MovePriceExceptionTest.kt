@@ -18,15 +18,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
-import java.time.LocalDate
 import java.time.Year
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class MovePriceExceptionTest : IntegrationTest() {
 
-  private val currentDate = LocalDate.now()
-
-  private val date = standardMoveSM4().moveDate!!
+  private val date = standardMoveSM4().updatedAt
 
   private val month = date.month
 
