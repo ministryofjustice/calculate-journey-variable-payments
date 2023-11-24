@@ -23,7 +23,9 @@ import java.time.Year
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class MovePriceExceptionTest : IntegrationTest() {
 
-  private val date = standardMoveSM4().updatedAt
+  private val move = standardMoveSM4()
+
+  private val date = move.updatedAt
 
   private val month = date.month
 
@@ -54,7 +56,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .showPriceExceptionsTab()
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .addPriceException(date.month, Money.valueOf("3000.00"))
+      .addPriceException(month, Money.valueOf("3000.00"))
 
     isAtPage(UpdatePrice)
       .assertTextIsPresent("Existing price exceptions")
@@ -67,10 +69,10 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(MovesByType)
       .isAtPageFor(STANDARD)
-      .navigateToDetailsFor(standardMoveSM4())
+      .navigateToDetailsFor(move)
 
     isAtPage(MoveDetails)
-      .isAtPageFor(standardMoveSM4(), Money.valueOf("3000.00"))
+      .isAtPageFor(move, Money.valueOf("3000.00"))
   }
 
   @Test
@@ -99,8 +101,8 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .assertTextIsPresent("Existing price exceptions")
       .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
       .showPriceExceptionsTab()
-      .removePriceException(date.month)
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+      .removePriceException(month)
 
     goToPage(Dashboard)
 
@@ -109,9 +111,9 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(MovesByType)
       .isAtPageFor(STANDARD)
-      .navigateToDetailsFor(standardMoveSM4())
+      .navigateToDetailsFor(move)
 
     isAtPage(MoveDetails)
-      .isAtPageFor(standardMoveSM4(), Money.valueOf("100.00"))
+      .isAtPageFor(move, Money.valueOf("100.00"))
   }
 }
