@@ -52,7 +52,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
     environment:
       - SERVER_PORT=9090
-      - SPRING_PROFILES_ACTIVE=dev,local-postgres
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
       - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
 
   hmpps-external-users-api:

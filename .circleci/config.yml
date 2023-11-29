@@ -48,7 +48,7 @@ jobs:
       - image: quay.io/hmpps/hmpps-auth:latest
         environment:
           - SERVER_PORT=9090
-          - SPRING_PROFILES_ACTIVE=dev,local-postgres
+          - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
           - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:7432/auth-db
       - image: quay.io/hmpps/hmpps-external-users-api:latest
         environment:
