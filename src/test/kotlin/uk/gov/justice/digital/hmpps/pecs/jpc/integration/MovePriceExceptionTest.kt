@@ -101,8 +101,8 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .assertTextIsPresent("Existing price exceptions")
       .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
       .showPriceExceptionsTab()
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .removePriceException(month)
+      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
 
     goToPage(Dashboard)
 
