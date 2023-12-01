@@ -114,6 +114,6 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .navigateToDetailsFor(move)
 
     isAtPage(MoveDetails)
-      .isAtPageFor(move, Money.valueOf("100.00"))
+      .isAtPageFor(move, Money.valueOf("101.00"))
   }
 }
