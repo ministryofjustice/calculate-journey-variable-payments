@@ -18,15 +18,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.lodgingMoveLM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
-import java.time.LocalDate
 import java.time.Year
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class LodgingPriceTest : IntegrationTest() {
 
-  private val currentDate = LocalDate.now()
+  private val move = lodgingMoveLM1()
 
-  private val date = currentDate.minusMonths(2)
+  private val date = move.updatedAt
 
   private val month = date.month
 
@@ -90,9 +89,9 @@ internal class LodgingPriceTest : IntegrationTest() {
 
     isAtPage(MovesByType)
       .isAtPageFor(STANDARD)
-      .navigateToDetailsFor(lodgingMoveLM1())
+      .navigateToDetailsFor(move)
 
     isAtPage(MoveDetails)
-      .isAtPageFor(lodgingMoveLM1(), Money.valueOf("3002.00"))
+      .isAtPageFor(move, Money.valueOf("3002.00"))
   }
 }
