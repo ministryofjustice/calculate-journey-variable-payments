@@ -413,7 +413,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             create(journey(move, fromAgencyId = "PRISON1L", toAgencyId = "POLICE1L"), template),
             create(journey(move, fromAgencyId = "POLICE1L", toAgencyId = "POLICE2L"), template),
           ),
-        ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
+        ).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
     }
   }
