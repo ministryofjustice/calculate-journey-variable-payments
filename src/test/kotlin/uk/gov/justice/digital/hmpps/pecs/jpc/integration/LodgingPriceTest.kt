@@ -44,9 +44,9 @@ internal class LodgingPriceTest : IntegrationTest() {
 
     isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
 
-    isAtPage(ManageJourneyPrice).assertTextIsPresent("Existing prifce exceptions")
-
     isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE L", "POLICE ONE L")
+
+    isAtPage(JourneyResults).assertTextIsPresent("Existing prifce exceptions")
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE L", "POLICE ONE L")

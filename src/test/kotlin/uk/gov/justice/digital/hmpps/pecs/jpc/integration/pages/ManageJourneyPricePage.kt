@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
-import org.assertj.core.api.Assertions
 import org.fluentlenium.core.annotation.PageUrl
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.support.FindBy
@@ -22,11 +21,5 @@ class ManageJourneyPricePage : ApplicationPage() {
     to.fill().withText(toAgency)
 
     findJourneys.submit()
-  }
-
-  fun assertTextIsPresent(text: String): ManageJourneyPricePage {
-    Assertions.assertThat(super.pageSource()).containsIgnoringCase(text)
-
-    return this
   }
 }
