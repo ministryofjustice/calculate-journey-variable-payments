@@ -7,12 +7,9 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.defaultMoveDate10Sep2020
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultDate
-import uk.gov.justice.digital.hmpps.pecs.jpc.service.reports.defaultDateTime
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -372,34 +369,35 @@ object SercoPreviousMonthMoveData {
     toNomisAgencyId: String = "POLICE1L",
     state: JourneyState = JourneyState.completed,
     billable: Boolean = true,
-    pickUpDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay(),
-    dropOffDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
     events: List<Event> = listOf(),
     vehicleRegistration: String = "REG100",
-  ) = Journey(
-    journeyId = journeyId,
-    supplier = Supplier.SERCO,
-    clientTimeStamp = defaultDateTime,
-    updatedAt = defaultDateTime,
-    state = state,
-    moveId = moveId,
-    fromNomisAgencyId = fromNomisAgencyId,
-    fromSiteName = "PRISON ONE L",
-    fromLocationType = LocationType.PR,
-    toNomisAgencyId = toNomisAgencyId,
-    toSiteName = "POLICE ONE L",
-    toLocationType = LocationType.PS,
-    pickUpDateTime = pickUpDateTime,
-    dropOffDateTime = dropOffDateTime,
-    billable = billable,
-    priceInPence = 100,
-    vehicleRegistration = vehicleRegistration,
-    notes = "some notes",
-    events = events,
-    effectiveYear = effectiveYearForDate(
-      defaultDate,
-    ),
-  )
+  ) =
+    startOfPreviousMonth.minusMonths(1).let { moveDate ->
+      Journey(
+        journeyId = journeyId,
+        supplier = Supplier.SERCO,
+        clientTimeStamp = moveDate.atStartOfDay(),
+        updatedAt = moveDate.atTime(10, 0),
+        state = state,
+        moveId = moveId,
+        fromNomisAgencyId = fromNomisAgencyId,
+        fromSiteName = "PRISON ONE L",
+        fromLocationType = LocationType.PR,
+        toNomisAgencyId = toNomisAgencyId,
+        toSiteName = "POLICE ONE L",
+        toLocationType = LocationType.PS,
+        pickUpDateTime = moveDate.atStartOfDay(),
+        dropOffDateTime = moveDate.atTime(10, 0),
+        billable = billable,
+        priceInPence = 100,
+        vehicleRegistration = vehicleRegistration,
+        notes = "some notes",
+        events = events,
+        effectiveYear = effectiveYearForDate(
+          moveDate,
+        ),
+      )
+    }
 
   fun journeyLJ2(
     moveId: String = "LM1",
@@ -408,34 +406,35 @@ object SercoPreviousMonthMoveData {
     toNomisAgencyId: String = "POLICE2L",
     state: JourneyState = JourneyState.completed,
     billable: Boolean = true,
-    pickUpDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay(),
-    dropOffDateTime: LocalDateTime? = defaultMoveDate10Sep2020.atStartOfDay().plusHours(10),
     events: List<Event> = listOf(),
     vehicleRegistration: String = "REG100",
-  ) = Journey(
-    journeyId = journeyId,
-    supplier = Supplier.SERCO,
-    clientTimeStamp = defaultDateTime,
-    updatedAt = defaultDateTime,
-    state = state,
-    moveId = moveId,
-    fromNomisAgencyId = fromNomisAgencyId,
-    fromSiteName = "POLICE ONE L",
-    fromLocationType = LocationType.PS,
-    toNomisAgencyId = toNomisAgencyId,
-    toSiteName = "POLICE TWO L",
-    toLocationType = LocationType.PS,
-    pickUpDateTime = pickUpDateTime,
-    dropOffDateTime = dropOffDateTime,
-    billable = billable,
-    priceInPence = 100,
-    vehicleRegistration = vehicleRegistration,
-    notes = "some notes",
-    events = events,
-    effectiveYear = effectiveYearForDate(
-      defaultDate,
-    ),
-  )
+  ) =
+    startOfPreviousMonth.minusMonths(1).plusDays(1).let { moveDate ->
+      Journey(
+        journeyId = journeyId,
+        supplier = Supplier.SERCO,
+        clientTimeStamp = moveDate.atStartOfDay(),
+        updatedAt = moveDate.atTime(10, 0),
+        state = state,
+        moveId = moveId,
+        fromNomisAgencyId = fromNomisAgencyId,
+        fromSiteName = "POLICE ONE L",
+        fromLocationType = LocationType.PS,
+        toNomisAgencyId = toNomisAgencyId,
+        toSiteName = "POLICE TWO L",
+        toLocationType = LocationType.PS,
+        pickUpDateTime = moveDate.atStartOfDay(),
+        dropOffDateTime = moveDate.atTime(10, 0),
+        billable = billable,
+        priceInPence = 100,
+        vehicleRegistration = vehicleRegistration,
+        notes = "some notes",
+        events = events,
+        effectiveYear = effectiveYearForDate(
+          moveDate,
+        ),
+      )
+    }
 
   fun lodgingMoveLM1() =
     startOfPreviousMonth.minusMonths(1).let { moveDate ->

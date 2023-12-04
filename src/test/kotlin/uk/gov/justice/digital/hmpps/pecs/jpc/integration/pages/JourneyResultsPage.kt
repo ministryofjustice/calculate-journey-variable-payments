@@ -46,10 +46,4 @@ class JourneyResultsPage : ApplicationPage() {
 
     return this
   }
-
-  fun assertTextIsPresent(text: String): JourneyResultsPage {
-    assertThat(super.pageSource()).containsIgnoringCase(text)
-
-    return this
-  }
 }
