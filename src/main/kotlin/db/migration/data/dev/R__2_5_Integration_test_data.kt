@@ -56,6 +56,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       createLockoutMoves(it)
       createMultiTypeMoves(it)
       createCancelledMoves(it)
+      createLodgingMoves(it)
     }
   }
 
@@ -382,6 +383,37 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             ),
           ),
         ).failMigrationIfNotMoveType(MoveType.CANCELLED)
+      }
+    }
+  }
+
+  private fun createLodgingMoves(template: JdbcTemplate) {
+    logger.info("create lodging moves")
+
+    mapOf(
+      "LM1" to "PR401",
+    ).forEach {
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "PRISON1L",
+          toAgencyId = "POLICE2L",
+          type = MoveType.STANDARD,
+          date = startOfPreviousMonth.minusMonths(1),
+        ),
+        template,
+      ).also { move ->
+        move.copy(
+          events = listOf(
+            create(moveStartEvent(move), template),
+            create(moveCompleteEvent(move), template),
+          ),
+          journeys = listOf(
+            create(journey(move, fromAgencyId = "PRISON1L", toAgencyId = "POLICE1L"), template),
+            create(journey(move, fromAgencyId = "POLICE1L", toAgencyId = "POLICE2L"), template),
+          ),
+        ).failMigrationIfNotMoveType(MoveType.STANDARD)
       }
     }
   }
