@@ -16,14 +16,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MovesByType
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.lodgingMoveLM1
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.lodgingMoveLDGM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import java.time.Year
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class LodgingPriceTest : IntegrationTest() {
 
-  private val move = lodgingMoveLM1()
+  private val move = lodgingMoveLDGM1()
 
   private val date = move.updatedAt
 

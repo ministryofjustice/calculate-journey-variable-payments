@@ -362,9 +362,9 @@ object SercoPreviousMonthMoveData {
       )
     }
 
-  fun journeyLJ1(
-    moveId: String = "LM1",
-    journeyId: String = "LJ1",
+  fun journeyLDGJ1(
+    moveId: String = "LDGM1",
+    journeyId: String = "LDGJ1",
     fromNomisAgencyId: String = "PRISON1L",
     toNomisAgencyId: String = "POLICE1L",
     state: JourneyState = JourneyState.completed,
@@ -399,9 +399,9 @@ object SercoPreviousMonthMoveData {
       )
     }
 
-  fun journeyLJ2(
-    moveId: String = "LM1",
-    journeyId: String = "LJ2",
+  fun journeyLDGJ2(
+    moveId: String = "LDGM1",
+    journeyId: String = "LDGJ2",
     fromNomisAgencyId: String = "POLICE1L",
     toNomisAgencyId: String = "POLICE2L",
     state: JourneyState = JourneyState.completed,
@@ -436,10 +436,10 @@ object SercoPreviousMonthMoveData {
       )
     }
 
-  fun lodgingMoveLM1() =
+  fun lodgingMoveLDGM1() =
     startOfPreviousMonth.minusMonths(1).let { moveDate ->
       Move(
-        moveId = "LM1",
+        moveId = "LDGM1",
         updatedAt = moveDate.atStartOfDay(),
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
@@ -455,8 +455,8 @@ object SercoPreviousMonthMoveData {
         dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
         person = billyTheKid,
         journeys = listOf(
-          journeyLJ1(),
-          journeyLJ2(),
+          journeyLDGJ1(),
+          journeyLDGJ2(),
         ),
       )
     }
