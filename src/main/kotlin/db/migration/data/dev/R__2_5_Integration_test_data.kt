@@ -431,8 +431,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             ),
           ),
         ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
-        create(Priced(fromPrimaryKey = PRISON1L_PRIMARY_KEY, fromAgencyId = "PRISON1L", toPrimaryKey = POLICE1L_PRIMARY_KEY, toAgencyId = "POLICE1L", amount = Money(1599), effectiveYear =  effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth),), template)
-        create(Priced(fromPrimaryKey = POLICE1L_PRIMARY_KEY, fromAgencyId = "POLICE1L", toPrimaryKey = POLICE2L_PRIMARY_KEY, toAgencyId = "POLICE2L", amount = Money(1875), effectiveYear =  effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth),), template)
+        create(Priced(fromPrimaryKey = PRISON1L_PRIMARY_KEY, fromAgencyId = "PRISON1L", toPrimaryKey = POLICE1L_PRIMARY_KEY, toAgencyId = "POLICE1L", amount = Money(1599), effectiveYear = effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth)), template)
+        create(Priced(fromPrimaryKey = POLICE1L_PRIMARY_KEY, fromAgencyId = "POLICE1L", toPrimaryKey = POLICE2L_PRIMARY_KEY, toAgencyId = "POLICE2L", amount = Money(1875), effectiveYear = effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth)), template)
       }
     }
   }
@@ -511,17 +511,17 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
   }
 
   private fun create(priced: Priced, template: JdbcTemplate) {
-      template.update(
-        priceSql,
-        UUID.randomUUID(),
-        LocalDateTime.now(),
-        priced.effectiveYear,
-        priced.amount.pence,
-        Supplier.SERCO.name,
-        priced.fromPrimaryKey,
-        priced.toPrimaryKey,
-      )
-    }
+    template.update(
+      priceSql,
+      UUID.randomUUID(),
+      LocalDateTime.now(),
+      priced.effectiveYear,
+      priced.amount.pence,
+      Supplier.SERCO.name,
+      priced.fromPrimaryKey,
+      priced.toPrimaryKey,
+    )
+  }
 }
 
 private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
