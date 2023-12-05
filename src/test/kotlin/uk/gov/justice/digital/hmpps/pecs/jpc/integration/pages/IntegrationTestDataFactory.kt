@@ -462,7 +462,7 @@ object SercoPreviousMonthMoveData {
         reportFromLocationType = "prison",
         reportToLocationType = "police",
         pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
-        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
+        dropOffOrCancelledDateTime = moveDate.plusDays(1).atStartOfDay().plusHours(endHoursOffset),
         person = jonnyLodger,
         journeys = listOf(
           journeyLDGJ1(),
