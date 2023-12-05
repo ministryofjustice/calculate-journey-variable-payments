@@ -407,13 +407,16 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
         move.copy(
           events = listOf(
             create(moveStartEvent(move), template),
+            create(moveOvernightLodgeEvent(move), template),
+            create(moveLodgingStartEvent(move), template),
+            create(moveLodgingEndEvent(move), template),
             create(moveCompleteEvent(move), template),
           ),
           journeys = listOf(
             create(journey(move, fromAgencyId = "PRISON1L", toAgencyId = "POLICE1L"), template),
             create(journey(move, fromAgencyId = "POLICE1L", toAgencyId = "POLICE2L"), template),
           ),
-        ).failMigrationIfNotMoveType(MoveType.STANDARD)
+        ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
       }
     }
   }
@@ -565,6 +568,9 @@ private fun moveLodgingStartEvent(move: Move, supplier: Supplier = Supplier.SERC
 
 private fun moveLodgingEndEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
   moveEvent(move, supplier, "LodgingEnd")
+
+private fun moveOvernightLodgeEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
+  moveEvent(move, supplier, "OvernightLodge")
 
 private fun moveLockoutEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Lockout")
 
