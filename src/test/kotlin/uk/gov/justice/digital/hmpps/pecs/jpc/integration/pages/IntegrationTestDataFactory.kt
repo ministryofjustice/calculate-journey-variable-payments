@@ -454,7 +454,7 @@ object SercoPreviousMonthMoveData {
         supplier = Supplier.SERCO,
         moveType = MoveType.STANDARD,
         status = MoveStatus.completed,
-        reference = "LODGINGM1",
+        reference = "LONG_HAULLDGM1",
         fromNomisAgencyId = "PRISON1L",
         fromSiteName = "PRISON ONE L",
         toNomisAgencyId = "POLICE2L",
