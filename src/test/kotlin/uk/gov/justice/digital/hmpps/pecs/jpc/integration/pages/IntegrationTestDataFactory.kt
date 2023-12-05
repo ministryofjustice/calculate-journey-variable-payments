@@ -452,7 +452,7 @@ object SercoPreviousMonthMoveData {
         moveId = "LDGM1",
         updatedAt = moveDate.atStartOfDay(),
         supplier = Supplier.SERCO,
-        moveType = MoveType.STANDARD,
+        moveType = MoveType.LONG_HAUL,
         status = MoveStatus.completed,
         reference = "LONG_HAULLDGM1",
         fromNomisAgencyId = "PRISON1L",
