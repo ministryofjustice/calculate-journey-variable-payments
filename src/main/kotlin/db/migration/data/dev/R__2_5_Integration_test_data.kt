@@ -399,7 +399,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           profileId = it.value,
           fromAgencyId = "PRISON1L",
           toAgencyId = "POLICE2L",
-          type = MoveType.STANDARD,
+          type = MoveType.LONG_HAUL,
           date = startOfPreviousMonth.minusMonths(1),
           days = 1,
         ),
