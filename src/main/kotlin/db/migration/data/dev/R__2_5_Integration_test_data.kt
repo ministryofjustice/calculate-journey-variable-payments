@@ -391,7 +391,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     logger.info("create lodging moves")
 
     mapOf(
-      "LDGM1" to "PR401",
+      "LDGM1" to "PR45",
     ).forEach {
       create(
         move(

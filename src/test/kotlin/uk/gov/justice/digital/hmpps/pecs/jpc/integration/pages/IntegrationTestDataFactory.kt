@@ -28,6 +28,17 @@ private val billyTheKid =
     gender = "male",
   )
 
+private val jonnyLodger =
+  Person(
+    personId = "_",
+    updatedAt = LocalDateTime.now(),
+    prisonNumber = "PRISONER45",
+    firstNames = "Jonny",
+    lastName = "Lodger",
+    dateOfBirth = LocalDate.of(1970, 10, 1),
+    gender = "male",
+  )
+
 private val bonnieElizabeth =
   Person(
     personId = "_",
@@ -392,7 +403,6 @@ object SercoPreviousMonthMoveData {
         priceInPence = 100,
         vehicleRegistration = vehicleRegistration,
         notes = "some notes",
-        events = events,
         effectiveYear = effectiveYearForDate(
           moveDate,
         ),
@@ -453,7 +463,7 @@ object SercoPreviousMonthMoveData {
         reportToLocationType = "police",
         pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
         dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
-        person = billyTheKid,
+        person = jonnyLodger,
         journeys = listOf(
           journeyLDGJ1(),
           journeyLDGJ2(),
