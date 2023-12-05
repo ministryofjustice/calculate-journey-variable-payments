@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.LONG_HAUL
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -85,10 +86,10 @@ internal class LodgingPriceTest : IntegrationTest() {
     goToPage(Dashboard)
 
     isAtPage(Dashboard)
-      .navigateToMovesBy(STANDARD)
+      .navigateToMovesBy(LONG_HAUL)
 
     isAtPage(MovesByType)
-      .isAtPageFor(STANDARD)
+      .isAtPageFor(LONG_HAUL)
       .navigateToDetailsFor(move)
 
     isAtPage(MoveDetails)
