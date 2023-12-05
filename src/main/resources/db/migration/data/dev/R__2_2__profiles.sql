@@ -6,3 +6,4 @@ insert into profiles (profile_id, person_id, updated_at) select * from (select '
 insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR6', 'PE6', '2020-06-16 10:20:30.000000'::timestamp) as tmp where not exists (select profile_id from profiles where profile_id = 'PR6');
 insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR7', 'PE7', '2020-06-16 10:20:30.000000'::timestamp) as tmp where not exists (select profile_id from profiles where profile_id = 'PR7');
 insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR8', 'PE8', '2020-06-16 10:20:30.000000'::timestamp) as tmp where not exists (select profile_id from profiles where profile_id = 'PR8');
+insert into profiles (profile_id, person_id, updated_at) select * from (select 'PR45', 'PE45', '2020-06-16 10:20:30.000000'::timestamp) as tmp where not exists (select profile_id from profiles where profile_id = 'PR45');

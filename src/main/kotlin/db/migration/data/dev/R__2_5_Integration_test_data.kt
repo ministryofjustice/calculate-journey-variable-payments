@@ -38,6 +38,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     val PRISON1_PRIMARY_KEY: UUID = UUID.fromString("709fbee3-7fe6-4584-a8dc-f12481165bfa")
     val PRISON2_PRIMARY_KEY: UUID = UUID.fromString("612ec4d3-9cfa-4c89-ad39-3f02acc8b41d")
     val POLICE1_PRIMARY_KEY: UUID = UUID.fromString("13c46837-c5c9-45a4-83d5-5a0d1438ff3c")
+    val POLICE1L_PRIMARY_KEY: UUID = UUID.fromString("7f8ac7b2-3df2-4171-b8c0-637827ce4983")
+    val POLICE2L_PRIMARY_KEY: UUID = UUID.fromString("9d783f8f-4b61-46a5-a345-457558f9aea9")
+    val PRISON1L_PRIMARY_KEY: UUID = UUID.fromString("9a67ab84-3a07-4d70-9c55-9f829552fcfb")
   }
 
   private data class Priced(
@@ -46,6 +49,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     val toPrimaryKey: UUID,
     val toAgencyId: String,
     val amount: Money,
+    val effectiveYear: Int? = null,
   )
 
   override fun migrate(context: Context) {
@@ -427,6 +431,8 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
             ),
           ),
         ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
+        create(Priced(fromPrimaryKey = PRISON1L_PRIMARY_KEY, fromAgencyId = "PRISON1L", toPrimaryKey = POLICE1L_PRIMARY_KEY, toAgencyId = "POLICE1L", amount = Money(1599), effectiveYear =  effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth),), template)
+        create(Priced(fromPrimaryKey = POLICE1L_PRIMARY_KEY, fromAgencyId = "POLICE1L", toPrimaryKey = POLICE2L_PRIMARY_KEY, toAgencyId = "POLICE2L", amount = Money(1875), effectiveYear =  effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth),), template)
       }
     }
   }
@@ -503,6 +509,19 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
 
     return event
   }
+
+  private fun create(priced: Priced, template: JdbcTemplate) {
+      template.update(
+        priceSql,
+        UUID.randomUUID(),
+        LocalDateTime.now(),
+        priced.effectiveYear,
+        priced.amount.pence,
+        Supplier.SERCO.name,
+        priced.fromPrimaryKey,
+        priced.toPrimaryKey,
+      )
+    }
 }
 
 private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)

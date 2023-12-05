@@ -49,7 +49,7 @@ class ChooseSupplierFilter : OncePerRequestFilter() {
 
         response.sendRedirect(CHOOSE_SUPPLIER_URL)
       }
-      else -> chain.doFilter(request, response).also { logger.info("supplier present in the session") }
+      else -> chain.doFilter(request, response).also { logger.debug("supplier present in the session") }
     }
   }
 }

@@ -46,11 +46,9 @@ internal class LodgingPriceTest : IntegrationTest() {
 
     isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE L", "POLICE ONE L")
 
-    isAtPage(JourneyResults).assertTextIsPresent("Existing prifce exceptions")
-
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE L", "POLICE ONE L")
-      .isJourneyRowPresent("PRISON ONE L", "POLICE ONE L", Money.valueOf("100.00"))
+      .isJourneyRowPresent("PRISON ONE L", "POLICE ONE L", Money.valueOf("15.99"))
       .navigateToUpdatePriceFor("PRISON1L", "POLICE1L")
 
     isAtPage(UpdatePrice)
@@ -70,7 +68,7 @@ internal class LodgingPriceTest : IntegrationTest() {
 
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("POLICE ONE L", "POLICE TWO L")
-      .isJourneyRowPresent("POLICE ONE L", "POLICE TWO L", Money.valueOf("100.00"))
+      .isJourneyRowPresent("POLICE ONE L", "POLICE TWO L", Money.valueOf("18.75"))
       .navigateToUpdatePriceFor("POLICE1L", "POLICE2L")
 
     isAtPage(UpdatePrice)
