@@ -401,6 +401,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           toAgencyId = "POLICE2L",
           type = MoveType.STANDARD,
           date = startOfPreviousMonth.minusMonths(1),
+          days = 1,
         ),
         template,
       ).also { move ->
@@ -414,7 +415,16 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
           ),
           journeys = listOf(
             create(journey(move, fromAgencyId = "PRISON1L", toAgencyId = "POLICE1L"), template),
-            create(journey(move, fromAgencyId = "POLICE1L", toAgencyId = "POLICE2L"), template),
+            create(
+              journey(
+                move,
+                fromAgencyId = "POLICE1L",
+                toAgencyId = "POLICE2L",
+                pickUp = move.pickUpDateTime?.plusDays(1),
+                dropOff = move.dropOffOrCancelledDateTime,
+              ),
+              template,
+            ),
           ),
         ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
       }
