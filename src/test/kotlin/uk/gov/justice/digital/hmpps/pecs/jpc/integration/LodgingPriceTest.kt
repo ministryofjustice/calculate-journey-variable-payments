@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.LONG_HAUL
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
