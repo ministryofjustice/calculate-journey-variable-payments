@@ -1,10 +1,15 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -20,6 +25,17 @@ private val billyTheKid =
     firstNames = "Billy the",
     lastName = "Kid",
     dateOfBirth = LocalDate.of(1980, 12, 25),
+    gender = "male",
+  )
+
+private val jonnyLodger =
+  Person(
+    personId = "_",
+    updatedAt = LocalDateTime.now(),
+    prisonNumber = "PRISONER45",
+    firstNames = "Jonny",
+    lastName = "Lodger",
+    dateOfBirth = LocalDate.of(1970, 10, 1),
     gender = "male",
   )
 
@@ -354,6 +370,104 @@ object SercoPreviousMonthMoveData {
         pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
         dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
         person = billyTheKid,
+      )
+    }
+
+  fun journeyLDGJ1(
+    moveId: String = "LDGM1",
+    journeyId: String = "LDGJ1",
+    fromNomisAgencyId: String = "PRISON1L",
+    toNomisAgencyId: String = "POLICE1L",
+    state: JourneyState = JourneyState.completed,
+    billable: Boolean = true,
+    events: List<Event> = listOf(),
+    vehicleRegistration: String = "REG100",
+  ) =
+    startOfPreviousMonth.minusMonths(1).let { moveDate ->
+      Journey(
+        journeyId = journeyId,
+        supplier = Supplier.SERCO,
+        clientTimeStamp = moveDate.atStartOfDay(),
+        updatedAt = moveDate.atTime(10, 0),
+        state = state,
+        moveId = moveId,
+        fromNomisAgencyId = fromNomisAgencyId,
+        fromSiteName = "PRISON ONE L",
+        fromLocationType = LocationType.PR,
+        toNomisAgencyId = toNomisAgencyId,
+        toSiteName = "POLICE ONE L",
+        toLocationType = LocationType.PS,
+        pickUpDateTime = moveDate.atStartOfDay(),
+        dropOffDateTime = moveDate.atTime(10, 0),
+        billable = billable,
+        priceInPence = 100,
+        vehicleRegistration = vehicleRegistration,
+        notes = "some notes",
+        effectiveYear = effectiveYearForDate(
+          moveDate,
+        ),
+      )
+    }
+
+  fun journeyLDGJ2(
+    moveId: String = "LDGM1",
+    journeyId: String = "LDGJ2",
+    fromNomisAgencyId: String = "POLICE1L",
+    toNomisAgencyId: String = "POLICE2L",
+    state: JourneyState = JourneyState.completed,
+    billable: Boolean = true,
+    events: List<Event> = listOf(),
+    vehicleRegistration: String = "REG100",
+  ) =
+    startOfPreviousMonth.minusMonths(1).plusDays(1).let { moveDate ->
+      Journey(
+        journeyId = journeyId,
+        supplier = Supplier.SERCO,
+        clientTimeStamp = moveDate.atStartOfDay(),
+        updatedAt = moveDate.atTime(10, 0),
+        state = state,
+        moveId = moveId,
+        fromNomisAgencyId = fromNomisAgencyId,
+        fromSiteName = "POLICE ONE L",
+        fromLocationType = LocationType.PS,
+        toNomisAgencyId = toNomisAgencyId,
+        toSiteName = "POLICE TWO L",
+        toLocationType = LocationType.PS,
+        pickUpDateTime = moveDate.atStartOfDay(),
+        dropOffDateTime = moveDate.atTime(10, 0),
+        billable = billable,
+        priceInPence = 100,
+        vehicleRegistration = vehicleRegistration,
+        notes = "some notes",
+        events = events,
+        effectiveYear = effectiveYearForDate(
+          moveDate,
+        ),
+      )
+    }
+
+  fun lodgingMoveLDGM1() =
+    startOfPreviousMonth.minusMonths(1).let { moveDate ->
+      Move(
+        moveId = "LDGM1",
+        updatedAt = moveDate.atStartOfDay(),
+        supplier = Supplier.SERCO,
+        moveType = MoveType.LONG_HAUL,
+        status = MoveStatus.completed,
+        reference = "LONG_HAULLDGM1",
+        fromNomisAgencyId = "PRISON1L",
+        fromSiteName = "PRISON ONE L",
+        toNomisAgencyId = "POLICE2L",
+        toSiteName = "POLICE TWO L",
+        reportFromLocationType = "prison",
+        reportToLocationType = "police",
+        pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
+        dropOffOrCancelledDateTime = moveDate.plusDays(1).atStartOfDay().plusHours(endHoursOffset),
+        person = jonnyLodger,
+        journeys = listOf(
+          journeyLDGJ1(),
+          journeyLDGJ2(),
+        ),
       )
     }
 }

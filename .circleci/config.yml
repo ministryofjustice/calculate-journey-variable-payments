@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@7.3.3
-  browser-tools: circleci/browser-tools@1.4.1
+  hmpps: ministryofjustice/hmpps@7.5.0
+  browser-tools: circleci/browser-tools@1.4.6
 
 jobs:
   validate:
@@ -48,7 +48,7 @@ jobs:
       - image: quay.io/hmpps/hmpps-auth:latest
         environment:
           - SERVER_PORT=9090
-          - SPRING_PROFILES_ACTIVE=dev,local-postgres
+          - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
           - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:7432/auth-db
       - image: quay.io/hmpps/hmpps-external-users-api:latest
         environment:

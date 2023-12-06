@@ -62,7 +62,7 @@ object MoveFilterer {
 
   /**
    * A simple lodging move must be a completed move with 1 move lodging start and 1 move lodging end event
-   * It must also have at 2 billable, completed journeys
+   * It must also have at least 2 billable, completed journeys
    */
   fun isLongHaulMove(move: Move) =
     move.isCompleted() &&
@@ -71,7 +71,7 @@ object MoveFilterer {
         ) &&
       move.hasNoneOf(EventType.MOVE_REDIRECT, EventType.MOVE_LOCKOUT) &&
       with(move.journeys.map { it }) {
-        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } == 2
+        count { it.stateIsAnyOf(JourneyState.completed) && it.billable } >= 2
       }
 
   /**

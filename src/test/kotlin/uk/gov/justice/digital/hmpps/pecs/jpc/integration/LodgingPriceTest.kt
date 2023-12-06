@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.STANDARD
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.LONG_HAUL
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
@@ -16,14 +16,14 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MovesByType
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonthYear
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM4
+import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.lodgingMoveLDGM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import java.time.Year
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-internal class MovePriceExceptionTest : IntegrationTest() {
+internal class LodgingPriceTest : IntegrationTest() {
 
-  private val move = standardMoveSM4()
+  private val move = lodgingMoveLDGM1()
 
   private val date = move.updatedAt
 
@@ -33,7 +33,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
   @Test
   @Order(1)
-  fun `add a price exception and verify the move price matches the exception price`() {
+  fun `add price exceptions and verify the move price matches the exception prices`() {
     loginAndGotoDashboardFor(Supplier.SERCO)
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
@@ -44,76 +44,54 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
     isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
 
-    isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE", "POLICE ONE")
+    isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE L", "POLICE ONE L")
 
     isAtPage(JourneyResults)
-      .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("100.00"))
-      .navigateToUpdatePriceFor("PRISON1", "POLICE1")
+      .isAtResultsPageForJourney("PRISON ONE L", "POLICE ONE L")
+      .isJourneyRowPresent("PRISON ONE L", "POLICE ONE L", Money.valueOf("15.99"))
+      .navigateToUpdatePriceFor("PRISON1L", "POLICE1L")
 
     isAtPage(UpdatePrice)
-      .isAtPricePageForJourney("PRISON1", "POLICE1")
+      .isAtPricePageForJourney("PRISON1L", "POLICE1L")
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .showPriceExceptionsTab()
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .addPriceException(month, Money.valueOf("3000.00"))
+      .addPriceException(date.month, Money.valueOf("3000.00"))
 
     isAtPage(UpdatePrice)
       .assertTextIsPresent("Existing price exceptions")
       .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
 
-    goToPage(Dashboard)
+    goToPage(ManageJourneyPrice)
 
-    isAtPage(Dashboard)
-      .navigateToMovesBy(STANDARD)
-
-    isAtPage(MovesByType)
-      .isAtPageFor(STANDARD)
-      .navigateToDetailsFor(move)
-
-    isAtPage(MoveDetails)
-      .isAtPageFor(move, Money.valueOf("3000.00"))
-  }
-
-  @Test
-  @Order(2)
-  fun `remove a price exception and verify the move price is back to its original price`() {
-    loginAndGotoDashboardFor(Supplier.SERCO)
-
-    isAtPage(Dashboard).navigateToSelectMonthPage()
-
-    isAtPage(SelectMonthYear).navigateToDashboardFor(month, year)
-
-    isAtPage(Dashboard).navigateToManageJourneyPrice()
-
-    isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
-
-    isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE", "POLICE ONE")
+    isAtPage(ManageJourneyPrice).findJourneyForPricing("POLICE ONE L", "POLICE TWO L")
 
     isAtPage(JourneyResults)
-      .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
-      // The price here is affected by the volume adjustment test, need to make them not affect each other
-      .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("101.00"))
-      .navigateToUpdatePriceFor("PRISON1", "POLICE1")
+      .isAtResultsPageForJourney("POLICE ONE L", "POLICE TWO L")
+      .isJourneyRowPresent("POLICE ONE L", "POLICE TWO L", Money.valueOf("18.75"))
+      .navigateToUpdatePriceFor("POLICE1L", "POLICE2L")
 
     isAtPage(UpdatePrice)
-      .isAtPricePageForJourney("PRISON1", "POLICE1")
-      .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
-      .showPriceExceptionsTab()
-      .removePriceException(month)
+      .isAtPricePageForJourney("POLICE1L", "POLICE2L")
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+      .showPriceExceptionsTab()
+      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+      .addPriceException(date.month, Money.valueOf("2.00"))
+
+    isAtPage(UpdatePrice)
+      .assertTextIsPresent("Existing price exceptions")
+      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£2.00")
 
     goToPage(Dashboard)
 
     isAtPage(Dashboard)
-      .navigateToMovesBy(STANDARD)
+      .navigateToMovesBy(LONG_HAUL)
 
     isAtPage(MovesByType)
-      .isAtPageFor(STANDARD)
+      .isAtPageFor(LONG_HAUL)
       .navigateToDetailsFor(move)
 
     isAtPage(MoveDetails)
-      .isAtPageFor(move, Money.valueOf("101.00"))
+      .isAtPageFor(move, Money.valueOf("3002.00"))
   }
 }
