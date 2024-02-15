@@ -164,6 +164,7 @@ workflows:
             - validate
             - build_docker
             - helm_lint
+            - integration_tests
       - request-preprod-approval:
           type: approval
           requires:

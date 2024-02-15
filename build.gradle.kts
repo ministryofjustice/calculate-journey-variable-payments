@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.9.0"
-  kotlin("plugin.spring") version "1.9.21"
-  kotlin("plugin.jpa") version "1.9.21"
-  kotlin("plugin.allopen") version "1.9.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.2"
+  kotlin("plugin.spring") version "1.9.22"
+  kotlin("plugin.jpa") version "1.9.22"
+  kotlin("plugin.allopen") version "1.9.22"
 }
 
 allOpen {
