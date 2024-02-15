@@ -67,7 +67,7 @@ dependencies {
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.6.0")
+  runtimeOnly("org.postgresql:postgresql:42.7.1")
 }
 
 java {
