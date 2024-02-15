@@ -142,19 +142,19 @@ class ManageSchedule34LocationsController(
   }
 
   data class SearchLocationForm(
-    @get: NotBlank(message = "Please enter a schedule 34 location name")
+    @get:NotBlank(message = "Please enter a schedule 34 location name")
     val location: String? = null,
   )
 
   data class LocationForm(
-    @get: NotBlank(message = "NOMIS agency id is required")
+    @get:NotBlank(message = "NOMIS agency id is required")
     val agencyId: String,
 
-    @get: NotBlank(message = "Please enter a schedule 34 location name")
-    @get: Length(max = 255, message = "Enter details upto 255 characters")
+    @get:NotBlank(message = "Please enter a schedule 34 location name")
+    @get:Length(max = 255, message = "Enter details upto 255 characters")
     val locationName: String = "",
 
-    @get: NotNull(message = "Please enter a schedule 34 location type")
+    @get:NotNull(message = "Please enter a schedule 34 location type")
     val locationType: LocationType? = null,
 
     val nomisLocationName: String = "",

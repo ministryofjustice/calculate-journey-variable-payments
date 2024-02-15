@@ -18,11 +18,11 @@ data class Location(
   var locationType: LocationType,
 
   @Column(name = "nomis_agency_id", unique = true, nullable = false)
-  @get: NotBlank(message = "NOMIS agency id cannot be blank")
+  @get:NotBlank(message = "NOMIS agency id cannot be blank")
   val nomisAgencyId: String,
 
   @Column(name = "site_name", unique = true, nullable = false)
-  @get: NotBlank(message = "site name cannot be blank")
+  @get:NotBlank(message = "site name cannot be blank")
   var siteName: String,
 
   @Column(name = "added_at", nullable = false)

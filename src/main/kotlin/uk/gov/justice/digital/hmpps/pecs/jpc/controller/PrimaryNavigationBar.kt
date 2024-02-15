@@ -14,5 +14,7 @@ fun interface PrimaryNavigationBar {
 }
 
 enum class PrimaryNavigation {
-  LOCATION, PRICE, SUMMARY
+  LOCATION,
+  PRICE,
+  SUMMARY,
 }

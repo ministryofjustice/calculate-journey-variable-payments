@@ -117,14 +117,14 @@ class AnnualPriceAdjustmentsController(
   }
 
   data class AnnualPriceAdjustmentForm(
-    @get: Pattern(regexp = "^[0-9]{0,2}(\\.[0-9]{0,40})?\$", message = "Invalid rate")
+    @get:Pattern(regexp = "^[0-9]{0,2}(\\.[0-9]{0,40})?\$", message = "Invalid rate")
     val inflationaryRate: String?,
 
-    @get: Pattern(regexp = "^-?[0-9]{0,2}(\\.[0-9]{0,40})?\$", message = "Invalid volumetric rate")
+    @get:Pattern(regexp = "^-?[0-9]{0,2}(\\.[0-9]{0,40})?\$", message = "Invalid volumetric rate")
     val volumetricRate: String?,
 
-    @get: NotBlank(message = "Enter details upto 255 characters")
-    @get: Length(max = 255, message = "Enter details upto 255 characters")
+    @get:NotBlank(message = "Enter details upto 255 characters")
+    @get:Length(max = 255, message = "Enter details upto 255 characters")
     val details: String? = null,
   ) {
     fun mayBeInflationaryRate() =

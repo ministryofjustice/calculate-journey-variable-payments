@@ -50,9 +50,9 @@ class MaintainSupplierPricingController(
   override fun primaryNavigationChoice() = PrimaryNavigation.PRICE
 
   data class PriceForm(
-    @get: NotNull(message = "Invalid message id")
+    @get:NotNull(message = "Invalid message id")
     val moveId: String,
-    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
+    @get:Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
     val price: String,
     val from: String?,
     val to: String?,
@@ -76,7 +76,7 @@ class MaintainSupplierPricingController(
     val existingExceptions: Map<Int, Money> = emptyMap(),
     val exceptionMonth: String? = null,
     val effectiveYear: Int? = null,
-    @get: Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
+    @get:Pattern(regexp = "^[0-9]{1,4}(\\.[0-9]{0,2})?\$", message = "Invalid price")
     val exceptionPrice: String? = null,
   ) {
     val months: List<PriceExceptionMonth> = effectiveYear?.let {

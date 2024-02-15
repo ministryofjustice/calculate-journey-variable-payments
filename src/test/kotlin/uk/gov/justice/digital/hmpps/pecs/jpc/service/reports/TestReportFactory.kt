@@ -20,30 +20,34 @@ import java.util.UUID
 val defaultDateTime = LocalDateTime.parse("2020-06-16T10:20:30+01:00", DateTimeFormatter.ISO_DATE_TIME)
 val defaultDate = LocalDate.parse("2021-02-28", DateTimeFormatter.ISO_LOCAL_DATE)
 
-const val defaultMoveId = "M1"
-const val defaultJourneyId = "J1"
-const val defaultMoveEventId = "ME1"
-const val defaultJourneyEventId = "JE1"
-const val defaultProfileId = "PR1"
-const val defaultPersonId = "PE1"
+const val DEFAULT_MOVE_ID = "M1"
+const val DEFAULT_JOURNEY_ID = "J1"
+const val DEFAULT_MOVE_EVENT_ID = "ME1"
+const val DEFAULT_JOURNEY_EVENT_ID = "JE1"
+const val DEFAULT_PROFILE_ID = "PR1"
+const val DEFAULT_PERSON_ID = "PE1"
 
 val defaultSupplierSerco = Supplier.SERCO
 val defaultMoveTypeStandard = MoveType.STANDARD
 
 fun fromPrisonNomisAgencyId() = "WYI"
+
+@Suppress("ktlint:standard:function-naming")
 fun WYIPrisonLocation() =
   Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
 
 fun toCourtNomisAgencyId() = "GNI"
+
+@Suppress("ktlint:standard:function-naming")
 fun GNICourtLocation() =
   Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
 
 fun notMappedNomisAgencyId() = "NOT_MAPPED_AGENCY_ID"
 
 fun reportMoveFactory(
-  moveId: String = defaultMoveId,
+  moveId: String = DEFAULT_MOVE_ID,
   supplier: Supplier = defaultSupplierSerco,
-  profileId: String = defaultProfileId,
+  profileId: String = DEFAULT_PROFILE_ID,
   status: MoveStatus = MoveStatus.completed,
   fromLocation: String = fromPrisonNomisAgencyId(),
   fromLocationType: String = "prison",
@@ -76,7 +80,7 @@ fun reportMoveFactory(
   return move
 }
 
-fun reportPersonFactory(personId: String = defaultPersonId): Person {
+fun reportPersonFactory(personId: String = DEFAULT_PERSON_ID): Person {
   return Person(
     personId = personId,
     updatedAt = defaultDateTime,
@@ -91,15 +95,15 @@ fun reportPersonFactory(personId: String = defaultPersonId): Person {
 }
 
 fun profileFactory(
-  profileId: String = defaultProfileId,
-  personId: String = defaultPersonId,
+  profileId: String = DEFAULT_PROFILE_ID,
+  personId: String = DEFAULT_PERSON_ID,
 ): Profile {
   return Profile(profileId, defaultDateTime, personId)
 }
 
 fun moveEventFactory(
-  eventId: String = defaultMoveEventId,
-  moveId: String = defaultMoveId,
+  eventId: String = DEFAULT_MOVE_EVENT_ID,
+  moveId: String = DEFAULT_MOVE_ID,
   type: String = EventType.MOVE_CANCEL.value,
   supplier: Supplier = defaultSupplierSerco,
   occurredAt: LocalDateTime = defaultDateTime,
@@ -121,8 +125,8 @@ fun moveEventFactory(
 }
 
 fun reportJourneyFactory(
-  journeyId: String = defaultJourneyId,
-  moveId: String = defaultMoveId,
+  journeyId: String = DEFAULT_JOURNEY_ID,
+  moveId: String = DEFAULT_MOVE_ID,
   state: JourneyState = JourneyState.completed,
   supplier: Supplier = defaultSupplierSerco,
   billable: Boolean = false,
@@ -132,7 +136,8 @@ fun reportJourneyFactory(
   effectiveYear: Int? = null,
   events: List<Event> = listOf(),
 
-): Journey {
+
+  ): Journey {
   val journey = Journey(
     journeyId = journeyId,
     updatedAt = defaultDateTime,
@@ -146,13 +151,14 @@ fun reportJourneyFactory(
     toNomisAgencyId = toLocation,
     effectiveYear = effectiveYear,
     events = events,
+
   )
   return journey
 }
 
 fun journeyEventFactory(
-  journeyEventId: String = defaultJourneyEventId,
-  journeyId: String = defaultJourneyId,
+  journeyEventId: String = DEFAULT_JOURNEY_EVENT_ID,
+  journeyId: String = DEFAULT_JOURNEY_ID,
   type: String = EventType.JOURNEY_START.value,
   supplier: Supplier = defaultSupplierSerco,
   occurredAt: LocalDateTime = defaultDateTime,

@@ -41,7 +41,8 @@ internal class PricesSpreadsheetGeneratorTest {
       Supplier.GEOAMEY,
       moveType,
       MoveStatus.completed,
-      "$moveType", // this is used to verify the correct move type is put into the correct spreadsheet tab
+      // this is used to verify the correct move type is put into the correct spreadsheet tab
+      "$moveType",
       timeSource.date(),
       "FROM$id",
       "PR",

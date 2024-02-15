@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:enum-entry-name-case")
+
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey
 
 import com.beust.klaxon.Converter
@@ -211,7 +213,6 @@ data class Journey(
   }
 }
 
-/* ktlint-disable enum-entry-name-case */
 enum class JourneyState() {
   proposed,
   in_progress,

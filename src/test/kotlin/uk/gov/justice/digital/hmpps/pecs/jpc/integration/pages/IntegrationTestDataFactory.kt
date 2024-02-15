@@ -145,7 +145,8 @@ object Dec2020MoveData {
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
       toNomisAgencyId = "BOG",
-      toSiteName = "BOG", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "BOG",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 3, 12, 0),
@@ -164,7 +165,8 @@ object Dec2020MoveData {
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
       toNomisAgencyId = "GNI",
-      toSiteName = "GNI", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "GNI",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 2, 10, 20),
@@ -221,7 +223,8 @@ object Dec2020MoveData {
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
       toNomisAgencyId = "GNI",
-      toSiteName = "GNI", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "GNI",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = null,
@@ -234,9 +237,9 @@ object SercoPreviousMonthMoveData {
 
   private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
 
-  private const val startHoursOffset = 10L
+  private const val START_HOURS_OFFSET = 10L
 
-  private const val endHoursOffset = 12L
+  private const val END_HOURS_OFFSET = 12L
 
   fun standardMoveSM1() =
     Move(
@@ -252,8 +255,8 @@ object SercoPreviousMonthMoveData {
       toSiteName = "PRISON TWO",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET),
       person = billyTheKid,
     )
 
@@ -268,11 +271,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET),
       person = ronnieBiggs,
     )
 
@@ -287,11 +291,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET).plusDays(1),
       person = fredBloggs,
     )
 
@@ -306,11 +311,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET).plusDays(1),
       person = janeBloggs,
     )
 
@@ -325,11 +331,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY4",
-      toSiteName = "TO_AGENCY4", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY4",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET).plusDays(1),
       person = donaldDuck,
     )
 
@@ -344,11 +351,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET),
       person = professorMoriarty,
     )
 
@@ -367,8 +375,8 @@ object SercoPreviousMonthMoveData {
         toSiteName = "POLICE ONE",
         reportFromLocationType = "prison",
         reportToLocationType = "police",
-        pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
-        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
+        pickUpDateTime = moveDate.atStartOfDay().plusHours(START_HOURS_OFFSET),
+        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(END_HOURS_OFFSET),
         person = billyTheKid,
       )
     }
@@ -461,8 +469,8 @@ object SercoPreviousMonthMoveData {
         toSiteName = "POLICE TWO L",
         reportFromLocationType = "prison",
         reportToLocationType = "police",
-        pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
-        dropOffOrCancelledDateTime = moveDate.plusDays(1).atStartOfDay().plusHours(endHoursOffset),
+        pickUpDateTime = moveDate.atStartOfDay().plusHours(START_HOURS_OFFSET),
+        dropOffOrCancelledDateTime = moveDate.plusDays(1).atStartOfDay().plusHours(END_HOURS_OFFSET),
         person = jonnyLodger,
         journeys = listOf(
           journeyLDGJ1(),
