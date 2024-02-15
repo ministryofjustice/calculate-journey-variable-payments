@@ -135,9 +135,7 @@ fun reportJourneyFactory(
   vehicleRegistration: String? = "UHE-92",
   effectiveYear: Int? = null,
   events: List<Event> = listOf(),
-
-
-  ): Journey {
+): Journey {
   val journey = Journey(
     journeyId = journeyId,
     updatedAt = defaultDateTime,
