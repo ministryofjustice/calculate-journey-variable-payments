@@ -37,7 +37,7 @@ dependencies {
     "org.springframework.session:spring-session-jdbc",
     "org.thymeleaf.extras:thymeleaf-extras-springsecurity6",
     "com.google.code.findbugs:jsr305:3.0.2",
-    "com.microsoft.azure:applicationinsights-logging-logback:2.6.4"
+    "com.microsoft.azure:applicationinsights-logging-logback:2.6.4",
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
@@ -62,7 +62,7 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.11.0",
-    "com.squareup.okhttp3:okhttp:4.11.0"
+    "com.squareup.okhttp3:okhttp:4.11.0",
   ).forEach { testImplementation(it) }
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
