@@ -43,14 +43,14 @@ dependencies {
 
   // Test versions
   val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.12.0"
+  val seleniumVersion = "4.17.0"
   listOf(
     "org.wiremock:wiremock:3.1.0",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:5.2.0",
-    "org.seleniumhq.selenium:htmlunit-driver:$seleniumVersion",
+    "org.seleniumhq.selenium:htmlunit-driver:4.13.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
