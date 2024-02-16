@@ -52,7 +52,7 @@ dependencies {
     "org.mockito:mockito-inline:5.2.0",
     "org.seleniumhq.selenium:htmlunit-driver:4.13.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-http-jdk-client:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-http-jdk-client:4.13.0",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
