@@ -43,7 +43,7 @@ dependencies {
 
   // Test versions
   val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.17.0"
+  val seleniumVersion = "4.13.0"
   listOf(
     "org.wiremock:wiremock:3.1.0",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
