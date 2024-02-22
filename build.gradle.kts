@@ -20,9 +20,9 @@ dependencies {
   val shedlockVersion = "5.8.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.555",
-    "com.amazonaws:aws-java-sdk-sts:1.12.555",
-    "io.sentry:sentry-spring-boot-starter:6.29.0",
+    "com.amazonaws:aws-java-sdk-s3:1.12.663",
+    "com.amazonaws:aws-java-sdk-sts:1.12.663",
+    "io.sentry:sentry-spring-boot-starter:6.34.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0",
@@ -50,6 +50,7 @@ dependencies {
     "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:5.2.0",
+    "org.apache.commons:commons-compress:1.26.0",
     "org.seleniumhq.selenium:htmlunit-driver:4.13.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-http-jdk-client:4.13.0",
@@ -68,7 +69,7 @@ dependencies {
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.1")
+  runtimeOnly("org.postgresql:postgresql:42.7.2")
 }
 
 java {
