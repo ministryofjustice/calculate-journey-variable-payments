@@ -38,6 +38,7 @@ dependencies {
     "org.thymeleaf.extras:thymeleaf-extras-springsecurity6",
     "com.google.code.findbugs:jsr305:3.0.2",
     "com.microsoft.azure:applicationinsights-logging-logback:2.6.4",
+    "org.apache.commons:commons-compress:1.26.0",
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
@@ -73,7 +74,7 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(20))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
@@ -84,7 +85,7 @@ tasks {
 
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-      jvmTarget = "20"
+      jvmTarget = "21"
     }
   }
 

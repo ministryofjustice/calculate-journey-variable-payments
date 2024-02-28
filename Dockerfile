@@ -1,4 +1,4 @@
-FROM eclipse-temurin:20.0.2_9-jre AS builder
+FROM eclipse-temurin:21.0.2_13-jre AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
@@ -8,7 +8,7 @@ ADD . .
 RUN ./gradlew clean assemble -Dorg.gradle.daemon=false
 
 
-FROM eclipse-temurin:20.0.2_9-jre
+FROM eclipse-temurin:21.0.2_13-jre
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 RUN apt-get update && \
