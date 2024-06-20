@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   hmpps: ministryofjustice/hmpps@7.5.0
-  browser-tools: circleci/browser-tools@1.4.6
+  browser-tools: circleci/browser-tools@1.4.8
 
 jobs:
   validate:
@@ -81,7 +81,7 @@ jobs:
           install-firefox: false
           install-geckodriver: false
           replace-existing-chrome: true
-          chrome-version: 114.0.5735.198
+          chrome-version: 123.0.6312.86
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
