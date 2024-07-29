@@ -3,6 +3,7 @@ plugins {
   kotlin("plugin.spring") version "1.9.22"
   kotlin("plugin.jpa") version "1.9.22"
   kotlin("plugin.allopen") version "1.9.22"
+  id("org.jetbrains.kotlinx.kover") version "0.8.2"
 }
 
 allOpen {

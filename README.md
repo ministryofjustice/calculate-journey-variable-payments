@@ -153,3 +153,9 @@ _Note: this should be used with caution, there may be genuine reasons certain de
 ```bash
 $ ./gradlew useLatestVersions
 ```
+
+To generate test coverage reports, run:
+
+```bash
+$ ./gradlew koverHtmlReport
+```
