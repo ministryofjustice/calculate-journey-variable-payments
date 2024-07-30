@@ -19,7 +19,7 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          command: ./gradlew build koverHtmlReport
+          command: ./gradlew build
       - save_cache:
           paths:
             - ~/.gradle
@@ -29,6 +29,8 @@ jobs:
       - store_artifacts:
           path: build/reports/tests
           destination: test-report
+      - run:
+          command: ./gradlew koverHtmlReport
       - store_artifacts:
           path: build/reports/kover/html
           destination: test-coverage-report
