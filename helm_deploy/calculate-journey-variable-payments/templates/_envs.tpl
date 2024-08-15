@@ -44,7 +44,7 @@ env:
         key: database_password
 
   - name: APP_DB_URL
-    value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?user=$(DB_USERNAME)&password=$(DB_PASSWORD)"
+    value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=verify-full&user=$(DB_USERNAME)&password=$(DB_PASSWORD)"
 
   - name: AWS_DEFAULT_REGION
     value: "eu-west-2"
