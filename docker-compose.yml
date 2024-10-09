@@ -90,7 +90,7 @@ services:
       - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:9090/auth/oauth/token
 
   hmpps-book-secure-move-api:
-    image: rodolpheche/wiremock:latest
+    image: wiremock/wiremock:latest
     container_name: hmpps-book-secure-move-api
     ports:
       - "9999:8081"
