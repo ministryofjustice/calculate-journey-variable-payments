@@ -57,6 +57,8 @@ jobs:
           - API_BASE_URL_OAUTH=http://localhost:9090/auth
           - SPRING_R2DBC_URL=r2dbc:postgresql://localhost:7432/auth-db?sslmode=prefer
           - SPRING_FLYWAY_URL=jdbc:postgresql://localhost:7432/auth-db?sslmode=prefer
+          - HMPPS_SQS_PROVIDER=localstack
+          - HMPPS_SQS_LOCALSTACKURL=http://approved-premises-api-localstack:4566
       - image: quay.io/hmpps/hmpps-manage-users-api:latest
         environment:
           - SERVER_PORT=9091
