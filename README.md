@@ -148,7 +148,7 @@ $ ./gradlew wrapper --gradle-version=<VERSION>
 ```
 To automatically update project dependencies, run:
 
-_Note: this should be used with caution, there may be genuine reasons certain dependencies are at a particular versions._
+_Note: This should be used with caution, there may be genuine reasons certain dependencies are at a particular versions._
 
 ```bash
 $ ./gradlew useLatestVersions
