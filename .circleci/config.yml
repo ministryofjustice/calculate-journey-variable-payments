@@ -53,16 +53,11 @@ jobs:
       - image: cimg/openjdk:21.0-browsers
         environment:
           _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-      - image: quay.io/hmpps/hmpps-auth:latest
-        environment:
-          - SERVER_PORT=9090
-          - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/auth-db
       - image: quay.io/hmpps/hmpps-external-users-api:latest
         environment:
           - SERVER_PORT=8089
           - SPRING_PROFILES_ACTIVE=dev,local-postgres
-          - API_BASE_URL_OAUTH=http://localhost:9090/auth
+          - API_BASE_URL_OAUTH=http://localhost:8090/auth
           - SPRING_R2DBC_URL=r2dbc:postgresql://localhost:5432/auth-db?sslmode=prefer
           - SPRING_FLYWAY_URL=jdbc:postgresql://localhost:5432/auth-db?sslmode=prefer
           - HMPPS_SQS_PROVIDER=localstack
@@ -71,11 +66,11 @@ jobs:
         environment:
           - SERVER_PORT=9091
           - SPRING_PROFILES_ACTIVE=dev
-          - HMPPS-AUTH_ENDPOINT_URL=http://localhost:9090/auth
+          - HMPPS-AUTH_ENDPOINT_URL=http://localhost:8090/auth
           - EXTERNAL-USERS_ENDPOINT_URL=http://localhost:8089
           - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
           - DELIUS_ENDPOINT_URL=http://community-api:8080
-          - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://localhost:9090/auth/oauth/token
+          - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://localhost:8090/auth/oauth/token
       - image: postgres:15.5
         environment:
           POSTGRES_DB: jpc
