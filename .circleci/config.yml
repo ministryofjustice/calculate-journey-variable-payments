@@ -3,6 +3,12 @@ orbs:
   hmpps: ministryofjustice/hmpps@10
   browser-tools: circleci/browser-tools@1.4.8
 parameters:
+  java-version:
+    type: string
+    default: "21.0"
+  postgres-version:
+    type: string
+    default: "15"
   localstack-version:
     type: string
     default: "3"
@@ -10,11 +16,17 @@ parameters:
 jobs:
   validate:
     executor:
-      name: hmpps/java
-      tag: "21.0"
-    environment:
-      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-
+      name: hmpps/java_localstack_postgres
+      jdk_tag: << pipeline.parameters.java-version >>
+      localstack_tag: << pipeline.parameters.localstack-version >>
+      services: "sns,sqs"
+      postgres_tag: << pipeline.parameters.postgres-version >>
+      postgres_username: "admin"
+      postgres_password: "admin_password"
+      postgres_db: "auth-db"
+      postgres_port: "7432"
+      java_options: "-Xmx2048m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=true -Dkotlin.compiler.execution.strategy=in-process -Dorg.gradle.workers.max=1"
+      resource_class: "large"
     steps:
       - checkout
       - restore_cache:
@@ -42,12 +54,6 @@ jobs:
       - image: cimg/openjdk:21.0-browsers
         environment:
           _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-      - image: postgres:15
-        environment:
-            - POSTGRES_PASSWORD=admin_password
-            - POSTGRES_USER=admin
-            - POSTGRES_DB=auth-db
-        command: -p 7432
       - image: quay.io/hmpps/hmpps-auth:latest
         environment:
           - SERVER_PORT=9090
