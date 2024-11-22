@@ -16,7 +16,7 @@ parameters:
 jobs:
   validate:
     executor:
-      name: hmpps/java_localstack_postgres
+      name: hmpps/java_localstack_postgres_with_db_name
       jdk_tag: << pipeline.parameters.java-version >>
       localstack_tag: << pipeline.parameters.localstack-version >>
       services: "sns,sqs"
