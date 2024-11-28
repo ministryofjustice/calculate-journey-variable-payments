@@ -48,7 +48,7 @@ abstract class ApplicationPage : FluentPage() {
     val query = values.joinToString(" ") { "and contains(., '$it')" }
     logger.info("Looking for row with xpath:")
     logger.info(query)
-    FluentWait(this).withTimeout(Duration.ofSeconds(60)).pollingEvery(Duration.ofSeconds(4)).until {
+    FluentWait(this).withTimeout(Duration.ofSeconds(30)).pollingEvery(Duration.ofSeconds(2)).until {
       find(By.xpath("//tr[contains(.,'$value') $query]")).firstOrNull() != null
     }
 

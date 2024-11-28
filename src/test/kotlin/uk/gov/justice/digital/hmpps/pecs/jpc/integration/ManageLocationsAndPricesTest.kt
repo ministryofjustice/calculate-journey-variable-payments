@@ -52,14 +52,12 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .navigateToJourneysForReview()
 
     isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
-    wait.until {
-      isAtPage(AddPrice)
-        .isAtPricePageForJourney("PRISON1", "PRISON2")
-        .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
-    }
-    wait.until {
-      isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
-    }
+
+    isAtPage(AddPrice)
+      .isAtPricePageForJourney("PRISON1", "PRISON2")
+      .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
+
+    isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
   }
 
   @Test
@@ -166,11 +164,10 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
     isAtPage(MapLocation)
       .isAtMapLocationPageForAgency("STOPOVER_AGENCY")
       .mapLocation("STOP OVER", LocationType.PR)
-    wait.until {
-      isAtPage(JourneysForReview)
-        .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
-        .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
-    }
+
+    isAtPage(JourneysForReview)
+      .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
+      .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
   }
 
   @Test
@@ -185,8 +182,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
     isAtPage(ManageLocation)
       .isAtManageLocationPageForAgency("STOPOVER_AGENCY")
       .updateLocation("STOP OVER AGENCY", LocationType.PS)
-    wait.until {
-      isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
-    }
+
+    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
   }
 }
