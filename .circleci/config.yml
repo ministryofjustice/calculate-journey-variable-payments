@@ -81,7 +81,7 @@ jobs:
           install-firefox: false
           install-geckodriver: false
           replace-existing-chrome: true
-          chrome-version: 131.0.6778.86
+          chrome-version: 133.0.6847.2
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
