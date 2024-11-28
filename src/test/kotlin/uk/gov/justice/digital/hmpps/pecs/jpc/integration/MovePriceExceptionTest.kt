@@ -57,11 +57,11 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .showPriceExceptionsTab()
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .addPriceException(month, Money.valueOf("3000.00"))
-
-    isAtPage(UpdatePrice)
-      .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
-
+    wait.until {
+      isAtPage(UpdatePrice)
+        .assertTextIsPresent("Existing price exceptions")
+        .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
+    }
     goToPage(Dashboard)
 
     isAtPage(Dashboard)
