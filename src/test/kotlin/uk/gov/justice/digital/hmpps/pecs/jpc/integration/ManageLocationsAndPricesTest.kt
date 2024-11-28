@@ -170,7 +170,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       isAtPage(JourneysForReview)
         .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
         .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
-      }
+    }
   }
 
   @Test
