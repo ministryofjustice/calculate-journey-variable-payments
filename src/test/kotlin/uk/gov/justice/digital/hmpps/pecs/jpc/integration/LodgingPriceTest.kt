@@ -57,11 +57,11 @@ internal class LodgingPriceTest : IntegrationTest() {
       .showPriceExceptionsTab()
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .addPriceException(date.month, Money.valueOf("3000.00"))
-    wait.until {
-      isAtPage(UpdatePrice)
-        .assertTextIsPresent("Existing price exceptions")
-        .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
-    }
+
+    isAtPage(UpdatePrice)
+      .assertTextIsPresent("Existing price exceptions")
+      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
+
     goToPage(ManageJourneyPrice)
 
     isAtPage(ManageJourneyPrice).findJourneyForPricing("POLICE ONE L", "POLICE TWO L")
@@ -77,11 +77,11 @@ internal class LodgingPriceTest : IntegrationTest() {
       .showPriceExceptionsTab()
       .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
       .addPriceException(date.month, Money.valueOf("2.00"))
-    wait.until {
-      isAtPage(UpdatePrice)
-        .assertTextIsPresent("Existing price exceptions")
-        .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£2.00")
-    }
+
+    isAtPage(UpdatePrice)
+      .assertTextIsPresent("Existing price exceptions")
+      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£2.00")
+
     goToPage(Dashboard)
 
     isAtPage(Dashboard)
