@@ -50,18 +50,19 @@ internal class MovePriceExceptionTest : IntegrationTest() {
       .isAtResultsPageForJourney("PRISON ONE", "POLICE ONE")
       .isJourneyRowPresent("PRISON ONE", "POLICE ONE", Money.valueOf("100.00"))
       .navigateToUpdatePriceFor("PRISON1", "POLICE1")
-
-    isAtPage(UpdatePrice)
-      .isAtPricePageForJourney("PRISON1", "POLICE1")
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .showPriceExceptionsTab()
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .addPriceException(month, Money.valueOf("3000.00"))
-
-    isAtPage(UpdatePrice)
-      .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
-
+    wait.until {
+      isAtPage(UpdatePrice)
+        .isAtPricePageForJourney("PRISON1", "POLICE1")
+        .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+        .showPriceExceptionsTab()
+        .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+        .addPriceException(month, Money.valueOf("3000.00"))
+    }
+    wait.until {
+      isAtPage(UpdatePrice)
+        .assertTextIsPresent("Existing price exceptions")
+        .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
+    }
     goToPage(Dashboard)
 
     isAtPage(Dashboard)

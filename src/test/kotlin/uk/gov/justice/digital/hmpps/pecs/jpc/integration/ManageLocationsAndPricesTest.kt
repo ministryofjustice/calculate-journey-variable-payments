@@ -52,12 +52,14 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .navigateToJourneysForReview()
 
     isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
-
-    isAtPage(AddPrice)
-      .isAtPricePageForJourney("PRISON1", "PRISON2")
-      .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
-
-    isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
+    wait.until {
+      isAtPage(AddPrice)
+        .isAtPricePageForJourney("PRISON1", "PRISON2")
+        .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
+    }
+    wait.until {
+      isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
+    }
   }
 
   @Test
