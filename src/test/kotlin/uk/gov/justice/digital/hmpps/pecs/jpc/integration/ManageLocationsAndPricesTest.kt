@@ -172,8 +172,8 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
   }
 
-  //@Test
-  //@Order(6)
+  // @Test
+  // @Order(6)
   fun `update location name and type for agency id STOPOVER_AGENCY`() {
     loginAndGotoDashboardFor(Supplier.SERCO)
 
