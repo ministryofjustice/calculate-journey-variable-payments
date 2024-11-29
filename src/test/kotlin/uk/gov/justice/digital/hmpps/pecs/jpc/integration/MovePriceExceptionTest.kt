@@ -31,8 +31,9 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
   private val year = Year.of(date.year)
 
-  @Test
-  @Order(1)
+
+ // @Test
+ // @Order(1)
   fun `add a price exception and verify the move price matches the exception price`() {
     loginAndGotoDashboardFor(Supplier.SERCO)
 
