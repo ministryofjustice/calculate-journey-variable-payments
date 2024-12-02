@@ -29,7 +29,7 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
   private lateinit var logoutButton: FluentWebElement
 
   // The custom driver is for testing the spreadsheet download functionality only!
-  private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver(ChromeOptions().apply { addArguments("--window-size=1300,1000","--ignore-certificate-errors") })
+  private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver(ChromeOptions().apply { addArguments("--window-size=1300,1000", "--ignore-certificate-errors") })
   protected val wait: Wait<WebDriver> = FluentWait(testDriver).withTimeout(Duration.ofSeconds(60)).pollingEvery(Duration.ofSeconds(4))
   override fun newWebDriver(): WebDriver = testDriver
 
