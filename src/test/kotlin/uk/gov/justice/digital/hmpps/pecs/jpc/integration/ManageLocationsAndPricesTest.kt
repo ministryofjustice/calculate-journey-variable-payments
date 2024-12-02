@@ -164,10 +164,11 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
     isAtPage(MapLocation)
       .isAtMapLocationPageForAgency("STOPOVER_AGENCY")
       .mapLocation("STOP OVER", LocationType.PR)
-
-    isAtPage(JourneysForReview)
-      .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
-      .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
+    wait.until {
+      isAtPage(JourneysForReview)
+        .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
+        .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
+    }
   }
 
   @Test
