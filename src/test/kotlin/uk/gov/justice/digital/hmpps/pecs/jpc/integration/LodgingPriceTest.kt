@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
 import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.LONG_HAUL
@@ -29,8 +31,8 @@ internal class LodgingPriceTest : IntegrationTest() {
 
   private val year = Year.of(date.year)
 
-  // @Test
-  // @Order(1)
+  @Test
+  @Order(1)
   fun `add price exceptions and verify the move price matches the exception prices`() {
     loginAndGotoDashboardFor(Supplier.SERCO)
 

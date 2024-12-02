@@ -52,14 +52,12 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .navigateToJourneysForReview()
 
     isAtPage(JourneysForReview).addPriceForJourney("PRISON1", "PRISON2")
-    wait.until {
-      isAtPage(AddPrice)
-        .isAtPricePageForJourney("PRISON1", "PRISON2")
-        .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
-    }
-    wait.until {
-      isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
-    }
+
+    isAtPage(AddPrice)
+      .isAtPricePageForJourney("PRISON1", "PRISON2")
+      .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
+
+    isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
   }
 
   @Test
@@ -172,8 +170,8 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
   }
 
-  // @Test
-  // @Order(6)
+  @Test
+  @Order(6)
   fun `update location name and type for agency id STOPOVER_AGENCY`() {
     loginAndGotoDashboardFor(Supplier.SERCO)
 
