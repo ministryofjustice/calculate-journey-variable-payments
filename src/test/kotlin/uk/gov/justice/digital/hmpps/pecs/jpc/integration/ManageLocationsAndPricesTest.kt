@@ -185,6 +185,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Order(6)
   fun `update location name and type for agency id STOPOVER_AGENCY`() {
     try {
+      
       loginAndGotoDashboardFor(Supplier.SERCO)
 
       isAtPage(Dashboard).navigateToManageLocations()
