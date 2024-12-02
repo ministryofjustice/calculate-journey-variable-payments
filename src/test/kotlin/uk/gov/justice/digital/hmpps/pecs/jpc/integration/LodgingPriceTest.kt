@@ -1,9 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import uk.gov.justice.digital.hmpps.pecs.jpc.controller.titleCased
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType.LONG_HAUL
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
@@ -18,6 +21,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.SelectMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.lodgingMoveLDGM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
+import java.io.File
+import java.lang.Error
 import java.time.Year
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -34,64 +39,73 @@ internal class LodgingPriceTest : IntegrationTest() {
   @Test
   @Order(1)
   fun `add price exceptions and verify the move price matches the exception prices`() {
-    loginAndGotoDashboardFor(Supplier.SERCO)
+    try {
+      loginAndGotoDashboardFor(Supplier.SERCO)
 
-    isAtPage(Dashboard).navigateToSelectMonthPage()
+      isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(month, year)
+      isAtPage(SelectMonthYear).navigateToDashboardFor(month, year)
 
-    isAtPage(Dashboard).navigateToManageJourneyPrice()
+      isAtPage(Dashboard).navigateToManageJourneyPrice()
 
-    isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
+      isAtPage(ManageJourneyPriceCatalogue).navigateToFindJourneys()
 
-    isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE L", "POLICE ONE L")
+      isAtPage(ManageJourneyPrice).findJourneyForPricing("PRISON ONE L", "POLICE ONE L")
 
-    isAtPage(JourneyResults)
-      .isAtResultsPageForJourney("PRISON ONE L", "POLICE ONE L")
-      .isJourneyRowPresent("PRISON ONE L", "POLICE ONE L", Money.valueOf("15.99"))
-      .navigateToUpdatePriceFor("PRISON1L", "POLICE1L")
+      isAtPage(JourneyResults)
+        .isAtResultsPageForJourney("PRISON ONE L", "POLICE ONE L")
+        .isJourneyRowPresent("PRISON ONE L", "POLICE ONE L", Money.valueOf("15.99"))
+        .navigateToUpdatePriceFor("PRISON1L", "POLICE1L")
 
-    isAtPage(UpdatePrice)
-      .isAtPricePageForJourney("PRISON1L", "POLICE1L")
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .showPriceExceptionsTab()
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .addPriceException(date.month, Money.valueOf("3000.00"))
+      isAtPage(UpdatePrice)
+        .isAtPricePageForJourney("PRISON1L", "POLICE1L")
+        .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+        .showPriceExceptionsTab()
+        .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+        .addPriceException(date.month, Money.valueOf("3000.00"))
 
-    isAtPage(UpdatePrice)
-      .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
+      isAtPage(UpdatePrice)
+        .assertTextIsPresent("Existing price exceptions")
+        .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£3000.00")
 
-    goToPage(ManageJourneyPrice)
+      goToPage(ManageJourneyPrice)
 
-    isAtPage(ManageJourneyPrice).findJourneyForPricing("POLICE ONE L", "POLICE TWO L")
+      isAtPage(ManageJourneyPrice).findJourneyForPricing("POLICE ONE L", "POLICE TWO L")
 
-    isAtPage(JourneyResults)
-      .isAtResultsPageForJourney("POLICE ONE L", "POLICE TWO L")
-      .isJourneyRowPresent("POLICE ONE L", "POLICE TWO L", Money.valueOf("18.75"))
-      .navigateToUpdatePriceFor("POLICE1L", "POLICE2L")
+      isAtPage(JourneyResults)
+        .isAtResultsPageForJourney("POLICE ONE L", "POLICE TWO L")
+        .isJourneyRowPresent("POLICE ONE L", "POLICE TWO L", Money.valueOf("18.75"))
+        .navigateToUpdatePriceFor("POLICE1L", "POLICE2L")
 
-    isAtPage(UpdatePrice)
-      .isAtPricePageForJourney("POLICE1L", "POLICE2L")
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .showPriceExceptionsTab()
-      .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
-      .addPriceException(date.month, Money.valueOf("2.00"))
+      isAtPage(UpdatePrice)
+        .isAtPricePageForJourney("POLICE1L", "POLICE2L")
+        .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+        .showPriceExceptionsTab()
+        .assertTextIsNotPresent<UpdatePricePage>("Existing price exceptions")
+        .addPriceException(date.month, Money.valueOf("2.00"))
 
-    isAtPage(UpdatePrice)
-      .assertTextIsPresent("Existing price exceptions")
-      .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£2.00")
+      isAtPage(UpdatePrice)
+        .assertTextIsPresent("Existing price exceptions")
+        .isRowPresent<UpdatePricePage>(month.name.titleCased(), year.value, "£2.00")
 
-    goToPage(Dashboard)
+      goToPage(Dashboard)
 
-    isAtPage(Dashboard)
-      .navigateToMovesBy(LONG_HAUL)
+      isAtPage(Dashboard)
+        .navigateToMovesBy(LONG_HAUL)
 
-    isAtPage(MovesByType)
-      .isAtPageFor(LONG_HAUL)
-      .navigateToDetailsFor(move)
+      isAtPage(MovesByType)
+        .isAtPageFor(LONG_HAUL)
+        .navigateToDetailsFor(move)
 
-    isAtPage(MoveDetails)
-      .isAtPageFor(move, Money.valueOf("3002.00"))
+      isAtPage(MoveDetails)
+        .isAtPageFor(move, Money.valueOf("3002.00"))
+    } catch (e: Error) {
+      val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
+      FileUtils.copyFile(
+        scrFile,
+        File("build/reports/tests/testIntegration/add-price-exceptions-and-verify-the-move-price-matches-the-exception-prices.jpg"),
+      )
+      throw e
+    }
   }
 }
