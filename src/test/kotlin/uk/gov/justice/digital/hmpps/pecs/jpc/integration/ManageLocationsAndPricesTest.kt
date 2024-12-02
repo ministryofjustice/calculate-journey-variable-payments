@@ -1,9 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
@@ -23,6 +26,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonthYear
+import java.io.File
 import java.time.LocalDate
 import java.time.Year
 
@@ -87,7 +91,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
       .isPriceUpdatedMessagePresent("PRISON ONE", "PRISON TWO", Money(2000))
-      .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(2000))
+      .isJourneyRowPresent("PRISON ONES", "PRISON TWO", Money(2000))
   }
 
   @Test
@@ -97,7 +101,10 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear().minusYears(2))
+    isAtPage(SelectMonthYear).navigateToDashboardFor(
+      currentDate.previousMonth(),
+      currentDate.previousMonthYear().minusYears(2),
+    )
 
     isAtPage(Dashboard).navigateToJourneysForReview()
 
@@ -113,7 +120,10 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
 
     isAtPage(Dashboard).navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(currentDate.previousMonth(), currentDate.previousMonthYear().minusYears(2))
+    isAtPage(SelectMonthYear).navigateToDashboardFor(
+      currentDate.previousMonth(),
+      currentDate.previousMonthYear().minusYears(2),
+    )
 
     isAtPage(Dashboard).navigateToManageJourneyPrice()
 
@@ -174,17 +184,23 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
   @Test
   @Order(6)
   fun `update location name and type for agency id STOPOVER_AGENCY`() {
-    loginAndGotoDashboardFor(Supplier.SERCO)
+    try {
+      loginAndGotoDashboardFor(Supplier.SERCO)
 
-    isAtPage(Dashboard).navigateToManageLocations()
+      isAtPage(Dashboard).navigateToManageLocations()
 
-    isAtPage(SearchLocations).searchForLocation("STOP OVER")
+      isAtPage(SearchLocations).searchForLocation("STOP OVER")
 
-    isAtPage(ManageLocation)
-      .isAtManageLocationPageForAgency("STOPOVER_AGENCY")
-      .updateLocation("STOP OVER AGENCY", LocationType.PS)
-    wait.until {
-      isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
+      isAtPage(ManageLocation)
+        .isAtManageLocationPageForAgency("STOPOVER_AGENCY")
+        .updateLocation("STOP OVER AGENCY", LocationType.PS)
+      wait.until {
+        isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
+      }
+    } catch (e: Exception) {
+      val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
+      FileUtils.copyFile(scrFile, File("build/reports/tests/testIntegration/1.jpg"))
+      throw e
     }
   }
 }
