@@ -197,6 +197,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       wait.until {
         isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
       }
+      throw AssertionError("Error")
     } catch (e: AssertionError) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(scrFile, File("build/reports/tests/testIntegration/1.jpg"))
