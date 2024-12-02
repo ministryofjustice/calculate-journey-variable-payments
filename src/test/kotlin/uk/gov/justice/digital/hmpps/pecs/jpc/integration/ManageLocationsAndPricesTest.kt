@@ -91,7 +91,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
     isAtPage(JourneyResults)
       .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
       .isPriceUpdatedMessagePresent("PRISON ONE", "PRISON TWO", Money(2000))
-      .isJourneyRowPresent("PRISON ONES", "PRISON TWO", Money(2000))
+      .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(2000))
   }
 
   @Test
@@ -197,7 +197,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       wait.until {
         isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
       }
-    } catch (e: Exception) {
+    } catch (e: AssertionError) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(scrFile, File("build/reports/tests/testIntegration/1.jpg"))
       throw e
