@@ -182,7 +182,8 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
     isAtPage(ManageLocation)
       .isAtManageLocationPageForAgency("STOPOVER_AGENCY")
       .updateLocation("STOP OVER AGENCY", LocationType.PS)
-
-    isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
+    wait.until {
+      isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
+    }
   }
 }
