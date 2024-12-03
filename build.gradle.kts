@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
   kotlin("plugin.spring") version "1.9.22"
@@ -90,6 +92,8 @@ tasks {
   }
 
   val testIntegration by registering(Test::class) {
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = TestExceptionFormat.FULL
     useJUnitPlatform()
     include("uk/gov/justice/digital/hmpps/pecs/jpc/integration/*")
   }
