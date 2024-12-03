@@ -17,6 +17,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
+import java.util.logging.Level
 
 /**
  * Super class for all integration test implementations.
@@ -43,10 +44,10 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
           )
         },
       )
-      driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2))
+      driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(4))
       // Activate SEVERE logs to monitor Selenium driver steps.
       // This can help to find out the reason of flaky tests.
-      // driver.setLogLevel(Level.SEVERE)
+      driver.setLogLevel(Level.SEVERE)
       return driver
     }
   }
