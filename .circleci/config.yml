@@ -107,27 +107,8 @@ jobs:
       - restore_cache:
           key: gradle-cache-{{ checksum "build.gradle.kts" }}
       - run:
-          name: Run AnnualBulkPriceAdjustmentTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.AnnualBulkPriceAdjustmentTest
-      - run:
-          name: Run GotoDashboardTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.GotoDashboardTest
-      - run:
-          name: Run LodgingPriceTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.LodgingPriceTest
-      - run:
-          name: Run ManageLocationsAndPricesTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ManageLocationsAndPricesTest
-      - run:
-          name: Run MovePriceExceptionTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.MovePriceExceptionTest
-      - run:
-          name: Run ViewAllMoveTypesTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ViewAllMoveTypesTest
-      - run:
-          name: Run ViewMoveDetailsTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ViewMoveDetailsTest
-
+          name: Run Fluent Integration Tests
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration
       - save_cache:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           paths:

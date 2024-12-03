@@ -25,7 +25,6 @@ import java.util.logging.Level
 internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : FluentTest() {
 
   private val logger = loggerFor<IntegrationTest>()
-  protected val imageLocation = "build/reports/tests/testIntegration/"
 
   @FindBy(id = "sign-out")
   private lateinit var logoutButton: FluentWebElement
@@ -40,19 +39,21 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
       val driver = ChromeDriver(
         ChromeOptions().apply {
           addArguments(
-            "--window-size=1300,2000",
+            "--headless",
             "--ignore-certificate-errors",
           )
         },
       )
-      driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(4))
-      driver.setLogLevel(Level.SEVERE)
+      driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2))
+      // Activate SEVERE logs to monitor Selenium driver steps.
+      // This can help to find out the reason of flaky tests.
+      // driver.setLogLevel(Level.SEVERE)
       return driver
     }
   }
 
   protected val wait: Wait<WebDriver> =
-    FluentWait(testDriver).withTimeout(Duration.ofSeconds(60)).pollingEvery(Duration.ofSeconds(4))
+    FluentWait(testDriver).withTimeout(Duration.ofSeconds(30)).pollingEvery(Duration.ofSeconds(2))
 
   override fun newWebDriver(): WebDriver = testDriver
 
