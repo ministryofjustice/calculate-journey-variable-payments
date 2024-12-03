@@ -45,7 +45,7 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
           )
         },
       )
-      driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(4));
+      driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(4))
       driver.setLogLevel(Level.SEVERE)
       return driver
     }
