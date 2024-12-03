@@ -1,9 +1,12 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.cancelledMoveM60
@@ -24,6 +27,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMont
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM1
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonthYear
+import java.io.File
 import java.time.LocalDate
 import java.time.Month
 import java.time.Year
@@ -59,22 +63,31 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
   @Test
   @Order(2)
   fun `view one of each move type for GEOAmey in Dec 2020`() {
-    loginAndGotoDashboardFor(Supplier.GEOAMEY)
+    try {
+      loginAndGotoDashboardFor(Supplier.GEOAMEY)
 
-    isAtPage(Dashboard)
-      .isAtMonthYear(currentDate.month, year)
-      .navigateToSelectMonthPage()
+      isAtPage(Dashboard)
+        .isAtMonthYear(currentDate.month, year)
+        .navigateToSelectMonthPage()
 
-    isAtPage(SelectMonthYear).navigateToDashboardFor(Month.DECEMBER, Year.of(2020))
+      isAtPage(SelectMonthYear).navigateToDashboardFor(Month.DECEMBER, Year.of(2020))
 
-    listOf(
-      standardMoveM4(),
-      longHaulMoveM30(),
-      redirectMoveM20(),
-      lockoutMoveM40(),
-      multiMoveM50(),
-      cancelledMoveM60(),
-    ).forEach { move -> verifyDetailsOf(move, Month.DECEMBER, Year.of(2020)) }
+      listOf(
+        standardMoveM4(),
+        longHaulMoveM30(),
+        redirectMoveM20(),
+        lockoutMoveM40(),
+        multiMoveM50(),
+        cancelledMoveM60(),
+      ).forEach { move -> verifyDetailsOf(move, Month.DECEMBER, Year.of(2020)) }
+    } catch (e: Throwable) {
+      val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
+      FileUtils.copyFile(
+        scrFile,
+        File(imageLocation + "view-one-of-each-move-type-for-GEOAmey-in-Dec-2020.jpg"),
+      )
+      throw e
+    }
   }
 
   private fun verifyDetailsOf(move: Move, month: Month, year: Year) {
