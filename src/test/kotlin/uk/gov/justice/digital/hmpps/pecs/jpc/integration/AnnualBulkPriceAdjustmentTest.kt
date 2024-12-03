@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Test
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.support.ui.FluentWait
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
@@ -8,6 +11,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.AnnualPrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
+import java.io.File
+import java.lang.Error
 import java.time.Duration
 import java.time.LocalDate
 
@@ -22,17 +27,26 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
   @Test
   fun `apply annual price adjustments`() {
-    logger.info("Logging in and going to Dashboard")
-    loginAndGotoDashboardFor(Supplier.SERCO)
+    try {
+      logger.info("Logging in and going to Dashboard")
+      loginAndGotoDashboardFor(Supplier.SERCO)
 
-    logger.info("Doing inflationary Adjustment")
-    doInflationaryAdjustment()
+      logger.info("Doing inflationary Adjustment")
+      doInflationaryAdjustment()
 
-    logger.info("Going back to Dashboard")
-    goToPage(Dashboard)
+      logger.info("Going back to Dashboard")
+      goToPage(Dashboard)
 
-    logger.info("Doing Volumetric adjustment")
-    doVolumetricAdjustment()
+      logger.info("Doing Volumetric adjustment")
+      doVolumetricAdjustment()
+    } catch (e: Error) {
+      val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
+      FileUtils.copyFile(
+        scrFile,
+        File(imageLocation + "apply-annual-price-adjustments.jpg"),
+      )
+      throw e
+    }
   }
 
   private fun doInflationaryAdjustment() {
@@ -53,7 +67,8 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
     isAtPage(ManageJourneyPriceCatalogue).navigateToApplyBulkPriceAdjustment()
 
     logger.info("Checking for price history row on Price history tab")
-    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab().isPriceHistoryRowPresent(inflationary, rate, year, "Inflationary rate of $rate.")
+    isAtPage(AnnualPriceAdjustment).showPriceAdjustmentHistoryTab()
+      .isPriceHistoryRowPresent(inflationary, rate, year, "Inflationary rate of $rate.")
   }
 
   private fun doVolumetricAdjustment() {

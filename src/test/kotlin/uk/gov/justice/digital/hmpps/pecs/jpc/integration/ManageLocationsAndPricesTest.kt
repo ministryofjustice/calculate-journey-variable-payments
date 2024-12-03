@@ -68,7 +68,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/missing-priceis-added-for-Serco-journey-from-Prison-One-to-Prison-Two.jpg"),
+        File(imageLocation + "missing-price-is-added-for-Serco-journey-from-Prison-One-to-Prison-Two.jpg"),
       )
       throw e
     }
@@ -107,7 +107,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/price-is-updated-for-Serco-journey-from-Prison-One-to-Prison-Two.jpg"),
+        File(imageLocation + "price-is-updated-for-Serco-journey-from-Prison-One-to-Prison-Two.jpg"),
       )
       throw e
     }
@@ -135,7 +135,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/price-book-cannot-be-changed-with-journey-two-years-old-or-more-missing-price.jpg"),
+        File(imageLocation + "price-book-cannot-be-changed-with-journey-two-years-old-or-more-missing-price.jpg"),
       )
       throw e
     }
@@ -174,7 +174,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/price-book-cannot-be-changed-when-journey-price-two-years-old-or-more.jpg"),
+        File(imageLocation + "price-book-cannot-be-changed-when-journey-price-two-years-old-or-more.jpg"),
       )
       throw e
     }
@@ -221,7 +221,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/map-missing-location-name-and-location-type-to-agency-id-STOPOVER_AGENCY.jpg"),
+        File(imageLocation + "map-missing-location-name-and-location-type-to-agency-id-STOPOVER_AGENCY.jpg"),
       )
       throw e
     }
@@ -247,7 +247,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/update-location-name-and-type-for-agency-id-STOPOVER_AGENCY.jpg"),
+        File(imageLocation + "update-location-name-and-type-for-agency-id-STOPOVER_AGENCY.jpg"),
       )
       throw e
     }

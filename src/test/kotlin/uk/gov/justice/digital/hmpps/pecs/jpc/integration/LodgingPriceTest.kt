@@ -103,7 +103,7 @@ internal class LodgingPriceTest : IntegrationTest() {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
-        File("build/reports/tests/testIntegration/add-price-exceptions-and-verify-the-move-price-matches-the-exception-prices.jpg"),
+        File(imageLocation + "add-price-exceptions-and-verify-the-move-price-matches-the-exception-prices.jpg"),
       )
       throw e
     }
