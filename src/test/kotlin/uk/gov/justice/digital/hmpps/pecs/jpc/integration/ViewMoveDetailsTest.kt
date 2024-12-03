@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.FindMove
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.MoveDetails
 import java.io.File
-import java.lang.Error
 
 internal class ViewMoveDetailsTest : IntegrationTest() {
 
@@ -31,7 +30,7 @@ internal class ViewMoveDetailsTest : IntegrationTest() {
       val details = isAtPage(MoveDetails)
       wait.until { details.atPage(standardMoveM4().moveId) }
       details.isAtPageFor(standardMoveM4())
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,

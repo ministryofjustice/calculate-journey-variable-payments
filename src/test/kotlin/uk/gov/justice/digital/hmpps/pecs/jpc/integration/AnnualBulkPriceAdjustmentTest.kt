@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.ManageJourneyPriceCatalogue
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.io.File
-import java.lang.Error
 import java.time.Duration
 import java.time.LocalDate
 
@@ -39,7 +38,7 @@ internal class AnnualBulkPriceAdjustmentTest : IntegrationTest() {
 
       logger.info("Doing Volumetric adjustment")
       doVolumetricAdjustment()
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,

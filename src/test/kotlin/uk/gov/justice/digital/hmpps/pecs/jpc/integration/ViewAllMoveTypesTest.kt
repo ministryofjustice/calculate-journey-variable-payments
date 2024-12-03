@@ -28,7 +28,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMont
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonthYear
 import java.io.File
-import java.lang.Error
 import java.time.LocalDate
 import java.time.Month
 import java.time.Year
@@ -81,7 +80,7 @@ internal class ViewAllMoveTypesTest : IntegrationTest() {
         multiMoveM50(),
         cancelledMoveM60(),
       ).forEach { move -> verifyDetailsOf(move, Month.DECEMBER, Year.of(2020)) }
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,

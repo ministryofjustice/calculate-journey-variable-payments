@@ -27,7 +27,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonth
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.previousMonthYear
 import java.io.File
-import java.lang.Error
 import java.time.LocalDate
 import java.time.Year
 
@@ -64,7 +63,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
         .addPriceForJourney("PRISON1", "PRISON2", Money(1000))
 
       isAtPage(JourneysForReview).isPriceAddedMessagePresent("PRISON ONE", "PRISON TWO", Money(1000))
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
@@ -103,7 +102,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
         .isAtResultsPageForJourney("PRISON ONE", "PRISON TWO")
         .isPriceUpdatedMessagePresent("PRISON ONE", "PRISON TWO", Money(2000))
         .isJourneyRowPresent("PRISON ONE", "PRISON TWO", Money(2000))
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
@@ -131,7 +130,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       isAtPage(JourneysForReview)
         .isRowPresent<JourneysForReviewPage>("PRISON ONE", "PR", "PRISON TWO", "PR", 1, "Not priced")
         .assertTextIsNotPresent<JourneysForReviewPage>("Add price")
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
@@ -170,7 +169,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
         .assertTextIsNotPresent<UpdatePricePage>("Update price")
         .assertTextIsNotPresent<UpdatePricePage>("Price exceptions")
         .assertTextIsPresent("Price history")
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
@@ -217,7 +216,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
           .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
           .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
       }
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
@@ -243,7 +242,7 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       wait.until {
         isAtPage(SearchLocations).isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER AGENCY")
       }
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,

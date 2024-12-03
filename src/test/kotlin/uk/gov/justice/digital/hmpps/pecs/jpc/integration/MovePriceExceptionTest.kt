@@ -22,7 +22,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.UpdatePrice
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.SercoPreviousMonthMoveData.standardMoveSM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.UpdatePricePage
 import java.io.File
-import java.lang.Error
 import java.time.Year
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -80,7 +79,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
       isAtPage(MoveDetails)
         .isAtPageFor(move, Money.valueOf("3000.00"))
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
@@ -131,7 +130,7 @@ internal class MovePriceExceptionTest : IntegrationTest() {
 
       isAtPage(MoveDetails)
         .isAtPageFor(move, Money.valueOf("101.00"))
-    } catch (e: Error) {
+    } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
         scrFile,
