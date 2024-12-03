@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
+import io.netty.handler.logging.LogLevel
 import org.fluentlenium.adapter.junit.jupiter.FluentTest
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.WebDriver
@@ -17,6 +18,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
+import java.util.logging.Level
 
 /**
  * Super class for all integration test implementations.
@@ -30,8 +32,28 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
   private lateinit var logoutButton: FluentWebElement
 
   // The custom driver is for testing the spreadsheet download functionality only!
-  private val testDriver: WebDriver = if (useCustomDriver) CustomHtmlUnitDriver() else ChromeDriver(ChromeOptions().apply { addArguments("--window-size=1300,2000", "--ignore-certificate-errors") })
-  protected val wait: Wait<WebDriver> = FluentWait(testDriver).withTimeout(Duration.ofSeconds(60)).pollingEvery(Duration.ofSeconds(4))
+  private val testDriver: WebDriver = getTestDriver(useCustomDriver)
+
+  private fun getTestDriver(useCustomDriver: Boolean): WebDriver {
+    return if (useCustomDriver) CustomHtmlUnitDriver() else {
+      val driver = ChromeDriver(
+        ChromeOptions().apply {
+          addArguments(
+            "--window-size=1300,2000",
+            "--ignore-certificate-errors",
+          )
+        },
+      )
+
+      driver.setLogLevel(Level.SEVERE)
+      return driver
+      }
+  }
+
+
+  protected val wait: Wait<WebDriver> =
+    FluentWait(testDriver).withTimeout(Duration.ofSeconds(60)).pollingEvery(Duration.ofSeconds(4))
+
   override fun newWebDriver(): WebDriver = testDriver
 
   fun goToPage(page: Pages<*>) {
