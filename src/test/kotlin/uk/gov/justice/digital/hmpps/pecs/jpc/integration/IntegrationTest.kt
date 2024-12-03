@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration
 
-import io.netty.handler.logging.LogLevel
 import org.fluentlenium.adapter.junit.jupiter.FluentTest
 import org.fluentlenium.core.domain.FluentWebElement
 import org.openqa.selenium.WebDriver
@@ -35,7 +34,9 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
   private val testDriver: WebDriver = getTestDriver(useCustomDriver)
 
   private fun getTestDriver(useCustomDriver: Boolean): WebDriver {
-    return if (useCustomDriver) CustomHtmlUnitDriver() else {
+    return if (useCustomDriver) {
+      CustomHtmlUnitDriver()
+    } else {
       val driver = ChromeDriver(
         ChromeOptions().apply {
           addArguments(
@@ -47,9 +48,8 @@ internal abstract class IntegrationTest(useCustomDriver: Boolean = false) : Flue
 
       driver.setLogLevel(Level.SEVERE)
       return driver
-      }
+    }
   }
-
 
   protected val wait: Wait<WebDriver> =
     FluentWait(testDriver).withTimeout(Duration.ofSeconds(60)).pollingEvery(Duration.ofSeconds(4))
