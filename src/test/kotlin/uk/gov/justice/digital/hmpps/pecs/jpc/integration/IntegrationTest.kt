@@ -17,7 +17,6 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Dashboard
 import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Pages.Login
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.Duration
-import java.util.logging.Level
 
 /**
  * Super class for all integration test implementations.
