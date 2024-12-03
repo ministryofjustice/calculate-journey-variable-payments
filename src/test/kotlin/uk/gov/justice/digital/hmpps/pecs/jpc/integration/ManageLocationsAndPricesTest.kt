@@ -211,11 +211,11 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       isAtPage(MapLocation)
         .isAtMapLocationPageForAgency("STOPOVER_AGENCY")
         .mapLocation("STOP OVER", LocationType.PR)
-      wait.until {
-        isAtPage(JourneysForReview)
-          .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
-          .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
-      }
+
+      isAtPage(JourneysForReview)
+        .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
+        .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
+      
     } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
