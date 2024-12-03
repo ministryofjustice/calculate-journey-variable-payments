@@ -215,7 +215,6 @@ internal class ManageLocationsAndPricesTest : IntegrationTest() {
       isAtPage(JourneysForReview)
         .isLocationUpdatedMessagePresent("STOPOVER_AGENCY", "STOP OVER")
         .isRowPresent<JourneysForReviewPage>("STOP OVER", LocationType.PR.name)
-      
     } catch (e: Throwable) {
       val scrFile: File = (driver as TakesScreenshot).getScreenshotAs(OutputType.FILE)
       FileUtils.copyFile(
