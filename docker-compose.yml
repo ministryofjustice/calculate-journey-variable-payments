@@ -56,7 +56,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
 
   hmpps-external-users-api:
-    image: quay.io/hmpps/hmpps-external-users-api:latest
+    image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
     container_name: hmpps-external-users-api
     depends_on:
       - hmpps-auth
@@ -90,7 +90,7 @@ services:
       - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:9090/auth/oauth/token
 
   hmpps-book-secure-move-api:
-    image: rodolpheche/wiremock:latest
+    image: wiremock/wiremock:latest
     container_name: hmpps-book-secure-move-api
     ports:
       - "9999:8081"
