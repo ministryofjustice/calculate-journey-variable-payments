@@ -39,7 +39,7 @@ jobs:
       - image: cimg/openjdk:21.0-browsers
         environment:
           _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-      - image: postgres:15
+      - image: postgres:16.4
         environment:
             - POSTGRES_PASSWORD=admin_password
             - POSTGRES_USER=admin
@@ -66,7 +66,7 @@ jobs:
           - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
           - DELIUS_ENDPOINT_URL=http://community-api:8080
           - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://localhost:9090/auth/oauth/token
-      - image: postgres:15.5
+      - image: postgres:16.4
         environment:
           POSTGRES_DB: jpc
           POSTGRES_USER: jpc
@@ -208,42 +208,3 @@ workflows:
             - calculate-journey-variable-payments-prod
           requires:
             - request-prod-approval
-
-  security:
-    triggers:
-      - schedule:
-          cron: "4 5 * * 1-5"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - hmpps/gradle_owasp_dependency_check:
-          jdk_tag: "21.0"
-          slack_channel: pecs-dev
-          context:
-            - hmpps-common-vars
-          cache_key: "v2_0"
-      - hmpps/trivy_latest_scan:
-          slack_channel: pecs-dev
-          context:
-            - hmpps-common-vars
-      - hmpps/veracode_pipeline_scan:
-          slack_channel: pecs-dev
-          context:
-            - veracode-credentials
-            - hmpps-common-vars
-  security-weekly:
-    triggers:
-      - schedule:
-          cron: "28 6 * * 1"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - hmpps/veracode_policy_scan:
-          slack_channel: pecs-dev
-          context:
-            - veracode-credentials
-            - hmpps-common-vars
