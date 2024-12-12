@@ -1,10 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "5.15.3"
-  kotlin("plugin.spring") version "1.9.22"
-  kotlin("plugin.jpa") version "1.9.22"
-  kotlin("plugin.allopen") version "1.9.22"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "6.1.0"
+  kotlin("plugin.spring") version "2.0.21"
+  kotlin("plugin.jpa") version "2.0.21"
+  kotlin("plugin.allopen") version "2.0.21"
 }
 
 allOpen {
@@ -46,7 +46,7 @@ dependencies {
 
   // Test versions
   val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.13.0"
+  val seleniumVersion = "4.27.0"
   listOf(
     "org.wiremock:wiremock:3.1.0",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
@@ -54,9 +54,9 @@ dependencies {
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.26.0",
-    "org.seleniumhq.selenium:htmlunit-driver:4.13.0",
+    "org.seleniumhq.selenium:htmlunit-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-http-jdk-client:4.13.0",
+    "org.seleniumhq.selenium:selenium-http-jdk-client:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
