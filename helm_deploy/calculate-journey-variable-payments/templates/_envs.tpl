@@ -130,4 +130,7 @@ env:
   - name: IMPORT_REPORTS_BACKDATE_ENABLED
     value: "{{ .Values.env.IMPORT_REPORTS_BACKDATE_ENABLED }}"
 
+  - name: SERVER_SERVLET_SESSION_COOKIE_SECURE
+    value: "{{ .Values.env.SERVER_SERVLET_SESSION_COOKIE_SECURE }}"
+
 {{- end -}}
