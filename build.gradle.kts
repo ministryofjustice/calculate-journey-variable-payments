@@ -30,6 +30,7 @@ dependencies {
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0",
     "org.apache.poi:poi-ooxml:5.2.2",
     "org.flywaydb:flyway-core",
+    "org.flywaydb:flyway-database-postgresql",
     "org.springframework.boot:spring-boot-starter-security",
     "org.springframework.boot:spring-boot-starter-data-jpa",
     "org.springframework.boot:spring-boot-starter-thymeleaf",
@@ -46,7 +47,7 @@ dependencies {
 
   // Test versions
   val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.27.0"
+  val seleniumVersion = "4.13.0"
   listOf(
     "org.wiremock:wiremock:3.1.0",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
@@ -54,9 +55,9 @@ dependencies {
     "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.26.0",
-    "org.seleniumhq.selenium:htmlunit-driver:$seleniumVersion",
+    "org.seleniumhq.selenium:htmlunit-driver:4.13.0",
     "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-http-jdk-client:$seleniumVersion",
+    "org.seleniumhq.selenium:selenium-http-jdk-client:4.13.0",
     "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-support:$seleniumVersion",

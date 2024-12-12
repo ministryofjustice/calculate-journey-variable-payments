@@ -6,7 +6,6 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate.jdbc.batch_size: 5
       hibernate.order_inserts: true
@@ -14,7 +13,6 @@ spring:
       hibernate.jdbc.batch_versioned_data: true
       hibernate.generate_statistics: false
   datasource:
-    platform: postgres
     url: ${APP_DB_URL}
     driverClassName: org.postgresql.Driver
   session:
@@ -46,6 +44,9 @@ spring:
 
   flyway:
     locations: classpath:/db/migration/ddl,classpath:/db/migration/dml
+  sql:
+    init:
+      platform: postgres
 
 resources:
   provider: s3
