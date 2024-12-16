@@ -65,6 +65,7 @@ dependencies {
     "org.seleniumhq.selenium:selenium-chromium-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion",
     "org.seleniumhq.selenium:selenium-manager:$seleniumVersion",
+    "io.github.bonigarcia:webdrivermanager:5.9.2",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.11.0",
