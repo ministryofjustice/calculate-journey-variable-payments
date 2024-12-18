@@ -27,7 +27,6 @@ dependencyCheck {
 
 dependencies {
 
-
   val shedlockVersion = "5.8.0"
   listOf(
     "com.beust:klaxon:5.6",
