@@ -94,6 +94,12 @@ env:
         name: {{ template "app.name" . }}
         key: HMPPS_AUTH_CLIENT_SECRET
 
+  - name: APPINSIGHTS_INSTRUMENTATIONKEY
+    valueFrom:
+      secretKeyRef:
+        name: {{ template "app.name" . }}
+        key: APPINSIGHTS_INSTRUMENTATIONKEY
+
   - name: CRON_AUTOMATIC_LOCATION_MAPPING
     value: "{{ .Values.env.CRON_AUTOMATIC_LOCATION_MAPPING }}"
 
@@ -117,6 +123,12 @@ env:
 
   - name: BASM_API_BASE_URL
     value: "{{ .Values.env.BASM_API_BASE_URL }}"
+
+  - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+    value: "{{ .Values.env.APPLICATIONINSIGHTS_CONNECTION_STRING }}"
+
+  - name: APPLICATIONINSIGHTS_CONFIGURATION_FILE
+    value: "{{ .Values.env.APPLICATIONINSIGHTS_CONFIGURATION_FILE }}"
 
   - name: FEEDBACK_URL
     valueFrom:
