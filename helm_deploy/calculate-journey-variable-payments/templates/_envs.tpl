@@ -97,13 +97,13 @@ env:
   - name: APPINSIGHTS_INSTRUMENTATIONKEY
     valueFrom:
       secretKeyRef:
-        name: application-insights
+        name: "{{ .Values.ai.secret_name }}"
         key: APPINSIGHTS_INSTRUMENTATIONKEY
 
   - name: APPLICATIONINSIGHTS_CONNECTION_STRING
     valueFrom:
       secretKeyRef:
-        name: application-insights
+        name: "{{ .Values.ai.secret_name }}"
         key: APPLICATIONINSIGHTS_CONNECTION_STRING
 
   - name: CRON_AUTOMATIC_LOCATION_MAPPING
