@@ -94,12 +94,6 @@ env:
         name: {{ template "app.name" . }}
         key: HMPPS_AUTH_CLIENT_SECRET
 
-  - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-    valueFrom:
-      secretKeyRef:
-        name: "{{ .Values.ai.secret_name }}"
-        key: APPLICATIONINSIGHTS_CONNECTION_STRING
-
   - name: CRON_AUTOMATIC_LOCATION_MAPPING
     value: "{{ .Values.env.CRON_AUTOMATIC_LOCATION_MAPPING }}"
 
