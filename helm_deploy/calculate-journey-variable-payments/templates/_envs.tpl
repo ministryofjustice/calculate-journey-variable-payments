@@ -94,13 +94,13 @@ env:
         name: {{ template "app.name" . }}
         key: HMPPS_AUTH_CLIENT_SECRET
 
-  - name: APPINSIGHTS_INSTRUMENTATIONKEY_SC
+  - name: APPINSIGHTS_INSTRUMENTATIONKEY
     valueFrom:
       secretKeyRef:
         name: "{{ .Values.ai.secret_name }}"
         key: APPINSIGHTS_INSTRUMENTATIONKEY
 
-  - name: APPLICATIONINSIGHTS_CONNECTION_STRING_SC
+  - name: APPLICATIONINSIGHTS_CONNECTION_STRING
     valueFrom:
       secretKeyRef:
         name: "{{ .Values.ai.secret_name }}"
