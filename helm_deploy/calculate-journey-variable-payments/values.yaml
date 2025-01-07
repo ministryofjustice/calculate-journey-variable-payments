@@ -48,6 +48,8 @@ generic-service:
     SERVER_SERVLET_SESSION_COOKIE_SECURE: "SERVER_SERVLET_SESSION_COOKIE_SECURE"
 
   namespace_secrets:
+    application-insights:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
     calculate-journey-variable-payments-bucket:
       JPC_BUCKET_NAME: bucket_name
     basm-reporting-bucket:
