@@ -2,7 +2,7 @@
 # Values here are the same across all environments
 generic-service:
   nameOverride: calculate-journey-variable-payments
-  replicaCount: 4
+  replicaCount: 2
 
   image:
     repository: quay.io/hmpps/calculate-journey-variable-payments
@@ -13,6 +13,7 @@ generic-service:
     enabled: true
     tlsSecretName: calculate-journey-variable-payments
     ath: /
+    path: /
 
   livenessProbe:
     httpGet:
