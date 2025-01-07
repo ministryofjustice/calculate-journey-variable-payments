@@ -1,46 +1,41 @@
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+generic-service:
+  replicaCount: 1
 
-replicaCount: 1
+  image:
+    repository: quay.io/hmpps/calculate-journey-variable-payments
+    tag: latest
+    port: 8080
 
-image:
-  repository: quay.io/hmpps/calculate-journey-variable-payments
-  tag: latest
-  port: 8080
+  ingress:
+    enabled: true
+    enable_whitelist: false
+    hosts:
+      - host: calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk
+    path: /
+    aws_weight: "100"
 
-ai:
-  secret_name: application-insights
+  env:
+    JAVA_OPTS: "-Xmx1024m"
+    HMPPS_AUTH_BASE_URI: "https://sign-in-dev.hmpps.service.justice.gov.uk"
+    HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
+    HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk"
+    CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 13 * * ?"
+    CRON_IMPORT_REPORTS: "-"
+    CRON_BACKFILL_REPORTS: "-"
+    CRON_REPROCESS_EXISTING_MOVES: "-"
+    SENTRY_ENVIRONMENT: dev
+    BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-staging.apps.cloud-platform.service.justice.gov.uk"
+    FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "true"
+    IMPORT_REPORTS_BACKDATE_ENABLED: "true"
+    SERVER_SERVLET_SESSION_COOKIE_SECURE: "false"
+    APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
-db:
-  secret_name: rds-instance-calculate-journey-variable-payments-dev
-
-sentry:
-  secret_name: calculate-journey-variable-payments-sentry
-
-feedback:
-  secret_name: calculate-journey-variable-payments-feedback
-
-ingress:
-  enabled: true
-  enable_whitelist: false
-  hosts:
-    - host: calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk
-#      cert_secret: calculate-journey-variable-payments-cert
-  path: /
-  aws_weight: "100"
-
-env:
-  JAVA_OPTS: "-Xmx1024m"
-  HMPPS_AUTH_BASE_URI: "https://sign-in-dev.hmpps.service.justice.gov.uk"
-  HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
-  HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk"
-  CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 13 * * ?"
-  CRON_IMPORT_REPORTS: "-"
-  CRON_BACKFILL_REPORTS: "-"
-  CRON_REPROCESS_EXISTING_MOVES: "-"
-  SENTRY_ENVIRONMENT: dev
-  BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-staging.apps.cloud-platform.service.justice.gov.uk"
-  FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "true"
-  IMPORT_REPORTS_BACKDATE_ENABLED: "true"
-  SERVER_SERVLET_SESSION_COOKIE_SECURE: "false"
-  APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
+  namespace_secrets:
+    rds-instance-calculate-journey-variable-payments-dev:
+      DB_HOST: database_host
+      DB_PORT: database_port
+      DB_NAME: database_name
+      DB_USERNAME: database_username
+      DB_PASSWORD: database_password
