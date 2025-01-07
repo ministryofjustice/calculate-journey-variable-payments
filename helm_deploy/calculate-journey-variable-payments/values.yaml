@@ -1,4 +1,67 @@
+---
+# Values here are the same across all environments
+generic-service:
+  nameOverride: calculate-journey-variable-payments
+  replicaCount: 2
+
   image:
     repository: quay.io/hmpps/calculate-journey-variable-payments
     tag: app_version # override at deployment time
     port: 8080
+
+  ingress:
+    enabled: true
+    tlsSecretName: calculate-journey-variable-payments
+    ath: /
+    path: /
+
+  livenessProbe:
+    httpGet:
+      path: /health
+
+  readinessProbe:
+    httpGet:
+      path: /health
+
+  env:
+    SERVER_PORT: 8080
+    JAVA_OPTS: "-Xmx1024m"
+    SPRING_PROFILES_ACTIVE: "logstash"
+    APP_DB_URL: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=verify-full&user=$(DB_USERNAME)&password=$(DB_PASSWORD)"
+    AWS_DEFAULT_REGION: "eu-west-2"
+    AWS_REGION: "eu-west-2"
+    IMPORT_FILES_LOCATIONS: "schedule_34_locations.xlsx"
+    IMPORT_FILES_PRICES_SERCO: "serco_prices.xlsx"
+    IMPORT_FILES_PRICES_GEO: "geoamey_prices.xlsx"
+    HMPPS_AUTH_BASE_URI: "HMPPS_AUTH_BASE_URI"
+    HMPPS_MANAGE_USERS_BASE_URI: "HMPPS_MANAGE_USERS_BASE_URI"
+    HMPPS_AUTH_REDIRECT_BASE_URI: "HMPPS_AUTH_REDIRECT_BASE_URI"
+    CRON_AUTOMATIC_LOCATION_MAPPING: "CRON_AUTOMATIC_LOCATION_MAPPING"
+    CRON_IMPORT_REPORTS: "CRON_IMPORT_REPORTS"
+    CRON_BACKFILL_REPORTS: "CRON_BACKFILL_REPORTS"
+    CRON_REPROCESS_EXISTING_MOVES: "CRON_REPROCESS_EXISTING_MOVES"
+    SENTRY_ENVIRONMENT: "SENTRY_ENVIRONMENT"
+    BASM_API_BASE_URL: "BASM_API_BASE_URL"
+    APPLICATIONINSIGHTS_CONFIGURATION_FILE: "APPLICATIONINSIGHTS_CONFIGURATION_FILE"
+    FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES"
+    IMPORT_REPORTS_BACKDATE_ENABLED: "IMPORT_REPORTS_BACKDATE_ENABLED"
+    SERVER_SERVLET_SESSION_COOKIE_SECURE: "SERVER_SERVLET_SESSION_COOKIE_SECURE"
+
+  namespace_secrets:
+    application-insights:
+      APPLICATIONINSIGHTS_CONNECTION_STRING: "APPLICATIONINSIGHTS_CONNECTION_STRING"
+    calculate-journey-variable-payments-bucket:
+      JPC_BUCKET_NAME: bucket_name
+    basm-reporting-bucket:
+      BASM_BUCKET_NAME: bucket_name
+    calculate-journey-variable-payments:
+      HMPPS_AUTH_CLIENT_ID: HMPPS_AUTH_CLIENT_ID
+      HMPPS_AUTH_CLIENT_SECRET: HMPPS_AUTH_CLIENT_SECRET
+    calculate-journey-variable-payments-sentry:
+      SENTRY_DSN: sentry_dsn
+    calculate-journey-variable-payments-feedback:
+      FEEDBACK_URL: feedback_url
+
+generic-prometheus-alerts:
+    targetApplication: calculate-journey-variable-payments
+    alertSeverity: digital-prison-service-dev
