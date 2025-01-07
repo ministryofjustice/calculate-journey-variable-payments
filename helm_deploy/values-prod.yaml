@@ -3,11 +3,6 @@
 generic-service:
   replicaCount: 1
 
-  image:
-    repository: quay.io/hmpps/calculate-journey-variable-payments
-    tag: latest
-    port: 8080
-
   ingress:
     enabled: true
     enable_whitelist: false
