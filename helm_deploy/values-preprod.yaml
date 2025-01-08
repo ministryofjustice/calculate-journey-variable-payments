@@ -4,9 +4,8 @@ generic-service:
   replicaCount: 1
 
   ingress:
-    enable_whitelist: false
     hosts:
-      - host: calculate-journey-variable-payments-preprod.apps.cloud-platform.service.justice.gov.uk
+      - calculate-journey-variable-payments-preprod.apps.cloud-platform.service.justice.gov.uk
     aws_weight: "100"
 
   env:

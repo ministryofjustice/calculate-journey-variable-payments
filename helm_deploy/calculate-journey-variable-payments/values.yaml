@@ -62,6 +62,8 @@ generic-service:
     calculate-journey-variable-payments-feedback:
       FEEDBACK_URL: feedback_url
 
+  allowlist: false
+
 generic-prometheus-alerts:
     targetApplication: calculate-journey-variable-payments
     alertSeverity: digital-prison-service-dev
