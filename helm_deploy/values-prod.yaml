@@ -4,11 +4,9 @@ generic-service:
   replicaCount: 1
 
   ingress:
-    enable_whitelist: false
     hosts:
-      - host: calculate-journey-variable-payments.hmpps.service.justice.gov.uk
+      - calculate-journey-variable-payments.hmpps.service.justice.gov.uk
     tlsSecretName: calculate-journey-variable-payments-cert
-    aws_weight: "100"
 
   env:
     JAVA_OPTS: "-Xmx1024m"
