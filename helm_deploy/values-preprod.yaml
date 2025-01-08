@@ -6,7 +6,6 @@ generic-service:
   ingress:
     hosts:
       - calculate-journey-variable-payments-preprod.apps.cloud-platform.service.justice.gov.uk
-    aws_weight: "100"
 
   env:
     JAVA_OPTS: "-Xmx1024m"

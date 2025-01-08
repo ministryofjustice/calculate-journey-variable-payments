@@ -7,7 +7,6 @@ generic-service:
     hosts:
       - calculate-journey-variable-payments.hmpps.service.justice.gov.uk
     tlsSecretName: calculate-journey-variable-payments-cert
-    aws_weight: "100"
 
   env:
     JAVA_OPTS: "-Xmx1024m"
