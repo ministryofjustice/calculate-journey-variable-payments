@@ -25,7 +25,7 @@ generic-service:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
 
   namespace_secrets:
-    calculate-journey-variable-payments-prod:
+    rds-instance-calculate-journey-variable-payments-prod:
       DB_HOST: database_host
       DB_PORT: database_port
       DB_NAME: database_name
