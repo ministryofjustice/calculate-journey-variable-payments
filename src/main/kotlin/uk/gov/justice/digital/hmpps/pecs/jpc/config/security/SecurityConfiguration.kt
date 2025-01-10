@@ -20,9 +20,9 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
-import org.springframework.session.FindByIndexNameSessionRepository
 import org.springframework.session.Session
-import org.springframework.session.security.SpringSessionBackedSessionRegistry
+import org.springframework.session.config.SessionRepositoryCustomizer
+import org.springframework.session.jdbc.JdbcIndexedSessionRepository
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogInAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogOutAuditHandler
@@ -46,12 +46,31 @@ class SecurityConfiguration<S : Session> {
   @Value("\${HMPPS_AUTH_BASE_URI}")
   private lateinit var authLogoutSuccessUri: String
 
-  @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-  @Autowired
-  private lateinit var sessionRepository: FindByIndexNameSessionRepository<S>
-
   @Autowired
   private lateinit var auditService: AuditService
+
+  @Bean
+  fun jdbcHttpSessionCustomizer(): PostgreSqlJdbcHttpSessionCustomizer {
+    return PostgreSqlJdbcHttpSessionCustomizer()
+  }
+
+  class PostgreSqlJdbcHttpSessionCustomizer :
+
+    SessionRepositoryCustomizer<JdbcIndexedSessionRepository> {
+    override fun customize(sessionRepository: JdbcIndexedSessionRepository) {
+      sessionRepository.setCreateSessionAttributeQuery(CREATE_SESSION_ATTRIBUTE_QUERY)
+    }
+
+    companion object {
+      private val CREATE_SESSION_ATTRIBUTE_QUERY = """
+        INSERT INTO SPRING_SESSION_ATTRIBUTES (SESSION_PRIMARY_ID, ATTRIBUTE_NAME, ATTRIBUTE_BYTES)
+        VALUES (?, ?, ?)
+        ON CONFLICT (SESSION_PRIMARY_ID, ATTRIBUTE_NAME)
+        DO UPDATE SET ATTRIBUTE_BYTES = EXCLUDED.ATTRIBUTE_BYTES
+        
+      """.trimIndent()
+    }
+  }
 
   @Bean
   @Throws(Exception::class)
@@ -66,9 +85,7 @@ class SecurityConfiguration<S : Session> {
         it.invalidSessionUrl(ssoLogoutUri())
           .sessionAuthenticationErrorUrl(ssoLogoutUri())
           .sessionConcurrency { concurrency ->
-            concurrency
-              .sessionRegistry(clusteredConcurrentSessionRegistry())
-              .maximumSessions(1)
+            concurrency.maximumSessions(1)
           }
       }
       .exceptionHandling {
@@ -89,10 +106,6 @@ class SecurityConfiguration<S : Session> {
 
   @Bean
   fun logOutHandler() = LogOutAuditHandler(auditService, ssoLogoutUri())
-
-  @Bean
-  fun clusteredConcurrentSessionRegistry(): SpringSessionBackedSessionRegistry<S> =
-    SpringSessionBackedSessionRegistry(sessionRepository)
 
   @Bean
   fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
