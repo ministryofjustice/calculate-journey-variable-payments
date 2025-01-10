@@ -1,7 +1,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 generic-service:
-  replicaCount: 1
+  replicaCount: 4
 
   ingress:
     hosts:
@@ -21,7 +21,6 @@ generic-service:
     BASM_API_BASE_URL: "https://api.bookasecuremove.service.justice.gov.uk"
     FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "false"
     IMPORT_REPORTS_BACKDATE_ENABLED: "true"
-    SERVER_SERVLET_SESSION_COOKIE_SECURE: "false"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
 
   namespace_secrets:
