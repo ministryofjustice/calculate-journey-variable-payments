@@ -23,7 +23,6 @@ generic-service:
     BASM_API_BASE_URL: "https://hmpps-book-secure-move-api-staging.apps.cloud-platform.service.justice.gov.uk"
     FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "true"
     IMPORT_REPORTS_BACKDATE_ENABLED: "true"
-    SERVER_SERVLET_SESSION_COOKIE_SECURE: "false"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.dev.json
 
   namespace_secrets:
