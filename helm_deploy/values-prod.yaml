@@ -38,12 +38,12 @@ generic-service:
         DB_NAME: "database_name"
         DB_USER: "database_username"
         DB_PASS: "database_password"
-        DB_HOST: "rds_instance_address"
+        DB_HOST: "database_host"
       rds-instance-calculate-journey-variable-payments-preprod:
         DB_NAME_PREPROD: "database_name"
         DB_USER_PREPROD: "database_username"
         DB_PASS_PREPROD: "database_password"
-        DB_HOST_PREPROD: "rds_instance_address"
+        DB_HOST_PREPROD: "database_host"
 
 generic-prometheus-alerts:
   targetApplication: calculate-journey-variable-payments
