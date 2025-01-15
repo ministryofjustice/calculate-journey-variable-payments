@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MovesSummary
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
 import java.time.Month
 
@@ -17,6 +18,7 @@ class MoveService(
   private val moveRepository: MoveRepository,
   private val eventRepository: EventRepository,
 ) {
+  private val logger = loggerFor<MoveService>()
 
   fun moveWithPersonJourneysAndEvents(moveId: String, supplier: Supplier, inMonth: Month): Move? {
     val maybeMove = moveQueryRepository.moveWithPersonAndJourneys(moveId, supplier, inMonth)
@@ -53,8 +55,12 @@ class MoveService(
 
   fun moveTypeSummaries(supplier: Supplier, startDate: LocalDate): MoveTypeSummaries {
     val endDate = endOfMonth(startDate)
+    logger.info("SQL data: GET - moveQueryRepository.moveCountInDateRange for supplier: $supplier, startDate: $startDate, endDate: $endDate ")
     val moveCount = moveQueryRepository.moveCountInDateRange(supplier, startDate, endDate)
+    logger.info("SQL data: COMPLETED - moveQueryRepository.moveCountInDateRange")
+    logger.info("SQL data: GET - moveQueryRepository.summariesInDateRange")
     val summaries = moveQueryRepository.summariesInDateRange(supplier, startDate, endDate, moveCount)
+    logger.info("SQL data: COMPLETED - moveQueryRepository.summariesInDateRange for supplier: $supplier, startDate: $startDate, endDate: $endDate ")
     return MoveTypeSummaries(moveCount, summaries)
   }
 

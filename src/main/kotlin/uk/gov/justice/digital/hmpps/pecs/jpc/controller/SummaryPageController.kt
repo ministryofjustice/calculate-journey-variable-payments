@@ -206,6 +206,7 @@ class SummaryPageController(
       addAttribute("journeysSummary", journeysSummary)
       addAttribute("summaries", countAndSummaries.allSummaries())
     }
+    logger.info("all data for $supplier ready to display")
     return "dashboard"
   }
 
