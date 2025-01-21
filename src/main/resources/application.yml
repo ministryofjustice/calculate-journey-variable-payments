@@ -4,6 +4,8 @@ spring:
   jpa:
     show-sql: true
     generate-ddl: false
+    properties:
+      hibernate.jdbc.batch_size: 5
     hibernate:
       ddl-auto: none
       order_inserts: true
