@@ -2,21 +2,24 @@ spring:
   application:
     name: calculate-journey-variable-payments
   jpa:
-    database: POSTGRESQL
-    show-sql: false
+    show-sql: true
+    generate-ddl: false
     hibernate:
-      ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate.jdbc.batch_size: 5
-      hibernate.order_inserts: true
-      hibernate.order_updates: true
-      hibernate.jdbc.batch_versioned_data: true
-      hibernate.generate_statistics: false
+      ddl-auto: none
+      order_inserts: true
+      order_updates: true
+      batch_versioned_data: true
+      generate_statistics: true
+
   datasource:
-    platform: postgres
     url: ${APP_DB_URL}
-    driverClassName: org.postgresql.Driver
+    hikari:
+      pool-name: LIP-DB-CP
+      maximum-pool-size: 20
+      max-lifetime: 600000
+      connection-timeout: 1000
+      validation-timeout: 500
+
   session:
     store-type: jdbc
     jdbc:
