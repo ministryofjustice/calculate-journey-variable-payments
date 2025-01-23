@@ -234,6 +234,26 @@ internal class MoveFiltererTest {
     journeys = listOf(),
   )
 
+  private val cancelledIncompletePer = reportMoveFactory(
+    moveId = "M10",
+    status = MoveStatus.cancelled,
+    fromLocation = fromPrisonNomisAgencyId(),
+    fromLocationType = "prison",
+    toLocation = toCourtNomisAgencyId(),
+    toLocationType = "prison",
+    cancellationReason = "incomplete_per",
+    date = to,
+    events = listOf(
+      moveEventFactory(
+        type = EventType.MOVE_ACCEPT.value,
+        moveId = "M10",
+        occurredAt = to.atStartOfDay().minusHours(24),
+      ),
+      moveEventFactory(type = EventType.MOVE_CANCEL.value, moveId = "M10", occurredAt = to.atStartOfDay().minusHours(2)),
+    ),
+    journeys = listOf(),
+  )
+
   @Test
   fun `is standard move`() {
     assertThat(MoveFilterer.isStandardMove(standard)).isTrue
@@ -290,6 +310,7 @@ internal class MoveFiltererTest {
   fun `is cancelled billable`() {
     assertThat(MoveFilterer.isCancelledBillableMove(cancelledBillable)).isTrue
     assertThat(MoveFilterer.isCancelledBillableMove(multiTypeMove)).isFalse
+    assertThat(MoveFilterer.isCancelledBillableMove(cancelledIncompletePer)).isTrue
   }
 
   @Test
