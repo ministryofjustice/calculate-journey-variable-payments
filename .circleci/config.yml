@@ -1,14 +1,14 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@7.3.3
-  browser-tools: circleci/browser-tools@1.4.1
+  hmpps: ministryofjustice/hmpps@7.5.0
+  browser-tools: circleci/browser-tools@1.4.8
 
 jobs:
   validate:
     executor:
       name: hmpps/java
-      tag: "20.0"
+      tag: "21.0"
     environment:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
 
@@ -36,10 +36,10 @@ jobs:
 
   integration_tests:
     docker:
-      - image: cimg/openjdk:20.0-browsers
+      - image: cimg/openjdk:21.0-browsers
         environment:
           _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-      - image: postgres:15
+      - image: postgres:16.4
         environment:
             - POSTGRES_PASSWORD=admin_password
             - POSTGRES_USER=admin
@@ -48,9 +48,9 @@ jobs:
       - image: quay.io/hmpps/hmpps-auth:latest
         environment:
           - SERVER_PORT=9090
-          - SPRING_PROFILES_ACTIVE=dev,local-postgres
+          - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
           - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:7432/auth-db
-      - image: quay.io/hmpps/hmpps-external-users-api:latest
+      - image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
         environment:
           - SERVER_PORT=8089
           - SPRING_PROFILES_ACTIVE=dev,local-postgres
@@ -66,7 +66,7 @@ jobs:
           - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
           - DELIUS_ENDPOINT_URL=http://community-api:8080
           - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://localhost:9090/auth/oauth/token
-      - image: postgres:12.11
+      - image: postgres:16.4
         environment:
           POSTGRES_DB: jpc
           POSTGRES_USER: jpc
@@ -81,13 +81,13 @@ jobs:
           install-firefox: false
           install-geckodriver: false
           replace-existing-chrome: true
-          chrome-version: 114.0.5735.198
+          chrome-version: 131.0.6778.85
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
       - run:
           name: Get wiremock
-          command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.2/wiremock-standalone-2.27.2.jar
+          command: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
       - run:
           name: Run wiremock
           command: java -jar wiremock.jar --port 9999
@@ -107,8 +107,27 @@ jobs:
       - restore_cache:
           key: gradle-cache-{{ checksum "build.gradle.kts" }}
       - run:
-          name: Run Fluent Integration Tests
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration
+          name: Run AnnualBulkPriceAdjustmentTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.AnnualBulkPriceAdjustmentTest
+      - run:
+          name: Run GotoDashboardTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.GotoDashboardTest
+      - run:
+          name: Run LodgingPriceTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.LodgingPriceTest
+      - run:
+          name: Run ManageLocationsAndPricesTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ManageLocationsAndPricesTest
+      - run:
+          name: Run MovePriceExceptionTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.MovePriceExceptionTest
+      - run:
+          name: Run ViewAllMoveTypesTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ViewAllMoveTypesTest
+      - run:
+          name: Run ViewMoveDetailsTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ViewMoveDetailsTest
+
       - save_cache:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           paths:
@@ -164,6 +183,7 @@ workflows:
             - validate
             - build_docker
             - helm_lint
+            - integration_tests
       - request-preprod-approval:
           type: approval
           requires:
@@ -188,42 +208,3 @@ workflows:
             - calculate-journey-variable-payments-prod
           requires:
             - request-prod-approval
-
-  security:
-    triggers:
-      - schedule:
-          cron: "4 5 * * 1-5"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - hmpps/gradle_owasp_dependency_check:
-          jdk_tag: "20.0"
-          slack_channel: pecs-dev
-          context:
-            - hmpps-common-vars
-          cache_key: "v2_0"
-      - hmpps/trivy_latest_scan:
-          slack_channel: pecs-dev
-          context:
-            - hmpps-common-vars
-      - hmpps/veracode_pipeline_scan:
-          slack_channel: pecs-dev
-          context:
-            - veracode-credentials
-            - hmpps-common-vars
-  security-weekly:
-    triggers:
-      - schedule:
-          cron: "28 6 * * 1"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - hmpps/veracode_policy_scan:
-          slack_channel: pecs-dev
-          context:
-            - veracode-credentials
-            - hmpps-common-vars

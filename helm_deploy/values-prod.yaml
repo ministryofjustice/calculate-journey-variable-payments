@@ -1,49 +1,50 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+generic-service:
+  replicaCount: 4
 
-replicaCount: 2
+  ingress:
+    hosts:
+      - calculate-journey-variable-payments.hmpps.service.justice.gov.uk
+    tlsSecretName: calculate-journey-variable-payments-cert
 
-image:
-  repository: quay.io/hmpps/calculate-journey-variable-payments
-  tag: latest
-  port: 8080
+  env:
+    JAVA_OPTS: "-Xmx1539m"
+    HMPPS_AUTH_BASE_URI: "https://sign-in.hmpps.service.justice.gov.uk"
+    HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api.hmpps.service.justice.gov.uk"
+    HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments.hmpps.service.justice.gov.uk"
+    CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 3 * * ?"
+    CRON_IMPORT_REPORTS: "-"
+    CRON_BACKFILL_REPORTS: "-"
+    CRON_REPROCESS_EXISTING_MOVES: "-"
+    SENTRY_ENVIRONMENT: prod
+    BASM_API_BASE_URL: "https://api.bookasecuremove.service.justice.gov.uk"
+    FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "false"
+    IMPORT_REPORTS_BACKDATE_ENABLED: "true"
+    APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
 
-db:
-  secret_name: rds-instance-calculate-journey-variable-payments-prod
+  namespace_secrets:
+    rds-instance-calculate-journey-variable-payments-prod:
+      DB_HOST: database_host
+      DB_PORT: database_port
+      DB_NAME: database_name
+      DB_USERNAME: database_username
+      DB_PASSWORD: database_password
 
-sentry:
-  secret_name: calculate-journey-variable-payments-sentry
+  postgresDatabaseRestore:
+    enabled: true
+    namespace_secrets:
+      rds-instance-calculate-journey-variable-payments-prod:
+        DB_NAME: "database_name"
+        DB_USER: "database_username"
+        DB_PASS: "database_password"
+        DB_HOST: "database_host"
+      rds-instance-calculate-journey-variable-payments-preprod:
+        DB_NAME_PREPROD: "database_name"
+        DB_USER_PREPROD: "database_username"
+        DB_PASS_PREPROD: "database_password"
+        DB_HOST_PREPROD: "database_host"
 
-feedback:
-  secret_name: calculate-journey-variable-payments-feedback
-
-ingress:
-  enabled: true
-  enable_whitelist: false
-  hosts:
-    - host: calculate-journey-variable-payments.hmpps.service.justice.gov.uk
-      cert_secret: calculate-journey-variable-payments-cert
-  path: /
-  aws_weight: "100"
-
-env:
-  JAVA_OPTS: "-Xmx1024m"
-  HMPPS_AUTH_BASE_URI: "https://sign-in.hmpps.service.justice.gov.uk"
-  HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api.hmpps.service.justice.gov.uk"
-  HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments.hmpps.service.justice.gov.uk"
-  CRON_AUTOMATIC_LOCATION_MAPPING: "0 30 3 * * ?"
-  CRON_IMPORT_REPORTS: "-"
-  CRON_BACKFILL_REPORTS: "-"
-  CRON_REPROCESS_EXISTING_MOVES: "-"
-  SENTRY_ENVIRONMENT: prod
-  BASM_API_BASE_URL: "https://api.bookasecuremove.service.justice.gov.uk"
-  FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: "false"
-  IMPORT_REPORTS_BACKDATE_ENABLED: "true"
-
-#whitelist:
-#  office: "217.33.148.210/32"
-#  health-kick: "35.177.252.195/32"
-#  mojvpn: "81.134.202.29/32"
-#  cloudplatform-live1-1: "35.178.209.113/32"
-#  cloudplatform-live1-2: "3.8.51.207/32"
-#  cloudplatform-live1-3: "35.177.252.54/32"
+generic-prometheus-alerts:
+  targetApplication: calculate-journey-variable-payments
+  alertSeverity: digital-prison-service-prod

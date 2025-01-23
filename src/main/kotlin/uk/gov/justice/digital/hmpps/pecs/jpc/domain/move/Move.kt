@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:enum-entry-name-case")
+
 package uk.gov.justice.digital.hmpps.pecs.jpc.domain.move
 
 import com.beust.klaxon.Converter
@@ -251,7 +253,6 @@ data class Move(
       this.journeys.flatMap { it.events ?: emptyList() }.filter { ets.map { it.value }.contains(it.type) }
 }
 
-/* ktlint-disable enum-entry-name-case */
 enum class MoveStatus {
   proposed,
   requested,

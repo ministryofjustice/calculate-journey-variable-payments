@@ -22,7 +22,8 @@ class VersionOutputter(buildProperties: BuildProperties) {
   }
 
   @Bean
-  fun versionContextInitializer() {
+  fun versionContextInitializer(): String {
     ComponentContext(ConcurrentHashMap()).setVersion(version)
+    return version
   }
 }

@@ -35,7 +35,7 @@ data class Event constructor(
   @Column(name = "updated_at")
   val updatedAt: LocalDateTime,
 
-  @get: NotBlank(message = "type cannot be blank")
+  @get:NotBlank(message = "type cannot be blank")
   @Column(name = "event_type")
   val type: String,
 
@@ -45,7 +45,7 @@ data class Event constructor(
   val supplier: Supplier? = null,
 
   @Json(name = "eventable_type")
-  @get: NotBlank(message = "eventable type cannot be blank")
+  @get:NotBlank(message = "eventable type cannot be blank")
   @Column(name = "eventable_type")
   val eventableType: String,
 

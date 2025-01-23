@@ -23,7 +23,8 @@ class ChooseSupplierFilter : OncePerRequestFilter() {
     CHOOSE_SUPPLIER_URL,
     "$CHOOSE_SUPPLIER_URL/geoamey",
     "$CHOOSE_SUPPLIER_URL/serco",
-    GENERATE_PRICES_SPREADSHEET, // Allowed otherwise result of redirect ends up in the downloaded file.
+    // Allowed otherwise result of redirect ends up in the downloaded file.
+    GENERATE_PRICES_SPREADSHEET,
   )
 
   private val allowedStaticResources = arrayOf(
@@ -49,7 +50,7 @@ class ChooseSupplierFilter : OncePerRequestFilter() {
 
         response.sendRedirect(CHOOSE_SUPPLIER_URL)
       }
-      else -> chain.doFilter(request, response).also { logger.info("supplier present in the session") }
+      else -> chain.doFilter(request, response).also { logger.debug("supplier present in the session") }
     }
   }
 }

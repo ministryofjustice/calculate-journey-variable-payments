@@ -103,8 +103,9 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
                      left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id
                      left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
                      left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?
-                     where m.move_type is not null and m.supplier = ? 
-                        and m.move_month = ? and m.move_year = ?
+                     where  m.move_month = ? and m.move_year = ?
+                        and m.supplier = ? 
+                        and m.move_type is not null
                         and m.drop_off_or_cancelled is not null
             GROUP BY j.from_nomis_agency_id, j.to_nomis_agency_id, jfl.site_name, jtl.site_name, jfl.location_type, jtl.location_type, COALESCE(pe.price_in_pence, p.price_in_pence)
             $havingOnlyUnpriced
@@ -116,9 +117,9 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       journeyWithPricesRowMapper,
       supplier.name,
       startDate.possiblePriceExceptionMonth(),
-      supplier.name,
       startDate.month.value,
       startDate.year,
+      supplier.name,
     )
   }
 
@@ -155,7 +156,7 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
              left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id 
              left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
              left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?
-             where m.move_type is not null and m.supplier = ? and m.move_month = ? and m.move_year = ? and m.drop_off_or_cancelled is not null
+             where m.move_month = ? and m.move_year = ? and m.supplier = ? and m.move_type is not null and m.drop_off_or_cancelled is not null 
              GROUP BY journey) as js
       """.trimIndent()
 
@@ -164,9 +165,9 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       journeysSummaryRowMapper,
       supplier.name,
       startDate.possiblePriceExceptionMonth(),
-      supplier.name,
       startDate.month.value,
       startDate.year,
+      supplier.name,
     )[0]
   }
 }

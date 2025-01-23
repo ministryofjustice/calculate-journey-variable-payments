@@ -1,10 +1,15 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
 
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyState
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.location.LocationType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveStatus
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.MoveType
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.personprofile.Person
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.effectiveYearForDate
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
@@ -20,6 +25,17 @@ private val billyTheKid =
     firstNames = "Billy the",
     lastName = "Kid",
     dateOfBirth = LocalDate.of(1980, 12, 25),
+    gender = "male",
+  )
+
+private val jonnyLodger =
+  Person(
+    personId = "_",
+    updatedAt = LocalDateTime.now(),
+    prisonNumber = "PRISONER45",
+    firstNames = "Jonny",
+    lastName = "Lodger",
+    dateOfBirth = LocalDate.of(1970, 10, 1),
     gender = "male",
   )
 
@@ -129,7 +145,8 @@ object Dec2020MoveData {
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
       toNomisAgencyId = "BOG",
-      toSiteName = "BOG", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "BOG",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 3, 12, 0),
@@ -148,7 +165,8 @@ object Dec2020MoveData {
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
       toNomisAgencyId = "GNI",
-      toSiteName = "GNI", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "GNI",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = LocalDateTime.of(2020, 12, 2, 10, 20),
@@ -205,7 +223,8 @@ object Dec2020MoveData {
       fromNomisAgencyId = "PRISON1",
       fromSiteName = "PRISON ONE",
       toNomisAgencyId = "GNI",
-      toSiteName = "GNI", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "GNI",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
       pickUpDateTime = null,
@@ -218,9 +237,9 @@ object SercoPreviousMonthMoveData {
 
   private val startOfPreviousMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1)
 
-  private const val startHoursOffset = 10L
+  private const val START_HOURS_OFFSET = 10L
 
-  private const val endHoursOffset = 12L
+  private const val END_HOURS_OFFSET = 12L
 
   fun standardMoveSM1() =
     Move(
@@ -236,8 +255,8 @@ object SercoPreviousMonthMoveData {
       toSiteName = "PRISON TWO",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET),
       person = billyTheKid,
     )
 
@@ -252,11 +271,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET),
       person = ronnieBiggs,
     )
 
@@ -271,11 +291,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET).plusDays(1),
       person = fredBloggs,
     )
 
@@ -290,11 +311,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET).plusDays(1),
       person = janeBloggs,
     )
 
@@ -309,11 +331,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY4",
-      toSiteName = "TO_AGENCY4", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY4",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset).plusDays(1),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET).plusDays(1),
       person = donaldDuck,
     )
 
@@ -328,11 +351,12 @@ object SercoPreviousMonthMoveData {
       fromNomisAgencyId = "FROM_AGENCY",
       fromSiteName = "FROM_AGENCY",
       toNomisAgencyId = "TO_AGENCY",
-      toSiteName = "TO_AGENCY", // Test data is not mapped so will default to the agency ID
+      // Test data is not mapped so will default to the agency ID
+      toSiteName = "TO_AGENCY",
       reportFromLocationType = "prison",
       reportToLocationType = "prison",
-      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(startHoursOffset),
-      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(endHoursOffset),
+      pickUpDateTime = startOfPreviousMonth.atStartOfDay().plusHours(START_HOURS_OFFSET),
+      dropOffOrCancelledDateTime = startOfPreviousMonth.atStartOfDay().plusHours(END_HOURS_OFFSET),
       person = professorMoriarty,
     )
 
@@ -351,9 +375,107 @@ object SercoPreviousMonthMoveData {
         toSiteName = "POLICE ONE",
         reportFromLocationType = "prison",
         reportToLocationType = "police",
-        pickUpDateTime = moveDate.atStartOfDay().plusHours(startHoursOffset),
-        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(endHoursOffset),
+        pickUpDateTime = moveDate.atStartOfDay().plusHours(START_HOURS_OFFSET),
+        dropOffOrCancelledDateTime = moveDate.atStartOfDay().plusHours(END_HOURS_OFFSET),
         person = billyTheKid,
+      )
+    }
+
+  fun journeyLDGJ1(
+    moveId: String = "LDGM1",
+    journeyId: String = "LDGJ1",
+    fromNomisAgencyId: String = "PRISON1L",
+    toNomisAgencyId: String = "POLICE1L",
+    state: JourneyState = JourneyState.completed,
+    billable: Boolean = true,
+    events: List<Event> = listOf(),
+    vehicleRegistration: String = "REG100",
+  ) =
+    startOfPreviousMonth.minusMonths(1).let { moveDate ->
+      Journey(
+        journeyId = journeyId,
+        supplier = Supplier.SERCO,
+        clientTimeStamp = moveDate.atStartOfDay(),
+        updatedAt = moveDate.atTime(10, 0),
+        state = state,
+        moveId = moveId,
+        fromNomisAgencyId = fromNomisAgencyId,
+        fromSiteName = "PRISON ONE L",
+        fromLocationType = LocationType.PR,
+        toNomisAgencyId = toNomisAgencyId,
+        toSiteName = "POLICE ONE L",
+        toLocationType = LocationType.PS,
+        pickUpDateTime = moveDate.atStartOfDay(),
+        dropOffDateTime = moveDate.atTime(10, 0),
+        billable = billable,
+        priceInPence = 100,
+        vehicleRegistration = vehicleRegistration,
+        notes = "some notes",
+        effectiveYear = effectiveYearForDate(
+          moveDate,
+        ),
+      )
+    }
+
+  fun journeyLDGJ2(
+    moveId: String = "LDGM1",
+    journeyId: String = "LDGJ2",
+    fromNomisAgencyId: String = "POLICE1L",
+    toNomisAgencyId: String = "POLICE2L",
+    state: JourneyState = JourneyState.completed,
+    billable: Boolean = true,
+    events: List<Event> = listOf(),
+    vehicleRegistration: String = "REG100",
+  ) =
+    startOfPreviousMonth.minusMonths(1).plusDays(1).let { moveDate ->
+      Journey(
+        journeyId = journeyId,
+        supplier = Supplier.SERCO,
+        clientTimeStamp = moveDate.atStartOfDay(),
+        updatedAt = moveDate.atTime(10, 0),
+        state = state,
+        moveId = moveId,
+        fromNomisAgencyId = fromNomisAgencyId,
+        fromSiteName = "POLICE ONE L",
+        fromLocationType = LocationType.PS,
+        toNomisAgencyId = toNomisAgencyId,
+        toSiteName = "POLICE TWO L",
+        toLocationType = LocationType.PS,
+        pickUpDateTime = moveDate.atStartOfDay(),
+        dropOffDateTime = moveDate.atTime(10, 0),
+        billable = billable,
+        priceInPence = 100,
+        vehicleRegistration = vehicleRegistration,
+        notes = "some notes",
+        events = events,
+        effectiveYear = effectiveYearForDate(
+          moveDate,
+        ),
+      )
+    }
+
+  fun lodgingMoveLDGM1() =
+    startOfPreviousMonth.minusMonths(1).let { moveDate ->
+      Move(
+        moveId = "LDGM1",
+        updatedAt = moveDate.atStartOfDay(),
+        supplier = Supplier.SERCO,
+        moveType = MoveType.LONG_HAUL,
+        status = MoveStatus.completed,
+        reference = "LONG_HAULLDGM1",
+        fromNomisAgencyId = "PRISON1L",
+        fromSiteName = "PRISON ONE L",
+        toNomisAgencyId = "POLICE2L",
+        toSiteName = "POLICE TWO L",
+        reportFromLocationType = "prison",
+        reportToLocationType = "police",
+        pickUpDateTime = moveDate.atStartOfDay().plusHours(START_HOURS_OFFSET),
+        dropOffOrCancelledDateTime = moveDate.plusDays(1).atStartOfDay().plusHours(END_HOURS_OFFSET),
+        person = jonnyLodger,
+        journeys = listOf(
+          journeyLDGJ1(),
+          journeyLDGJ2(),
+        ),
       )
     }
 }

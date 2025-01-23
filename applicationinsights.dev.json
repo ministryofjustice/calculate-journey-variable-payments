@@ -28,7 +28,7 @@
             "matchType": "strict"
           }
         ],
-        "percentage": 5
+        "percentage": 100
       },
       {
         "telemetryType": "dependency",
@@ -39,7 +39,7 @@
             "matchType": "regexp"
           }
         ],
-        "percentage": 5
+        "percentage": 10
       },
       {
         "telemetryType": "request",
@@ -50,7 +50,7 @@
             "matchType": "regexp"
           }
         ],
-        "percentage": 5
+        "percentage": 10
       },
       {
         "telemetryType": "request",
@@ -61,7 +61,7 @@
             "matchType": "strict"
           }
         ],
-        "percentage": 5
+        "percentage": 10
       }
     ]
   },

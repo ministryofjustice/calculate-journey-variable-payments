@@ -40,10 +40,9 @@ class JourneyService(private val journeyQueryRepository: JourneyQueryRepository)
   }
 
   fun journeysSummary(supplier: Supplier, startDate: LocalDate): JourneysSummary {
-    logger.info("Fetching journey summary for $supplier on start date $startDate")
-
+    logger.info("SQL data: GET - journeyQueryRepository.journeysSummaryInDateRange for $supplier on start date $startDate")
     return journeyQueryRepository.journeysSummaryInDateRange(supplier, startDate, endOfMonth(startDate)).also {
-      logger.info("Retrieved journey summary for $supplier on start date $startDate")
+      logger.info("SQL data: COMPLETED - journeyQueryRepository.journeysSummaryInDateRange for $supplier on start date $startDate")
     }
   }
 

@@ -192,14 +192,14 @@ class MapFriendlyLocationController(
 
   @ValidDuplicateLocation
   data class MapLocationForm(
-    @get: NotEmpty(message = "Enter NOMIS agency id")
+    @get:NotEmpty(message = "Enter NOMIS agency id")
     val agencyId: String,
 
-    @get: NotBlank(message = "Enter Schedule 34 location")
-    @get: Length(max = 255, message = "Enter details upto 255 characters")
+    @get:NotBlank(message = "Enter Schedule 34 location")
+    @get:Length(max = 255, message = "Enter details upto 255 characters")
     val locationName: String = "",
 
-    @get: NotNull(message = "Enter Schedule 34 location type")
+    @get:NotNull(message = "Enter Schedule 34 location type")
     val locationType: LocationType? = null,
 
     val operation: String = "create",

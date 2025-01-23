@@ -36,7 +36,7 @@ data class AuditEvent(
   val createdAt: LocalDateTime,
 
   @Column(name = "username", nullable = false)
-  @get: NotBlank(message = "User cannot be blank")
+  @get:NotBlank(message = "User cannot be blank")
   val username: String,
 
   @Column(name = "metadata", nullable = true, length = 1024)

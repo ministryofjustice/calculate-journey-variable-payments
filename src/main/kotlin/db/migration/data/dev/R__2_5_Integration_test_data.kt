@@ -38,6 +38,9 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     val PRISON1_PRIMARY_KEY: UUID = UUID.fromString("709fbee3-7fe6-4584-a8dc-f12481165bfa")
     val PRISON2_PRIMARY_KEY: UUID = UUID.fromString("612ec4d3-9cfa-4c89-ad39-3f02acc8b41d")
     val POLICE1_PRIMARY_KEY: UUID = UUID.fromString("13c46837-c5c9-45a4-83d5-5a0d1438ff3c")
+    val POLICE1L_PRIMARY_KEY: UUID = UUID.fromString("7f8ac7b2-3df2-4171-b8c0-637827ce4983")
+    val POLICE2L_PRIMARY_KEY: UUID = UUID.fromString("9d783f8f-4b61-46a5-a345-457558f9aea9")
+    val PRISON1L_PRIMARY_KEY: UUID = UUID.fromString("9a67ab84-3a07-4d70-9c55-9f829552fcfb")
   }
 
   private data class Priced(
@@ -46,6 +49,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     val toPrimaryKey: UUID,
     val toAgencyId: String,
     val amount: Money,
+    val effectiveYear: Int? = null,
   )
 
   override fun migrate(context: Context) {
@@ -56,6 +60,7 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
       createLockoutMoves(it)
       createMultiTypeMoves(it)
       createCancelledMoves(it)
+      createLodgingMoves(it)
     }
   }
 
@@ -386,6 +391,52 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     }
   }
 
+  private fun createLodgingMoves(template: JdbcTemplate) {
+    logger.info("create lodging moves")
+
+    mapOf(
+      "LDGM1" to "PR45",
+    ).forEach {
+      create(
+        move(
+          moveId = it.key,
+          profileId = it.value,
+          fromAgencyId = "PRISON1L",
+          toAgencyId = "POLICE2L",
+          type = MoveType.LONG_HAUL,
+          date = startOfPreviousMonth.minusMonths(1),
+          days = 1,
+        ),
+        template,
+      ).also { move ->
+        move.copy(
+          events = listOf(
+            create(moveStartEvent(move), template),
+            create(moveOvernightLodgeEvent(move), template),
+            create(moveLodgingStartEvent(move), template),
+            create(moveLodgingEndEvent(move), template),
+            create(moveCompleteEvent(move), template),
+          ),
+          journeys = listOf(
+            create(journey(move, fromAgencyId = "PRISON1L", toAgencyId = "POLICE1L"), template),
+            create(
+              journey(
+                move,
+                fromAgencyId = "POLICE1L",
+                toAgencyId = "POLICE2L",
+                pickUp = move.pickUpDateTime?.plusDays(1),
+                dropOff = move.dropOffOrCancelledDateTime,
+              ),
+              template,
+            ),
+          ),
+        ).failMigrationIfNotMoveType(MoveType.LONG_HAUL)
+        create(Priced(fromPrimaryKey = PRISON1L_PRIMARY_KEY, fromAgencyId = "PRISON1L", toPrimaryKey = POLICE1L_PRIMARY_KEY, toAgencyId = "POLICE1L", amount = Money(1599), effectiveYear = effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth)), template)
+        create(Priced(fromPrimaryKey = POLICE1L_PRIMARY_KEY, fromAgencyId = "POLICE1L", toPrimaryKey = POLICE2L_PRIMARY_KEY, toAgencyId = "POLICE2L", amount = Money(1875), effectiveYear = effectiveYearForDate(move.pickUpDateTime?.toLocalDate() ?: startOfPreviousMonth)), template)
+      }
+    }
+  }
+
   private fun Move.failMigrationIfNotMoveType(moveType: MoveType) {
     if (moveType.hasMoveType(this).not()) {
       logger.error("Move should be a $moveType but is not $this")
@@ -457,6 +508,19 @@ class R__2_5_Integration_test_data : BaseJavaMigration() {
     )
 
     return event
+  }
+
+  private fun create(priced: Priced, template: JdbcTemplate) {
+    template.update(
+      priceSql,
+      UUID.randomUUID(),
+      LocalDateTime.now(),
+      priced.effectiveYear,
+      priced.amount.pence,
+      Supplier.SERCO.name,
+      priced.fromPrimaryKey,
+      priced.toPrimaryKey,
+    )
   }
 }
 
@@ -533,6 +597,9 @@ private fun moveLodgingStartEvent(move: Move, supplier: Supplier = Supplier.SERC
 
 private fun moveLodgingEndEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
   moveEvent(move, supplier, "LodgingEnd")
+
+private fun moveOvernightLodgeEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
+  moveEvent(move, supplier, "OvernightLodge")
 
 private fun moveLockoutEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Lockout")
 
