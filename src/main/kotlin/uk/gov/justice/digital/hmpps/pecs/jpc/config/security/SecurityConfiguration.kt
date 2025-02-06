@@ -112,12 +112,13 @@ class SecurityConfiguration<S : Session> {
     val delegate = DefaultOAuth2UserService()
 
     return OAuth2UserService { userRequest ->
-      val user = delegate.loadUser(userRequest)
-      val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
 
+      val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
+      val userAttributes = jwt.claims
+      logger.info("JWT:" + userRequest.accessToken.tokenValue)
       DefaultOAuth2User(
         jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
-        user.attributes,
+        userAttributes,
         "name",
       )
     }
