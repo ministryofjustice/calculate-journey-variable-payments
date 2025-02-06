@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
@@ -109,15 +108,13 @@ class SecurityConfiguration<S : Session> {
 
   @Bean
   fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    val delegate = DefaultOAuth2UserService()
-
     return OAuth2UserService { userRequest ->
-      val user = delegate.loadUser(userRequest)
-      val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
 
+      val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
+      val userAttributes = jwt.claims
       DefaultOAuth2User(
         jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
-        user.attributes,
+        userAttributes,
         "name",
       )
     }
