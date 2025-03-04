@@ -51,7 +51,6 @@ dependencies {
     "org.apache.commons:commons-compress:1.26.0",
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
-
   // Test versions
   val fluentleniumVersion = "5.0.4"
   val seleniumVersion = "4.13.0"
@@ -74,6 +73,7 @@ dependencies {
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.11.0",
     "com.squareup.okhttp3:okhttp:4.11.0",
+    "com.microsoft.playwright:playwright:1.50.0",
   ).forEach { testImplementation(it) }
 
   testRuntimeOnly("com.h2database:h2:1.4.200")

@@ -113,6 +113,9 @@ jobs:
           name: Run GotoDashboardTest
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.GotoDashboardTest
       - run:
+          name: Run GotoDashboardAndDownloadSpreadsheetTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.GotoDashboardAndDownloadSpreadsheetTest
+      - run:
           name: Run LodgingPriceTest
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.LodgingPriceTest
       - run:
