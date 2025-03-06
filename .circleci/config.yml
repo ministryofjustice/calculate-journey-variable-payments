@@ -147,7 +147,7 @@ jobs:
 
   integration_playwright_tests:
     docker:
-      - image: mcr.microsoft.com/playwright/java:v1.49.0-noble
+      - image: cimg/openjdk:21.0-browsers
         environment:
           _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
       - image: postgres:16.4
@@ -189,6 +189,35 @@ jobs:
       - attach_workspace:
           at: ~/app
       - run:
+          name: Install PlayWright tools
+          command: |
+            apt-get update apt-get install -y \
+              libnss3 \
+              libatk1.0-0 \
+              libatk-bridge2.0-0 \
+              libcups2 \
+              libxkbcommon-x11-0 \
+              libxcomposite1 \
+              libxrandr2 \
+              libgbm1 \
+              libasound2 \
+              libpangocairo-1.0-0 \
+              libpango-1.0-0 \
+              libgtk-3-0 \
+              libxdamage1 \
+              libxfixes3 \
+              libxcb1 \
+              fonts-liberation \
+              libwoff1 \
+              libopus0 \
+              libwebp6 \
+              libgdk-pixbuf2.0-0 \
+              libevent-2.1-7 \
+              xvfb
+      - run:
+          name: Install PlayWright
+          command: npx playwright install --with-deps
+      - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
       - run:
@@ -212,10 +241,6 @@ jobs:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
       - restore_cache:
           key: gradle-cache-{{ checksum "build.gradle.kts" }}
-      - run:
-          name: Run AnnualBulkPriceAdjustmentTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration
-
       - save_cache:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
           paths:
@@ -229,6 +254,12 @@ jobs:
           destination: integration/fluent
       - store_test_results:
           path: build/test-results
+
+
+
+      - run:
+          name: Run AnnualBulkPriceAdjustmentTest
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration
 
 
 workflows:
