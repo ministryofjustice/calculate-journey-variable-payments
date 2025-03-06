@@ -87,7 +87,7 @@ kotlin {
 tasks {
   test {
     useJUnitPlatform()
-    exclude("**/integration/*")
+    exclude("**/integration/*","**/integrationplaywright/*")
   }
 
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -100,5 +100,12 @@ tasks {
     useJUnitPlatform()
 
     include("uk/gov/justice/digital/hmpps/pecs/jpc/integration/*")
+  }
+  val testPlayWrightIntegration by registering(Test::class) {
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = TestExceptionFormat.FULL
+    useJUnitPlatform()
+
+    include("uk/gov/justice/digital/hmpps/pecs/jpc/integrationplaywright/*")
   }
 }
