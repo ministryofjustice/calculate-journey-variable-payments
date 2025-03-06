@@ -87,7 +87,7 @@ kotlin {
 tasks {
   test {
     useJUnitPlatform()
-    exclude("**/integration/*","**/integrationplaywright/*")
+    exclude("**/integration/*", "**/integrationplaywright/*")
   }
 
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
