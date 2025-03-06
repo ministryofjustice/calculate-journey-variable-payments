@@ -188,35 +188,10 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/app
-      - run:
-          name: Install PlayWright tools
-          command: |
-            sudo apt-get update && sudo apt-get install -y \
-              libnss3 \
-              libatk1.0-0 \
-              libatk-bridge2.0-0 \
-              libcups2 \
-              libxkbcommon-x11-0 \
-              libxcomposite1 \
-              libxrandr2 \
-              libgbm1 \
-              libasound2 \
-              libpangocairo-1.0-0 \
-              libpango-1.0-0 \
-              libgtk-3-0 \
-              libxdamage1 \
-              libxfixes3 \
-              libxcb1 \
-              fonts-liberation \
-              libwoff1 \
-              libopus0 \
-              libwebp6 \
-              libgdk-pixbuf2.0-0 \
-              libevent-2.1-7 \
-              xvfb
+
       - run:
           name: Install PlayWright
-          command: npx playwright install --with-deps
+          command: sudo mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps"
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
