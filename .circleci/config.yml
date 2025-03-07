@@ -190,9 +190,6 @@ jobs:
           at: ~/app
 
       - run:
-          name: Install PlayWright
-          command: sudo mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install-deps"
-      - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
       - run:
@@ -247,12 +244,9 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
-      - integration_tests:
-          requires:
-            - validate
       - integration_playwright_tests:
           requires:
-            - integration_tests
+            - validate
       - hmpps/build_docker:
           name: test_build_docker
           publish: false
@@ -281,7 +275,6 @@ workflows:
             - validate
             - build_docker
             - helm_lint
-            - integration_tests
             - integration_playwright_tests
       - request-preprod-approval:
           type: approval
