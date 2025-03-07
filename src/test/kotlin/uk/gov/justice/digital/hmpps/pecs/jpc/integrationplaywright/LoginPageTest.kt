@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.LoginPage
 
-internal class GotoDashboardTest {
+internal class LoginPageTest {
 
   companion object {
     // Shared between all tests in this class.

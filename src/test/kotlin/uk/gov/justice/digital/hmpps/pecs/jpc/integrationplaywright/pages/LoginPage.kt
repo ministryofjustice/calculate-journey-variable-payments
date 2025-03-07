@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
-import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.GotoDashboardTest.Companion.page
+import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.LoginPageTest.Companion.page
 
 class LoginPage(page: Page?) {
 
