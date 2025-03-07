@@ -227,12 +227,9 @@ jobs:
       - store_test_results:
           path: build/test-results
 
-
-
       - run:
-          name: Run AnnualBulkPriceAdjustmentTest
+          name: Run Playwright Integration Tests
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration
-
 
 workflows:
   version: 2
@@ -244,9 +241,12 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
-      - integration_playwright_tests:
+      - integration_tests:
           requires:
             - validate
+      - integration_playwright_tests:
+          requires:
+            - integration_tests
       - hmpps/build_docker:
           name: test_build_docker
           publish: false
@@ -275,6 +275,7 @@ workflows:
             - validate
             - build_docker
             - helm_lint
+            - integration_tests
             - integration_playwright_tests
       - request-preprod-approval:
           type: approval
