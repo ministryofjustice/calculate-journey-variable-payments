@@ -110,9 +110,6 @@ jobs:
           name: Run AnnualBulkPriceAdjustmentTest
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.AnnualBulkPriceAdjustmentTest
       - run:
-          name: Run GotoDashboardTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.GotoDashboardTest
-      - run:
           name: Run GotoDashboardAndDownloadSpreadsheetTest
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.GotoDashboardAndDownloadSpreadsheetTest
       - run:
