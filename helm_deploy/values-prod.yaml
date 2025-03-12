@@ -45,6 +45,12 @@ generic-service:
         DB_PASS_PREPROD: "database_password"
         DB_HOST_PREPROD: "database_host"
 
+  allowlist:
+    groups:
+      - moj_cloud_platform
+      - digital_staff_and_mojo
+      - prisons
+
 generic-prometheus-alerts:
   targetApplication: calculate-journey-variable-payments
   alertSeverity: move-a-prisoner-alerts-prod
