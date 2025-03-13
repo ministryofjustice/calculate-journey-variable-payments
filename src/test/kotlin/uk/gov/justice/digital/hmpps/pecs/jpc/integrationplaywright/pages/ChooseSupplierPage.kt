@@ -25,5 +25,4 @@ class ChooseSupplierPage(page: Page?) {
   fun goToGeoameyDashboard() {
     page?.getByText("GEOAmey")?.click()
   }
-
 }

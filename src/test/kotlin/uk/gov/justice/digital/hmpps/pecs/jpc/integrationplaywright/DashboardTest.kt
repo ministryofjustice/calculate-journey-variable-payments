@@ -29,5 +29,4 @@ internal class DashboardTest : PlayWrightTest() {
     assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
     assert(dashboardPage.isDownloadAllMovesActive())
   }
-
 }
