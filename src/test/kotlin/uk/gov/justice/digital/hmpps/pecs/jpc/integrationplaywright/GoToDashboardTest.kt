@@ -37,18 +37,20 @@ internal class GoToDashboardTest : PlayWrightTest() {
   @Test
   fun `User can go directly to GEOAMEY dashboard`() {
     val loginPage = LoginPage(page)
+    val supplierPage = ChooseSupplierPage(page)
     val dashboardPage = DashboardPage(page)
     loginPage.login()
-    dashboardPage.gotToPage(Supplier.GEOAMEY)
+    supplierPage.gotToPage(Supplier.GEOAMEY)
     assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
   }
 
   @Test
   fun `User can go directly to SERCO dashboard`() {
     val loginPage = LoginPage(page)
+    val supplierPage = ChooseSupplierPage(page)
     val dashboardPage = DashboardPage(page)
     loginPage.login()
-    dashboardPage.gotToPage(Supplier.SERCO)
+    supplierPage.gotToPage(Supplier.SERCO)
     assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
   }
 }
