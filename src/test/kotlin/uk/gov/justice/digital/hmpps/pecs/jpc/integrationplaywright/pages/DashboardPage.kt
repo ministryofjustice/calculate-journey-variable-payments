@@ -13,4 +13,9 @@ class DashboardPage(page: Page?) {
     page?.waitForURL(dashboardUrl)
     return page?.url().equals(dashboardUrl) && page?.getByText(supplier.name)?.first()?.isVisible == true
   }
+
+  fun isDownloadAllMovesActive(): Boolean {
+    val download = page?.waitForDownload { page.locator("a.download-icon").click() }
+    return download?.suggestedFilename()?.endsWith(".xlsx") == true
+  }
 }
