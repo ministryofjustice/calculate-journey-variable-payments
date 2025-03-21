@@ -40,5 +40,4 @@ internal class ManageJourneyPriceCatalogueTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
   }
-
 }

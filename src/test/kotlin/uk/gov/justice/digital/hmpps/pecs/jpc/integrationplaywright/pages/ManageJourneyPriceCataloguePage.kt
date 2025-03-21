@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
-import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 class ManageJourneyPriceCataloguePage(page: Page?) {
 
