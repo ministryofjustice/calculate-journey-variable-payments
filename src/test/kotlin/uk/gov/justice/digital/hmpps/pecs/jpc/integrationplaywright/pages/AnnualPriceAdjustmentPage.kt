@@ -15,12 +15,12 @@ class AnnualPriceAdjustmentPage(page: Page?) {
     return page?.waitForSelector("h1")?.innerText()?.startsWith("Manage Journey Price Catalogue") == true
   }
 
-  fun applyBulkPriceAdjustment(inflationaryRate: Double, volumetricRate: Double?, details: String) {
+  fun applyBulkPriceAdjustment(inflationaryRate: String, volumetricRate: String?, details: String) {
     assert(this.isPageSuccessful())
     page?.getByRole(AriaRole.TEXTBOX)?.first()?.getAttribute("name")
-    page?.locator("input#inflationary-rate")?.fill(String.format("%.12f", inflationaryRate))
+    page?.locator("input#inflationary-rate")?.fill(inflationaryRate)
     if (volumetricRate != null) {
-      page?.locator("input#volumetric-rate")?.fill(String.format("%.12f", volumetricRate))
+      page?.locator("input#volumetric-rate")?.fill(volumetricRate)
     }
     page?.locator("textarea#details")?.fill(details)
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Apply adjustment"))?.click()

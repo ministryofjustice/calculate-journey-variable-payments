@@ -27,7 +27,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val rate = Random.nextDouble(0.01, 0.99)
+    val rate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
     val details = "Inflationary rate of $rate."
     annualPriceAdjustmentPage.applyBulkPriceAdjustment(rate, null, details)
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
@@ -50,8 +50,8 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val inflationaryRate = Random.nextDouble(0.01, 0.99)
-    val volumetricRate = Random.nextDouble(1.0, 9.0)
+    val inflationaryRate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
+    val volumetricRate = String.format("%.12f", Random.nextDouble(1.0, 9.0))
     val details = "Inflationary rate of $inflationaryRate and Volumetric rate of $volumetricRate."
     annualPriceAdjustmentPage.applyBulkPriceAdjustment(inflationaryRate, volumetricRate, details)
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
@@ -74,7 +74,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val rate = Random.nextDouble(0.01, 0.99)
+    val rate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
     val details = "Inflationary rate of $rate."
     annualPriceAdjustmentPage.applyBulkPriceAdjustment(rate, null, details)
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
@@ -97,8 +97,8 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val inflationaryRate = Random.nextDouble(0.01, 0.99)
-    val volumetricRate = Random.nextDouble(1.0, 9.0)
+    val inflationaryRate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
+    val volumetricRate = String.format("%.12f", Random.nextDouble(1.0, 9.0))
     val details = "Inflationary rate of $inflationaryRate and Volumetric rate of $volumetricRate."
     annualPriceAdjustmentPage.applyBulkPriceAdjustment(inflationaryRate, volumetricRate, details)
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()

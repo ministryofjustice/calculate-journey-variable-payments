@@ -16,8 +16,10 @@ class ManageJourneyPriceCataloguePage(page: Page?) {
   }
   fun goToSearchJourneys() {
     page?.getByText("Find journeys")?.click()
+    page?.waitForLoadState()
   }
   fun goToAnnualPriceAdjustment() {
     page?.getByText("Apply bulk price adjustment")?.click()
+    page?.waitForLoadState()
   }
 }
