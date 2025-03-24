@@ -11,6 +11,7 @@ import kotlin.random.Random
 
 internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
 
+
   @Test
   fun `Apply Inflationary rate price adjustments for SERCO`() {
     val loginPage = LoginPage(page)
