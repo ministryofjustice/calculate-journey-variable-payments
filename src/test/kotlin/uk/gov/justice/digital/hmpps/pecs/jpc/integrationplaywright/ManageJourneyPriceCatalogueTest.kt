@@ -36,7 +36,7 @@ internal class ManageJourneyPriceCatalogueTest : PlayWrightTest() {
     supplierPage.gotToPage()
     assert(supplierPage.isPageSuccessful())
     supplierPage.goToGeoameyDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
+    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
   }
