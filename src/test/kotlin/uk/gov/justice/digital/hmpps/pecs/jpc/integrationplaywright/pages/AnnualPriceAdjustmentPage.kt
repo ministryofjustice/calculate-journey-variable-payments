@@ -48,19 +48,19 @@ class AnnualPriceAdjustmentPage(page: Page?) {
 
     when (rows?.count()) {
       0 -> {
-        logger.info("Record not found")
+        logger.info("Record not found: $message")
         false
       }
 
       1 -> {
-        logger.info("Scenario when only Inflationary record is added")
+        logger.info("Scenario when only Inflationary record is added: $message")
         val rateText = rows.nth(0).locator("td:nth-child(3)").innerText()
         logger.info(rateText)
         return rateText.contains("Inflationary price adjustment by rate of")
       }
 
       2 -> {
-        logger.info(" Scenario when both Inflationary and Volumetric records is added")
+        logger.info("Scenario when both Inflationary and Volumetric records is added: $message")
         val inflationaryRateText = rows.nth(1).locator("td:nth-child(3)").innerText()
         val volumetricRateText = rows.nth(0).locator("td:nth-child(3)").innerText()
         logger.info(inflationaryRateText)
@@ -70,7 +70,7 @@ class AnnualPriceAdjustmentPage(page: Page?) {
       }
 
       else -> {
-        logger.info("To many records created")
+        logger.info("To many records created: $message")
         false
       }
     }
