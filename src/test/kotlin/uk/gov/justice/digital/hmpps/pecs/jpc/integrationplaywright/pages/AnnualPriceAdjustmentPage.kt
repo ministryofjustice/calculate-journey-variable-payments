@@ -15,7 +15,7 @@ class AnnualPriceAdjustmentPage(page: Page?) {
     return page?.waitForSelector("h1")?.innerText()?.startsWith("Manage Journey Price Catalogue") == true
   }
 
-  fun applyBulkPriceAdjustment(inflationaryRate: String, volumetricRate: String?, details: String) {
+  fun applyBulkPriceAdjustment(inflationaryRate: String, volumetricRate: String?, details: String): Boolean {
     assert(this.isPageSuccessful())
     page?.getByRole(AriaRole.TEXTBOX)?.first()?.getAttribute("name")
     page?.locator("input#inflationary-rate")?.fill(inflationaryRate)
@@ -24,6 +24,14 @@ class AnnualPriceAdjustmentPage(page: Page?) {
     }
     page?.locator("textarea#details")?.fill(details)
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Apply adjustment"))?.click()
+    page?.waitForLoadState()
+    val formSubmitted = !page?.url().equals(url)
+    if (!formSubmitted) {
+      page?.locator("p.govuk-error-message")?.all()?.forEach { element ->
+        logger.info("Validation Error: $element")
+      }
+    }
+    return formSubmitted
   }
 
   fun showApplyBulkPriceAdjustmentTab() {
