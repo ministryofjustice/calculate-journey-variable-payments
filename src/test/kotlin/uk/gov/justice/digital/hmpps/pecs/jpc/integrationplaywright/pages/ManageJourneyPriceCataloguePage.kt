@@ -14,7 +14,7 @@ class ManageJourneyPriceCataloguePage(page: Page?) {
   fun isPageSuccessful(): Boolean {
     return page?.waitForSelector("h1")?.innerText()?.startsWith("Manage Journey Price Catalogue") == true
   }
-  fun goToSearchJourneys() {
+  fun goToFindJourneys() {
     page?.getByText("Find journeys")?.click()
     page?.waitForLoadState()
   }
