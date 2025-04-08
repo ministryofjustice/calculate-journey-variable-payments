@@ -21,7 +21,7 @@ class MovesByTypePage(page: Page?) {
   fun getPrice(): String? {
     val priceLocator = page?.locator("li:has(p:has-text('total price')) >> p.govuk-heading-l")
     val price = priceLocator?.textContent()?.trim()
-    logger.info("the price is$price")
+    logger.info("the price is $price")
     return price
   }
 }
