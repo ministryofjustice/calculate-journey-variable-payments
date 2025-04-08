@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
+import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 class MovesByTypePage(page: Page?) {
 
   private val url = "http://localhost:8080/moves-by-type"
   private val page = page
+  private val logger = loggerFor<MovesByTypePage>()
 
   fun gotToPage(moveType: MoveType) {
     page?.navigate("$url/$moveType")
@@ -18,7 +20,9 @@ class MovesByTypePage(page: Page?) {
 
   fun getPrice(): String? {
     val priceLocator = page?.locator("li:has(p:has-text('total price')) >> p.govuk-heading-l")
-    return priceLocator?.textContent()?.trim()
+    val price = priceLocator?.textContent()?.trim()
+    logger.info("the price is$price")
+    return price
   }
 }
 

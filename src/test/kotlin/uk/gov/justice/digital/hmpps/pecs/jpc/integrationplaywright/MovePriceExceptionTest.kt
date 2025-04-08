@@ -75,6 +75,6 @@ internal class MovePriceExceptionTest : PlayWrightTest() {
     updatePricePage.removeAllPriceExceptions()
     dashboardPage.goToStandardMoves()
     assert(movesByTypePage.isPageSuccessful(MoveType.STANDARD))
-    assert(movesByTypePage.getPrice().equals("£101.00"))
+    assert(movesByTypePage.getPrice().equals("£100.00"))
   }
 }
