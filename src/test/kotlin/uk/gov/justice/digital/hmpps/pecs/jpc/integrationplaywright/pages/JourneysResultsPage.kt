@@ -1,9 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.options.AriaRole
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
-import java.time.LocalDate
 
 class JourneysResultsPage(page: Page?) {
 
@@ -42,5 +40,4 @@ class JourneysResultsPage(page: Page?) {
     }
     return false
   }
-
 }
