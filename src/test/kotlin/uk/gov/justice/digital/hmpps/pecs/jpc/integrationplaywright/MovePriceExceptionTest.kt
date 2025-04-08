@@ -46,8 +46,9 @@ internal class MovePriceExceptionTest : PlayWrightTest() {
     assert(movesByTypePage.getPrice().equals("£3,000.00"))
   }
 
-  @Test
-  @Order(2)
+  //@Test
+  //@Order(2)
+  // This test can be activated when all Selenium test will be replaced. The existing selenium test change the end price
   fun `remove a price exception and verify the move price is back to its original price`() {
     val fromAgency = "PRISON ONE"
     val toAgency = "POLICE ONE"
@@ -75,7 +76,6 @@ internal class MovePriceExceptionTest : PlayWrightTest() {
     updatePricePage.removeAllPriceExceptions()
     dashboardPage.goToStandardMoves()
     assert(movesByTypePage.isPageSuccessful(MoveType.STANDARD))
-    // The selenium tests change the price to  107.65 need to be changed to 101.00 when all selenium test will be removed
-    assert(movesByTypePage.getPrice().equals("107.65"))
+    assert(movesByTypePage.getPrice().equals("101.00"))
   }
 }
