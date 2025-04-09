@@ -46,8 +46,8 @@ internal class MovePriceExceptionTest : PlayWrightTest() {
     assert(movesByTypePage.getPrice().equals("£3,000.00"))
   }
 
-  //@Test
-  //@Order(2)
+  // @Test
+  // @Order(2)
   // This test can be activated when all Selenium test will be replaced. The existing selenium test change the end price
   fun `remove a price exception and verify the move price is back to its original price`() {
     val fromAgency = "PRISON ONE"
