@@ -27,4 +27,10 @@ class DashboardPage(page: Page?) {
     page?.waitForURL(dashboardUrl)
     page?.locator("a:has-text(\"Standard\")")?.click()
   }
+
+  fun goToMoveBuyReferenceId() {
+    gotToPage()
+    page?.waitForURL(dashboardUrl)
+    page?.locator("a:has-text(\"Find by move reference ID\")")?.click()
+  }
 }
