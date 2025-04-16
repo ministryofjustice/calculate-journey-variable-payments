@@ -35,10 +35,18 @@ class FindMovePage(page: Page?) {
         .equals(move.person?.dateOfBirth?.format(DateTimeFormatter.ofPattern("dd MM YYYY"))),
     )
     assert(page?.locator("dd#gender")?.innerText().equals(move.person?.gender))
-    assert(
-      page?.locator("dd#move-pickup-date")?.innerText()
-        .equals(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM YYYY, HH:mm"))),
-    )
+    if (move.pickUpDateTime != null) {
+      assert(
+        page?.locator("dd#move-pickup-date")?.innerText()
+          .equals(move.pickUpDateTime?.format(DateTimeFormatter.ofPattern("dd MMM YYYY, HH:mm"))),
+      )
+    } else {
+      assert(
+        page?.locator("dd#move-pickup-date")?.innerText()
+          .equals("Not known"),
+      )
+    }
+
     assert(
       page?.locator("dd#move-dropoff-date")?.innerText()
         .equals(move.dropOffOrCancelledDateTime?.format(DateTimeFormatter.ofPattern("dd MMM YYYY, HH:mm"))),

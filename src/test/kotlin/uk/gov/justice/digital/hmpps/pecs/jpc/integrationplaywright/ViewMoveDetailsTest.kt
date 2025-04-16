@@ -7,7 +7,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.Dashboa
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.FindMovePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.LoginPage
 
-internal class VewMoveDetailsTest : PlayWrightTest() {
+internal class ViewMoveDetailsTest : PlayWrightTest() {
   @Test
   fun `search for a move by the move reference identifier and view its details`() {
     val loginPage = LoginPage(page)

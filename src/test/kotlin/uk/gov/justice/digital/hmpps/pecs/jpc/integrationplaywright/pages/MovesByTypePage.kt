@@ -24,6 +24,9 @@ class MovesByTypePage(page: Page?) {
     logger.info("the price is $price")
     return price
   }
+  fun clickMoveByReference(moveRef: String) {
+    page?.locator("a:has-text(\"${moveRef}\")")?.click()
+  }
 }
 
 enum class MoveType {

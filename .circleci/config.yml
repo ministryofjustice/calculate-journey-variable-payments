@@ -112,9 +112,6 @@ jobs:
       - run:
           name: Run ManageLocationsAndPricesTest
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ManageLocationsAndPricesTest
-      - run:
-          name: Run ViewAllMoveTypesTest
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testIntegration --tests=uk.gov.justice.digital.hmpps.pecs.jpc.integration.ViewAllMoveTypesTest
 
       - save_cache:
           key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
