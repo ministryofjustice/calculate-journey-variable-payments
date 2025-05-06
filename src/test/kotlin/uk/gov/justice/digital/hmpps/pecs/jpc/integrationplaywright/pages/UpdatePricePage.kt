@@ -2,8 +2,10 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
+import java.time.Month
 
 class UpdatePricePage(page: Page?) {
 
@@ -18,6 +20,15 @@ class UpdatePricePage(page: Page?) {
 
   fun gotToPage(fromAgencyId: String, toAgencyId: String) {
     page?.navigate("$url/$fromAgencyId-$toAgencyId")
+  }
+
+  fun isAtPricePageForJourney(fromAgencyId: String, toAgencyId: String): Boolean {
+    return page?.url()?.contains("$url/$fromAgencyId-$toAgencyId") ?: false
+  }
+
+  fun updatePriceForJourney(fromAgencyId: String, toAgencyId: String, amount: Money) {
+    page?.locator("#price")?.fill(amount.toString())
+    page?.locator("#confirm-save-price")?.click()
   }
 
   fun goToPriceExceptions() {
@@ -39,5 +50,17 @@ class UpdatePricePage(page: Page?) {
       page?.waitForLoadState()
       removeAllPriceExceptions()
     }
+  }
+  
+  fun assertTextIsPresent(text: String): Boolean {
+    return page?.content()?.contains(text) ?: false
+  }
+  
+  fun assertTextIsNotPresent(text: String): Boolean {
+    return !(page?.content()?.contains(text) ?: true)
+  }
+  
+  fun removePriceException(month: Month) {
+    page?.locator("#remove-exception-${month.name}")?.click()
   }
 }

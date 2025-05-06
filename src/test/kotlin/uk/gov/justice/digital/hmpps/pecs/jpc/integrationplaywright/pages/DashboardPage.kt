@@ -33,6 +33,13 @@ class DashboardPage(page: Page?) {
     page?.waitForURL(dashboardUrl)
     page?.locator("a:has-text(\"Find by move reference ID\")")?.click()
   }
+  
+  fun goToLongHaulMoves() {
+    gotToPage()
+    page?.waitForURL(dashboardUrl)
+    page?.locator("a:has-text(\"Long haul\")")?.click()
+  }
+  
   fun navigateToMovesBy(moveTypeLabel: String) {
     page?.locator("a:has-text(\"${moveTypeLabel}\")")?.click()
   }
