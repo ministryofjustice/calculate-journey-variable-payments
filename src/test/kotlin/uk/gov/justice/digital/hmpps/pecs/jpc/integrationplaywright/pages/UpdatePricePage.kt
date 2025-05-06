@@ -51,15 +51,15 @@ class UpdatePricePage(page: Page?) {
       removeAllPriceExceptions()
     }
   }
-  
+
   fun assertTextIsPresent(text: String): Boolean {
     return page?.content()?.contains(text) ?: false
   }
-  
+
   fun assertTextIsNotPresent(text: String): Boolean {
     return !(page?.content()?.contains(text) ?: true)
   }
-  
+
   fun removePriceException(month: Month) {
     page?.locator("#remove-exception-${month.name}")?.click()
   }

@@ -19,7 +19,6 @@ internal class LodgingPriceTest : PlayWrightTest() {
 
   @Test
   fun `add price exceptions and verify the move price matches the exception prices`() {
-
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
     val selectMonth = SelectMonthPage(page)

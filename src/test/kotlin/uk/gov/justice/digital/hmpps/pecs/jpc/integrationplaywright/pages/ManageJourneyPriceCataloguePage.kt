@@ -14,16 +14,16 @@ class ManageJourneyPriceCataloguePage(page: Page?) {
   fun isPageSuccessful(): Boolean {
     return page?.waitForSelector("h1")?.innerText()?.startsWith("Manage Journey Price Catalogue") == true
   }
-  
+
   fun goToFindJourneys() {
     page?.getByText("Find journeys")?.click()
     page?.waitForLoadState()
   }
-  
+
   fun navigateToFindJourneys() {
     goToFindJourneys()
   }
-  
+
   fun goToAnnualPriceAdjustment() {
     page?.getByText("Apply bulk price adjustment")?.click()
     page?.waitForLoadState()
