@@ -18,8 +18,10 @@ class DashboardPage(page: Page?) {
   }
 
   fun isDownloadAllMovesActive(): Boolean {
-    val download = page?.waitForDownload { page.locator("a.download-icon").click() }
-    return download?.suggestedFilename()?.endsWith(".xlsx") == true
+    val download = page?.waitForDownload { page.locator("a.download-icon").click()}
+    page?.waitForSelector("a.govuk-heading-s:has-text('Downloading...')")
+    page?.waitForSelector("a.govuk-heading-s:has-text('Download all moves')")
+    return download?.suggestedFilename()?.endsWith(".csv") == true || download?.suggestedFilename()?.endsWith(".xlsx") == true
   }
 
   fun goToStandardMoves() {

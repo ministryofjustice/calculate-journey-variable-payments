@@ -23,12 +23,15 @@ class SearchJourneysPage(page: Page?) {
   fun findJourney(fromAgency: String, toAgency: String): Boolean {
     page?.waitForLoadState()
     page?.locator("input#from")?.fill(fromAgency)
+    page?.waitForTimeout(1000.0)
     try {
       page?.waitForSelector("#from__listbox li", Page.WaitForSelectorOptions().setTimeout(2000.0))
     } catch (e: PlaywrightException) {
       return false
     }?.click()
+    page?.waitForLoadState()
     page?.locator("input#to")?.fill(toAgency)
+    page?.waitForTimeout(1000.0)
     try {
       page?.waitForSelector("#to__listbox li", Page.WaitForSelectorOptions().setTimeout(2000.0))
     } catch (e: PlaywrightException) {

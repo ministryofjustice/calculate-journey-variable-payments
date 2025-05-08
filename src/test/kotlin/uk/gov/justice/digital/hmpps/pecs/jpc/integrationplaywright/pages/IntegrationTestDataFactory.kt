@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages
+package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.event.Event
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.Journey
