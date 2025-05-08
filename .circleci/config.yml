@@ -130,12 +130,9 @@ workflows:
               ignore: /.*/
       - hmpps/helm_lint:
           name: helm_lint
-      - integration_tests:
-          requires:
-            - validate
       - integration_playwright_tests:
           requires:
-            - integration_tests
+            - validate
       - hmpps/build_docker:
           name: test_build_docker
           publish: false
@@ -164,7 +161,6 @@ workflows:
             - validate
             - build_docker
             - helm_lint
-            - integration_tests
             - integration_playwright_tests
       - request-preprod-approval:
           type: approval
