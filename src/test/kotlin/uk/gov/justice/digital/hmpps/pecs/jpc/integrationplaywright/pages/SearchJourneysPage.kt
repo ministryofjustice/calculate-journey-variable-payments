@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.PlaywrightException
-import com.microsoft.playwright.options.AriaRole
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 
 class SearchJourneysPage(page: Page?) {
@@ -21,23 +19,12 @@ class SearchJourneysPage(page: Page?) {
   }
 
   fun findJourney(fromAgency: String, toAgency: String): Boolean {
-    page?.waitForLoadState()
+    page?.waitForSelector("input#from")
+    page?.waitForSelector("input#to")
+    page?.waitForSelector("button[id^='find-journeys']")
     page?.locator("input#from")?.fill(fromAgency)
-    page?.waitForTimeout(1000.0)
-    try {
-      page?.waitForSelector("#from__listbox li", Page.WaitForSelectorOptions().setTimeout(2000.0))
-    } catch (e: PlaywrightException) {
-      return false
-    }?.click()
-    page?.waitForLoadState()
     page?.locator("input#to")?.fill(toAgency)
-    page?.waitForTimeout(1000.0)
-    try {
-      page?.waitForSelector("#to__listbox li", Page.WaitForSelectorOptions().setTimeout(2000.0))
-    } catch (e: PlaywrightException) {
-      return false
-    }?.click()
-    page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Find Journeys"))?.click()
+    page?.waitForSelector("button[id^='find-journeys']")?.click()
     return page?.waitForSelector("h1")?.innerText()
       ?.startsWith("Manage Journey Price Catalogue") == true
   }

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.options.AriaRole
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
@@ -40,7 +39,7 @@ class UpdatePricePage(page: Page?) {
     removeAllPriceExceptions()
     page?.locator("#exception-month")?.selectOption(date.month.name)
     page?.locator("input#exception-price")?.fill(String.format("%.2f", price))
-    page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Add exception"))?.click()
+    page?.waitForSelector("button[id^='confirm-save-exception']")?.click()
   }
 
   fun removeAllPriceExceptions() {
