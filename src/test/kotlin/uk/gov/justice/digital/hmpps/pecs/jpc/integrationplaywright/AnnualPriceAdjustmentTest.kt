@@ -27,7 +27,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val rate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
+    val rate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
     val details = "Inflationary rate of $rate."
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(rate, null, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
@@ -51,8 +51,8 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val inflationaryRate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
-    val volumetricRate = String.format("%.12f", Random.nextDouble(1.0, 9.0))
+    val inflationaryRate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
+    val volumetricRate = String.format("%.2f", Random.nextDouble(1.0, 9.0))
     val details = "Inflationary rate of $inflationaryRate and Volumetric rate of $volumetricRate."
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(inflationaryRate, volumetricRate, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
@@ -76,7 +76,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val rate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
+    val rate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
     val details = "Inflationary rate of $rate."
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(rate, null, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
@@ -100,8 +100,8 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     manageJourneyPriceCatalogue.gotToPage()
     assert(manageJourneyPriceCatalogue.isPageSuccessful())
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
-    val inflationaryRate = String.format("%.12f", Random.nextDouble(0.01, 0.99))
-    val volumetricRate = String.format("%.12f", Random.nextDouble(1.0, 9.0))
+    val inflationaryRate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
+    val volumetricRate = String.format("%.2f", Random.nextDouble(1.0, 9.0))
     val details = "Inflationary rate of $inflationaryRate and Volumetric rate of $volumetricRate."
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(inflationaryRate, volumetricRate, details)
     assert(formSubmitted) { "Validation error occurred for $details" }

@@ -52,23 +52,12 @@ dependencies {
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
   // Test versions
-  val fluentleniumVersion = "5.0.4"
-  val seleniumVersion = "4.13.0"
+
   listOf(
     "org.wiremock:wiremock:3.1.0",
     "net.sourceforge.htmlunit:htmlunit:2.70.0",
-    "org.fluentlenium:fluentlenium-junit-jupiter:$fluentleniumVersion",
-    "org.fluentlenium:fluentlenium-assertj:$fluentleniumVersion",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.26.0",
-    "org.seleniumhq.selenium:htmlunit-driver:4.13.0",
-    "org.seleniumhq.selenium:selenium-java:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-http-jdk-client:4.13.0",
-    "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-chrome-driver:$seleniumVersion",
-    "org.seleniumhq.selenium:selenium-manager:$seleniumVersion",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.11.0",

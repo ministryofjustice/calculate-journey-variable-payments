@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright
 
 import org.junit.jupiter.api.Test
-import uk.gov.justice.digital.hmpps.pecs.jpc.integration.pages.Dec2020MoveData.standardMoveM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.ChooseSupplierPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.DashboardPage
+import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.Dec2020MoveData.standardMoveM4
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.FindMovePage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.LoginPage
 

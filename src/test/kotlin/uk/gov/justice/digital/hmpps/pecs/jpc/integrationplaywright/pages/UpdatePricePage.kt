@@ -1,9 +1,10 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.options.AriaRole
+import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Money
 import uk.gov.justice.digital.hmpps.pecs.jpc.util.loggerFor
 import java.time.LocalDate
+import java.time.Month
 
 class UpdatePricePage(page: Page?) {
 
@@ -20,6 +21,15 @@ class UpdatePricePage(page: Page?) {
     page?.navigate("$url/$fromAgencyId-$toAgencyId")
   }
 
+  fun isAtPricePageForJourney(fromAgencyId: String, toAgencyId: String): Boolean {
+    return page?.url()?.contains("$url/$fromAgencyId-$toAgencyId") ?: false
+  }
+
+  fun updatePriceForJourney(fromAgencyId: String, toAgencyId: String, amount: Money) {
+    page?.locator("#price")?.fill(amount.toString())
+    page?.locator("#confirm-save-price")?.click()
+  }
+
   fun goToPriceExceptions() {
     page?.locator("a#tab_price-exceptions")?.click()
   }
@@ -29,7 +39,7 @@ class UpdatePricePage(page: Page?) {
     removeAllPriceExceptions()
     page?.locator("#exception-month")?.selectOption(date.month.name)
     page?.locator("input#exception-price")?.fill(String.format("%.2f", price))
-    page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Add exception"))?.click()
+    page?.waitForSelector("button[id^='confirm-save-exception']")?.click()
   }
 
   fun removeAllPriceExceptions() {
@@ -39,5 +49,17 @@ class UpdatePricePage(page: Page?) {
       page?.waitForLoadState()
       removeAllPriceExceptions()
     }
+  }
+
+  fun assertTextIsPresent(text: String): Boolean {
+    return page?.content()?.contains(text) ?: false
+  }
+
+  fun assertTextIsNotPresent(text: String): Boolean {
+    return !(page?.content()?.contains(text) ?: true)
+  }
+
+  fun removePriceException(month: Month) {
+    page?.locator("#remove-exception-${month.name}")?.click()
   }
 }
