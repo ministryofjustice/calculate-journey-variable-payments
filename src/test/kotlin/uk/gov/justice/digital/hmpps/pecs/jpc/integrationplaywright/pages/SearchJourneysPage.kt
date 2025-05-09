@@ -24,6 +24,7 @@ class SearchJourneysPage(page: Page?) {
     page?.waitForSelector("button[id^='find-journeys']")
     page?.locator("input#from")?.fill(fromAgency)
     page?.locator("input#to")?.fill(toAgency)
+    page?.locator("input#to")?.blur()
     page?.waitForSelector("button[id^='find-journeys']")?.click()
     return page?.waitForSelector("h1")?.innerText()
       ?.startsWith("Manage Journey Price Catalogue") == true
