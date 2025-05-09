@@ -24,8 +24,7 @@ class SelectMonthPage(page: Page?) {
   ): LocalDate {
     page?.waitForSelector("input#month-year")
     page?.locator("input#month-year")?.fill("${date.month.name} ${date.year}")
-    page?.locator("input#month-year")?.blur()
-    page?.waitForSelector("button[id^='submit-month-year]")?.click()
+    page?.keyboard()?.press("Enter")
     assert(page?.waitForSelector("h1")?.innerText()?.equals("${date.month.name} ${date.year}", ignoreCase = true) == true)
     return date
   }
