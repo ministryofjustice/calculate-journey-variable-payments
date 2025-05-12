@@ -26,7 +26,6 @@ Start up the dependencies followed by the application and then running the integ
 Run docker-compose.  This will start up the dependent containers e.g. Postgres, Auth etc:
 ```bash
 $ docker-compose down --remove-orphans
-
 $ docker-compose up
 ```
 
@@ -46,7 +45,6 @@ You can run the latest version of the application using with Docker compose (not
 
 ```bash
 $ docker-compose down --remove-orphans
-
 $ docker-compose -f docker-compose.yml -f docker-compose-cjvp.yml up
 ```
 
