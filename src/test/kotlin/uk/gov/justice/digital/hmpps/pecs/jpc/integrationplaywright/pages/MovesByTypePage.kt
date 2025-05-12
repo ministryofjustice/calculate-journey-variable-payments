@@ -31,4 +31,5 @@ class MovesByTypePage(page: Page?) {
 
 enum class MoveType {
   STANDARD,
+  LONG_HAUL,
 }
