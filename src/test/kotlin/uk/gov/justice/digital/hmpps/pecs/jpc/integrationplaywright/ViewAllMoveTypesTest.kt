@@ -57,7 +57,7 @@ internal class ViewAllMoveTypesTest : PlayWrightTest() {
     }
   }
 
-  //@Test
+  // @Test
   fun `view one of each move type for GEOAmey in Dec 2020`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
