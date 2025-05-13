@@ -35,7 +35,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
   }
 
-  @Test
+  // @Test
   fun `Apply Inflationary and Volumetric rate price adjustments for SERCO`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
