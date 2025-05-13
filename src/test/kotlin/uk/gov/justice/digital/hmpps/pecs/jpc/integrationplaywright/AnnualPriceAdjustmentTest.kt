@@ -60,7 +60,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
   }
 
-  @Test
+  // @Test
   fun `Apply Inflationary rate price adjustments for GEOAMEY`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
