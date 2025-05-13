@@ -36,7 +36,7 @@ $ SPRING_PROFILES_ACTIVE=dev SERVER_SERVLET_SESSION_COOKIE_SECURE=false ./gradle
 
 Run the integration tests:
 ```bash
-$ ./gradlew clean testIntegration
+$ ./gradlew clean testPlayWrightIntegration
 ```
 
 ## Running the containerised service and its dependent services locally

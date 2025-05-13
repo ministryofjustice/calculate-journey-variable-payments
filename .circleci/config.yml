@@ -111,7 +111,7 @@ jobs:
           paths:
             - /home/circleci/.gradle/caches
       - store_artifacts:
-          path: build/reports/tests/testIntegration
+          path: build/reports/tests/testPlayWrightIntegration
           destination: integration/fluent
       - store_test_results:
           path: build/test-results
