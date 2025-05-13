@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright
 
-import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.ChooseSupplierPage
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.DashboardPage
@@ -15,8 +14,8 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.UpdateP
 
 internal class MovePriceExceptionTest : PlayWrightTest() {
 
+  // @Order(1)
   @Test
-  @Order(1)
   fun `add a price exception and verify the move price matches the exception price for SERCO`() {
     val fromAgency = "PRISON ONE"
     val toAgency = "POLICE ONE"
