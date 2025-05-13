@@ -19,7 +19,9 @@ class DashboardPage(page: Page?) {
 
   fun isDownloadAllMovesActive(): Boolean {
     val download = page?.waitForDownload { page.locator("a.download-icon").click() }
-    return download?.suggestedFilename()?.endsWith(".xlsx") == true
+    page?.waitForSelector("a.govuk-heading-s:has-text('Downloading...')")
+    page?.waitForSelector("a.govuk-heading-s:has-text('Download all moves')")
+    return download?.suggestedFilename()?.endsWith(".csv") == true || download?.suggestedFilename()?.endsWith(".xlsx") == true
   }
 
   fun goToStandardMoves() {
@@ -33,6 +35,13 @@ class DashboardPage(page: Page?) {
     page?.waitForURL(dashboardUrl)
     page?.locator("a:has-text(\"Find by move reference ID\")")?.click()
   }
+
+  fun goToLongHaulMoves() {
+    gotToPage()
+    page?.waitForURL(dashboardUrl)
+    page?.locator("a:has-text(\"Long haul\")")?.click()
+  }
+
   fun navigateToMovesBy(moveTypeLabel: String) {
     page?.locator("a:has-text(\"${moveTypeLabel}\")")?.click()
   }

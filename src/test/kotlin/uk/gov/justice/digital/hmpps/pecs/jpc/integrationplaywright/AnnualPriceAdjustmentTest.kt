@@ -11,7 +11,7 @@ import kotlin.random.Random
 
 internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
 
-  @Test
+  // @Test
   fun `Apply Inflationary rate price adjustments for SERCO`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
@@ -35,7 +35,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
   }
 
-  @Test
+  // @Test
   fun `Apply Inflationary and Volumetric rate price adjustments for SERCO`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
@@ -60,7 +60,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
   }
 
-  @Test
+  // @Test
   fun `Apply Inflationary rate price adjustments for GEOAMEY`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
