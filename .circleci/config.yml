@@ -20,31 +20,6 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
-          name: Install System Dependencies
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y \
-            libgtk-4-1 \
-            libgraphene-1.0-0 \
-            libxslt1.1 \
-            libwoff1 \
-            libvpx7 \
-            libevent-2.1-7 \
-            libopus0 \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good \
-            libflite1 \
-            libwebp7 \
-            libavif13 \
-            libharfbuzz-icu0 \
-            libwebpmux3 \
-            libenchant-2-2 \
-            libsecret-1-0 \
-            libhyphen0 \
-            libmanette-0.2-0 \
-            libgles2 \
-            libx264-dev
-      - run:
           command: ./gradlew build
       - save_cache:
           paths:
@@ -103,7 +78,31 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/app
-
+      - run:
+          name: Install System Dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+            libgtk-4-1 \
+            libgraphene-1.0-0 \
+            libxslt1.1 \
+            libwoff1 \
+            libvpx7 \
+            libevent-2.1-7 \
+            libopus0 \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            libflite1 \
+            libwebp7 \
+            libavif13 \
+            libharfbuzz-icu0 \
+            libwebpmux3 \
+            libenchant-2-2 \
+            libsecret-1-0 \
+            libhyphen0 \
+            libmanette-0.2-0 \
+            libgles2 \
+            libx264-dev
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
