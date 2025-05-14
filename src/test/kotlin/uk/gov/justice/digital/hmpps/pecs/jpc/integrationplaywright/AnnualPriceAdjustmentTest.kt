@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright
 
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 import uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages.AnnualPriceAdjustmentPage
@@ -62,7 +61,6 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
   }
 
   @Test
-  @Disabled
   fun `Apply Inflationary rate price adjustments for GEOAMEY`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)
@@ -86,7 +84,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
   }
 
-  // @Test
+  @Test
   fun `Apply Inflationary and Volumetric rate price adjustments for GEOAMEY`() {
     val loginPage = LoginPage(page)
     val supplierPage = ChooseSupplierPage(page)

@@ -23,6 +23,7 @@ class AnnualPriceAdjustmentPage(page: Page?) {
       page?.locator("input#volumetric-rate")?.fill(volumetricRate)
     }
     page?.locator("textarea#details")?.fill(details)
+    page?.locator("textarea#details")?.blur()
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Apply adjustment"))?.click()
     page?.waitForLoadState()
     val formSubmitted = !page?.url().equals(url)
