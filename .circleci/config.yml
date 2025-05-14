@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@8.0.0
-  browser-tools: circleci/browser-tools@1.5.3
+  hmpps: ministryofjustice/hmpps@7.5.0
+  browser-tools: circleci/browser-tools@1.4.8
 
 jobs:
   validate:
@@ -41,9 +41,9 @@ jobs:
           _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
       - image: postgres:16.4
         environment:
-          - POSTGRES_PASSWORD=admin_password
-          - POSTGRES_USER=admin
-          - POSTGRES_DB=auth-db
+            - POSTGRES_PASSWORD=admin_password
+            - POSTGRES_USER=admin
+            - POSTGRES_DB=auth-db
         command: -p 7432
       - image: quay.io/hmpps/hmpps-auth:latest
         environment:
