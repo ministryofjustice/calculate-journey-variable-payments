@@ -11,7 +11,6 @@ jobs:
       tag: "21.0"
     environment:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-      GRADLE_OPTS: "-Dorg.gradle.workers.max=2 -Dorg.gradle.parallel=true"
 
     steps:
       - checkout
@@ -83,26 +82,29 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install -y \
-            libgtk-4-1 \
-            libgraphene-1.0-0 \
-            libxslt1.1 \
-            libwoff1 \
-            libvpx7 \
-            libevent-2.1-7 \
-            libopus0 \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good \
-            libflite1 \
-            libwebp7 \
-            libavif13 \
-            libharfbuzz-icu0 \
-            libwebpmux3 \
-            libenchant-2-2 \
-            libsecret-1-0 \
-            libhyphen0 \
-            libmanette-0.2-0 \
-            libgles2 \
-            libx264-dev
+              libgtk-4-1 \
+              libgraphene-1.0-0 \
+              libxslt1.1 \
+              libwoff1 \
+              libvpx7 \
+              libevent-2.1-7 \
+              libopus0 \
+              gstreamer1.0-plugins-base \
+              gstreamer1.0-plugins-good \
+              libflite1 \
+              libwebp7 \
+              libavif13 \
+              libharfbuzz-icu0 \
+              libwebpmux3 \
+              libenchant-2-2 \
+              libsecret-1-0 \
+              libhyphen0 \
+              libmanette-0.2-0 \
+              libgles2 \
+              libx264-dev \
+              libgstreamer-gl1.0-0 \
+              libgstreamer-plugins-bad1.0-0 \
+              libwebpdemux2
       - run:
           name: Wait for auth
           command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
