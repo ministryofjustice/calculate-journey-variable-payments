@@ -44,13 +44,6 @@ jobs:
             libmanette-0.2-0 \
             libgles2 \
             libx264-dev
-      - browser-tools/install-chrome:
-          chrome-version: "latest"
-      - run:
-          name: Check Chrome installation
-          command: |
-            google-chrome --version
-            chromedriver --version
       - run:
           command: ./gradlew build
       - save_cache:
