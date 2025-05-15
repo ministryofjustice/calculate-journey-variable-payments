@@ -145,7 +145,7 @@ jobs:
 
       - run:
           name: Run Playwright Integration Tests
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" -Dplaywright.test.headless=true testPlaywrightIntegration
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" -Dplaywright.test.headless=false testPlaywrightIntegration
 
 workflows:
   version: 2

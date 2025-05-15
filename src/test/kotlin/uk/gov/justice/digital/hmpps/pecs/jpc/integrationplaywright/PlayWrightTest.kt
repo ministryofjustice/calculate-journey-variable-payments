@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Value
+import java.nio.file.Paths
 
 internal abstract class PlayWrightTest {
 
@@ -41,12 +42,17 @@ internal abstract class PlayWrightTest {
 
   @BeforeEach
   fun createContextAndPage() {
-    context = browser?.newContext()
+    context = browser?.newContext(
+      Browser.NewContextOptions()
+        .setRecordVideoDir(Paths.get("build/test-results/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")),
+    )
     page = context?.newPage()
   }
 
   @AfterEach
   fun closeContext() {
     context?.close()
+    page?.close()
+    // page?.video()?.saveAs(Paths.get("abc.webm"))
   }
 }
