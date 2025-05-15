@@ -35,13 +35,10 @@ class AnnualPriceAdjustmentPage(page: Page?) {
     return formSubmitted
   }
 
-  fun showApplyBulkPriceAdjustmentTab() {
-    page?.navigate("$url#annual-price-adjustment")
-  }
-
   fun showPriceAdjustmentHistoryTab() {
-    page?.navigate("$url#price-adjustment-history")
-    page?.waitForURL("$url#price-adjustment-history")
+    page?.navigate(url)
+    page?.waitForURL(url)
+    page?.locator("a#tab_price-adjustment-history")?.click()
   }
 
   fun isPriceAdjustmentRecordsPresent(message: String): Boolean {

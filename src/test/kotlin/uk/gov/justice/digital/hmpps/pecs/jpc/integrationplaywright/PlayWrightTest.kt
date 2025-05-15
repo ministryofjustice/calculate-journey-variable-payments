@@ -53,6 +53,5 @@ internal abstract class PlayWrightTest {
   fun closeContext() {
     context?.close()
     page?.close()
-    // page?.video()?.saveAs(Paths.get("abc.webm"))
   }
 }
