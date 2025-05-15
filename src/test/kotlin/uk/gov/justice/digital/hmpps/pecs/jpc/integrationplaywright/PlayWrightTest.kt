@@ -44,7 +44,7 @@ internal abstract class PlayWrightTest {
   fun createContextAndPage() {
     context = browser?.newContext(
       Browser.NewContextOptions()
-        .setRecordVideoDir(Paths.get("build/test-results/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")),
+        .setRecordVideoDir(Paths.get("build/reports/tests/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")),
     )
     page = context?.newPage()
   }
