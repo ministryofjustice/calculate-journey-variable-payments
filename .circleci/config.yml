@@ -137,13 +137,14 @@ jobs:
           key: gradle-cache-{{ checksum "build.gradle.kts" }}
           paths:
             - /home/circleci/.gradle/caches
-      - store_artifacts:
-          path: build/reports/tests/testPlayWrightIntegration
-          destination: build/reports/tests/testPlayWrightIntegration
-
       - run:
           name: Run Playwright Integration Tests
           command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" -Dplaywright.test.headless=false testPlaywrightIntegration
+      - store_artifacts:
+          path: build/reports/tests/testPlayWrightIntegration
+          destination: build/reports/tests/testPlayWrightIntegration
+      - store_test_results:
+          path: build/test-results
 
 workflows:
   version: 2
