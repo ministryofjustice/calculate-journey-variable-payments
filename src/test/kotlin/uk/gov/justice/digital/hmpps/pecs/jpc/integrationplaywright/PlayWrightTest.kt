@@ -21,7 +21,7 @@ internal abstract class PlayWrightTest {
 
     var playwright: Playwright? = null
     var browser: Browser? = null
-    
+
     var context: BrowserContext? = null
     var page: Page? = null
 
