@@ -15,14 +15,13 @@ import java.nio.file.Paths
 internal abstract class PlayWrightTest {
 
   companion object {
-    // Shared between all tests in this class.
+
     @Value("\${playwright.test.headless:false}")
     private val headless: Boolean = false
 
     var playwright: Playwright? = null
     var browser: Browser? = null
-
-    // New instance for each test method.
+    
     var context: BrowserContext? = null
     var page: Page? = null
 
