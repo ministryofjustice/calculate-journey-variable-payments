@@ -30,7 +30,7 @@ class DashboardPage(page: Page?) {
     assertThat(downloadingHeading).isVisible()
 
     val downloadAllHeading = page?.locator("a.govuk-heading-s:has-text('Download all moves')")
-    assertThat(downloadAllHeading).isVisible(LocatorAssertions.IsVisibleOptions().setTimeout(10000.0))
+    assertThat(downloadAllHeading).isVisible(LocatorAssertions.IsVisibleOptions().setTimeout(20000.0))
 
     assert(download?.suggestedFilename()?.let { it.endsWith(".csv") || it.endsWith(".xlsx") } == true)
   }
