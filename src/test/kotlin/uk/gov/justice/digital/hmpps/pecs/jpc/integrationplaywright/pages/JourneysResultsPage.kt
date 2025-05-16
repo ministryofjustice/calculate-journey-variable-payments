@@ -19,6 +19,7 @@ class JourneysResultsPage(page: Page?) {
   }
 
   fun findJourneyAndUpdatePrice(fromAgency: String): Boolean {
+    page?.waitForSelector("h1")?.innerText()?.startsWith("Manage Journey Price Catalogue")
     val rows = page?.locator("//tr[td/a/span[contains(text(), '$fromAgency')]]")
 
     when (rows?.count()) {
