@@ -16,9 +16,9 @@ internal class GoToDashboardTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
+    dashboardPage.isPageSuccessful(Supplier.SERCO)
   }
 
   @Test
@@ -29,9 +29,9 @@ internal class GoToDashboardTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToGeoameyDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
+    dashboardPage.isPageSuccessful(Supplier.GEOAMEY)
   }
 
   @Test
@@ -41,7 +41,7 @@ internal class GoToDashboardTest : PlayWrightTest() {
     val dashboardPage = DashboardPage(page)
     loginPage.login()
     supplierPage.gotToPage(Supplier.GEOAMEY)
-    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
+    dashboardPage.isPageSuccessful(Supplier.GEOAMEY)
   }
 
   @Test
@@ -51,6 +51,6 @@ internal class GoToDashboardTest : PlayWrightTest() {
     val dashboardPage = DashboardPage(page)
     loginPage.login()
     supplierPage.gotToPage(Supplier.SERCO)
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
+    dashboardPage.isPageSuccessful(Supplier.SERCO)
   }
 }

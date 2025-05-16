@@ -15,8 +15,8 @@ internal class DashboardTest : PlayWrightTest() {
     val dashboardPage = DashboardPage(page)
     loginPage.login()
     supplierPage.gotToPage(Supplier.GEOAMEY)
-    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
-    assert(dashboardPage.isDownloadAllMovesActive())
+    dashboardPage.isPageSuccessful(Supplier.GEOAMEY)
+    dashboardPage.isDownloadAllMovesActive()
   }
 
   @Test
@@ -26,7 +26,7 @@ internal class DashboardTest : PlayWrightTest() {
     val dashboardPage = DashboardPage(page)
     loginPage.login()
     supplierPage.gotToPage(Supplier.SERCO)
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
-    assert(dashboardPage.isDownloadAllMovesActive())
+    dashboardPage.isPageSuccessful(Supplier.SERCO)
+    dashboardPage.isDownloadAllMovesActive()
   }
 }

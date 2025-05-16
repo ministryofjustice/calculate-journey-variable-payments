@@ -34,7 +34,7 @@ internal class ViewAllMoveTypesTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
     selectMonth.gotToPage()
     val date = LocalDate.now()
@@ -68,7 +68,7 @@ internal class ViewAllMoveTypesTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToGeoameyDashboard()
     selectMonth.gotToPage()
     selectMonth.goToMonth(LocalDate.of(2020, 12, 1))

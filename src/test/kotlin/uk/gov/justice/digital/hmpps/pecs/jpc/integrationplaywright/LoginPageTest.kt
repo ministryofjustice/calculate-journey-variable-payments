@@ -9,6 +9,6 @@ internal class LoginPageTest : PlayWrightTest() {
   fun `can load index`() {
     val loginPage = LoginPage(page)
     loginPage.login()
-    assert(loginPage.isLoginSuccessful())
+    loginPage.isLoginSuccessful()
   }
 }

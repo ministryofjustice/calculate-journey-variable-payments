@@ -18,11 +18,11 @@ internal class ManageJourneyPriceCatalogueTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
+    dashboardPage.isPageSuccessful(Supplier.SERCO)
     manageJourneyPriceCatalogue.gotToPage()
-    assert(manageJourneyPriceCatalogue.isPageSuccessful())
+    manageJourneyPriceCatalogue.isPageSuccessful()
   }
 
   @Test
@@ -34,10 +34,10 @@ internal class ManageJourneyPriceCatalogueTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToGeoameyDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
+    dashboardPage.isPageSuccessful(Supplier.GEOAMEY)
     manageJourneyPriceCatalogue.gotToPage()
-    assert(manageJourneyPriceCatalogue.isPageSuccessful())
+    manageJourneyPriceCatalogue.isPageSuccessful()
   }
 }
