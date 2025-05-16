@@ -9,11 +9,6 @@ class JourneysResultsPage(page: Page?) {
   private val url = "http://localhost:8080/journeys-results"
   private val page = page
 
-  fun isPageSuccessful(): Boolean {
-    page?.waitForURL(url)
-    return page?.waitForSelector("h2")?.innerText()?.equals("Find Journeys") == true
-  }
-
   fun gotToPage(fromAgency: String, toAgency: String) {
     page?.navigate("$url?pickup-up=$fromAgency&drop-off=$toAgency")
   }

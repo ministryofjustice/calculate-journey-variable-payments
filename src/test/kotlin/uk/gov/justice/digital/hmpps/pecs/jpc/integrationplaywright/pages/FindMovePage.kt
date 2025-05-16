@@ -14,11 +14,6 @@ class FindMovePage(page: Page?) {
     page?.navigate(url)
   }
 
-  fun isPageSuccessful(): Boolean {
-    page?.waitForURL(url)
-    return page?.url().equals(url)
-  }
-
   fun findMoveByReferenceId(referenceId: String): Boolean {
     page?.waitForLoadState()
     page?.locator("input#reference")?.fill(referenceId)
