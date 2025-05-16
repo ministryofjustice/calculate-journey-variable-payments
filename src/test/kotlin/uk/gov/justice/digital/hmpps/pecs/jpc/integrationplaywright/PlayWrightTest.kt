@@ -44,7 +44,7 @@ internal abstract class PlayWrightTest {
   fun createContextAndPage() {
     context = browser?.newContext(
       Browser.NewContextOptions()
-        .setRecordVideoSize(1920,1080)
+        .setRecordVideoSize(1920, 1080)
         .setRecordVideoDir(Paths.get("build/reports/tests/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")),
     )
     page = context?.newPage()
