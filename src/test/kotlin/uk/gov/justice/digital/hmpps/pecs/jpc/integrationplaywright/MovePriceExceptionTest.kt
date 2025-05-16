@@ -31,7 +31,7 @@ internal class MovePriceExceptionTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
     selectMonth.gotToPage()
     val selectedDate = selectMonth.goToMonth()
@@ -63,7 +63,7 @@ internal class MovePriceExceptionTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
     selectMonth.gotToPage()
     selectMonth.goToMonth()

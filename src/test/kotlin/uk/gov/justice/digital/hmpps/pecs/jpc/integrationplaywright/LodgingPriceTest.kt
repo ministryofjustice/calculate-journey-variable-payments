@@ -31,7 +31,7 @@ internal class LodgingPriceTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
 
     selectMonth.gotToPage()

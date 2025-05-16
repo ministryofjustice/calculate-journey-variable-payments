@@ -21,18 +21,18 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
+    dashboardPage.isPageSuccessful(Supplier.SERCO)
     manageJourneyPriceCatalogue.gotToPage()
-    assert(manageJourneyPriceCatalogue.isPageSuccessful())
+    manageJourneyPriceCatalogue.isPageSuccessful()
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
     val rate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
     val details = "Inflationary rate of $rate."
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(rate, null, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
-    assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
+    annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details)
   }
 
   @Test
@@ -45,11 +45,11 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.SERCO))
+    dashboardPage.isPageSuccessful(Supplier.SERCO)
     manageJourneyPriceCatalogue.gotToPage()
-    assert(manageJourneyPriceCatalogue.isPageSuccessful())
+    manageJourneyPriceCatalogue.isPageSuccessful()
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
     val inflationaryRate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
     val volumetricRate = String.format("%.2f", Random.nextDouble(1.0, 9.0))
@@ -57,7 +57,7 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(inflationaryRate, volumetricRate, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
-    assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
+    annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details)
   }
 
   @Test
@@ -70,18 +70,18 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToGeoameyDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
+    dashboardPage.isPageSuccessful(Supplier.GEOAMEY)
     manageJourneyPriceCatalogue.gotToPage()
-    assert(manageJourneyPriceCatalogue.isPageSuccessful())
+    manageJourneyPriceCatalogue.isPageSuccessful()
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
     val rate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
     val details = "Inflationary rate of $rate."
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(rate, null, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
-    assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
+    annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details)
   }
 
   @Test
@@ -94,11 +94,11 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToGeoameyDashboard()
-    assert(dashboardPage.isPageSuccessful(Supplier.GEOAMEY))
+    dashboardPage.isPageSuccessful(Supplier.GEOAMEY)
     manageJourneyPriceCatalogue.gotToPage()
-    assert(manageJourneyPriceCatalogue.isPageSuccessful())
+    manageJourneyPriceCatalogue.isPageSuccessful()
     manageJourneyPriceCatalogue.goToAnnualPriceAdjustment()
     val inflationaryRate = String.format("%.2f", Random.nextDouble(0.01, 0.99))
     val volumetricRate = String.format("%.2f", Random.nextDouble(1.0, 9.0))
@@ -106,6 +106,6 @@ internal class AnnualPriceAdjustmentTest : PlayWrightTest() {
     val formSubmitted = annualPriceAdjustmentPage.applyBulkPriceAdjustment(inflationaryRate, volumetricRate, details)
     assert(formSubmitted) { "Validation error occurred for $details" }
     annualPriceAdjustmentPage.showPriceAdjustmentHistoryTab()
-    assert(annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details))
+    annualPriceAdjustmentPage.isPriceAdjustmentRecordsPresent(details)
   }
 }

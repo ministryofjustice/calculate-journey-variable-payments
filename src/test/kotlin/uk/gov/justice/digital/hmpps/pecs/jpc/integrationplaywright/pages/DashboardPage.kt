@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.assertions.LocatorAssertions
+import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 
 class DashboardPage(page: Page?) {
@@ -12,16 +14,25 @@ class DashboardPage(page: Page?) {
     page?.navigate(dashboardUrl)
   }
 
-  fun isPageSuccessful(supplier: Supplier): Boolean {
+  fun isPageSuccessful(supplier: Supplier) {
     page?.waitForURL(dashboardUrl)
-    return page?.url().equals(dashboardUrl) && page?.getByText(supplier.name)?.first()?.isVisible == true
+    assertThat(page!!).hasURL(dashboardUrl)
+    val supplierLocator = page.getByText(supplier.name)
+    assertThat(supplierLocator.first()).isVisible()
   }
 
-  fun isDownloadAllMovesActive(): Boolean {
-    val download = page?.waitForDownload { page.locator("a.download-icon").click() }
-    page?.waitForSelector("a.govuk-heading-s:has-text('Downloading...')")
-    page?.waitForSelector("a.govuk-heading-s:has-text('Download all moves')")
-    return download?.suggestedFilename()?.endsWith(".csv") == true || download?.suggestedFilename()?.endsWith(".xlsx") == true
+  fun isDownloadAllMovesActive() {
+    val download = page?.waitForDownload {
+      page.locator("a.download-icon").click()
+    }
+
+    val downloadingHeading = page?.locator("a.govuk-heading-s:has-text('Downloading...')")
+    assertThat(downloadingHeading).isVisible()
+
+    val downloadAllHeading = page?.locator("a.govuk-heading-s:has-text('Download all moves')")
+    assertThat(downloadAllHeading).isVisible(LocatorAssertions.IsVisibleOptions().setTimeout(10000.0))
+
+    assert(download?.suggestedFilename()?.let { it.endsWith(".csv") || it.endsWith(".xlsx") } == true)
   }
 
   fun goToStandardMoves() {
