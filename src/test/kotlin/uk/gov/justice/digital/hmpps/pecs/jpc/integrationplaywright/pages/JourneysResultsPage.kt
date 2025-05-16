@@ -18,7 +18,7 @@ class JourneysResultsPage(page: Page?) {
     page?.navigate("$url?pickup-up=$fromAgency&drop-off=$toAgency")
   }
 
-  fun findJourneyAndUpdatePrice(fromAgency: String, toAgency: String): Boolean {
+  fun findJourneyAndUpdatePrice(fromAgency: String): Boolean {
     val rows = page?.locator("//tr[td/a/span[contains(text(), '$fromAgency')]]")
 
     when (rows?.count()) {
