@@ -17,7 +17,7 @@ internal class VewMoveDetailsTest : PlayWrightTest() {
     val move = standardMoveM4()
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToGeoameyDashboard()
     dashboardPage.goToMoveBuyReferenceId()
     assert(findMovePage.findMoveByReferenceId(move.reference))

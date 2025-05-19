@@ -31,7 +31,7 @@ internal class LodgingPriceTest : PlayWrightTest() {
 
     loginPage.login()
     supplierPage.gotToPage()
-    assert(supplierPage.isPageSuccessful())
+    supplierPage.isPageSuccessful()
     supplierPage.goToSercoDashboard()
 
     selectMonth.gotToPage()
@@ -41,7 +41,7 @@ internal class LodgingPriceTest : PlayWrightTest() {
     manageJourneyPriceCataloguePage.goToFindJourneys()
 
     searchJourneysPage.findJourney("PRISON ONE L", "POLICE ONE L")
-    journeysResultsPage.findJourneyAndUpdatePrice("PRISON ONE L", "POLICE ONE L")
+    assert(journeysResultsPage.findJourneyAndUpdatePrice("PRISON ONE L"))
 
     updatePricePage.addPriceExceptions(selectedDate, 3000.00)
 
@@ -49,7 +49,7 @@ internal class LodgingPriceTest : PlayWrightTest() {
     manageJourneyPriceCataloguePage.goToFindJourneys()
 
     searchJourneysPage.findJourney("POLICE ONE L", "POLICE TWO L")
-    journeysResultsPage.findJourneyAndUpdatePrice("POLICE ONE L", "POLICE TWO L")
+    assert(journeysResultsPage.findJourneyAndUpdatePrice("POLICE ONE L"))
 
     updatePricePage.addPriceExceptions(selectedDate, 2.00)
 

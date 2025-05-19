@@ -9,16 +9,12 @@ class JourneysResultsPage(page: Page?) {
   private val url = "http://localhost:8080/journeys-results"
   private val page = page
 
-  fun isPageSuccessful(): Boolean {
-    page?.waitForURL(url)
-    return page?.waitForSelector("h2")?.innerText()?.equals("Find Journeys") == true
-  }
-
   fun gotToPage(fromAgency: String, toAgency: String) {
     page?.navigate("$url?pickup-up=$fromAgency&drop-off=$toAgency")
   }
 
-  fun findJourneyAndUpdatePrice(fromAgency: String, toAgency: String): Boolean {
+  fun findJourneyAndUpdatePrice(fromAgency: String): Boolean {
+    page?.waitForSelector("h1")?.innerText()?.startsWith("Manage Journey Price Catalogue")
     val rows = page?.locator("//tr[td/a/span[contains(text(), '$fromAgency')]]")
 
     when (rows?.count()) {
@@ -30,6 +26,7 @@ class JourneysResultsPage(page: Page?) {
       1 -> {
         logger.info("Scenario when journey is found for: $fromAgency")
         rows.nth(0).locator("td:nth-child(5)").click()
+        page?.waitForSelector("h1")?.innerText()?.equals("Manage Journey Price Catalogue")
         return true
       }
 

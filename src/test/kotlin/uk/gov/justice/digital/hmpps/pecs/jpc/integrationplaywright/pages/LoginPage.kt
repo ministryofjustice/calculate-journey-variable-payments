@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.pecs.jpc.integrationplaywright.pages
 
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole
 
 class LoginPage(page: Page?) {
@@ -14,7 +15,8 @@ class LoginPage(page: Page?) {
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sign In"))?.click()
   }
 
-  fun isLoginSuccessful(): Boolean {
-    return page?.waitForSelector("h1")?.innerText().equals("Select service")
+  fun isLoginSuccessful() {
+    val h1 = page?.locator("h1")
+    assertThat(h1).containsText("Select service")
   }
 }
