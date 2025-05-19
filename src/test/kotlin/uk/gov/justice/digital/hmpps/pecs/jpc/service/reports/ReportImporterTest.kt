@@ -157,9 +157,7 @@ internal class ReportImporterTest(
   }
 
   private class FailingStreamingReportParser(private val errorMessage: String) : StreamingReportParser {
-    override fun <T> forEach(reportName: String, parse: (String) -> T?, consumer: (T) -> Unit) {
-      throw RuntimeException(errorMessage)
-    }
+    override fun <T> forEach(reportName: String, parse: (String) -> T?, consumer: (T) -> Unit): Unit = throw RuntimeException(errorMessage)
   }
 
   private fun movesFilteredBy(filterer: (m: Move) -> Boolean) = moves.filter(filterer)

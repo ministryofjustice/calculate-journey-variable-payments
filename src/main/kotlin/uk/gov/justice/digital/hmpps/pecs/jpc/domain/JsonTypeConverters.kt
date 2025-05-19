@@ -18,15 +18,13 @@ annotation class JsonDateConverter
 val jsonDateConverter = object : Converter {
   override fun canConvert(cls: Class<*>) = cls == LocalDate::class.java
 
-  override fun fromJson(jv: JsonValue) =
-    if (jv.string != null) {
-      LocalDate.parse(jv.string, DateTimeFormatter.ISO_LOCAL_DATE)
-    } else {
-      null
-    }
+  override fun fromJson(jv: JsonValue) = if (jv.string != null) {
+    LocalDate.parse(jv.string, DateTimeFormatter.ISO_LOCAL_DATE)
+  } else {
+    null
+  }
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }
 
 @Target(AnnotationTarget.FIELD)
@@ -35,15 +33,13 @@ annotation class JsonDateTimeConverter
 val jsonDateTimeConverter = object : Converter {
   override fun canConvert(cls: Class<*>) = cls == LocalDateTime::class.java
 
-  override fun fromJson(jv: JsonValue) =
-    if (jv.string != null) {
-      LocalDateTime.parse(jv.string, DateTimeFormatter.ISO_DATE_TIME)
-    } else {
-      throw KlaxonException("Couldn't parse date: ${jv.string}")
-    }
+  override fun fromJson(jv: JsonValue) = if (jv.string != null) {
+    LocalDateTime.parse(jv.string, DateTimeFormatter.ISO_DATE_TIME)
+  } else {
+    throw KlaxonException("Couldn't parse date: ${jv.string}")
+  }
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }
 
 @Target(AnnotationTarget.FIELD)
@@ -55,6 +51,5 @@ val jsonSupplierConverter = object : Converter {
 
   override fun fromJson(jv: JsonValue) = Supplier.valueOfCaseInsensitive(jv.string)
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }

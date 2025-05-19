@@ -54,17 +54,13 @@ class ApplicationInformationController(
     )
   }
 
-  private fun isPriceAdjustmentInProgressFor(supplier: Supplier) =
-    annualPriceAdjustmentsService.adjustmentInProgressFor(supplier)
+  private fun isPriceAdjustmentInProgressFor(supplier: Supplier) = annualPriceAdjustmentsService.adjustmentInProgressFor(supplier)
 
-  private fun isPreviousContractualYear(model: ModelMap) =
-    effectiveYear.previous() == model.getSelectedEffectiveYear()
+  private fun isPreviousContractualYear(model: ModelMap) = effectiveYear.previous() == model.getSelectedEffectiveYear()
 
-  private fun isNotAbleToUpdatePricesForSelectedYear(model: ModelMap) =
-    !effectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())
+  private fun isNotAbleToUpdatePricesForSelectedYear(model: ModelMap) = !effectiveYear.canAddOrUpdatePrices(model.getSelectedEffectiveYear())
 
-  private fun isPricingDataIsOutByTwoDays() =
-    Period.between(reportsService.dateOfLastImport() ?: timeSource.date(), timeSource.date()).days > 1
+  private fun isPricingDataIsOutByTwoDays() = Period.between(reportsService.dateOfLastImport() ?: timeSource.date(), timeSource.date()).days > 1
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   data class ApplicationInformation(val message: String? = null)

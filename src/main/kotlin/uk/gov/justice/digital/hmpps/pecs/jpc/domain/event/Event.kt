@@ -132,26 +132,19 @@ data class Event constructor(
     return result
   }
 
-  override fun toString(): String {
-    return "Event(eventId='$eventId', updatedAt=$updatedAt, type='$type', supplier=$supplier, eventableType='$eventableType', eventableId='$eventableId', details=$details, occurredAt=$occurredAt, recordedAt=$recordedAt, notes=$notes)"
-  }
+  override fun toString(): String = "Event(eventId='$eventId', updatedAt=$updatedAt, type='$type', supplier=$supplier, eventableType='$eventableType', eventableId='$eventableId', details=$details, occurredAt=$occurredAt, recordedAt=$recordedAt, notes=$notes)"
 
   fun vehicleRegistration(): String? = details?.attributes?.get("vehicle_reg") as String?
 
-  override operator fun compareTo(other: Event): Int {
-    return this.occurredAt.compareTo(other.occurredAt)
-  }
+  override operator fun compareTo(other: Event): Int = this.occurredAt.compareTo(other.occurredAt)
 
   companion object {
-    fun getLatestByType(events: Collection<Event>, eventType: EventType): Event? =
-      events.sortedByDescending { it.occurredAt }.find { it.hasType(eventType) }
+    fun getLatestByType(events: Collection<Event>, eventType: EventType): Event? = events.sortedByDescending { it.occurredAt }.find { it.hasType(eventType) }
 
-    fun fromJson(json: String): Event? {
-      return Klaxon().fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
-        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter)
-        .fieldConverter(JsonDetailsConverter::class, jsonDetailsConverter)
-        .parse<Event>(json)
-    }
+    fun fromJson(json: String): Event? = Klaxon().fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter)
+      .fieldConverter(JsonDetailsConverter::class, jsonDetailsConverter)
+      .parse<Event>(json)
   }
 }
 
@@ -182,13 +175,9 @@ enum class EventType(val value: String) {
 
 @Converter
 class JpaDetailsConverter : AttributeConverter<Details, String> {
-  override fun convertToDatabaseColumn(entity: Details?): String? {
-    return entity?.let { Klaxon().toJsonString(it.attributes) }
-  }
+  override fun convertToDatabaseColumn(entity: Details?): String? = entity?.let { Klaxon().toJsonString(it.attributes) }
 
-  override fun convertToEntityAttribute(dbData: String?): Details? {
-    return dbData?.let { Klaxon().parse<Map<String, Any>>(it)?.let { attrs -> Details(attrs) } }
-  }
+  override fun convertToEntityAttribute(dbData: String?): Details? = dbData?.let { Klaxon().parse<Map<String, Any>>(it)?.let { attrs -> Details(attrs) } }
 }
 
 data class Details(val attributes: Map<String, Any?>)
@@ -201,6 +190,5 @@ val jsonDetailsConverter = object : com.beust.klaxon.Converter {
 
   override fun fromJson(jv: JsonValue) = jv.obj?.map?.let { Details(it.toMap()) }
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }

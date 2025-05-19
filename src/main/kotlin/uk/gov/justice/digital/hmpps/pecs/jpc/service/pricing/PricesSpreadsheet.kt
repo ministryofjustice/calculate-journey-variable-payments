@@ -45,8 +45,7 @@ class PricesSpreadsheet(
   /**
    * Only rows containing prices are returned. The heading row is not included.
    */
-  private fun getRows(): List<Row> =
-    spreadsheet.getSheetAt(0).drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
+  private fun getRows(): List<Row> = spreadsheet.getSheetAt(0).drop(COLUMN_HEADINGS).filterNot { it.getCell(1)?.stringCellValue.isNullOrBlank() }
 
   fun mapToPrice(row: Row) = getPrice(supplier, row)
 
@@ -85,15 +84,13 @@ class PricesSpreadsheet(
     )
   }
 
-  private fun findExistingPrice(supplier: Supplier, fromLocation: Location, toLocation: Location): Price? {
-    return pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-      supplier,
-      fromLocation,
-      toLocation,
-      effectiveYear,
-    )
-      .also { logger.debug("Found existing price for '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier") }
-  }
+  private fun findExistingPrice(supplier: Supplier, fromLocation: Location, toLocation: Location): Price? = pricesRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+    supplier,
+    fromLocation,
+    toLocation,
+    effectiveYear,
+  )
+    .also { logger.debug("Found existing price for '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier") }
 
   fun addError(row: Row, error: Throwable) = errors.add(
     PricesSpreadsheetError(
@@ -107,9 +104,7 @@ class PricesSpreadsheet(
   /**
    * Strips all whitespace and converts to uppercase.  If blank then returns null.
    */
-  private fun Row.getFormattedStringCell(cell: Int): String? {
-    return getCell(cell).stringCellValue.uppercase().trim().takeIf { it.isNotBlank() }
-  }
+  private fun Row.getFormattedStringCell(cell: Int): String? = getCell(cell).stringCellValue.uppercase().trim().takeIf { it.isNotBlank() }
 
   override fun close() {
     spreadsheet.close()

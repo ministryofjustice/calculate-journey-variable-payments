@@ -6,7 +6,5 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.util.MonthYearParser
 
 class MonthYearConstraintValidator : ConstraintValidator<ValidMonthYear?, String?> {
   override fun initialize(arg0: ValidMonthYear?) {}
-  override fun isValid(dateAsString: String?, context: ConstraintValidatorContext): Boolean {
-    return dateAsString != null && MonthYearParser.isValid(dateAsString)
-  }
+  override fun isValid(dateAsString: String?, context: ConstraintValidatorContext): Boolean = dateAsString != null && MonthYearParser.isValid(dateAsString)
 }

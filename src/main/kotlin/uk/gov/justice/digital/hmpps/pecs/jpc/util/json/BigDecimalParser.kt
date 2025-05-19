@@ -5,15 +5,13 @@ import com.beust.klaxon.JsonValue
 import java.math.BigDecimal
 
 @Target(AnnotationTarget.FIELD)
-annotation class BigDecimalParser()
+annotation class BigDecimalParser
 
 val bigDecimalConverter = object : Converter {
 
   override fun canConvert(cls: Class<*>) = cls == BigDecimal::class.java
 
-  override fun fromJson(jv: JsonValue) =
-    Result.runCatching { BigDecimal(jv.string) }.getOrElse { jv.double!!.toBigDecimal() }
+  override fun fromJson(jv: JsonValue) = Result.runCatching { BigDecimal(jv.string) }.getOrElse { jv.double!!.toBigDecimal() }
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }

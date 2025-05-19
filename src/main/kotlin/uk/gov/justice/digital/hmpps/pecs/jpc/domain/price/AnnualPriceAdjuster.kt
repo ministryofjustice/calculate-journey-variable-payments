@@ -68,15 +68,14 @@ class AnnualPriceAdjuster(
    *
    * Returns the ID of the lock (if successfully created).
    */
-  internal fun attemptLockForPriceAdjustment(supplier: Supplier, multiplier: AdjustmentMultiplier, effectiveYear: Int) =
-    priceAdjustmentRepository.saveAndFlush(
-      PriceAdjustment(
-        supplier = supplier,
-        addedAt = timeSource.dateTime(),
-        multiplier = multiplier.value,
-        effectiveYear = effectiveYear,
-      ),
-    ).id
+  internal fun attemptLockForPriceAdjustment(supplier: Supplier, multiplier: AdjustmentMultiplier, effectiveYear: Int) = priceAdjustmentRepository.saveAndFlush(
+    PriceAdjustment(
+      supplier = supplier,
+      addedAt = timeSource.dateTime(),
+      multiplier = multiplier.value,
+      effectiveYear = effectiveYear,
+    ),
+  ).id
 
   private fun applyPriceAdjustmentsForSupplierAndEffectiveYear(
     supplier: Supplier,
@@ -101,8 +100,7 @@ class AnnualPriceAdjuster(
     if (adjustments % 100 == 0) logger.info("$adjustments prices adjusted...")
   }
 
-  private fun PriceRepository.possiblePricesForAdjustment(supplier: Supplier, effectiveYear: Int) =
-    this.findBySupplierAndEffectiveYear(supplier, effectiveYear).asSequence()
+  private fun PriceRepository.possiblePricesForAdjustment(supplier: Supplier, effectiveYear: Int) = this.findBySupplierAndEffectiveYear(supplier, effectiveYear).asSequence()
 
   private fun maybePriceAdjustment(previousYearPrice: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier): Price? {
     val existingAdjustedPrice = maybeExistingAdjustedPrice(previousYearPrice, effectiveYear)
@@ -124,23 +122,20 @@ class AnnualPriceAdjuster(
 
   private fun Price.adjustPriceTo(money: Money) = this.apply { priceInPence = money.pence }
 
-  private fun Price.auditedAdjustment(previousPrice: Price, multiplier: AdjustmentMultiplier) =
-    this.also { auditService.create(AuditableEvent.adjustPrice(this, previousPrice.price(), multiplier)) }
+  private fun Price.auditedAdjustment(previousPrice: Price, multiplier: AdjustmentMultiplier) = this.also { auditService.create(AuditableEvent.adjustPrice(this, previousPrice.price(), multiplier)) }
 
-  private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier) =
-    price.adjusted(
-      amount = multiplier * price.price(),
-      effectiveYear = effectiveYear,
-      addedAt = timeSource.dateTime(),
-    )
+  private fun newPriceAdjustmentFor(price: Price, effectiveYear: Int, multiplier: AdjustmentMultiplier) = price.adjusted(
+    amount = multiplier * price.price(),
+    effectiveYear = effectiveYear,
+    addedAt = timeSource.dateTime(),
+  )
 
-  private fun maybeExistingAdjustedPrice(price: Price, effectiveYear: Int) =
-    priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
-      price.supplier,
-      price.fromLocation,
-      price.toLocation,
-      effectiveYear,
-    )
+  private fun maybeExistingAdjustedPrice(price: Price, effectiveYear: Int) = priceRepository.findBySupplierAndFromLocationAndToLocationAndEffectiveYear(
+    price.supplier,
+    price.fromLocation,
+    price.toLocation,
+    effectiveYear,
+  )
 
   internal fun releaseLockForPriceAdjustment(id: UUID) {
     with(priceAdjustmentRepository) {

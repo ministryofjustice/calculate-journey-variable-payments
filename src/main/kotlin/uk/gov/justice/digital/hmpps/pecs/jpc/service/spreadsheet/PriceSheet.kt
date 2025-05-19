@@ -179,11 +179,9 @@ abstract class PriceSheet(
     }
   }
 
-  private fun Sheet.mergeCells(row: Int, firstCol: Int, lastCol: Int) =
-    this.addMergedRegion(CellRangeAddress(row, row, firstCol, lastCol))
+  private fun Sheet.mergeCells(row: Int, firstCol: Int, lastCol: Int) = this.addMergedRegion(CellRangeAddress(row, row, firstCol, lastCol))
 
-  protected fun Row.addHeaderCell(column: Int, label: Any, style: CellStyle = headerStyle) =
-    this.addCell(column, label, style)
+  protected fun Row.addHeaderCell(column: Int, label: Any, style: CellStyle = headerStyle) = this.addCell(column, label, style)
 
   protected fun Row.addEmptyHeaderCell(column: Int) = this.addCell(column, null, headerStyle)
 

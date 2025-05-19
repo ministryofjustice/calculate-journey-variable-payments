@@ -61,9 +61,7 @@ class SummaryPageController(
   }
 
   @RequestMapping("/choose-supplier")
-  fun chooseSupplier(model: ModelMap): String {
-    return "choose-supplier"
-  }
+  fun chooseSupplier(model: ModelMap): String = "choose-supplier"
 
   @RequestMapping("/choose-supplier/serco")
   fun chooseSupplierSerco(model: ModelMap): RedirectView {

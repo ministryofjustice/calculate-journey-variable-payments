@@ -33,6 +33,5 @@ class ObfuscatingPiiReaderParserTest {
     }
   }
 
-  private fun personProvider(prisonNumber: String, firstName: String, lastName: String, ethnicity: String) =
-    """{"id":"PE1","updated_at": "2020-06-16T10:20:30+01:00", "prison_number":"$prisonNumber","latest_nomis_booking_id":null,"gender":"male","age":100, "ethnicity" : "$ethnicity", "first_names" : "$firstName", "last_name": "$lastName", "date_of_birth" : "1980-12-25"}""".trimIndent()
+  private fun personProvider(prisonNumber: String, firstName: String, lastName: String, ethnicity: String) = """{"id":"PE1","updated_at": "2020-06-16T10:20:30+01:00", "prison_number":"$prisonNumber","latest_nomis_booking_id":null,"gender":"male","age":100, "ethnicity" : "$ethnicity", "first_names" : "$firstName", "last_name": "$lastName", "date_of_birth" : "1980-12-25"}""".trimIndent()
 }

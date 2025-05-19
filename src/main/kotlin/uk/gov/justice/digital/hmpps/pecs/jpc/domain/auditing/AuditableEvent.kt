@@ -53,68 +53,56 @@ data class AuditableEvent(
 
     fun logOutEvent(authentication: Authentication) = createEvent(AuditEventType.LOG_OUT, authentication)
 
-    fun downloadSpreadsheetEvent(date: LocalDate, supplier: Supplier, authentication: Authentication) =
-      createEvent(
-        AuditEventType.DOWNLOAD_SPREADSHEET,
-        authentication,
-        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier),
-      )
+    fun downloadSpreadsheetEvent(date: LocalDate, supplier: Supplier, authentication: Authentication) = createEvent(
+      AuditEventType.DOWNLOAD_SPREADSHEET,
+      authentication,
+      mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier),
+    )
 
-    fun downloadSpreadsheetFailure(date: LocalDate, supplier: Supplier, authentication: Authentication) =
-      createEvent(
-        AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE,
-        authentication,
-        mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier),
+    fun downloadSpreadsheetFailure(date: LocalDate, supplier: Supplier, authentication: Authentication) = createEvent(
+      AuditEventType.DOWNLOAD_SPREADSHEET_FAILURE,
+      authentication,
+      mapOf("month" to date.format(DateTimeFormatter.ofPattern("yyyy-MM")), "supplier" to supplier),
 
-      )
+    )
 
     /**
      * A price can be added via the front end in which case it is authenticated or by the back end via bulk price import which is un-authenticated.
      */
-    fun addPrice(newPrice: Price): AuditableEvent {
-      return AuditableEvent(
-        type = AuditEventType.JOURNEY_PRICE,
-        username = authentication()?.name ?: terminal,
-        metadata = PriceMetadata.new(newPrice),
-      )
-    }
+    fun addPrice(newPrice: Price): AuditableEvent = AuditableEvent(
+      type = AuditEventType.JOURNEY_PRICE,
+      username = authentication()?.name ?: terminal,
+      metadata = PriceMetadata.new(newPrice),
+    )
 
-    fun updatePrice(updatedPrice: Price, oldPrice: Money): AuditableEvent {
-      return AuditableEvent(
-        type = AuditEventType.JOURNEY_PRICE,
-        username = authentication()?.name ?: terminal,
-        metadata = PriceMetadata.update(oldPrice, updatedPrice),
-      )
-    }
+    fun updatePrice(updatedPrice: Price, oldPrice: Money): AuditableEvent = AuditableEvent(
+      type = AuditEventType.JOURNEY_PRICE,
+      username = authentication()?.name ?: terminal,
+      metadata = PriceMetadata.update(oldPrice, updatedPrice),
+    )
 
-    fun addPriceException(price: Price, month: Month, amount: Money): AuditableEvent {
-      return AuditableEvent(
-        type = AuditEventType.JOURNEY_PRICE,
-        username = enforcedAuthentication().name,
-        metadata = PriceMetadata.exception(price, month, amount),
-      )
-    }
+    fun addPriceException(price: Price, month: Month, amount: Money): AuditableEvent = AuditableEvent(
+      type = AuditEventType.JOURNEY_PRICE,
+      username = enforcedAuthentication().name,
+      metadata = PriceMetadata.exception(price, month, amount),
+    )
 
-    fun removePriceException(price: Price, month: Month, amount: Money): AuditableEvent {
-      return AuditableEvent(
-        type = AuditEventType.JOURNEY_PRICE,
-        username = enforcedAuthentication().name,
-        metadata = PriceMetadata.removeException(price, month, amount),
-      )
-    }
+    fun removePriceException(price: Price, month: Month, amount: Money): AuditableEvent = AuditableEvent(
+      type = AuditEventType.JOURNEY_PRICE,
+      username = enforcedAuthentication().name,
+      metadata = PriceMetadata.removeException(price, month, amount),
+    )
 
     fun adjustPrice(
       price: Price,
       original: Money,
       multiplier: AdjustmentMultiplier,
       authentication: Authentication? = null,
-    ): AuditableEvent {
-      return AuditableEvent(
-        type = AuditEventType.JOURNEY_PRICE,
-        username = authentication?.name ?: terminal,
-        metadata = PriceMetadata.adjustment(price, original, multiplier),
-      )
-    }
+    ): AuditableEvent = AuditableEvent(
+      type = AuditEventType.JOURNEY_PRICE,
+      username = authentication?.name ?: terminal,
+      metadata = PriceMetadata.adjustment(price, original, multiplier),
+    )
 
     fun journeyPriceBulkPriceAdjustmentEvent(
       supplier: Supplier,
@@ -128,26 +116,23 @@ data class AuditableEvent(
       metadata = AnnualPriceAdjustmentMetadata(supplier, effectiveYear, multiplier.value, details),
     )
 
-    fun mapLocation(location: Location) =
-      AuditableEvent(
-        type = AuditEventType.LOCATION,
-        username = enforcedAuthentication().name,
-        metadata = MapLocationMetadata.map(location),
-      )
+    fun mapLocation(location: Location) = AuditableEvent(
+      type = AuditEventType.LOCATION,
+      username = enforcedAuthentication().name,
+      metadata = MapLocationMetadata.map(location),
+    )
 
-    fun remapLocation(old: Location, new: Location) =
-      AuditableEvent(
-        type = AuditEventType.LOCATION,
-        username = enforcedAuthentication().name,
-        metadata = MapLocationMetadata.remap(old, new),
-      )
+    fun remapLocation(old: Location, new: Location) = AuditableEvent(
+      type = AuditEventType.LOCATION,
+      username = enforcedAuthentication().name,
+      metadata = MapLocationMetadata.remap(old, new),
+    )
 
-    fun autoMapLocation(location: Location) =
-      AuditableEvent(
-        type = AuditEventType.LOCATION,
-        username = terminal,
-        metadata = MapLocationMetadata.map(location),
-      )
+    fun autoMapLocation(location: Location) = AuditableEvent(
+      type = AuditEventType.LOCATION,
+      username = terminal,
+      metadata = MapLocationMetadata.map(location),
+    )
 
     fun authentication(): Authentication? = SecurityContextHolder.getContext().authentication
 
@@ -162,19 +147,18 @@ data class AuditableEvent(
       people_saved: Int,
       profiles_processed: Int,
       profiles_saved: Int,
-    ) =
-      createEvent(
-        type = AuditEventType.REPORTING_DATA_IMPORT,
-        metadata = mapOf(
-          "report_date" to reportDate.toString(),
-          "moves_processed" to moves_processed,
-          "moves_saved" to moves_saved,
-          "people_processed" to people_processed,
-          "people_saved" to people_saved,
-          "profiles_processed" to profiles_processed,
-          "profiles_saved" to profiles_saved,
-        ),
-        allowNoUser = true,
-      )
+    ) = createEvent(
+      type = AuditEventType.REPORTING_DATA_IMPORT,
+      metadata = mapOf(
+        "report_date" to reportDate.toString(),
+        "moves_processed" to moves_processed,
+        "moves_saved" to moves_saved,
+        "people_processed" to people_processed,
+        "people_saved" to people_saved,
+        "profiles_processed" to profiles_processed,
+        "profiles_saved" to profiles_saved,
+      ),
+      allowNoUser = true,
+    )
   }
 }

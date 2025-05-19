@@ -9,7 +9,9 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 
-internal class FakeAuthentication : BeforeEachCallback, AfterEachCallback {
+internal class FakeAuthentication :
+  BeforeEachCallback,
+  AfterEachCallback {
 
   private val authentication: Authentication = mock { on { name } doReturn "mock username" }
   private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }

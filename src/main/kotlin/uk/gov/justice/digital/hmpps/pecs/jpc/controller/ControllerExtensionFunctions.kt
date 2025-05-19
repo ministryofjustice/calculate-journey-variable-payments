@@ -44,9 +44,8 @@ internal fun ModelMap.getSelectedYearEnd() = MonthYear("August" to getSelectedEf
 
 internal fun ModelMap.getSelectedEffectiveYear() = effectiveYearForDate(getStartOfMonth())
 
-internal fun ModelMap.getStartOfMonth() =
-  this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate }
-    ?: throw RuntimeException("date attribute not present in model")
+internal fun ModelMap.getStartOfMonth() = this.getAttribute(DATE_ATTRIBUTE)?.let { it as LocalDate }
+  ?: throw RuntimeException("date attribute not present in model")
 
 internal fun ModelMap.removeAnyPreviousSearchHistory() {
   this.addAttribute(PICK_UP_ATTRIBUTE, "")

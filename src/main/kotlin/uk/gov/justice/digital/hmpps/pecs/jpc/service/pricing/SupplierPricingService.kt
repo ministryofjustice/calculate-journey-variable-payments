@@ -172,22 +172,19 @@ class SupplierPricingService(
     if (!actualEffectiveYear.canAddOrUpdatePrices(effectiveYear)) throw RuntimeException("Price changes can no longer be made, change is outside of price change window.")
   }
 
-  private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> =
-    Pair(
-      getLocationBy(from) ?: throw RuntimeException("From NOMIS agency id '$from' not found."),
-      getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found."),
-    )
+  private fun getFromAndToLocationBy(from: String, to: String): Pair<Location, Location> = Pair(
+    getLocationBy(from) ?: throw RuntimeException("From NOMIS agency id '$from' not found."),
+    getLocationBy(to) ?: throw RuntimeException("To NOMIS agency id '$to' not found."),
+  )
 
   private fun getLocationBy(agencyId: String): Location? = locationRepository.findByNomisAgencyId(agencyId.sanitised())
 
-  fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> {
-    return auditService.auditEventsByTypeAndMetaKey(
-      AuditEventType.JOURNEY_PRICE,
-      PriceMetadata.key(supplier, fromAgencyId, toAgencyId),
-    )
-      .associateWith { PriceMetadata.map(it) }
-      .keys
-  }
+  fun priceHistoryForJourney(supplier: Supplier, fromAgencyId: String, toAgencyId: String): Set<AuditEvent> = auditService.auditEventsByTypeAndMetaKey(
+    AuditEventType.JOURNEY_PRICE,
+    PriceMetadata.key(supplier, fromAgencyId, toAgencyId),
+  )
+    .associateWith { PriceMetadata.map(it) }
+    .keys
 
   data class PriceDto(val fromAgency: String, val toAgency: String, val amount: Money) {
     val exceptions: MutableMap<Int, Money> = mutableMapOf()

@@ -27,7 +27,6 @@ enum class LocationType(val label: String) {
     /**
      * Attempts to map the supplied value to the supported locations types.  Returns null if no match found.
      */
-    fun map(value: String): LocationType? =
-      values().firstOrNull { it.label.uppercase() == value.uppercase().trim() }
+    fun map(value: String): LocationType? = values().firstOrNull { it.label.uppercase() == value.uppercase().trim() }
   }
 }

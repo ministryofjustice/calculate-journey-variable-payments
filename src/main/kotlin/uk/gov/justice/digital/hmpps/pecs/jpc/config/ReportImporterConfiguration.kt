@@ -35,12 +35,10 @@ class ReportImporterConfiguration {
   fun timeSource() = TimeSource { LocalDateTime.now(Clock.systemDefaultZone()) }
 
   @Bean
-  fun supplierPrices() =
-    SupplierPrices { supplier, year -> priceRepository.findBySupplierAndEffectiveYear(supplier, year) }
+  fun supplierPrices() = SupplierPrices { supplier, year -> priceRepository.findBySupplierAndEffectiveYear(supplier, year) }
 
   @Bean
-  fun reportImporter() =
-    ReportImporter(reportingProvider, monitoringString, streamingReportParser)
+  fun reportImporter() = ReportImporter(reportingProvider, monitoringString, streamingReportParser)
 
   // This is now needed for Spring Boot as part of moving from 2.5.3 to 3.0.0 Thymeleaf Layout Dialect
   @Bean

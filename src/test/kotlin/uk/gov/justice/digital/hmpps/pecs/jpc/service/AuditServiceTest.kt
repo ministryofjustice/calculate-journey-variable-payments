@@ -35,12 +35,10 @@ import java.time.LocalDateTime
 import java.time.Month
 
 private class AuditEventMatcher(var auditEvent: AuditEvent) : ArgumentMatcher<AuditEvent> {
-  override fun matches(otherAuditEvent: AuditEvent): Boolean {
-    return auditEvent.username == otherAuditEvent.username &&
-      auditEvent.createdAt == otherAuditEvent.createdAt &&
-      auditEvent.metadata == otherAuditEvent.metadata &&
-      auditEvent.eventType == otherAuditEvent.eventType
-  }
+  override fun matches(otherAuditEvent: AuditEvent): Boolean = auditEvent.username == otherAuditEvent.username &&
+    auditEvent.createdAt == otherAuditEvent.createdAt &&
+    auditEvent.metadata == otherAuditEvent.metadata &&
+    auditEvent.eventType == otherAuditEvent.eventType
 }
 
 @ExtendWith(FakeAuthentication::class)
@@ -52,19 +50,18 @@ internal class AuditServiceTest {
   private lateinit var authentication: Authentication
   private val eventCaptor = argumentCaptor<AuditEvent>()
 
-  private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) =
-    verify(auditEventRepository).save(
-      argThat(
-        AuditEventMatcher(
-          AuditEvent(
-            type,
-            dateTime,
-            username.trim().uppercase(),
-            if (metadata != null) Klaxon().toJsonString(metadata) else null,
-          ),
+  private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) = verify(auditEventRepository).save(
+    argThat(
+      AuditEventMatcher(
+        AuditEvent(
+          type,
+          dateTime,
+          username.trim().uppercase(),
+          if (metadata != null) Klaxon().toJsonString(metadata) else null,
         ),
       ),
-    )
+    ),
+  )
 
   @BeforeEach
   fun before() {
@@ -297,8 +294,7 @@ internal class AuditServiceTest {
     assertThat(jsonTo<PriceMetadata>(auditEvent.metadata!!)).isEqualTo(priceMetadata)
   }
 
-  private inline fun <reified T> jsonTo(json: String): T =
-    Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<T>(json)!!
+  private inline fun <reified T> jsonTo(json: String): T = Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<T>(json)!!
 
   @Test
   internal fun `create journey price bulk adjustment audit event`() {

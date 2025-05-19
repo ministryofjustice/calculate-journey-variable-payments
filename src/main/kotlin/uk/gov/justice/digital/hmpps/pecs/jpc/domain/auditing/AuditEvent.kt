@@ -83,9 +83,7 @@ data class AuditEvent(
     return result
   }
 
-  override fun toString(): String {
-    return "AuditEvent(eventType=$eventType, createdAt=$createdAt, username='$username', metadata=XXXXXX, metadataKey=$metadataKey, id=$id)"
-  }
+  override fun toString(): String = "AuditEvent(eventType=$eventType, createdAt=$createdAt, username='$username', metadata=XXXXXX, metadataKey=$metadataKey, id=$id)"
 }
 
 fun interface Metadata {

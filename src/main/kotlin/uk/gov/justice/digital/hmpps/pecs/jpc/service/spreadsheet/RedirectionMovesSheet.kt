@@ -16,27 +16,28 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.Data
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.PRICE
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.VEHICLE_REG
 
-class RedirectionMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
-  sheet = workbook.createSheet("Redirections"),
-  header = header,
-  subheading = "REDIRECTIONS (a redirection after the move has started)",
-  dataColumns = listOf(
-    MOVE_ID,
-    PICK_UP,
-    LOCATION_TYPE,
-    DROP_OFF,
-    LOCATION_TYPE,
-    PICK_UP_DATE,
-    PICK_UP_TIME,
-    DROP_OFF_DATE,
-    DROP_OFF_TIME,
-    VEHICLE_REG,
-    NOMIS_PRISON_ID,
-    PRICE,
-    CONTRACTOR_BILLABLE,
-    NOTES,
-  ),
-) {
+class RedirectionMovesSheet(workbook: Workbook, header: Header) :
+  PriceSheet(
+    sheet = workbook.createSheet("Redirections"),
+    header = header,
+    subheading = "REDIRECTIONS (a redirection after the move has started)",
+    dataColumns = listOf(
+      MOVE_ID,
+      PICK_UP,
+      LOCATION_TYPE,
+      DROP_OFF,
+      LOCATION_TYPE,
+      PICK_UP_DATE,
+      PICK_UP_TIME,
+      DROP_OFF_DATE,
+      DROP_OFF_TIME,
+      VEHICLE_REG,
+      NOMIS_PRISON_ID,
+      PRICE,
+      CONTRACTOR_BILLABLE,
+      NOTES,
+    ),
+  ) {
 
   override fun writeMove(move: Move) {
     writeMoveRow(move)

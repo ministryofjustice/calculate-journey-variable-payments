@@ -10,12 +10,13 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.Data
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.TOTAL_PRICE
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.UNIT_PRICE
 
-class JourneysSheet(workbook: Workbook, header: Header) : PriceSheet(
-  sheet = workbook.createSheet("Journeys"),
-  header = header,
-  subheading = "TOTAL VOLUME BY JOURNEY",
-  dataColumns = listOf(PICK_UP, DROP_OFF, TOTAL_JOURNEY_COUNT, BILLABLE_JOURNEY_COUNT, UNIT_PRICE, TOTAL_PRICE),
-) {
+class JourneysSheet(workbook: Workbook, header: Header) :
+  PriceSheet(
+    sheet = workbook.createSheet("Journeys"),
+    header = header,
+    subheading = "TOTAL VOLUME BY JOURNEY",
+    dataColumns = listOf(PICK_UP, DROP_OFF, TOTAL_JOURNEY_COUNT, BILLABLE_JOURNEY_COUNT, UNIT_PRICE, TOTAL_PRICE),
+  ) {
 
   override fun writeMove(move: Move) {}
 

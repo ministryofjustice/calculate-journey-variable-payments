@@ -98,16 +98,13 @@ data class PriceMetadata(
 
     fun removeException(price: Price, month: Month, amount: Money): PriceMetadata = PriceMetadata(price, month, amount, true)
 
-    fun map(event: AuditEvent): PriceMetadata {
-      return if (event.eventType == AuditEventType.JOURNEY_PRICE) {
-        Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<PriceMetadata>(event.metadata!!)!!
-      } else {
-        throw IllegalArgumentException("Audit event type is not a price event.")
-      }
+    fun map(event: AuditEvent): PriceMetadata = if (event.eventType == AuditEventType.JOURNEY_PRICE) {
+      Klaxon().fieldConverter(BigDecimalParser::class, bigDecimalConverter).parse<PriceMetadata>(event.metadata!!)!!
+    } else {
+      throw IllegalArgumentException("Audit event type is not a price event.")
     }
 
-    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) =
-      "$supplier-${fromNomisId.trim().uppercase()}-${toNomisId.trim().uppercase()}"
+    fun key(supplier: Supplier, fromNomisId: String, toNomisId: String) = "$supplier-${fromNomisId.trim().uppercase()}-${toNomisId.trim().uppercase()}"
   }
 
   fun isUpdate() = oldPrice != null && multiplier == null && exceptionMonth == null

@@ -217,8 +217,7 @@ internal class BasmClientApiServiceTest {
           } 
         ]
       }""",
-  ) =
-    MockResponse()
-      .addHeader("Content-Type", "application/json; charset=utf-8")
-      .setBody(body)
+  ) = MockResponse()
+    .addHeader("Content-Type", "application/json; charset=utf-8")
+    .setBody(body)
 }

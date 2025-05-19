@@ -57,6 +57,5 @@ class DateRangeTest {
     )
   }
 
-  private fun range(month: Month, year: Year) =
-    LocalDate.of(year.value, month.value, 1).let { DateRange(it, it.plusMonths(1).minusDays(1)) }
+  private fun range(month: Month, year: Year) = LocalDate.of(year.value, month.value, 1).let { DateRange(it, it.plusMonths(1).minusDays(1)) }
 }

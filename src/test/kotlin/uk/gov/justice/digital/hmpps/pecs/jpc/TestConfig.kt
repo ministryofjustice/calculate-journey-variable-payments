@@ -33,12 +33,10 @@ class TestConfig {
   private lateinit var resourceLoader: ResourceLoader
 
   @Bean
-  fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource) =
-    MoveQueryRepository(JdbcTemplate(dataSource))
+  fun moveQueryRepository(@Qualifier("dataSource") dataSource: DataSource) = MoveQueryRepository(JdbcTemplate(dataSource))
 
   @Bean
-  fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource) =
-    JourneyQueryRepository(JdbcTemplate(dataSource))
+  fun journeyQueryRepository(@Qualifier("dataSource") dataSource: DataSource) = JourneyQueryRepository(JdbcTemplate(dataSource))
 
   @Bean
   fun timeSource() = TimeSource { LocalDateTime.now(Clock.fixed(Instant.now(), ZoneId.systemDefault())) }
@@ -47,25 +45,19 @@ class TestConfig {
   fun dataSource(): DataSource = DataSourceBuilder.create().url("jdbc:h2:mem:testdb;MODE=PostgreSQL").build()
 
   @Bean
-  fun locationsResourceProvider(): Schedule34LocationsProvider {
-    return Schedule34LocationsProvider { resourceLoader.getResource("classpath:/spreadsheets/locations.xlsx").inputStream }
-  }
+  fun locationsResourceProvider(): Schedule34LocationsProvider = Schedule34LocationsProvider { resourceLoader.getResource("classpath:/spreadsheets/locations.xlsx").inputStream }
 
   @Bean
-  fun sercoPricesResourceProvider() =
-    SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
+  fun sercoPricesResourceProvider() = SercoPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_b_prices.xlsx").inputStream }
 
   @Bean
-  fun geoameyPricesResourceProvider() =
-    GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
+  fun geoameyPricesResourceProvider() = GeoameyPricesProvider { resourceLoader.getResource("classpath:/spreadsheets/supplier_a_prices.xlsx").inputStream }
 
   @Bean
-  fun reportingResourceProvider() =
-    ReportingProvider { resourceLoader.getResource("classpath:/reporting/$it").file.readText() }
+  fun reportingResourceProvider() = ReportingProvider { resourceLoader.getResource("classpath:/reporting/$it").file.readText() }
 
   @Bean
-  fun reportReaderParser() =
-    StandardStreamingReportParser { InputStreamReader(resourceLoader.getResource("classpath:/reporting/$it").inputStream) }
+  fun reportReaderParser() = StandardStreamingReportParser { InputStreamReader(resourceLoader.getResource("classpath:/reporting/$it").inputStream) }
 
   @Bean
   fun reportImporter() = ReportImporter(reportingResourceProvider(), mock { MonitoringService() }, reportReaderParser())

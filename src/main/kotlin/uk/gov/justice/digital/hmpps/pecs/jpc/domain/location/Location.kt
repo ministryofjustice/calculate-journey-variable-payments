@@ -61,7 +61,5 @@ data class Location(
     return result
   }
 
-  override fun toString(): String {
-    return "Location(locationType=$locationType, nomisAgencyId='$nomisAgencyId', siteName='$siteName', addedAt=$addedAt, updatedAt=$updatedAt, id=$id)"
-  }
+  override fun toString(): String = "Location(locationType=$locationType, nomisAgencyId='$nomisAgencyId', siteName='$siteName', addedAt=$addedAt, updatedAt=$updatedAt, id=$id)"
 }

@@ -13,10 +13,10 @@ class DuplicateLocationConstraintsValidator(
 
   override fun initialize(arg0: ValidDuplicateLocation?) {}
 
-  override fun isValid(form: MapLocationForm?, context: ConstraintValidatorContext): Boolean {
-    return form == null || form.locationName.isBlank() || !service.locationAlreadyExists(
+  override fun isValid(form: MapLocationForm?, context: ConstraintValidatorContext): Boolean = form == null ||
+    form.locationName.isBlank() ||
+    !service.locationAlreadyExists(
       form.agencyId,
       form.locationName,
     )
-  }
 }

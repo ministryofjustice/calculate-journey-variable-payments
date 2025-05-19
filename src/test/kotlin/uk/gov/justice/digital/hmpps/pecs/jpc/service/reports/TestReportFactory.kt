@@ -33,14 +33,12 @@ val defaultMoveTypeStandard = MoveType.STANDARD
 fun fromPrisonNomisAgencyId() = "WYI"
 
 @Suppress("ktlint:standard:function-naming")
-fun WYIPrisonLocation() =
-  Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
+fun WYIPrisonLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.PR, nomisAgencyId = "WYI", siteName = "from")
 
 fun toCourtNomisAgencyId() = "GNI"
 
 @Suppress("ktlint:standard:function-naming")
-fun GNICourtLocation() =
-  Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
+fun GNICourtLocation() = Location(id = UUID.randomUUID(), locationType = LocationType.CO, nomisAgencyId = "GNI", siteName = "to")
 
 fun notMappedNomisAgencyId() = "NOT_MAPPED_AGENCY_ID"
 
@@ -80,26 +78,22 @@ fun reportMoveFactory(
   return move
 }
 
-fun reportPersonFactory(personId: String = DEFAULT_PERSON_ID): Person {
-  return Person(
-    personId = personId,
-    updatedAt = defaultDateTime,
-    prisonNumber = "PRISON1",
-    latestNomisBookingId = null,
-    firstNames = "Billy the",
-    lastName = "Kid",
-    dateOfBirth = LocalDate.of(1980, 12, 25),
-    ethnicity = "White American",
-    gender = "male",
-  )
-}
+fun reportPersonFactory(personId: String = DEFAULT_PERSON_ID): Person = Person(
+  personId = personId,
+  updatedAt = defaultDateTime,
+  prisonNumber = "PRISON1",
+  latestNomisBookingId = null,
+  firstNames = "Billy the",
+  lastName = "Kid",
+  dateOfBirth = LocalDate.of(1980, 12, 25),
+  ethnicity = "White American",
+  gender = "male",
+)
 
 fun profileFactory(
   profileId: String = DEFAULT_PROFILE_ID,
   personId: String = DEFAULT_PERSON_ID,
-): Profile {
-  return Profile(profileId, defaultDateTime, personId)
-}
+): Profile = Profile(profileId, defaultDateTime, personId)
 
 fun moveEventFactory(
   eventId: String = DEFAULT_MOVE_EVENT_ID,

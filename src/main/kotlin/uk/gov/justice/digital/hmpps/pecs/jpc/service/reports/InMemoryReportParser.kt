@@ -61,17 +61,15 @@ object InMemoryReportParser {
    * @param f Lambda that takes a String and converts to entity of type T?
    * @return Sequence of entities of type T
    */
-  private fun <T> read(files: List<String>, f: (j: String) -> T?): Sequence<T> {
-    return files.asSequence().flatMap {
-      it.splitToSequence("\n").filter { it.isNotEmpty() }.map { json ->
-        try {
-          f(json)
-        } catch (e: Exception) {
-          // Simply warn and go on to the next one
-          logger.warn("ERROR parsing json $json: ${e.message}")
-          null
-        }
+  private fun <T> read(files: List<String>, f: (j: String) -> T?): Sequence<T> = files.asSequence().flatMap {
+    it.splitToSequence("\n").filter { it.isNotEmpty() }.map { json ->
+      try {
+        f(json)
+      } catch (e: Exception) {
+        // Simply warn and go on to the next one
+        logger.warn("ERROR parsing json $json: ${e.message}")
+        null
       }
-    }.filterNotNull()
-  }
+    }
+  }.filterNotNull()
 }
