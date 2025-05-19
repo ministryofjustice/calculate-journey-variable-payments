@@ -22,7 +22,7 @@ class SelectMonthPage(page: Page?) {
     page?.locator("input#month-year")?.fill("${date.month.name} ${date.year}")
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to month"))?.click()
     val h1 = page?.locator("h1")
-    assertThat(h1).containsText("${date.month.name} ${date.year}")
+    assertThat(h1).hasText("${date.month.name} ${date.year}")
     return date
   }
 }
