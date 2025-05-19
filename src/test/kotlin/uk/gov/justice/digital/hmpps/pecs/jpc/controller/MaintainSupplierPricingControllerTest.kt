@@ -9,11 +9,11 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
@@ -57,10 +57,10 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
 
   private val previousContractualEffectiveYear = effectiveYearForDate(previousContractualDate)
 
-  @MockBean
+  @MockitoBean
   private lateinit var actualEffectiveYear: EffectiveYear
 
-  @MockBean
+  @MockitoBean
   private lateinit var service: SupplierPricingService
 
   private val fromAgencyId = "AAAAAA"

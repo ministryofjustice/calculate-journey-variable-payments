@@ -6,10 +6,10 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
@@ -28,7 +28,7 @@ class ReferenceDataControllerTest(@Autowired private val wac: WebApplicationCont
   private val mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
   private val mockSession = MockHttpSession(wac.servletContext)
 
-  @MockBean
+  @MockitoBean
   lateinit var locationService: LocationsService
 
   @BeforeEach

@@ -7,10 +7,10 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.journey.JourneyRepository
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
@@ -38,7 +38,7 @@ class ImportServiceIntegrationTest(
   @Autowired private val profileRepository: ProfileRepository,
 ) {
 
-  @MockBean
+  @MockitoBean
   lateinit var monitoringService: MonitoringService
 
   @Autowired
