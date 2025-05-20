@@ -14,18 +14,19 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.Data
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.PERCENTAGE
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.PRICE
 
-class SummarySheet(workbook: Workbook, header: Header) : PriceSheet(
-  sheet = workbook.createSheet("Summary"),
-  header = header,
-  subheading = "OUTPUT SUMMARY",
-  dataColumns = listOf(
-    MOVE_TYPE,
-    PERCENTAGE,
-    MOVE_VOLUME,
-    MOVE_VOLUME_WITHOUT_PRICES,
-    PRICE,
-  ),
-) {
+class SummarySheet(workbook: Workbook, header: Header) :
+  PriceSheet(
+    sheet = workbook.createSheet("Summary"),
+    header = header,
+    subheading = "OUTPUT SUMMARY",
+    dataColumns = listOf(
+      MOVE_TYPE,
+      PERCENTAGE,
+      MOVE_VOLUME,
+      MOVE_VOLUME_WITHOUT_PRICES,
+      PRICE,
+    ),
+  ) {
 
   private val fontBlackArialItalic = sheet.workbook.createFont().apply {
     color = IndexedColors.BLACK.index

@@ -10,9 +10,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
@@ -33,7 +33,7 @@ internal class ReportImporterTest(
   @Autowired val reportReaderParser: StandardStreamingReportParser,
 ) {
 
-  @MockBean
+  @MockitoBean
   private lateinit var monitoringService: MonitoringService
 
   private lateinit var importer: ReportImporter
@@ -157,9 +157,7 @@ internal class ReportImporterTest(
   }
 
   private class FailingStreamingReportParser(private val errorMessage: String) : StreamingReportParser {
-    override fun <T> forEach(reportName: String, parse: (String) -> T?, consumer: (T) -> Unit) {
-      throw RuntimeException(errorMessage)
-    }
+    override fun <T> forEach(reportName: String, parse: (String) -> T?, consumer: (T) -> Unit): Unit = throw RuntimeException(errorMessage)
   }
 
   private fun movesFilteredBy(filterer: (m: Move) -> Boolean) = moves.filter(filterer)

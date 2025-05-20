@@ -175,8 +175,7 @@ class AnnualPriceAdjustmentsService(
     }
   }
 
-  fun adjustmentsHistoryFor(supplier: Supplier) =
-    auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT, supplier.name)
+  fun adjustmentsHistoryFor(supplier: Supplier) = auditService.auditEventsByTypeAndMetaKey(AuditEventType.JOURNEY_PRICE_BULK_ADJUSTMENT, supplier.name)
 
   fun adjustmentInProgressFor(supplier: Supplier) = annualPriceAdjuster.isInProgressFor(supplier)
 }

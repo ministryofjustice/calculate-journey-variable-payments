@@ -49,8 +49,7 @@ class HistoricMovesProcessingService(
       }
   }
 
-  private fun DateRange.notInPast() =
-    this.start.isAfter(timeSource.yesterday()) || this.endInclusive.isAfter(timeSource.yesterday())
+  private fun DateRange.notInPast() = this.start.isAfter(timeSource.yesterday()) || this.endInclusive.isAfter(timeSource.yesterday())
 
   private fun processExisting(moves: List<Move>) = movePersister.persist(moves)
 }

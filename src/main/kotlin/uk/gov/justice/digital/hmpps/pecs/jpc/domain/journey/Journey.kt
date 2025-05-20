@@ -112,9 +112,7 @@ data class Journey(
   @Column(name = "effective_year", nullable = false)
   val effectiveYear: Int? = null,
 ) {
-  override fun toString(): String {
-    return "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
-  }
+  override fun toString(): String = "JourneyModel(journeyId='$journeyId', state=$state, fromNomisAgencyId='$fromNomisAgencyId', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUp=$pickUpDateTime, dropOff=$dropOffDateTime, vehicleRegistation=$vehicleRegistration, billable=$billable, notes=$notes, priceInPence=$priceInPence)"
 
   fun hasPrice() = priceInPence != null
   fun isBillable() = if (billable) "YES" else "NO"
@@ -131,16 +129,14 @@ data class Journey(
   /**
    * A journey can have multiple registrations. The vehicle may change due to unforeseen circumstances e.g. breakdown.
    */
-  fun vehicleRegistrations() =
-    events?.startAndCompleteEvents()
-      ?.vehicleRegistration()
-      ?.distinct()
-      ?.joinToString(separator = ", ")
-      ?.ifEmpty { vehicleRegistration } ?: vehicleRegistration
+  fun vehicleRegistrations() = events?.startAndCompleteEvents()
+    ?.vehicleRegistration()
+    ?.distinct()
+    ?.joinToString(separator = ", ")
+    ?.ifEmpty { vehicleRegistration } ?: vehicleRegistration
 
-  private fun List<Event>.startAndCompleteEvents() =
-    this.filter { it.hasType(EventType.JOURNEY_START) || it.hasType(EventType.JOURNEY_COMPLETE) }
-      .sortedBy { it.occurredAt }
+  private fun List<Event>.startAndCompleteEvents() = this.filter { it.hasType(EventType.JOURNEY_START) || it.hasType(EventType.JOURNEY_COMPLETE) }
+    .sortedBy { it.occurredAt }
 
   private fun List<Event>.vehicleRegistration() = this.mapNotNull { it.vehicleRegistration() }
 
@@ -148,11 +144,9 @@ data class Journey(
     private val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    fun fromJson(json: String): Journey? {
-      return Klaxon().fieldConverter(JsonJourneyStateConverter::class, jsonJourneyStateConverter)
-        .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
-        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Journey>(json)
-    }
+    fun fromJson(json: String): Journey? = Klaxon().fieldConverter(JsonJourneyStateConverter::class, jsonJourneyStateConverter)
+      .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Journey>(json)
   }
 
   fun stateIsAnyOf(vararg states: JourneyState) = states.contains(state)
@@ -213,7 +207,7 @@ data class Journey(
   }
 }
 
-enum class JourneyState() {
+enum class JourneyState {
   proposed,
   in_progress,
   rejected,
@@ -223,8 +217,7 @@ enum class JourneyState() {
   ;
 
   companion object {
-    fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { JourneyState.values().first { js -> js.toString().lowercase() == value!!.lowercase() } }.getOrDefault(unknown)
+    fun valueOfCaseInsensitive(value: String?) = kotlin.runCatching { JourneyState.values().first { js -> js.toString().lowercase() == value!!.lowercase() } }.getOrDefault(unknown)
   }
 }
 
@@ -237,6 +230,5 @@ val jsonJourneyStateConverter = object : Converter {
 
   override fun fromJson(jv: JsonValue) = JourneyState.valueOfCaseInsensitive(jv.string)
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }

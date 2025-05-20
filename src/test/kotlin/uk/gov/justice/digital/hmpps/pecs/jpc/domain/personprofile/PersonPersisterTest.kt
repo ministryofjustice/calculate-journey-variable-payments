@@ -21,16 +21,12 @@ import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicInteger
 
 private class PersonMatcher(var person: Person) : ArgumentMatcher<Person> {
-  override fun matches(otherPerson: Person): Boolean {
-    return person.personId == otherPerson.personId
-  }
+  override fun matches(otherPerson: Person): Boolean = person.personId == otherPerson.personId
 }
 
 private class ProfileMatcher(var profile: Profile) : ArgumentMatcher<Profile> {
-  override fun matches(otherProfile: Profile): Boolean {
-    return profile.profileId == otherProfile.profileId &&
-      profile.personId == profile.personId
-  }
+  override fun matches(otherProfile: Profile): Boolean = profile.profileId == otherProfile.profileId &&
+    profile.personId == profile.personId
 }
 
 @ActiveProfiles("test")
@@ -176,6 +172,5 @@ internal class PersonPersisterTest(
     verify(profileRepositorySpy, times(6)).saveAndFlush(any())
   }
 
-  fun <T> entities(numberOf: Int, f: (id: String) -> T): Sequence<T> =
-    MutableList(numberOf) { index -> f(index.toString()) }.asSequence()
+  fun <T> entities(numberOf: Int, f: (id: String) -> T): Sequence<T> = MutableList(numberOf) { index -> f(index.toString()) }.asSequence()
 }

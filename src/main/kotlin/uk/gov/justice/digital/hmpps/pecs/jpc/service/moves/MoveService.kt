@@ -36,14 +36,11 @@ class MoveService(
     }
   }
 
-  fun moves(supplier: Supplier, startDate: LocalDate) =
-    moveQueryRepository.movesWithMoveTypeInDateRange(supplier, startDate, endOfMonth(startDate))
+  fun moves(supplier: Supplier, startDate: LocalDate) = moveQueryRepository.movesWithMoveTypeInDateRange(supplier, startDate, endOfMonth(startDate))
 
-  fun findMoveByReferenceAndSupplier(ref: String, supplier: Supplier) =
-    moveRepository.findByReferenceAndSupplier(ref, supplier)?.takeIf { it.moveType != null }
+  fun findMoveByReferenceAndSupplier(ref: String, supplier: Supplier) = moveRepository.findByReferenceAndSupplier(ref, supplier)?.takeIf { it.moveType != null }
 
-  fun movesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate) =
-    moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate))
+  fun movesForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate) = moveQueryRepository.movesForMoveTypeInDateRange(supplier, moveType, startDate, endOfMonth(startDate))
 
   fun summaryForMoveType(supplier: Supplier, moveType: MoveType, startDate: LocalDate): MovesTypeSummary {
     val endDate = endOfMonth(startDate)
@@ -69,8 +66,7 @@ class MoveService(
    * information for pricing purposes e.g. move type or drop off date time. This will enable the end users to better
    * reconcile invoices from the supplier. Prior to this they were not readily available.
    */
-  fun candidateReconciliations(supplier: Supplier, startDate: LocalDate) =
-    moveRepository.findCompletedCandidateReconcilableMoves(supplier, startDate.year, startDate.month.value)
+  fun candidateReconciliations(supplier: Supplier, startDate: LocalDate) = moveRepository.findCompletedCandidateReconcilableMoves(supplier, startDate.year, startDate.month.value)
 }
 
 data class MovesTypeSummary(val count: Int, val movesSummary: MovesSummary)

@@ -60,14 +60,11 @@ class MaintainSupplierPricingController(
 
   data class Warning(val text: String) {
     companion object {
-      fun standard(supplier: Supplier, effectiveYear: Int) =
-        Warning("Please note the added price will be effective for all instances of this journey undertaken by $supplier in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
+      fun standard(supplier: Supplier, effectiveYear: Int) = Warning("Please note the added price will be effective for all instances of this journey undertaken by $supplier in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
 
-      fun beforeWithCurrentPrice(effectiveYear: Int) =
-        Warning("Please note a price for this journey already exists in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
+      fun beforeWithCurrentPrice(effectiveYear: Int) = Warning("Please note a price for this journey already exists in the current contractual year $effectiveYear to ${effectiveYear + 1}.")
 
-      fun before(effectiveYear: Int) =
-        Warning("Making this change will only affect journeys undertaken in the contractual year $effectiveYear to ${effectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
+      fun before(effectiveYear: Int) = Warning("Making this change will only affect journeys undertaken in the contractual year $effectiveYear to ${effectiveYear + 1}. You will need to apply a bulk price adjustment to calculate the new journey price in the current contractual year.")
     }
   }
 
@@ -300,19 +297,18 @@ class MaintainSupplierPricingController(
     }
   }
 
-  private fun existingExceptions(existingExceptions: Map<Int, Money>, effectiveYear: Int) =
-    ordinalMonthsAndYearForSeptemberToAugust(effectiveYear).mapNotNull { (month, year) ->
-      if (existingExceptions.containsKey(month)) {
-        PriceExceptionMonth(
-          Month.of(month),
-          existingExceptions.containsKey(month),
-          year,
-          existingExceptions[month],
-        )
-      } else {
-        null
-      }
+  private fun existingExceptions(existingExceptions: Map<Int, Money>, effectiveYear: Int) = ordinalMonthsAndYearForSeptemberToAugust(effectiveYear).mapNotNull { (month, year) ->
+    if (existingExceptions.containsKey(month)) {
+      PriceExceptionMonth(
+        Month.of(month),
+        existingExceptions.containsKey(month),
+        year,
+        existingExceptions[month],
+      )
+    } else {
+      null
     }
+  }
 
   @PostMapping(ADD_PRICE_EXCEPTION)
   fun addPriceException(
@@ -394,8 +390,7 @@ class MaintainSupplierPricingController(
     return RedirectView("$UPDATE_PRICE/$moveId#price-exceptions")
   }
 
-  private fun RedirectAttributes.showErrorOnRedirect(attribute: String) =
-    this.addFlashAttribute("flashError", attribute)
+  private fun RedirectAttributes.showErrorOnRedirect(attribute: String) = this.addFlashAttribute("flashError", attribute)
 
   private fun getWarningTexts(supplier: Supplier, selectedEffectiveYear: Int, from: String, to: String): List<Warning> {
     if (selectedEffectiveYear >= actualEffectiveYear.current()) {
@@ -412,10 +407,9 @@ class MaintainSupplierPricingController(
     return listOf(Warning.before(selectedEffectiveYear))
   }
 
-  private fun priceHistoryForMove(supplier: Supplier, from: String, to: String) =
-    supplierPricingService.priceHistoryForJourney(supplier, from, to)
-      .map { history -> PriceHistoryDto.valueOf(supplier, history) }
-      .sortedByDescending { lh -> lh.datetime }
+  private fun priceHistoryForMove(supplier: Supplier, from: String, to: String) = supplierPricingService.priceHistoryForJourney(supplier, from, to)
+    .map { history -> PriceHistoryDto.valueOf(supplier, history) }
+    .sortedByDescending { lh -> lh.datetime }
 
   private fun ModelMap.getJourneySearchResultsUrl(): String {
     val url = UriComponentsBuilder.fromUriString(ManageJourneyPriceCatalogueController.SEARCH_JOURNEYS_RESULTS_URL)
@@ -426,11 +420,9 @@ class MaintainSupplierPricingController(
     return url.toUriString()
   }
 
-  private fun agencyIds(combined: String) =
-    Pair(combined.split("-")[0].trim().uppercase(), combined.split("-")[1].trim().uppercase())
+  private fun agencyIds(combined: String) = Pair(combined.split("-")[0].trim().uppercase(), combined.split("-")[1].trim().uppercase())
 
-  private fun parseAmount(value: String) =
-    value.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { Money.valueOf(it) }
+  private fun parseAmount(value: String) = value.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { Money.valueOf(it) }
 
   private fun ModelMap.getFromLocation() = this.getAttribute(PICK_UP_ATTRIBUTE).takeUnless { it == "" }
 

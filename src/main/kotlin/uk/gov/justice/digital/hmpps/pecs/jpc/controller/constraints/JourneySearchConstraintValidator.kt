@@ -7,6 +7,5 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.controller.ManageJourneyPriceCatalo
 class JourneySearchConstraintValidator : ConstraintValidator<ValidJourneySearch, ManageJourneyPriceCatalogueController.SearchJourneyForm> {
   override fun initialize(arg0: ValidJourneySearch) {}
 
-  override fun isValid(form: ManageJourneyPriceCatalogueController.SearchJourneyForm, context: ConstraintValidatorContext) =
-    !form.from.isNullOrBlank() || !form.to.isNullOrBlank()
+  override fun isValid(form: ManageJourneyPriceCatalogueController.SearchJourneyForm, context: ConstraintValidatorContext) = !form.from.isNullOrBlank() || !form.to.isNullOrBlank()
 }

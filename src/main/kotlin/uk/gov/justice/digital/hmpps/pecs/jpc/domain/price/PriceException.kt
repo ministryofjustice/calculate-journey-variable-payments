@@ -76,7 +76,5 @@ data class PriceException(
 
   override fun hashCode() = id.hashCode()
 
-  override fun toString(): String {
-    return "PriceException(id=$id, price=$price, month=$month, priceInPence=XXXXXX)"
-  }
+  override fun toString(): String = "PriceException(id=$id, price=$price, month=$month, priceInPence=XXXXXX)"
 }

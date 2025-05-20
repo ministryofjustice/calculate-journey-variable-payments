@@ -8,11 +8,12 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.Data
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.NOMIS_AGENCY_ID
 import java.util.stream.Stream
 
-class LocationsSheet(workbook: Workbook, header: Header) : PriceSheet(
-  sheet = workbook.createSheet("Locations"),
-  header = header,
-  dataColumns = listOf(NOMIS_AGENCY_ID, NAME, LOCATION_TYPE),
-) {
+class LocationsSheet(workbook: Workbook, header: Header) :
+  PriceSheet(
+    sheet = workbook.createSheet("Locations"),
+    header = header,
+    dataColumns = listOf(NOMIS_AGENCY_ID, NAME, LOCATION_TYPE),
+  ) {
   override fun writeMove(move: Move) {}
 
   fun write(locations: Stream<Location>) {

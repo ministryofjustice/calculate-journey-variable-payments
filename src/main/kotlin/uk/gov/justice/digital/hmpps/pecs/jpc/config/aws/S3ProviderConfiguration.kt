@@ -32,18 +32,14 @@ class S3ProviderConfiguration {
   fun jpcAmazonS3(
     @Value("\${resources.endpoint.url:}") endpoint: String,
     @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
-  ): AmazonS3 {
-    return amazonS3(endpoint, region)
-  }
+  ): AmazonS3 = amazonS3(endpoint, region)
 
   @Bean
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
   fun basmAmazonS3(
     @Value("\${resources.endpoint.url:}") endpoint: String,
     @Value("\${AWS_DEFAULT_REGION:eu-west-2}") region: String,
-  ): AmazonS3 {
-    return amazonS3(endpoint, region)
-  }
+  ): AmazonS3 = amazonS3(endpoint, region)
 
   private fun amazonS3(endpoint: String, region: String): AmazonS3 {
     logger.info("Using AWS configuration.")
@@ -128,9 +124,7 @@ class S3ProviderConfiguration {
   fun reportLookup(
     @Qualifier("basmAmazonS3") client: AmazonS3,
     @Value("\${BASM_BUCKET_NAME}") bucketName: String,
-  ): ReportLookup {
-    return ReportLookup { client.doesObjectExist(bucketName, it) }
-  }
+  ): ReportLookup = ReportLookup { client.doesObjectExist(bucketName, it) }
 
   @Bean
   @ConditionalOnProperty(name = ["resources.provider"], havingValue = "s3")
@@ -138,31 +132,29 @@ class S3ProviderConfiguration {
     @Qualifier("basmAmazonS3") client: AmazonS3,
     @Value("\${BASM_BUCKET_NAME}") bucketName: String,
     @Value("\${SENTRY_ENVIRONMENT:}") env: String,
-  ): StreamingReportParser {
-    return if (env.trim().uppercase() == "LOCAL") {
-      logger.warn("Running parser in PII obfuscation mode")
-      ObfuscatingStreamingReportParser {
-        InputStreamReader(
-          client.getObject(
-            GetObjectRequest(
-              bucketName,
-              it,
-            ),
-          ).objectContent,
-        )
-      }
-    } else {
-      logger.info("Using AWS S3 for streaming report parser.")
-      StandardStreamingReportParser {
-        InputStreamReader(
-          client.getObject(
-            GetObjectRequest(
-              bucketName,
-              it,
-            ),
-          ).objectContent,
-        )
-      }
+  ): StreamingReportParser = if (env.trim().uppercase() == "LOCAL") {
+    logger.warn("Running parser in PII obfuscation mode")
+    ObfuscatingStreamingReportParser {
+      InputStreamReader(
+        client.getObject(
+          GetObjectRequest(
+            bucketName,
+            it,
+          ),
+        ).objectContent,
+      )
+    }
+  } else {
+    logger.info("Using AWS S3 for streaming report parser.")
+    StandardStreamingReportParser {
+      InputStreamReader(
+        client.getObject(
+          GetObjectRequest(
+            bucketName,
+            it,
+          ),
+        ).objectContent,
+      )
     }
   }
 }

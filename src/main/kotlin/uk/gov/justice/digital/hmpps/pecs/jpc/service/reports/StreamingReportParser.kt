@@ -47,8 +47,7 @@ class ObfuscatingStreamingReportParser(private val reader: (String) -> Reader) :
 
   private fun randomString(length: Int) = ('a'..'z').randomString(length)
 
-  private fun ClosedRange<Char>.randomString(length: Int) =
-    (1..length)
-      .map { (Random().nextInt(endInclusive.code - start.code) + start.code).toChar() }
-      .joinToString("")
+  private fun ClosedRange<Char>.randomString(length: Int) = (1..length)
+    .map { (Random().nextInt(endInclusive.code - start.code) + start.code).toChar() }
+    .joinToString("")
 }

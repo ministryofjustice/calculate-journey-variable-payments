@@ -88,6 +88,5 @@ internal class JourneyServiceTest {
     fromSiteName: String? = null,
     toAgencyId: String,
     toSiteName: String? = null,
-  ) =
-    JourneyWithPrice(fromAgencyId, null, fromSiteName, toAgencyId, null, toSiteName, null, null, null)
+  ) = JourneyWithPrice(fromAgencyId, null, fromSiteName, toAgencyId, null, toSiteName, null, null, null)
 }

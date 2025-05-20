@@ -106,10 +106,9 @@ class AnnualPriceAdjustmentsController(
     this.rejectValue(field, "rate", "Invalid rate")
   }
 
-  private fun priceAdjustmentHistoryFor(supplier: Supplier): List<PriceAdjustmentHistoryDto> =
-    annualPriceAdjustmentsService.adjustmentsHistoryFor(supplier)
-      .map { history -> PriceAdjustmentHistoryDto.valueOf(supplier, history) }
-      .sortedByDescending { lh -> lh.datetime }
+  private fun priceAdjustmentHistoryFor(supplier: Supplier): List<PriceAdjustmentHistoryDto> = annualPriceAdjustmentsService.adjustmentsHistoryFor(supplier)
+    .map { history -> PriceAdjustmentHistoryDto.valueOf(supplier, history) }
+    .sortedByDescending { lh -> lh.datetime }
 
   private fun ModelMap.addAdjustmentHistoryFor(supplier: Supplier) {
     logger.info("Adding price adjustment history")
@@ -127,11 +126,9 @@ class AnnualPriceAdjustmentsController(
     @get:Length(max = 255, message = "Enter details upto 255 characters")
     val details: String? = null,
   ) {
-    fun mayBeInflationaryRate() =
-      inflationaryRate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
+    fun mayBeInflationaryRate() = inflationaryRate?.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { AdjustmentMultiplier(it) }
 
-    fun mayBeVolumetricRate() =
-      volumetricRate?.toBigDecimalOrNull()?.let { AdjustmentMultiplier(it) }
+    fun mayBeVolumetricRate() = volumetricRate?.toBigDecimalOrNull()?.let { AdjustmentMultiplier(it) }
   }
 
   companion object {

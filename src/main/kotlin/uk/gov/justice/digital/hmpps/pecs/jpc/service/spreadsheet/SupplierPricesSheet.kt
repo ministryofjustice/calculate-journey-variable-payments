@@ -17,11 +17,12 @@ import java.util.stream.Stream
 
 typealias PriceId = UUID
 
-internal class SupplierPricesSheet(workbook: Workbook, private val header: Header) : PriceSheet(
-  sheet = workbook.createSheet("JPC Price book"),
-  header = header,
-  dataColumns = listOf(PICK_UP, DROP_OFF, UNIT_PRICE, UNIT_PRICE_EXCEPTION),
-) {
+internal class SupplierPricesSheet(workbook: Workbook, private val header: Header) :
+  PriceSheet(
+    sheet = workbook.createSheet("JPC Price book"),
+    header = header,
+    dataColumns = listOf(PICK_UP, DROP_OFF, UNIT_PRICE, UNIT_PRICE_EXCEPTION),
+  ) {
   override fun writeMove(move: Move) {}
 
   fun write(prices: Stream<Price>, possiblePriceExceptions: Map<PriceId, List<PriceException>>) {

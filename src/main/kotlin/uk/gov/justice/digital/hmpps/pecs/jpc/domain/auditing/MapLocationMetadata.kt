@@ -49,12 +49,10 @@ data class MapLocationMetadata(
       return MapLocationMetadata(old, new)
     }
 
-    fun map(event: AuditEvent): MapLocationMetadata {
-      return if (event.eventType == AuditEventType.LOCATION) {
-        Klaxon().parse<MapLocationMetadata>(event.metadata!!)!!
-      } else {
-        throw IllegalArgumentException("Audit event type is not a location event.")
-      }
+    fun map(event: AuditEvent): MapLocationMetadata = if (event.eventType == AuditEventType.LOCATION) {
+      Klaxon().parse<MapLocationMetadata>(event.metadata!!)!!
+    } else {
+      throw IllegalArgumentException("Audit event type is not a location event.")
     }
 
     fun key(agencyId: String) = agencyId.trim().uppercase()

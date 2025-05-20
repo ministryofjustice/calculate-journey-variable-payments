@@ -25,6 +25,5 @@ class GlobalController {
   @ModelAttribute("manageYourDetailsUrl")
   fun manageYourDetailsUrl() = hmppsUri.ifBlankStayOrElseGet("/account-details")
 
-  fun String.ifBlankStayOrElseGet(suffix: String? = null) =
-    if (this.isBlank()) '#' else suffix?.let { this.plus(suffix) } ?: this
+  fun String.ifBlankStayOrElseGet(suffix: String? = null) = if (this.isBlank()) '#' else suffix?.let { this.plus(suffix) } ?: this
 }

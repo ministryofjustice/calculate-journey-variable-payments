@@ -20,27 +20,23 @@ class LocationsService(
   private val auditService: AuditService,
 ) {
 
-  fun findLocationBySiteName(locationName: String): Location? =
-    locationRepository.findBySiteName(sanitised(locationName))
+  fun findLocationBySiteName(locationName: String): Location? = locationRepository.findBySiteName(sanitised(locationName))
 
   fun findAll(): List<Location> = locationRepository.findAll()
 
   fun getVersion() = locationRepository.findFirstByOrderByUpdatedAtDesc()?.updatedAt?.toEpochSecond(ZoneOffset.UTC) ?: 0
 
-  fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? =
-    locationRepository.findByNomisAgencyId(sanitised(agencyId))
-      ?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }
+  fun findAgencyLocationAndType(agencyId: String): Triple<String, String, LocationType>? = locationRepository.findByNomisAgencyId(sanitised(agencyId))
+    ?.let { Triple(it.nomisAgencyId, it.siteName, it.locationType) }
 
-  fun locationAlreadyExists(agencyId: String, siteName: String) =
-    locationRepository.findBySiteName(sanitised(siteName))
-      ?.takeUnless { it.nomisAgencyId == sanitised(agencyId) } != null
+  fun locationAlreadyExists(agencyId: String, siteName: String) = locationRepository.findBySiteName(sanitised(siteName))
+    ?.takeUnless { it.nomisAgencyId == sanitised(agencyId) } != null
 
   fun setLocationDetails(agencyId: String, friendlyLocationName: String, locationType: LocationType) {
     val sanitizedAgencyId = sanitised(agencyId)
     val sanitisedLocationName = sanitised(friendlyLocationName)
 
-    fun Location.eitherHasChanged(siteName: String, type: LocationType) =
-      this.siteName != siteName || this.locationType != type
+    fun Location.eitherHasChanged(siteName: String, type: LocationType) = this.siteName != siteName || this.locationType != type
 
     locationRepository.findByNomisAgencyId(sanitizedAgencyId)?.let {
       if (it.eitherHasChanged(sanitisedLocationName, locationType)) {
@@ -69,9 +65,8 @@ class LocationsService(
     ).let { e -> auditService.create(e) }
   }
 
-  fun locationHistoryForAgencyId(agencyId: String) =
-    auditService.auditEventsByTypeAndMetaKey(AuditEventType.LOCATION, MapLocationMetadata.key(agencyId))
-      .associateWith { MapLocationMetadata.map(it) }.keys
+  fun locationHistoryForAgencyId(agencyId: String) = auditService.auditEventsByTypeAndMetaKey(AuditEventType.LOCATION, MapLocationMetadata.key(agencyId))
+    .associateWith { MapLocationMetadata.map(it) }.keys
 
   private fun sanitised(value: String) = value.trim().uppercase()
 }

@@ -59,21 +59,15 @@ class CommandRunner(
 
   private fun ApplicationArguments.contains(command: String) = this.optionNames.contains(command)
 
-  private fun ApplicationArguments.getSupplier() =
-    this.get("supplier")?.let { Supplier.valueOf(it) } ?: throw RuntimeException("Missing supplier argument")
+  private fun ApplicationArguments.getSupplier() = this.get("supplier")?.let { Supplier.valueOf(it) } ?: throw RuntimeException("Missing supplier argument")
 
-  private fun ApplicationArguments.getAction() =
-    this.get("action")?.let { PriceImporter.Action.valueOf(it) } ?: PriceImporter.Action.ERROR
+  private fun ApplicationArguments.getAction() = this.get("action")?.let { PriceImporter.Action.valueOf(it) } ?: PriceImporter.Action.ERROR
 
-  private fun ApplicationArguments.getYear() =
-    this.get("year")?.toIntOrNull() ?: throw RuntimeException("Missing year argument")
+  private fun ApplicationArguments.getYear() = this.get("year")?.toIntOrNull() ?: throw RuntimeException("Missing year argument")
 
-  private fun ApplicationArguments.getMultiplier(attribute: String) =
-    this.get(attribute)?.let { AdjustmentMultiplier.valueOf(it) }
+  private fun ApplicationArguments.getMultiplier(attribute: String) = this.get(attribute)?.let { AdjustmentMultiplier.valueOf(it) }
 
-  private fun ApplicationArguments.getDate(attribute: String) =
-    this.get(attribute)?.let { LocalDate.parse(it) } ?: throw RuntimeException("Missing date argument $attribute")
+  private fun ApplicationArguments.getDate(attribute: String) = this.get(attribute)?.let { LocalDate.parse(it) } ?: throw RuntimeException("Missing date argument $attribute")
 
-  private fun ApplicationArguments.get(attribute: String) =
-    this.getOptionValues(attribute).firstOrNull()?.trim()?.uppercase()
+  private fun ApplicationArguments.get(attribute: String) = this.getOptionValues(attribute).firstOrNull()?.trim()?.uppercase()
 }

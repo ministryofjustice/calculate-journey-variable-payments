@@ -49,13 +49,9 @@ class SecurityConfiguration<S : Session> {
   private lateinit var auditService: AuditService
 
   @Bean
-  fun jdbcHttpSessionCustomizer(): PostgreSqlJdbcHttpSessionCustomizer {
-    return PostgreSqlJdbcHttpSessionCustomizer()
-  }
+  fun jdbcHttpSessionCustomizer(): PostgreSqlJdbcHttpSessionCustomizer = PostgreSqlJdbcHttpSessionCustomizer()
 
-  class PostgreSqlJdbcHttpSessionCustomizer :
-
-    SessionRepositoryCustomizer<JdbcIndexedSessionRepository> {
+  class PostgreSqlJdbcHttpSessionCustomizer : SessionRepositoryCustomizer<JdbcIndexedSessionRepository> {
     override fun customize(sessionRepository: JdbcIndexedSessionRepository) {
       sessionRepository.setCreateSessionAttributeQuery(CREATE_SESSION_ATTRIBUTE_QUERY)
     }
@@ -73,32 +69,30 @@ class SecurityConfiguration<S : Session> {
 
   @Bean
   @Throws(Exception::class)
-  fun filterChain(http: HttpSecurity): SecurityFilterChain? {
-    return http
-      .authorizeHttpRequests { auth ->
-        auth
-          .requestMatchers("/health/**", "/info").permitAll()
-          .anyRequest().hasRole("PECS_JPC")
-      }
-      .sessionManagement {
-        it.invalidSessionUrl(ssoLogoutUri())
-          .sessionAuthenticationErrorUrl(ssoLogoutUri())
-          .sessionConcurrency { concurrency ->
-            concurrency.maximumSessions(1)
-          }
-      }
-      .exceptionHandling {
-        it.accessDeniedHandler(accessDeniedHandler())
-      }
-      .oauth2Login {
-        it.userInfoEndpoint { oAuth2UserService() }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
-      }
-      .logout {
-        it.logoutSuccessHandler(logOutHandler())
-          .logoutSuccessUrl(ssoLogoutUri())
-      }
-      .build()
-  }
+  fun filterChain(http: HttpSecurity): SecurityFilterChain? = http
+    .authorizeHttpRequests { auth ->
+      auth
+        .requestMatchers("/health/**", "/info").permitAll()
+        .anyRequest().hasRole("PECS_JPC")
+    }
+    .sessionManagement {
+      it.invalidSessionUrl(ssoLogoutUri())
+        .sessionAuthenticationErrorUrl(ssoLogoutUri())
+        .sessionConcurrency { concurrency ->
+          concurrency.maximumSessions(1)
+        }
+    }
+    .exceptionHandling {
+      it.accessDeniedHandler(accessDeniedHandler())
+    }
+    .oauth2Login {
+      it.userInfoEndpoint { oAuth2UserService() }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
+    }
+    .logout {
+      it.logoutSuccessHandler(logOutHandler())
+        .logoutSuccessUrl(ssoLogoutUri())
+    }
+    .build()
 
   @Bean
   fun logInHandler() = LogInAuditHandler(auditService)
@@ -107,37 +101,31 @@ class SecurityConfiguration<S : Session> {
   fun logOutHandler() = LogOutAuditHandler(auditService, ssoLogoutUri())
 
   @Bean
-  fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    return OAuth2UserService { userRequest ->
+  fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> = OAuth2UserService { userRequest ->
 
-      val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
-      val userAttributes = jwt.claims
-      DefaultOAuth2User(
-        jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
-        userAttributes,
-        "name",
-      )
-    }
+    val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
+    val userAttributes = jwt.claims
+    DefaultOAuth2User(
+      jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
+      userAttributes,
+      "name",
+    )
   }
 
-  private fun accessDeniedHandler(): AccessDeniedHandler {
-    return AccessDeniedHandler { request, response, accessDeniedException ->
-      val auth: Authentication? = SecurityContextHolder.getContext().authentication
+  private fun accessDeniedHandler(): AccessDeniedHandler = AccessDeniedHandler { request, response, accessDeniedException ->
+    val auth: Authentication? = SecurityContextHolder.getContext().authentication
 
-      auth?.let { logger.warn("User: ${auth.name} attempted to access the protected URL: ${request.requestURI}") }
+    auth?.let { logger.warn("User: ${auth.name} attempted to access the protected URL: ${request.requestURI}") }
 
-      logger.error(accessDeniedException.message)
+    logger.error(accessDeniedException.message)
 
-      request.session.invalidate()
+    request.session.invalidate()
 
-      response.sendRedirect(ssoLogoutUri())
-    }
+    response.sendRedirect(ssoLogoutUri())
   }
 
   private fun ssoLogoutUri() = authLogoutSuccessUri.plus("/auth/sign-out")
 
   @Bean
-  fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? {
-    return SpringSecurityDialect()
-  }
+  fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? = SpringSecurityDialect()
 }

@@ -128,9 +128,7 @@ data class Price(
 
   override fun hashCode() = id.hashCode()
 
-  override fun toString(): String {
-    return "Price(id=$id, supplier=$supplier, fromLocation=$fromLocation, toLocation=$toLocation, priceInPence=XXXXXX, addedAt=$addedAt, effectiveYear=$effectiveYear, exceptions=${exceptions.values.map { it.id }})"
-  }
+  override fun toString(): String = "Price(id=$id, supplier=$supplier, fromLocation=$fromLocation, toLocation=$toLocation, priceInPence=XXXXXX, addedAt=$addedAt, effectiveYear=$effectiveYear, exceptions=${exceptions.values.map { it.id }})"
 }
 
 enum class Supplier {
@@ -140,8 +138,7 @@ enum class Supplier {
   ;
 
   companion object {
-    fun valueOfCaseInsensitive(value: String?) =
-      kotlin.runCatching { valueOf(value!!.uppercase()) }.getOrDefault(UNKNOWN)
+    fun valueOfCaseInsensitive(value: String?) = kotlin.runCatching { valueOf(value!!.uppercase()) }.getOrDefault(UNKNOWN)
 
     fun forEach(consumer: (Supplier) -> Unit) {
       listOf(SERCO, GEOAMEY).forEach { consumer(it) }

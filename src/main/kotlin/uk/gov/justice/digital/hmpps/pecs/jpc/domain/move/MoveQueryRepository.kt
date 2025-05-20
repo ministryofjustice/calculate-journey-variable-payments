@@ -228,8 +228,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     }
   }
 
-  fun movesWithMoveTypeInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) =
-    MoveType.values().associateBy({ it }, { movesForMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) })
+  fun movesWithMoveTypeInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate) = MoveType.values().associateBy({ it }, { movesForMoveTypeInDateRange(supplier, it, startDate, endDateInclusive) })
 
   /**
    * This will include moves with and without a move type assigned in the results.

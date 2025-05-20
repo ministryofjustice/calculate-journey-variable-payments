@@ -141,14 +141,13 @@ data class Move(
   @Column(name = "move_year", nullable = true)
   val moveYear: Int? = pickUpDateTime?.year ?: moveDate?.year
 
-  fun totalInPence() =
-    if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) {
-      null
-    } else {
-      journeys.sumOf {
-        it.priceInPence ?: 0
-      }
+  fun totalInPence() = if (journeys.isEmpty() || journeys.count { it.priceInPence == null } > 0) {
+    null
+  } else {
+    journeys.sumOf {
+      it.priceInPence ?: 0
     }
+  }
 
   fun hasPrice() = totalInPence() != null
   fun totalInPounds() = totalInPence()?.let { Money(it).pounds() }
@@ -170,22 +169,16 @@ data class Move(
     const val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
     const val CANCELLATION_REASON_INCOMPLETE_PER = "incomplete_per"
 
-    fun fromJson(json: String): Move? {
-      return Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
-        .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
-        .fieldConverter(JsonDateConverter::class, jsonDateConverter)
-        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Move>(json)
-    }
+    fun fromJson(json: String): Move? = Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
+      .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+      .fieldConverter(JsonDateConverter::class, jsonDateConverter)
+      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Move>(json)
   }
 
-  fun toJson(): String {
-    return Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
-      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).toJsonString(this)
-  }
+  fun toJson(): String = Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
+    .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).toJsonString(this)
 
-  override fun toString(): String {
-    return "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes')"
-  }
+  override fun toString(): String = "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes')"
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -240,17 +233,14 @@ data class Move(
    * This goes through each filterer in turn to see if it is that MoveType
    * If it doesn't find any matching MoveType, return null
    */
-  fun moveType(): MoveType? {
-    return MoveType.values().firstOrNull { it.hasMoveType(this) }
-  }
+  fun moveType(): MoveType? = MoveType.values().firstOrNull { it.hasMoveType(this) }
 
   fun hasAllOf(vararg ets: EventType) = getEvents(*ets).size == ets.size
   fun hasAnyOf(vararg ets: EventType) = getEvents(*ets).isNotEmpty()
   fun hasNoneOf(vararg ets: EventType) = !hasAnyOf(*ets)
 
-  fun getEvents(vararg ets: EventType) =
-    this.events.filter { ets.map { it.value }.contains(it.type) } +
-      this.journeys.flatMap { it.events ?: emptyList() }.filter { ets.map { it.value }.contains(it.type) }
+  fun getEvents(vararg ets: EventType) = this.events.filter { ets.map { it.value }.contains(it.type) } +
+    this.journeys.flatMap { it.events ?: emptyList() }.filter { ets.map { it.value }.contains(it.type) }
 }
 
 enum class MoveStatus {
@@ -264,11 +254,9 @@ enum class MoveStatus {
   ;
 
   companion object {
-    fun valueOfCaseInsensitive(value: String?) =
-
-      kotlin.runCatching {
-        MoveStatus.values().first { ms -> ms.toString().lowercase() == value!!.lowercase() }
-      }.getOrDefault(unknown)
+    fun valueOfCaseInsensitive(value: String?) = kotlin.runCatching {
+      MoveStatus.values().first { ms -> ms.toString().lowercase() == value!!.lowercase() }
+    }.getOrDefault(unknown)
   }
 }
 
@@ -281,6 +269,5 @@ val moveStatusConverter = object : Converter {
 
   override fun fromJson(jv: JsonValue) = MoveStatus.valueOfCaseInsensitive(jv.string)
 
-  override fun toJson(value: Any) =
-    """"$value""""
+  override fun toJson(value: Any) = """"$value""""
 }

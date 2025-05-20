@@ -28,9 +28,7 @@ data class Profile(
   val personId: String,
 ) {
   companion object {
-    fun fromJson(json: String): Profile? {
-      return Klaxon().fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Profile>(json)
-    }
+    fun fromJson(json: String): Profile? = Klaxon().fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Profile>(json)
   }
 
   override fun equals(other: Any?): Boolean {
@@ -53,7 +51,5 @@ data class Profile(
     return result
   }
 
-  override fun toString(): String {
-    return "Profile(profileId='$profileId', updatedAt=$updatedAt, personId='$personId')"
-  }
+  override fun toString(): String = "Profile(profileId='$profileId', updatedAt=$updatedAt, personId='$personId')"
 }

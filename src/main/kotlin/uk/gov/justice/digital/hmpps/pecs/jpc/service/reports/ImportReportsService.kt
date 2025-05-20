@@ -33,8 +33,7 @@ class ImportReportsService(
   /**
    * Null implies there are no imports.
    */
-  fun dateOfLastImport(): LocalDate? =
-    auditService.findMostRecentEventByType(REPORTING_DATA_IMPORT)?.createdAt?.toLocalDate()
+  fun dateOfLastImport(): LocalDate? = auditService.findMostRecentEventByType(REPORTING_DATA_IMPORT)?.createdAt?.toLocalDate()
 
   /**
    * A runtime exception will be thrown if the date is in the past or if any of the report files for the given date are

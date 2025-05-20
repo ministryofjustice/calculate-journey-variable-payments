@@ -101,28 +101,25 @@ object NomisLocationDeserializer : JsonDeserializer<BasmNomisLocation>() {
     "secure_training_centre" to LocationType.STC,
   )
 
-  override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): BasmNomisLocation? =
-    (p?.readValueAsTree() as JsonNode)["attributes"]?.let { attributes ->
-      val title = attributes["title"].asText().trim().uppercase()
-      val agencyId = attributes["nomis_agency_id"].asText().trim().uppercase()
-      val locationType = attributes["location_type"].asText()
+  override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): BasmNomisLocation? = (p?.readValueAsTree() as JsonNode)["attributes"]?.let { attributes ->
+    val title = attributes["title"].asText().trim().uppercase()
+    val agencyId = attributes["nomis_agency_id"].asText().trim().uppercase()
+    val locationType = attributes["location_type"].asText()
 
-      return (mayBe[locationType] ?: mayBeCourt(locationType, title))?.let { BasmNomisLocation(title, agencyId, it) }
+    return (mayBe[locationType] ?: mayBeCourt(locationType, title))?.let { BasmNomisLocation(title, agencyId, it) }
+  }
+
+  private fun mayBeCourt(type: String, title: String): LocationType? = if (type == "court") {
+    val sanitisedTitle = title.uppercase()
+
+    when {
+      sanitisedTitle.contains("COMBINED COURT") -> LocationType.CM
+      sanitisedTitle.contains("COUNTY COURT") -> LocationType.CO
+      sanitisedTitle.contains("CROWN COURT") -> LocationType.CC
+      sanitisedTitle.contains("MAGISTRATES COURT") -> LocationType.MC
+      else -> LocationType.CRT
     }
-
-  private fun mayBeCourt(type: String, title: String): LocationType? {
-    return if (type == "court") {
-      val sanitisedTitle = title.uppercase()
-
-      when {
-        sanitisedTitle.contains("COMBINED COURT") -> LocationType.CM
-        sanitisedTitle.contains("COUNTY COURT") -> LocationType.CO
-        sanitisedTitle.contains("CROWN COURT") -> LocationType.CC
-        sanitisedTitle.contains("MAGISTRATES COURT") -> LocationType.MC
-        else -> LocationType.CRT
-      }
-    } else {
-      null
-    }
+  } else {
+    null
   }
 }

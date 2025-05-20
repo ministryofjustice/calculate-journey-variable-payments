@@ -12,8 +12,6 @@ enum class MoveType(val label: String, val description: String, val hasMoveType:
   ;
 
   companion object {
-    fun valueOfCaseInsensitive(value: String): MoveType {
-      return MoveType.valueOf(value.uppercase())
-    }
+    fun valueOfCaseInsensitive(value: String): MoveType = MoveType.valueOf(value.uppercase())
   }
 }

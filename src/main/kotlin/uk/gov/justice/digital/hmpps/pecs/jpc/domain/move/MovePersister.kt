@@ -128,26 +128,24 @@ class MovePersister(
     return mCounter
   }
 
-  fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> {
-    return if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty()) {
-      listOf(fakeCancelledJourneyForPricing(move))
-    } else {
-      journeys.map { journey ->
-        val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
-        val pickUp = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_START)?.occurredAt
-        val dropOff = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
-        val vehicleRegistration = journey.determineRegistrationsCombinedWithThoseFrom(thisJourneyEvents)
+  fun processJourneys(move: Move, journeys: List<Journey>, journeyEvents: List<Event>): List<Journey> = if (move.moveType() == MoveType.CANCELLED && journeys.isEmpty()) {
+    listOf(fakeCancelledJourneyForPricing(move))
+  } else {
+    journeys.map { journey ->
+      val thisJourneyEvents = journeyEvents.filter { it.eventableId == journey.journeyId }
+      val pickUp = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_START)?.occurredAt
+      val dropOff = Event.getLatestByType(thisJourneyEvents, EventType.JOURNEY_COMPLETE)?.occurredAt
+      val vehicleRegistration = journey.determineRegistrationsCombinedWithThoseFrom(thisJourneyEvents)
 
-        journey.copy(
-          events = listOf(),
-          pickUpDateTime = pickUp,
-          dropOffDateTime = dropOff,
-          effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(
-            move.moveDate ?: timeSource.date(),
-          ),
-          vehicleRegistration = vehicleRegistration,
-        )
-      }
+      journey.copy(
+        events = listOf(),
+        pickUpDateTime = pickUp,
+        dropOffDateTime = dropOff,
+        effectiveYear = pickUp?.let { effectiveYearForDate(it.toLocalDate()) } ?: effectiveYearForDate(
+          move.moveDate ?: timeSource.date(),
+        ),
+        vehicleRegistration = vehicleRegistration,
+      )
     }
   }
 
@@ -157,23 +155,21 @@ class MovePersister(
    * There ane no actual supplier journey/journey events for billable cancelled moves so to price a cancelled move we
    * must create a fake journey.
    */
-  internal fun fakeCancelledJourneyForPricing(move: Move): Journey {
-    return Journey(
-      journeyId = UUID.randomUUID().toString(),
-      updatedAt = LocalDateTime.now(),
-      moveId = move.moveId,
-      billable = true,
-      supplier = move.supplier,
-      clientTimeStamp = LocalDateTime.now(),
-      fromNomisAgencyId = move.fromNomisAgencyId,
-      toNomisAgencyId = move.toNomisAgencyId!!,
-      state = JourneyState.cancelled,
-      vehicleRegistration = null,
-      notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
-      effectiveYear = effectiveYearForDate(move.moveDate ?: timeSource.date()),
-      events = listOf(),
-    )
-  }
+  internal fun fakeCancelledJourneyForPricing(move: Move): Journey = Journey(
+    journeyId = UUID.randomUUID().toString(),
+    updatedAt = LocalDateTime.now(),
+    moveId = move.moveId,
+    billable = true,
+    supplier = move.supplier,
+    clientTimeStamp = LocalDateTime.now(),
+    fromNomisAgencyId = move.fromNomisAgencyId,
+    toNomisAgencyId = move.toNomisAgencyId!!,
+    state = JourneyState.cancelled,
+    vehicleRegistration = null,
+    notes = "FAKE JOURNEY ADDED FOR CANCELLED BILLABLE MOVE",
+    effectiveYear = effectiveYearForDate(move.moveDate ?: timeSource.date()),
+    events = listOf(),
+  )
 }
 
 private val noteworthyEvents = listOf(
@@ -185,5 +181,4 @@ private val noteworthyEvents = listOf(
   EventType.MOVE_CANCEL,
 ).map { it.value }
 
-fun List<Event>.notes() =
-  filter { it.type in noteworthyEvents && !it.notes.isNullOrBlank() }.joinToString { "${it.type}: ${it.notes}" }
+fun List<Event>.notes() = filter { it.type in noteworthyEvents && !it.notes.isNullOrBlank() }.joinToString { "${it.type}: ${it.notes}" }

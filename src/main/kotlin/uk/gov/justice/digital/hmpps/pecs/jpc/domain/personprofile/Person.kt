@@ -57,10 +57,8 @@ data class Person(
 
 ) {
   companion object {
-    fun fromJson(json: String): Person? {
-      return Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
-        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Person>(json)
-    }
+    fun fromJson(json: String): Person? = Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
+      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Person>(json)
   }
 
   override fun equals(other: Any?): Boolean {
@@ -95,7 +93,5 @@ data class Person(
     return result
   }
 
-  override fun toString(): String {
-    return "Person(personId='$personId', updatedAt=$updatedAt, prisonNumber=XXXXXX, latestNomisBookingId=XXXXXX, firstNames=XXXXXX, lastName=XXXXXX, dateOfBirth=XXXXXX, gender=XXXXXX, ethnicity=XXXXXX)"
-  }
+  override fun toString(): String = "Person(personId='$personId', updatedAt=$updatedAt, prisonNumber=XXXXXX, latestNomisBookingId=XXXXXX, firstNames=XXXXXX, lastName=XXXXXX, dateOfBirth=XXXXXX, gender=XXXXXX, ethnicity=XXXXXX)"
 }

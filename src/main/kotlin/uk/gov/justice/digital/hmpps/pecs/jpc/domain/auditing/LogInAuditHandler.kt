@@ -6,8 +6,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.AuditService
 
-class LogInAuditHandler(private val auditService: AuditService) :
-  SavedRequestAwareAuthenticationSuccessHandler() {
+class LogInAuditHandler(private val auditService: AuditService) : SavedRequestAwareAuthenticationSuccessHandler() {
   override fun onAuthenticationSuccess(
     request: HttpServletRequest?,
     response: HttpServletResponse?,

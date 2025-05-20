@@ -582,24 +582,19 @@ private val moveSql = """
 
 private fun moveStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Start")
 
-private fun moveRedirectEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
-  moveEvent(move, supplier, "Redirect", move.pickUpDateTime?.plusMinutes(1))
+private fun moveRedirectEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Redirect", move.pickUpDateTime?.plusMinutes(1))
 
-private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
-  moveEvent(move, supplier, "Complete", move.dropOffOrCancelledDateTime)
+private fun moveCompleteEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Complete", move.dropOffOrCancelledDateTime)
 
 private fun moveAcceptEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Accept")
 
 private fun moveCancelEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Cancel")
 
-private fun moveLodgingStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
-  moveEvent(move, supplier, "LodgingStart")
+private fun moveLodgingStartEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "LodgingStart")
 
-private fun moveLodgingEndEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
-  moveEvent(move, supplier, "LodgingEnd")
+private fun moveLodgingEndEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "LodgingEnd")
 
-private fun moveOvernightLodgeEvent(move: Move, supplier: Supplier = Supplier.SERCO) =
-  moveEvent(move, supplier, "OvernightLodge")
+private fun moveOvernightLodgeEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "OvernightLodge")
 
 private fun moveLockoutEvent(move: Move, supplier: Supplier = Supplier.SERCO) = moveEvent(move, supplier, "Lockout")
 

@@ -14,24 +14,25 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.Data
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.PRICE
 import uk.gov.justice.digital.hmpps.pecs.jpc.service.spreadsheet.PriceSheet.DataColumn.VEHICLE_REG
 
-class StandardMovesSheet(workbook: Workbook, header: Header) : PriceSheet(
-  sheet = workbook.createSheet("Standard"),
-  header = header,
-  subheading = "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",
-  dataColumns = listOf(
-    MOVE_ID,
-    PICK_UP,
-    LOCATION_TYPE,
-    DROP_OFF,
-    LOCATION_TYPE,
-    PICK_UP_DATE,
-    PICK_UP_TIME,
-    DROP_OFF_DATE,
-    DROP_OFF_TIME,
-    VEHICLE_REG,
-    NOMIS_PRISON_ID,
-    PRICE,
-  ),
-) {
+class StandardMovesSheet(workbook: Workbook, header: Header) :
+  PriceSheet(
+    sheet = workbook.createSheet("Standard"),
+    header = header,
+    subheading = "STANDARD MOVES (includes single journeys, cross supplier and redirects before the move has started)",
+    dataColumns = listOf(
+      MOVE_ID,
+      PICK_UP,
+      LOCATION_TYPE,
+      DROP_OFF,
+      LOCATION_TYPE,
+      PICK_UP_DATE,
+      PICK_UP_TIME,
+      DROP_OFF_DATE,
+      DROP_OFF_TIME,
+      VEHICLE_REG,
+      NOMIS_PRISON_ID,
+      PRICE,
+    ),
+  ) {
   override fun writeMove(move: Move) = writeMoveRow(move, false)
 }

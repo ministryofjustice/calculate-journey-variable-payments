@@ -35,12 +35,9 @@ class ChooseSupplierFilter : OncePerRequestFilter() {
     ".js",
   )
 
-  override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-    return request.isAllowedURI()
-  }
+  override fun shouldNotFilter(request: HttpServletRequest): Boolean = request.isAllowedURI()
 
-  private fun HttpServletRequest.isAllowedURI() =
-    allowedLinks.any { this.requestURI == it } || allowedStaticResources.any { this.requestURI.endsWith(it) }
+  private fun HttpServletRequest.isAllowedURI() = allowedLinks.any { this.requestURI == it } || allowedStaticResources.any { this.requestURI.endsWith(it) }
 
   @Throws(IOException::class, ServletException::class)
   override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {

@@ -11,23 +11,22 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class LocationTypeTest {
 
-  fun testData(): Stream<Arguments> =
-    Stream.of(
-      Arguments.of("Airport", " aiRport ", "AIRPORT", LocationType.AP),
-      Arguments.of("Approved Premises", " apprOved preMises ", "APPROVED PREMISES", LocationType.APP),
-      Arguments.of("Combined Court", " CombineD Court ", "COMBINED COURT", LocationType.CM),
-      Arguments.of("County Court", " county Court ", "COUNTY COURT", LocationType.CO),
-      Arguments.of("Crown Court", " CrowN court ", "CROWN COURT", LocationType.CC),
-      Arguments.of("Hospital", " hOspital ", "HOSPITAL", LocationType.HP),
-      Arguments.of("Immigration", " immIgration ", "IMMIGRATION", LocationType.IM),
-      Arguments.of("Mag Court", " maG courT ", "MAG COURT", LocationType.MC),
-      Arguments.of("Other", " othEr ", "OTHER", LocationType.O),
-      Arguments.of("Police", " policE ", "POLICE", LocationType.PS),
-      Arguments.of("Prison", " prisOn ", "PRISON", LocationType.PR),
-      Arguments.of("Probation", " proBation ", "PROBATION", LocationType.PB),
-      Arguments.of("sch", " sCh ", "SCH", LocationType.SCH),
-      Arguments.of("stc", " stC ", "STC", LocationType.STC),
-    )
+  fun testData(): Stream<Arguments> = Stream.of(
+    Arguments.of("Airport", " aiRport ", "AIRPORT", LocationType.AP),
+    Arguments.of("Approved Premises", " apprOved preMises ", "APPROVED PREMISES", LocationType.APP),
+    Arguments.of("Combined Court", " CombineD Court ", "COMBINED COURT", LocationType.CM),
+    Arguments.of("County Court", " county Court ", "COUNTY COURT", LocationType.CO),
+    Arguments.of("Crown Court", " CrowN court ", "CROWN COURT", LocationType.CC),
+    Arguments.of("Hospital", " hOspital ", "HOSPITAL", LocationType.HP),
+    Arguments.of("Immigration", " immIgration ", "IMMIGRATION", LocationType.IM),
+    Arguments.of("Mag Court", " maG courT ", "MAG COURT", LocationType.MC),
+    Arguments.of("Other", " othEr ", "OTHER", LocationType.O),
+    Arguments.of("Police", " policE ", "POLICE", LocationType.PS),
+    Arguments.of("Prison", " prisOn ", "PRISON", LocationType.PR),
+    Arguments.of("Probation", " proBation ", "PROBATION", LocationType.PB),
+    Arguments.of("sch", " sCh ", "SCH", LocationType.SCH),
+    Arguments.of("stc", " stC ", "STC", LocationType.STC),
+  )
 
   @ParameterizedTest
   @MethodSource("testData")

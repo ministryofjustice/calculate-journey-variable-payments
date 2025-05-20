@@ -69,14 +69,11 @@ open class ReportImporter(
   }
 
   companion object {
-    fun fileNamesForDate(entity: String, from: LocalDate, to: LocalDate): List<String> {
-      return from.datesUntil(to.plusDays(1)).map { d ->
-        "${d.year}/${padZero(d.monthValue)}/${padZero(d.dayOfMonth)}/${d.year}-${padZero(d.monthValue)}-${padZero(d.dayOfMonth)}-$entity.jsonl"
-      }.toList()
-    }
+    fun fileNamesForDate(entity: String, from: LocalDate, to: LocalDate): List<String> = from.datesUntil(to.plusDays(1)).map { d ->
+      "${d.year}/${padZero(d.monthValue)}/${padZero(d.dayOfMonth)}/${d.year}-${padZero(d.monthValue)}-${padZero(d.dayOfMonth)}-$entity.jsonl"
+    }.toList()
 
-    fun reportFilenamesFor(date: LocalDate) =
-      listOf("moves", "events", "journeys", "profiles", "people").flatMap { entity -> fileNamesForDate(entity, date, date) }
+    fun reportFilenamesFor(date: LocalDate) = listOf("moves", "events", "journeys", "profiles", "people").flatMap { entity -> fileNamesForDate(entity, date, date) }
 
     private fun padZero(value: Int) = if (value < 10) "0$value" else value.toString()
   }
