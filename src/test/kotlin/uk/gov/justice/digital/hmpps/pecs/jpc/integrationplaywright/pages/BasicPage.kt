@@ -10,7 +10,5 @@ open class BasicPage {
     properties.load(this::class.java.getResourceAsStream("/application-playwright.properties"))
   }
 
-  fun getProperty(name: String): String {
-    return properties.getProperty(name)
-  }
+  fun getProperty(name: String): String = properties.getProperty(name)
 }

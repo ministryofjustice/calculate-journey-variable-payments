@@ -4,7 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole
 
-class LoginPage(page: Page?): BasicPage() {
+class LoginPage(page: Page?) : BasicPage() {
 
   private val url = "http://localhost:9090/auth/sign-in"
   private val page = page
