@@ -9,15 +9,11 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.springframework.beans.factory.annotation.Value
 import java.nio.file.Paths
 
 internal abstract class PlayWrightTest {
 
   companion object {
-
-    @Value("\${playwright.test.headless:false}")
-    private val headless: Boolean = false
 
     var playwright: Playwright? = null
     var browser: Browser? = null
@@ -29,7 +25,7 @@ internal abstract class PlayWrightTest {
     @BeforeAll
     fun launchBrowser() {
       playwright = Playwright.create()
-      browser = playwright!!.chromium().launch(LaunchOptions().setHeadless(headless))
+      browser = playwright!!.chromium().launch(LaunchOptions().setHeadless(false))
     }
 
     @AfterAll

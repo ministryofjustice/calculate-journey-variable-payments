@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.1.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.2.0"
   kotlin("plugin.spring") version "2.1.21"
   kotlin("plugin.jpa") version "2.1.21"
   kotlin("plugin.allopen") version "2.1.21"
@@ -19,12 +19,12 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "6.6.1"
+  val shedlockVersion = "6.7.0"
   listOf(
     "com.beust:klaxon:5.6",
     "com.amazonaws:aws-java-sdk-s3:1.12.783",
     "com.amazonaws:aws-java-sdk-sts:1.12.783",
-    "io.sentry:sentry-spring-boot-starter:8.12.0",
+    "io.sentry:sentry-spring-boot-starter:8.13.2",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0",
@@ -48,7 +48,7 @@ dependencies {
     "org.wiremock:wiremock:3.13.0",
     "org.htmlunit:htmlunit:4.12.0",
     "org.mockito:mockito-inline:5.2.0",
-    "org.apache.commons:commons-compress:1.26.0",
+    "org.apache.commons:commons-compress:1.27.1",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.12.0",
@@ -56,9 +56,9 @@ dependencies {
     "com.microsoft.playwright:playwright:1.52.0",
   ).forEach { testImplementation(it) }
 
-  testRuntimeOnly("com.h2database:h2:1.4.200")
+  testRuntimeOnly("com.h2database:h2:2.3.232")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.5")
+  runtimeOnly("org.postgresql:postgresql:42.7.6")
 }
 kotlin {
   jvmToolchain(21)
