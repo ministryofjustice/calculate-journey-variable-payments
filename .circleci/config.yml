@@ -139,7 +139,7 @@ jobs:
             - /home/circleci/.gradle/caches
       - run:
           name: Run Playwright Integration Tests
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" -D testPlaywrightIntegration
+          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration
       - store_artifacts:
           path: build/reports/tests/testPlayWrightIntegration
           destination: build/reports/tests/testPlayWrightIntegration
