@@ -4,14 +4,15 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole
 
-class LoginPage(page: Page?) {
+class LoginPage(page: Page?) : BasicPage() {
 
   private val url = "http://localhost:9090/auth/sign-in"
   private val page = page
-  fun login(username: String = "JPC_USER", password: String = "password123456") {
+
+  fun login() {
     page?.navigate(url)
-    page?.getByLabel("username")?.fill(username)
-    page?.getByLabel("password")?.fill(password)
+    page?.getByLabel("username")?.fill(getProperty("jpc.web.user"))
+    page?.getByLabel("password")?.fill(getProperty("jpc.web.password"))
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sign In"))?.click()
   }
 
