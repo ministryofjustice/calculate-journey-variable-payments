@@ -26,7 +26,7 @@ class JourneysResultsPage(page: Page?) {
       1 -> {
         logger.info("Scenario when journey is found for: $fromAgency")
         rows.nth(0).locator("td:nth-child(5)").click()
-        page?.waitForSelector("h1")?.innerText()?.equals("Manage Journey Price Catalogue")
+        page?.waitForSelector("h1")?.innerText()?.contains("Manage Journey Price Catalogue")
         return true
       }
 
