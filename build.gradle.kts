@@ -19,11 +19,11 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "6.8.0"
+  val shedlockVersion = "6.9.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.784",
-    "com.amazonaws:aws-java-sdk-sts:1.12.785",
+    "com.amazonaws:aws-java-sdk-s3:1.12.786",
+    "com.amazonaws:aws-java-sdk-sts:1.12.786",
     "io.sentry:sentry-spring-boot-starter:8.13.2",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
@@ -45,7 +45,7 @@ dependencies {
   implementation(kotlin("script-runtime"))
 
   listOf(
-    "org.wiremock:wiremock:3.13.0",
+    "org.wiremock:wiremock:3.13.1",
     "org.htmlunit:htmlunit:4.13.0",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.27.1",
@@ -58,7 +58,7 @@ dependencies {
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.6")
+  runtimeOnly("org.postgresql:postgresql:42.7.7")
 }
 kotlin {
   jvmToolchain(21)
