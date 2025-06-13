@@ -12,6 +12,7 @@ class FindMovePage(page: Page?) {
 
   fun gotToPage() {
     page?.navigate(url)
+    page?.waitForLoadState()
   }
 
   fun findMoveByReferenceId(referenceId: String): Boolean {

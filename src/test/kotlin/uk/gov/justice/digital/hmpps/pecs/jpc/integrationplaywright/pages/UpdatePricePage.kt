@@ -18,6 +18,7 @@ class UpdatePricePage(page: Page?) {
 
   fun gotToPage(fromAgencyId: String, toAgencyId: String) {
     page?.navigate("$url/$fromAgencyId-$toAgencyId")
+    page?.waitForLoadState()
   }
 
   fun goToPriceExceptions() {

@@ -10,6 +10,7 @@ class ManageJourneyPriceCataloguePage(page: Page?) {
 
   fun gotToPage() {
     page?.navigate(url)
+    page?.waitForLoadState()
   }
 
   fun isPageSuccessful() {

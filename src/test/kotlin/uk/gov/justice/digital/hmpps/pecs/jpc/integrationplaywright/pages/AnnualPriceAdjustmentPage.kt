@@ -40,7 +40,7 @@ class AnnualPriceAdjustmentPage(page: Page?) {
 
   fun showPriceAdjustmentHistoryTab() {
     page?.navigate(url)
-    page?.waitForURL(url)
+    page?.waitForLoadState()
     page?.locator("a#tab_price-adjustment-history")?.click()
   }
 

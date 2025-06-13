@@ -11,6 +11,7 @@ class MovesByTypePage(page: Page?) {
 
   fun gotToPage(moveType: MoveType) {
     page?.navigate("$url/$moveType")
+    page?.waitForLoadState()
   }
 
   fun isPageSuccessful(moveType: MoveType): Boolean {

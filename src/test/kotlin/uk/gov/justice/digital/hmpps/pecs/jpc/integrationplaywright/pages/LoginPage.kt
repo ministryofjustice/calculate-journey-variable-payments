@@ -11,6 +11,7 @@ class LoginPage(page: Page?) : BasicPage() {
 
   fun login() {
     page?.navigate(url)
+    page?.waitForLoadState()
     page?.getByLabel("username")?.fill(getProperty("jpc.web.user"))
     page?.getByLabel("password")?.fill(getProperty("jpc.web.password"))
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sign In"))?.click()

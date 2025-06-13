@@ -11,6 +11,7 @@ class JourneysResultsPage(page: Page?) {
 
   fun gotToPage(fromAgency: String, toAgency: String) {
     page?.navigate("$url?pickup-up=$fromAgency&drop-off=$toAgency")
+    page?.waitForLoadState()
   }
 
   fun findJourneyAndUpdatePrice(fromAgency: String): Boolean {

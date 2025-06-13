@@ -16,6 +16,7 @@ class SearchJourneysPage(page: Page?) {
 
   fun gotToPage() {
     page?.navigate(url)
+    page?.waitForLoadState()
   }
 
   fun findJourney(fromAgency: String, toAgency: String): Boolean {
