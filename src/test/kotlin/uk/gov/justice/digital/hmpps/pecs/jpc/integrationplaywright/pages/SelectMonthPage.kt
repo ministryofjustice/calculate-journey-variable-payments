@@ -14,6 +14,7 @@ class SelectMonthPage(page: Page?) {
 
   fun gotToPage() {
     page?.navigate(url)
+    page?.waitForLoadState()
   }
 
   fun goToMonth(
