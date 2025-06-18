@@ -12,6 +12,7 @@ class DashboardPage(page: Page?) {
 
   fun gotToPage() {
     page?.navigate(dashboardUrl)
+    page?.waitForLoadState()
   }
 
   fun isPageSuccessful(supplier: Supplier) {

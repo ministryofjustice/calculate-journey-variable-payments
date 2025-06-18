@@ -14,12 +14,13 @@ class SelectMonthPage(page: Page?) {
 
   fun gotToPage() {
     page?.navigate(url)
+    page?.waitForLoadState()
   }
 
   fun goToMonth(
     date: LocalDate = LocalDate.now().minusMonths(2),
   ): LocalDate {
-    page?.locator("input#month-year")?.fill("${date.month.name} ${date.year}")
+    page?.locator("input#month-year")?.fill("${date.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${date.year}")
     page?.locator("input#month-year")?.blur()
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to month"))?.click()
     val h1 = page?.locator("h1")
