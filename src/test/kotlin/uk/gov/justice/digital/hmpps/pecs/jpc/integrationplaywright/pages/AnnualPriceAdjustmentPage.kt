@@ -42,7 +42,6 @@ class AnnualPriceAdjustmentPage(page: Page?) {
     page?.navigate(url)
     page?.waitForLoadState()
     page?.locator("a#tab_price-adjustment-history")?.click()
-
   }
 
   fun isPriceAdjustmentRecordsPresent(message: String) {
