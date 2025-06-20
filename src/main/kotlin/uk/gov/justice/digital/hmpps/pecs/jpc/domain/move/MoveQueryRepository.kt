@@ -235,8 +235,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
    */
   fun allMovesInDateRange(supplier: Supplier, startDate: LocalDate, endDateInclusive: LocalDate): List<Move> {
     val movesWithPersonAndJourneys = jdbcTemplate.query(
-      moveJourneySelectSQL +
-        "where m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
+      "$moveJourneySelectSQL where m.supplier = ? and m.drop_off_or_cancelled >= ? and m.drop_off_or_cancelled < ? " +
         "order by m.drop_off_or_cancelled, journey_drop_off NULLS LAST ",
       moveJourneyRowMapper,
       supplier.name,
