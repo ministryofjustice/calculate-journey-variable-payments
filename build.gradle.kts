@@ -6,6 +6,10 @@ plugins {
   kotlin("plugin.jpa") version "2.1.21"
   kotlin("plugin.allopen") version "2.1.21"
 }
+java {
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+}
 
 allOpen {
   annotation("javax.persistence.Entity")
