@@ -19,6 +19,10 @@ jobs:
             - gradle-{{ checksum "build.gradle.kts" }}
             - gradle-
       - run:
+          command: |
+            java -version
+            echo "JAVA_HOME=$JAVA_HOME"
+      - run:
           command: ./gradlew build
       - save_cache:
           paths:
