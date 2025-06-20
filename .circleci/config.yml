@@ -8,12 +8,14 @@ jobs:
   validate:
     executor:
       name: hmpps/java
-      tag: "21.0"
+      tag: "21"
     environment:
       _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
 
     steps:
       - checkout
+      - java/setup-java:
+          java-version: '21'
       - restore_cache:
           keys:
             - gradle-{{ checksum "build.gradle.kts" }}
