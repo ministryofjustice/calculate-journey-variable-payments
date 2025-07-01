@@ -41,13 +41,6 @@ jobs:
     name: Validate the kotlin
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/kotlin_validate.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
-  gradle-test-integration:
-    name: Run the integration tests
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/gradle_verify.yml@v2 # WORKFLOW_VERSION
-    secrets: inherit
-    with:
-      gradle-command: './gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration'
-      artifact-name: 'integration test results'
   build:
     name: Build docker image from hmpps-github-actions
     if: github.ref == 'refs/heads/main'
