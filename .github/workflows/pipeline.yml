@@ -77,8 +77,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Ensure Docker Compose is available
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose-plugin      
+
       - name: Start required containers
-        run: docker-compose -f docker-compose.integration.yml up -d
+        run: sudo docker-compose -f docker-compose.integration.yml up -d
 
       - name: Wait for services
         run: |
