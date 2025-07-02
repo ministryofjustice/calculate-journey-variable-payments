@@ -1,100 +1,74 @@
-version: '3.1'
+version: '3.9'
 
 services:
-  # Pinning to specific DB version to be inline with RDS instances.
-  db:
+  postgres-auth:
     image: postgres:16.4
-    container_name: jpc-database
-    restart: always
+    environment:
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_USER: admin
+      POSTGRES_DB: auth-db
+    command: -p 7432
     ports:
-      - "5433:5433"
+      - "7432:7432"
+
+  auth:
+    image: quay.io/hmpps/hmpps-auth:latest
+    environment:
+      SERVER_PORT: 9090
+      SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:7432/auth-db
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres-auth
+
+  external-users-api:
+    image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
+    environment:
+      SERVER_PORT: 8089
+      SPRING_PROFILES_ACTIVE: dev,local-postgres
+      API_BASE_URL_OAUTH: http://auth:9090/auth
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres-auth:7432/auth-db?sslmode=prefer
+      SPRING_FLYWAY_URL: jdbc:postgresql://postgres-auth:7432/auth-db?sslmode=prefer
+    ports:
+      - "8089:8089"
+    depends_on:
+      - auth
+      - postgres-auth
+
+  manage-users-api:
+    image: quay.io/hmpps/hmpps-manage-users-api:latest
+    environment:
+      SERVER_PORT: 9091
+      SPRING_PROFILES_ACTIVE: dev
+      HMPPS-AUTH_ENDPOINT_URL: http://auth:9090/auth
+      EXTERNAL-USERS_ENDPOINT_URL: http://external-users-api:8089
+      NOMIS_ENDPOINT_URL: http://nomis-user-roles-api:8080
+      DELIUS_ENDPOINT_URL: http://community-api:8080
+      AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL: http://auth:9090/auth/oauth/token
+    ports:
+      - "9091:9091"
+    depends_on:
+      - auth
+      - external-users-api
+
+  postgres-jpc:
+    image: postgres:16.4
     environment:
       POSTGRES_DB: jpc
       POSTGRES_USER: jpc
       POSTGRES_PASSWORD: letmein
-    command: -p 5433
-
-  auth-db:
-    image: postgres:16.4
-    container_name: auth-db
-    restart: always
     ports:
-      - "7432:5432"
-    environment:
-      - POSTGRES_PASSWORD=admin_password
-      - POSTGRES_USER=admin
-      - POSTGRES_DB=auth-db
+      - "5433:5432"  # Avoid conflict with auth DB if needed
 
-  localstack:
-    image: localstack/localstack:1.2.0
-    container_name: localstack
+  # Placeholder services for NOMIS and DELIUS if needed for manage-users-api to not error out
+  nomis-user-roles-api:
+    image: nginx:alpine
     ports:
-      - "4567-4597:4567-4597"
-    environment:
-      - SERVICES=s3
-      - DEBUG=${DEBUG- }
-      - DATA_DIR=${DATA_DIR- }
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - DEFAULT_REGION=eu-west-2
-    volumes:
-      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - $PWD/localstack:/docker-entrypoint-initaws.d
+      - "8081:8080"
 
-  hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
-    container_name: hmpps-auth
-    depends_on:
-      - auth-db
+  community-api:
+    image: nginx:alpine
     ports:
-      - "9090:9090"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
-    environment:
-      - SERVER_PORT=9090
-      - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
+      - "8082:8080"
 
-  hmpps-external-users-api:
-    image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
-    container_name: hmpps-external-users-api
-    depends_on:
-      - hmpps-auth
-    ports:
-      - "8089:8089"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8089/health/ping"]
-    environment:
-      - SERVER_PORT=8089
-      - SPRING_PROFILES_ACTIVE=dev,local-postgres
-      - API_BASE_URL_OAUTH=http://hmpps-auth:9090/auth
-      - SPRING_R2DBC_URL=r2dbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
-      - SPRING_FLYWAY_URL=jdbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
-
-  hmpps-manage-users-api:
-    image: quay.io/hmpps/hmpps-manage-users-api:latest
-    container_name: hmpps-manage-users-api
-    depends_on:
-      - hmpps-external-users-api
-      - hmpps-auth
-    ports:
-      - "9091:8080"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
-    environment:
-      - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=dev
-      - HMPPS-AUTH_ENDPOINT_URL=http://hmpps-auth:9090/auth
-      - EXTERNAL-USERS_ENDPOINT_URL=http://hmpps-external-users-api:8089
-      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
-      - DELIUS_ENDPOINT_URL=http://community-api:8080
-      - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:9090/auth/oauth/token
-
-  hmpps-book-secure-move-api:
-    image: wiremock/wiremock:latest
-    container_name: hmpps-book-secure-move-api
-    ports:
-      - "9999:8081"
-    volumes:
-      - $PWD/wiremock-docker:/home/wiremock
-    command: --verbose --global-response-templating --port=8081
