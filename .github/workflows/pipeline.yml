@@ -16,6 +16,13 @@ on:
         required: true
         default: false
         type: boolean
+env:
+  _JAVA_OPTIONS: >-
+    -Xmx1024m
+    -XX:ParallelGCThreads=2
+    -XX:ConcGCThreads=2
+    -Djava.util.concurrent.ForkJoinPool.common.parallelism=2
+    -Dorg.gradle.daemon=false
 
 permissions:
   contents: read
@@ -53,6 +60,70 @@ jobs:
       additional_docker_tag: ${{ inputs.additional_docker_tag }}
       push: ${{ inputs.push || true }}
       docker_multiplatform: false
+
+  integration_playwright_tests:
+    needs:
+      - kotlin_validate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.4
+        env:
+          POSTGRES_DB: jpc
+          POSTGRES_USER: jpc
+          POSTGRES_PASSWORD: letmein
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install apt dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-4-1 libgraphene-1.0-0 libxslt1.1 libwoff1 libvpx7 \
+            libevent-2.1-7 libopus0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            libflite1 libwebp7 libavif13 libharfbuzz-icu0 libwebpmux3 libenchant-2-2 \
+            libsecret-1-0 libhyphen0 libmanette-0.2-0 libgles2 libx264-dev \
+            libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 libwebpdemux2
+
+      - name: Start required containers
+        run: docker-compose -f docker-compose.integration.yml up -d
+
+      - name: Wait for services
+        run: |
+          curl --retry 10 --retry-connrefused --retry-delay 5 http://localhost:9090/auth/health
+
+      - name: Download WireMock
+        run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
+
+      - name: Start WireMock
+        run: java -jar wiremock.jar --port 9999 &
+        shell: bash
+
+      - name: Start App
+        run: java -Xmx1024m -jar build/libs/calculate-journey-variable-payments-*.jar &
+        env:
+          SPRING_PROFILES_ACTIVE: dev
+          SERVER_SERVLET_SESSION_COOKIE_SECURE: false
+
+      - name: Wait for App
+        run: sleep 20
+
+      - name: Run Playwright Integration Tests
+        run: ./gradlew testPlaywrightIntegration
+
   deploy_dev:
     name: Deploy to the development environment
     needs:
