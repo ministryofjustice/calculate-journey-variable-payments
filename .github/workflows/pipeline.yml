@@ -65,6 +65,8 @@ jobs:
     needs:
       - kotlin_validate
     runs-on: ubuntu-latest
+    container:
+      image: cimg/openjdk:21.0-browsers
     services:
       postgres:
         image: postgres:16.4
@@ -88,15 +90,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-
-      - name: Install apt dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-4-1 libgraphene-1.0-0 libxslt1.1 libwoff1 libvpx7 \
-            libevent-2.1-7 libopus0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
-            libflite1 libwebp7 libavif13 libharfbuzz-icu0 libwebpmux3 libenchant-2-2 \
-            libsecret-1-0 libhyphen0 libmanette-0.2-0 libgles2 libx264-dev \
-            libgstreamer-gl1.0-0 libgstreamer-plugins-bad1.0-0 libwebpdemux2
 
       - name: Start required containers
         run: docker-compose -f docker-compose.integration.yml up -d
