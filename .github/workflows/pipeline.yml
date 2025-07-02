@@ -81,7 +81,38 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      hmpps-auth:
+        image: quay.io/hmpps/hmpps-auth:latest
+        ports:
+          - "9090:9090"
+        environment:
+          SERVER_PORT: 9090
+          SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
+          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth-db
 
+      external-users-api:
+        image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
+        ports:
+          - "8089:8089"
+        environment:
+          SERVER_PORT: 8089
+          SPRING_PROFILES_ACTIVE: dev,local-postgres
+          API_BASE_URL_OAUTH: http://hmpps-auth:9090/auth
+          SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/auth-db?sslmode=prefer
+          SPRING_FLYWAY_URL: jdbc:postgresql://postgres:5432/auth-db?sslmode=prefer
+
+      manage-users-api:
+        image: quay.io/hmpps/hmpps-manage-users-api:latest
+        ports:
+          - "9091:9091"
+        environment:
+          SERVER_PORT: 9091
+          SPRING_PROFILES_ACTIVE: dev
+          HMPPS-AUTH_ENDPOINT_URL: http://hmpps-auth:9090/auth
+          EXTERNAL-USERS_ENDPOINT_URL: http://external-users-api:8089
+          NOMIS_ENDPOINT_URL: http://nomis-user-roles-api:8080
+          DELIUS_ENDPOINT_URL: http://community-api:8080
+          AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL: http://hmpps-auth:9090/auth/oauth/token
     steps:
       - uses: actions/checkout@v4
 
@@ -90,9 +121,6 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-
-      - name: Start required containers
-        run: docker-compose -f docker-compose.integration.yml up -d
 
       - name: Wait for services
         run: |
