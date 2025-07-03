@@ -87,7 +87,7 @@ jobs:
 
       - name: Wait for services
         run: |
-          curl --retry 10 --retry-connrefused --retry-delay 5 http://localhost:9090/auth/health
+          curl --retry 10 --retry-connrefused --retry-delay 5 http://auth:9090/auth/health
 
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
