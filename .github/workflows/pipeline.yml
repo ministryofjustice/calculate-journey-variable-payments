@@ -87,8 +87,19 @@ jobs:
 
       - name: Wait for services
         run: |
-          curl --retry 10 --retry-connrefused --retry-delay 5 http://localhost:9090/auth/health
-
+          echo "Waiting for auth service to respond at http://localhost:9090/auth/health..."
+          for i in {1..10}; do
+            if curl --fail --silent http://localhost:9090/auth/health; then
+              echo "✅ Auth service is ready!"
+              exit 0
+            fi
+            echo "Retry $i: Auth not ready yet. Waiting..."
+            sleep 10
+          done
+          echo "❌ Auth service did not become ready in time."
+          docker-compose -f docker-compose.integration.yml logs
+          exit 1
+      
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
 
