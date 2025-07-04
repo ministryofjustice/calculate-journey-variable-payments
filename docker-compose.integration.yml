@@ -10,7 +10,8 @@ services:
     command: -p 7432
     ports:
       - "7432:7432"
-
+    networks:
+      - app-net
   auth:
     image: quay.io/hmpps/hmpps-auth:latest
     environment:
@@ -21,7 +22,8 @@ services:
       - "9090:9090"
     depends_on:
       - postgres-auth
-
+    networks:
+      - app-net
   external-users-api:
     image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
     environment:
@@ -32,6 +34,8 @@ services:
       SPRING_FLYWAY_URL: jdbc:postgresql://postgres-auth:7432/auth-db?sslmode=prefer
     ports:
       - "8089:8089"
+    networks:
+      - app-net
     depends_on:
       - auth
       - postgres-auth
@@ -48,6 +52,8 @@ services:
       AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL: http://auth:9090/auth/oauth/token
     ports:
       - "9091:9091"
+    networks:
+      - app-net
     depends_on:
       - auth
       - external-users-api
@@ -58,6 +64,8 @@ services:
       POSTGRES_DB: jpc
       POSTGRES_USER: jpc
       POSTGRES_PASSWORD: letmein
+    networks:
+      - app-net
     ports:
       - "5433:5432"  # Avoid conflict with auth DB if needed
 
@@ -66,9 +74,16 @@ services:
     image: nginx:alpine
     ports:
       - "8081:8080"
+    networks:
+      - app-net
 
   community-api:
     image: nginx:alpine
     ports:
       - "8082:8080"
+    networks:
+      - app-net
 
+networks:
+  app-net:
+    driver: bridge
