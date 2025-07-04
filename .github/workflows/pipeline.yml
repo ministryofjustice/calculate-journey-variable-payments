@@ -97,9 +97,9 @@ jobs:
             sleep 10
           done
           echo "❌ Auth service did not become ready in time."
-          docker-compose -f docker-compose.integration.yml logs
+          sudo docker-compose -f docker-compose.integration.yml logs
           exit 1
-      
+
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
 
