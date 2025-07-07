@@ -93,7 +93,7 @@ jobs:
         run: |
           echo "Waiting for hello service from inside tester container..."
 
-          docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
             for i in $(seq 1 10); do
               echo "Attempt $i: curling http://hello:80"
               if curl --fail --silent http://hello:80; then
