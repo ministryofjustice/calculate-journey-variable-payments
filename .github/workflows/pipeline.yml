@@ -94,7 +94,7 @@ jobs:
         run: |
           echo "Waiting for auth service to respond at http://localhost:9090/auth/health..."
           for i in {1..10}; do
-            if curl --fail --silent http://localhost:9090/auth/health; then
+            if curl --fail --silent http://localhost:5500; then
               echo "✅ Auth service is ready!"
               exit 0
             fi

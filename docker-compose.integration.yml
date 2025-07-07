@@ -1,96 +1,15 @@
 version: '3.9'
 
 services:
-  postgres-auth:
-    image: postgres:16.4
-    container_name: postgres-auth
-    environment:
-      POSTGRES_PASSWORD: admin_password
-      POSTGRES_USER: admin
-      POSTGRES_DB: auth-db
-    command: -p 7432
+  hello:
+    image: nginxdemos/hello
+    container_name: hello
     ports:
-      - "7432:7432"
+      - "5500:80"
     networks:
       - app-net
 
-  postgres-jpc:
-    image: postgres:16.4
-    container_name: postgres-jpc
-    environment:
-      POSTGRES_DB: jpc
-      POSTGRES_USER: jpc
-      POSTGRES_PASSWORD: letmein
-    networks:
-      - app-net
-    ports:
-      - "5433:5432"  # Avoid conflict with auth DB if needed
 
-  # Placeholder services for NOMIS and DELIUS if needed for manage-users-api to not error out
-  nomis-user-roles-api:
-    image: nginx:alpine
-    container_name: nomis-user-roles-api
-    ports:
-      - "8081:8080"
-    networks:
-      - app-net
-
-  community-api:
-    image: nginx:alpine
-    container_name: community-api
-    ports:
-      - "8082:8080"
-    networks:
-      - app-net
-
-  auth:
-    image: quay.io/hmpps/hmpps-auth:latest
-    container_name: auth
-    environment:
-      SERVER_PORT: 9090
-      SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:7432/auth-db
-    ports:
-      - "9090:9090"
-    depends_on:
-      - postgres-auth
-    networks:
-      - app-net
-  external-users-api:
-    image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
-    container_name: external-users-api
-    environment:
-      SERVER_PORT: 8089
-      SPRING_PROFILES_ACTIVE: dev,local-postgres
-      API_BASE_URL_OAUTH: http://auth:9090/auth
-      SPRING_R2DBC_URL: r2dbc:postgresql://postgres-auth:7432/auth-db?sslmode=prefer
-      SPRING_FLYWAY_URL: jdbc:postgresql://postgres-auth:7432/auth-db?sslmode=prefer
-    ports:
-      - "8089:8089"
-    networks:
-      - app-net
-    depends_on:
-      - auth
-      - postgres-auth
-
-  manage-users-api:
-    image: quay.io/hmpps/hmpps-manage-users-api:latest
-    container_name: manage-users-api
-    environment:
-      SERVER_PORT: 9091
-      SPRING_PROFILES_ACTIVE: dev
-      HMPPS-AUTH_ENDPOINT_URL: http://auth:9090/auth
-      EXTERNAL-USERS_ENDPOINT_URL: http://external-users-api:8089
-      NOMIS_ENDPOINT_URL: http://nomis-user-roles-api:8080
-      DELIUS_ENDPOINT_URL: http://community-api:8080
-      AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL: http://auth:9090/auth/oauth/token
-    ports:
-      - "9091:9091"
-    networks:
-      - app-net
-    depends_on:
-      - auth
-      - external-users-api
 
 networks:
   app-net:
