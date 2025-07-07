@@ -69,6 +69,11 @@ jobs:
       image: cimg/openjdk:21.0-browsers
 
     steps:
+      - steps:
+          - name: Install xvfb
+            run: |
+              apt-get update
+              apt-get install -y xvfb
       - uses: actions/checkout@v4
 
       - name: Setup Java 21
