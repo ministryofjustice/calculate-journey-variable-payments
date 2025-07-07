@@ -3,6 +3,7 @@ version: '3.9'
 services:
   postgres-auth:
     image: postgres:16.4
+    container_name: postgres-auth
     environment:
       POSTGRES_PASSWORD: admin_password
       POSTGRES_USER: admin
@@ -15,6 +16,7 @@ services:
 
   postgres-jpc:
     image: postgres:16.4
+    container_name: postgres-jpc
     environment:
       POSTGRES_DB: jpc
       POSTGRES_USER: jpc
@@ -27,6 +29,7 @@ services:
   # Placeholder services for NOMIS and DELIUS if needed for manage-users-api to not error out
   nomis-user-roles-api:
     image: nginx:alpine
+    container_name: nomis-user-roles-api
     ports:
       - "8081:8080"
     networks:
@@ -34,6 +37,7 @@ services:
 
   community-api:
     image: nginx:alpine
+    container_name: community-api
     ports:
       - "8082:8080"
     networks:
@@ -41,6 +45,7 @@ services:
 
   auth:
     image: quay.io/hmpps/hmpps-auth:latest
+    container_name: auth
     environment:
       SERVER_PORT: 9090
       SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
@@ -53,6 +58,7 @@ services:
       - app-net
   external-users-api:
     image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
+    container_name: external-users-api
     environment:
       SERVER_PORT: 8089
       SPRING_PROFILES_ACTIVE: dev,local-postgres
@@ -69,6 +75,7 @@ services:
 
   manage-users-api:
     image: quay.io/hmpps/hmpps-manage-users-api:latest
+    container_name: manage-users-api
     environment:
       SERVER_PORT: 9091
       SPRING_PROFILES_ACTIVE: dev
