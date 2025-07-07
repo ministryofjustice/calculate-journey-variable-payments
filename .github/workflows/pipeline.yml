@@ -95,8 +95,8 @@ jobs:
 
           sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
             for i in $(seq 1 10); do
-              echo "Attempt $i: curling http://localhost:9090/auth/health"
-              if curl --fail --silent http://localhost:9090/auth/health; then
+              echo "Attempt $i: curling http://auth:9090/auth/health"
+              if curl --fail --silent http://auth:9090/auth/health; then
                 echo "✅ Auth service is ready!"
                 exit 0
               fi
