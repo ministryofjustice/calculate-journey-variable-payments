@@ -12,6 +12,33 @@ services:
       - "7432:7432"
     networks:
       - app-net
+
+  postgres-jpc:
+    image: postgres:16.4
+    environment:
+      POSTGRES_DB: jpc
+      POSTGRES_USER: jpc
+      POSTGRES_PASSWORD: letmein
+    networks:
+      - app-net
+    ports:
+      - "5433:5432"  # Avoid conflict with auth DB if needed
+
+  # Placeholder services for NOMIS and DELIUS if needed for manage-users-api to not error out
+  nomis-user-roles-api:
+    image: nginx:alpine
+    ports:
+      - "8081:8080"
+    networks:
+      - app-net
+
+  community-api:
+    image: nginx:alpine
+    ports:
+      - "8082:8080"
+    networks:
+      - app-net
+
   auth:
     image: quay.io/hmpps/hmpps-auth:latest
     environment:
@@ -57,32 +84,6 @@ services:
     depends_on:
       - auth
       - external-users-api
-
-  postgres-jpc:
-    image: postgres:16.4
-    environment:
-      POSTGRES_DB: jpc
-      POSTGRES_USER: jpc
-      POSTGRES_PASSWORD: letmein
-    networks:
-      - app-net
-    ports:
-      - "5433:5432"  # Avoid conflict with auth DB if needed
-
-  # Placeholder services for NOMIS and DELIUS if needed for manage-users-api to not error out
-  nomis-user-roles-api:
-    image: nginx:alpine
-    ports:
-      - "8081:8080"
-    networks:
-      - app-net
-
-  community-api:
-    image: nginx:alpine
-    ports:
-      - "8082:8080"
-    networks:
-      - app-net
 
 networks:
   app-net:
