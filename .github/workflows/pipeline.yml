@@ -90,6 +90,7 @@ jobs:
         run: sudo docker ps -a
 
       - name: Wait for services
+        shell: bash
         run: |
           echo "Waiting for auth service to respond at http://localhost:9090/auth/health..."
           for i in {1..10}; do
