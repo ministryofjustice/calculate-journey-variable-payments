@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: cimg/openjdk:21.0-browsers
-      name: app
+      options: --name app
 
     steps:
       - uses: actions/checkout@v4
