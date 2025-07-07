@@ -8,6 +8,12 @@ services:
       - "5500:80"
     networks:
       - app-net
+    healthcheck:
+      test: curl --fail http://localhost || exit 1
+      interval: 5s
+      retries: 5
+      start_period: 2s
+      timeout: 3s
 
 
 
