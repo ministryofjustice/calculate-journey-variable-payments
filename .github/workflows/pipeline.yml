@@ -129,7 +129,8 @@ jobs:
         run: sleep 20
 
       - name: Run Playwright Integration Tests
-        run: ./gradlew testPlaywrightIntegration
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" ./gradlew testPlaywrightIntegration
 
   deploy_dev:
     name: Deploy to the development environment
