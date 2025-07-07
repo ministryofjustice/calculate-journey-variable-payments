@@ -89,21 +89,23 @@ jobs:
       - name: List all containers
         run: sudo docker ps -a
 
-      - name: Wait for services
-        shell: bash
+      - name: Wait for services from inside tester container
         run: |
-          echo "Waiting for auth service to respond at http://localhost:5500..."
-          for i in {1..10}; do
-            if curl --fail --silent http://localhost:5500; then
-              echo "✅ Auth service is ready!"
-              exit 0
-            fi
-            echo "Retry $i: Auth not ready yet. Waiting..."
-            sleep 10
-          done
-          echo "❌ Auth service did not become ready in time."
-          sudo docker-compose -f docker-compose.integration.yml logs
-          exit 1
+          echo "Waiting for hello service from inside tester container..."
+
+          docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+            for i in $(seq 1 10); do
+              echo "Attempt $i: curling http://hello:80"
+              if curl --fail --silent http://hello:80; then
+                echo "✅ Hello service is ready!"
+                exit 0
+              fi
+              echo "Retry $i: Not ready yet. Sleeping..."
+              sleep 5
+            done
+            echo "❌ Hello service did not become ready."
+            exit 1
+          '
 
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
