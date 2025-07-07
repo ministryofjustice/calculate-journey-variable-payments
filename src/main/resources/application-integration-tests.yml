@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: classpath:/db/migration
+
+APP_DB_URL: "jdbc:postgresql://localhost:5433/jpc?reWriteBatchedInserts=true&user=jpc&password=letmein"
+AWS_DEFAULT_REGION: eu-west-2
+BASM_API_BASE_URL: http://localhost:9999
+BASM_BUCKET_NAME: basm
+CRON_AUTOMATIC_LOCATION_MAPPING: "-"
+CRON_IMPORT_REPORTS: "-"
+CRON_BACKFILL_REPORTS: "-"
+CRON_REPROCESS_EXISTING_MOVES: "-"
+HMPPS_AUTH_BASE_URI: http://auth:9090
+HMPPS_MANAGE_USERS_BASE_URI: http://manage-users-api:9091
+HMPPS_AUTH_CLIENT_ID: pecs-jpc-client
+HMPPS_AUTH_CLIENT_SECRET: clientsecret
+HMPPS_AUTH_REDIRECT_BASE_URI: http://app:8080
+IMPORT_FILES_LOCATIONS: schedule_34_locations_sample.xlsx
+IMPORT_FILES_PRICES_GEO: geoamey_sample.xlsx
+IMPORT_FILES_PRICES_SERCO: serco_sample.xlsx
+IMPORT_REPORTS_BACKDATE_ENABLED: false
+JPC_BUCKET_NAME: jpc
+SENTRY_ENVIRONMENT: local
+S3_ENDPOINT: http://localhost:4572
+FEATURE_FLAG_INCLUDE_RECONCILIATION_MOVES: true

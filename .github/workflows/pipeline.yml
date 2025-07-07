@@ -67,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: cimg/openjdk:21.0-browsers
+      name: app
 
     steps:
       - uses: actions/checkout@v4
@@ -122,7 +123,7 @@ jobs:
       - name: Start App
         run: java -Xmx1024m -jar build/libs/calculate-journey-variable-payments-*.jar &
         env:
-          SPRING_PROFILES_ACTIVE: dev
+          SPRING_PROFILES_ACTIVE: integration-tests
           SERVER_SERVLET_SESSION_COOKIE_SECURE: false
 
       - name: Wait for App
