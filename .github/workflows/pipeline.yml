@@ -85,6 +85,10 @@ jobs:
       - name: Start required containers
         run: sudo docker-compose -f docker-compose.integration.yml up -d
 
+      # List all containers including stopped ones
+      - name: List all containers
+        run: sudo docker ps -a
+
       - name: Wait for services
         run: |
           echo "Waiting for auth service to respond at http://localhost:9090/auth/health..."
