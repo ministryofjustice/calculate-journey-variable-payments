@@ -92,9 +92,9 @@ jobs:
       - name: Wait for services
         shell: bash
         run: |
-          echo "Waiting for auth service to respond at http://localhost:9090/auth/health..."
+          echo "Waiting for auth service to respond at http://hello:5500..."
           for i in {1..10}; do
-            if curl --fail --silent http://localhost:5500; then
+            if curl --fail --silent http://hello:5500; then
               echo "✅ Auth service is ready!"
               exit 0
             fi
