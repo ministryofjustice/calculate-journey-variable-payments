@@ -91,19 +91,19 @@ jobs:
 
       - name: Wait for services from inside tester container
         run: |
-          echo "Waiting for hello service from inside tester container..."
+          echo "Waiting for Auth service from inside tester container..."
 
           sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
             for i in $(seq 1 10); do
-              echo "Attempt $i: curling http://hello:80"
-              if curl --fail --silent http://hello:80; then
-                echo "✅ Hello service is ready!"
+              echo "Attempt $i: curling http://localhost:9090/auth/health"
+              if curl --fail --silent http://localhost:9090/auth/health; then
+                echo "✅ Auth service is ready!"
                 exit 0
               fi
               echo "Retry $i: Not ready yet. Sleeping..."
               sleep 5
             done
-            echo "❌ Hello service did not become ready."
+            echo "❌ Auth service did not become ready."
             exit 1
           '
 
