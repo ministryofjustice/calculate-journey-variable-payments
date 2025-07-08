@@ -1,10 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.2.0"
-  kotlin("plugin.spring") version "2.1.21"
-  kotlin("plugin.jpa") version "2.1.21"
-  kotlin("plugin.allopen") version "2.1.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.1"
+  kotlin("plugin.spring") version "2.2.0"
+  kotlin("plugin.jpa") version "2.2.0"
+  kotlin("plugin.allopen") version "2.2.0"
 }
 java {
   sourceCompatibility = JavaVersion.VERSION_21
@@ -23,12 +23,12 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "6.9.0"
+  val shedlockVersion = "6.9.2"
   listOf(
     "com.beust:klaxon:5.6",
     "com.amazonaws:aws-java-sdk-s3:1.12.787",
     "com.amazonaws:aws-java-sdk-sts:1.12.787",
-    "io.sentry:sentry-spring-boot-starter:8.14.0",
+    "io.sentry:sentry-spring-boot-starter:8.17.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0",
@@ -57,7 +57,7 @@ dependencies {
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.12.0",
     "com.squareup.okhttp3:okhttp:4.12.0",
-    "com.microsoft.playwright:playwright:1.52.0",
+    "com.microsoft.playwright:playwright:1.53.0",
   ).forEach { testImplementation(it) }
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
