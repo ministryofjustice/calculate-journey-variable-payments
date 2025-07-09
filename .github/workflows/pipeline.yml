@@ -139,6 +139,12 @@ jobs:
         run: java -jar wiremock.jar --port 9999 &
         shell: bash
 
+      - name: Download app JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/
+
       - name: List built JAR
         run: ls -lh build/libs/
 
