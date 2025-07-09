@@ -9,6 +9,7 @@ class LoginPage(page: Page?) : BasicPage() {
   private val page = page
 
   fun login() {
+    page?.navigate("http://localhost:8080/")
     page?.waitForLoadState()
     page?.querySelector("#sign-out")?.click()
     page?.getByLabel("username")?.fill(getProperty("jpc.web.user"))

@@ -7,7 +7,6 @@ internal class LoginPageTest : PlayWrightTest() {
 
   @Test
   fun `can load index`() {
-    page?.navigate("http://localhost:8080/")
     val loginPage = LoginPage(page)
     loginPage.login()
     loginPage.isLoginSuccessful()
