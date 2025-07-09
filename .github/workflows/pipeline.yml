@@ -164,7 +164,7 @@ jobs:
         shell: bash
         run: |
           for i in {1..15}; do
-            if curl -s http://localhost:8080/actuator/health | grep '"status":"UP"' > /dev/null; then
+            if curl -s http://localhost:8080/health | grep '"status":"UP"' > /dev/null; then
               echo "App is ready!"
               break
             fi
