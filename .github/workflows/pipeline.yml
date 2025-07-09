@@ -107,7 +107,7 @@ jobs:
                 exit 0
               fi
               echo "Retry $i: Not ready yet. Sleeping..."
-              sleep 5
+              sleep 10
             done
             echo "❌ Auth service did not become ready."
             exit 1
@@ -126,8 +126,22 @@ jobs:
           SPRING_PROFILES_ACTIVE: integration-tests
           SERVER_SERVLET_SESSION_COOKIE_SECURE: false
 
-      - name: Wait for App
-        run: sleep 20
+      - name: Wait for app to be ready
+        shell: bash
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:8080/actuator/health | grep '"status":"UP"' > /dev/null; then
+              echo "App is ready!"
+              break
+            fi
+            echo "Waiting for app to be ready..."
+            sleep 10
+          done
+
+          curl -s http://localhost:8080/actuator/health | grep '"status":"UP"' > /dev/null || {
+            echo "App failed to start in time"
+            exit 1
+          }
 
       - name: Run Playwright Integration Tests
         run: |
