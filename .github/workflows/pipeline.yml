@@ -172,7 +172,7 @@ jobs:
             sleep 10
           done
 
-          curl -s http://localhost:8080/actuator/health | grep '"status":"UP"' > /dev/null || {
+          curl -s http://localhost:8080/health | grep '"status":"UP"' > /dev/null || {
             echo "App failed to start in time"
             sudo docker ps -a
             exit 1
