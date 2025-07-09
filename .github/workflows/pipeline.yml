@@ -155,28 +155,27 @@ jobs:
         run: ls -lh build/libs/
 
       - name: Start App
-        run: java -Xmx1024m -jar build/libs/app.jar &
+        shell: bash
+        run: |
+          nohup java -Xmx1024m -jar build/libs/app.jar > app.log 2>&1 &
         env:
           SPRING_PROFILES_ACTIVE: integration-tests
           SERVER_SERVLET_SESSION_COOKIE_SECURE: false
 
-      - name: Wait for app to be ready
+      - name: Wait for app to be healthy
         shell: bash
         run: |
-          for i in {1..15}; do
+          for i in {1..20}; do
             if curl -s http://localhost:8080/health | grep '"status":"UP"' > /dev/null; then
-              echo "App is ready!"
-              break
+              echo "App is healthy!"
+              exit 0
             fi
-            echo "Waiting for app to be ready..."
+            echo "Waiting for app..."
             sleep 10
           done
-
-          curl -s http://localhost:8080/health | grep '"status":"UP"' > /dev/null || {
-            echo "App failed to start in time"
-            sudo docker ps -a
-            exit 1
-          }
+          echo "App failed to start in time"
+          cat app.log
+          exit 1
 
       - name: Run Playwright Integration Tests
         run: |
