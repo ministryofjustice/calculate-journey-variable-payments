@@ -82,6 +82,11 @@ jobs:
       - name: List built JAR
         run: ls -lh build/libs/
 
+      - name: Rename JAR to app.jar
+        run: |
+          JAR_FILE=$(ls build/libs/calculate-journey-variable-payments-*.jar | head -n 1)
+          mv "$JAR_FILE" build/libs/app.jar
+
   integration_playwright_tests:
     needs:
       - kotlin_build
@@ -138,7 +143,7 @@ jobs:
         shell: bash
 
       - name: Start App
-        run: java -Xmx1024m -jar build/libs/calculate-journey-variable-payments-*.jar &
+        run: java -Xmx1024m -jar build/libs/app.jar &
         env:
           SPRING_PROFILES_ACTIVE: integration-tests
           SERVER_SERVLET_SESSION_COOKIE_SECURE: false
