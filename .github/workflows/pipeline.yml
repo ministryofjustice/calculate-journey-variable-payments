@@ -165,7 +165,7 @@ jobs:
   deploy_dev:
     name: Deploy to the development environment
     needs:
-      - build
+      - docker_build
       - helm_lint
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
