@@ -79,9 +79,6 @@ jobs:
       - name: Build JAR
         run: ./gradlew build
 
-      - name: List built JAR
-        run: ls -lh build/libs/
-
       - name: Rename JAR to app.jar
         run: |
           JAR_FILE=$(ls build/libs/calculate-journey-variable-payments-*.jar | head -n 1)
@@ -141,6 +138,9 @@ jobs:
       - name: Start WireMock
         run: java -jar wiremock.jar --port 9999 &
         shell: bash
+
+      - name: List built JAR
+        run: ls -lh build/libs/
 
       - name: Start App
         run: java -Xmx1024m -jar build/libs/app.jar &
