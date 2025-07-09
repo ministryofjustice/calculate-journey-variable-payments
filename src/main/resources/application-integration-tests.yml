@@ -4,9 +4,9 @@ spring:
     hibernate:
       ddl-auto: validate
   datasource:
-    url: ${APP_DB_URL}
+    url: jdbc:postgresql://postgres-jpc:5433/jpc
     username: jpc
-    password: jpc
+    password: letmein
 
   flyway:
     enabled: true
