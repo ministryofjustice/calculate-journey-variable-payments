@@ -3,6 +3,7 @@
 generic-service:
   nameOverride: calculate-journey-variable-payments
   replicaCount: 2
+  serviceAccountName: calculate-journey-variable-payments
 
   image:
     repository: quay.io/hmpps/calculate-journey-variable-payments
