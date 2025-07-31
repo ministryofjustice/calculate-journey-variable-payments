@@ -72,7 +72,7 @@ data class Price(
   }
 
   private fun failOnLessThanZeroPrice() {
-    if (priceInPence < 1) throw IllegalArgumentException("Price in pence must be zero or greater.")
+    if (priceInPence < 0) throw IllegalArgumentException("Price in pence must be zero or greater.")
   }
 
   fun price() = Money(priceInPence)
