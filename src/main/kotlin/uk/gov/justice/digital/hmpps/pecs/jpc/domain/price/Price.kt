@@ -68,11 +68,11 @@ data class Price(
   private val exceptions: MutableMap<Int, PriceException> = mutableMapOf()
 
   init {
-    failOnLessThanZeroPrice()
+    failOnZeroOrLessPrice()
   }
 
-  private fun failOnLessThanZeroPrice() {
-    if (priceInPence < 0) throw IllegalArgumentException("Price in pence must zero or more.")
+  private fun failOnZeroOrLessPrice() {
+    if (priceInPence < 1) throw IllegalArgumentException("Price in pence must be greater than zero.")
   }
 
   fun price() = Money(priceInPence)
