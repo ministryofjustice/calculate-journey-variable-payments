@@ -257,8 +257,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       param("moveId", "$fromAgencyId-$toAgencyId")
       param("price", "0.00")
     }
-    .andExpect { redirectedUrl("/journeys") }
-    .andExpect { status { is3xxRedirection() } }
+      .andExpect { redirectedUrl("/journeys") }
+      .andExpect { status { is3xxRedirection() } }
 
     verify(service).addPriceForSupplier(
       SERCO,
@@ -266,7 +266,8 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
       toAgencyId,
       Money.valueOf("0.00"),
       currentContractualEffectiveYear,
-    )  }
+    )
+  }
 
   @Test
   internal fun `cannot add negative price for Serco`() {
