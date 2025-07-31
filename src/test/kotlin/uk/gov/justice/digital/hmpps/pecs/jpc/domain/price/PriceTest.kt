@@ -63,7 +63,7 @@ internal class PriceTest {
   }
 
   @Test
-  fun `cannot create price less than one pence`() {
+  fun `cannot create price less than zero pence`() {
     Price(
       supplier = Supplier.SERCO,
       fromLocation = mock(),
@@ -73,17 +73,14 @@ internal class PriceTest {
       addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
     )
 
-    assertThatThrownBy {
-      Price(
-        supplier = Supplier.SERCO,
-        fromLocation = mock(),
-        toLocation = mock(),
-        effectiveYear = 2020,
-        priceInPence = 0,
-        addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
-      )
-    }
-      .isInstanceOf(IllegalArgumentException::class.java)
+    Price(
+      supplier = Supplier.SERCO,
+      fromLocation = mock(),
+      toLocation = mock(),
+      effectiveYear = 2020,
+      priceInPence = 0,
+      addedAt = LocalDate.of(2020, 7, 27).atStartOfDay(),
+    )
 
     assertThatThrownBy {
       Price(
@@ -204,7 +201,7 @@ internal class PriceTest {
   }
 
   @Test
-  fun `add price exception fails if price is identical to excetpion amount`() {
+  fun `add price exception fails if price is identical to exception amount`() {
     val price = Price(
       supplier = Supplier.SERCO,
       fromLocation = mock(),
