@@ -46,12 +46,12 @@ data class PriceException(
 ) {
 
   init {
-    failOnZeroOrLessPrice()
+    failOnLessThanZeroPrice()
     failOnInvalidMonth()
   }
 
-  private fun failOnZeroOrLessPrice() {
-    if (priceInPence < 1) throw IllegalArgumentException("Price exception amount must be greater than zero.")
+  private fun failOnLessThanZeroPrice() {
+    if (priceInPence < 0) throw IllegalArgumentException("Price exception amount must be zero or more.")
   }
 
   private fun failOnInvalidMonth() {
