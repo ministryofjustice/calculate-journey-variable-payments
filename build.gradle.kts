@@ -60,7 +60,7 @@ dependencies {
     "com.microsoft.playwright:playwright:1.52.0",
   ).forEach { testImplementation(it) }
 
-  testRuntimeOnly("com.h2database:h2:1.4.200")
+  testRuntimeOnly("com.h2database:h2:2.3.232")
 
   runtimeOnly("org.postgresql:postgresql:42.7.7")
 }
