@@ -55,8 +55,8 @@ dependencies {
     "org.apache.commons:commons-compress:1.28.0",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
-    "com.squareup.okhttp3:mockwebserver:4.12.0",
-    "com.squareup.okhttp3:okhttp:4.12.0",
+    "com.squareup.okhttp3:mockwebserver:5.1.0",
+    "com.squareup.okhttp3:okhttp:5.1.0",
     "com.microsoft.playwright:playwright:1.54.0",
   ).forEach { testImplementation(it) }
 
