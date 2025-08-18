@@ -2,9 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.6"
-  kotlin("plugin.spring") version "2.2.0"
-  kotlin("plugin.jpa") version "2.2.0"
-  kotlin("plugin.allopen") version "2.2.0"
+  kotlin("plugin.spring") version "2.2.10"
+  kotlin("plugin.jpa") version "2.2.10"
+  kotlin("plugin.allopen") version "2.2.10"
 }
 java {
   sourceCompatibility = JavaVersion.VERSION_21
@@ -50,7 +50,7 @@ dependencies {
 
   listOf(
     "org.wiremock:wiremock:3.13.1",
-    "org.htmlunit:htmlunit:4.14.0",
+    "org.htmlunit:htmlunit:4.15.0",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.28.0",
     "org.springframework.boot:spring-boot-starter-test",
