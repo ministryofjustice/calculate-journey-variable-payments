@@ -23,7 +23,7 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "6.9.2"
+  val shedlockVersion = "6.10.0"
   listOf(
     "com.beust:klaxon:5.6",
     "com.amazonaws:aws-java-sdk-s3:1.12.788",
