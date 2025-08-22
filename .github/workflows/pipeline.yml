@@ -16,6 +16,13 @@ on:
         required: true
         default: false
         type: boolean
+env:
+  _JAVA_OPTIONS: >-
+    -Xmx1024m
+    -XX:ParallelGCThreads=2
+    -XX:ConcGCThreads=2
+    -Djava.util.concurrent.ForkJoinPool.common.parallelism=2
+    -Dorg.gradle.daemon=false
 
 permissions:
   contents: read
@@ -41,7 +48,7 @@ jobs:
     name: Validate the kotlin
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/kotlin_validate.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
-  build:
+  docker_build:
     name: Build docker image from hmpps-github-actions
     if: github.ref == 'refs/heads/main'
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
@@ -53,10 +60,131 @@ jobs:
       additional_docker_tag: ${{ inputs.additional_docker_tag }}
       push: ${{ inputs.push || true }}
       docker_multiplatform: false
+
+  kotlin_build:
+    name: Build Kotlin JAR
+    runs-on: ubuntu-latest
+    needs: kotlin_validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Grant execute permissions
+        run: chmod +x ./gradlew
+
+      - name: Build JAR
+        run: ./gradlew build
+
+      - name: Rename JAR to app.jar
+        run: |
+          JAR_FILE=$(ls build/libs/calculate-journey-variable-payments-*.jar | head -n 1)
+          mv "$JAR_FILE" build/libs/app.jar
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/app.jar
+
+  integration_playwright_tests:
+    needs:
+      - kotlin_build
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/openjdk:21.0-browsers
+      options: --name app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Ensure Docker Compose is available
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose-plugin      
+
+      - name: Start required containers
+        run: sudo docker-compose -f docker-compose.integration.yml up -d
+
+      - name: Wait for services from inside tester container
+        run: |
+          echo "Waiting for Auth service from inside tester container..."
+
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+            for i in $(seq 1 10); do
+              echo "Attempt $i: curling http://auth:9090/auth/health"
+              if curl --fail --silent http://auth:9090/auth/health; then
+                echo "✅ Auth service is ready!"
+                exit 0
+              fi
+              echo "Retry $i: Not ready yet. Sleeping..."
+              sleep 10
+            done
+            echo "❌ Auth service did not become ready."
+            exit 1
+          '
+
+      - name: Download WireMock
+        run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
+
+      - name: Start WireMock
+        run: java -jar wiremock.jar --port 9999 &
+        shell: bash
+
+      - name: Download app JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
+
+      - name: List built JAR
+        run: ls -lh build/libs/
+
+      - name: Start App
+        shell: bash
+        run: |
+          nohup java -Xmx1024m -jar build/libs/app.jar > app.log 2>&1 &
+        env:
+          SPRING_PROFILES_ACTIVE: integration-tests
+          SERVER_SERVLET_SESSION_COOKIE_SECURE: false
+
+      - name: Wait for app to be healthy
+        shell: bash
+        run: |
+          for i in {1..20}; do
+            if curl -s http://localhost:8080/health | grep '"status":"UP"' > /dev/null; then
+              echo "App is healthy!"
+              exit 0
+            fi
+            echo "Waiting for app..."
+            sleep 10
+          done
+          echo "App failed to start in time"
+          cat app.log
+          exit 1
+
+      - name: Run Playwright Integration Tests
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" ./gradlew testPlaywrightIntegration
+
   deploy_dev:
     name: Deploy to the development environment
     needs:
-      - build
+      - docker_build
       - helm_lint
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
