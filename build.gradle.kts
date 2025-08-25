@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.6"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
   kotlin("plugin.spring") version "2.2.10"
   kotlin("plugin.jpa") version "2.2.10"
   kotlin("plugin.allopen") version "2.2.10"
@@ -28,7 +28,7 @@ dependencies {
     "com.beust:klaxon:5.6",
     "com.amazonaws:aws-java-sdk-s3:1.12.788",
     "com.amazonaws:aws-java-sdk-sts:1.12.788",
-    "io.sentry:sentry-spring-boot-starter:8.19.1",
+    "io.sentry:sentry-spring-boot-starter:8.20.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0",
