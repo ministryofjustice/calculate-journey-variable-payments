@@ -249,27 +249,24 @@ class MaintainSupplierPricingControllerTest(@Autowired private val wac: WebAppli
   }
 
   @Test
-  internal fun `cannot add price less than one pence for Serco`() {
+  internal fun `can add price of zero pence for Serco`() {
     mockSession.addSupplierAndContractualYear(SERCO, currentContractualDate)
 
     mockMvc.post("/add-price") {
       session = mockSession
       param("moveId", "$fromAgencyId-$toAgencyId")
-      param("price", "0.001")
+      param("price", "0.00")
     }
-      .andExpect { model { attributeHasFieldErrorCode("form", "price", "Pattern") } }
-      .andExpect {
-        model {
-          attribute(
-            "warnings",
-            listOf(Warning("Please note the added price will be effective for all instances of this journey undertaken by SERCO in the current contractual year $currentContractualEffectiveYear to ${currentContractualEffectiveYear + 1}.")),
-          )
-        }
-      }
-      .andExpect { view { name("add-price") } }
-      .andExpect { status { isOk() } }
+      .andExpect { redirectedUrl("/journeys") }
+      .andExpect { status { is3xxRedirection() } }
 
-    verify(service, never()).addPriceForSupplier(any(), any(), any(), any(), any())
+    verify(service).addPriceForSupplier(
+      SERCO,
+      fromAgencyId,
+      toAgencyId,
+      Money.valueOf("0.00"),
+      currentContractualEffectiveYear,
+    )
   }
 
   @Test

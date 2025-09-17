@@ -1,10 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.2.0"
-  kotlin("plugin.spring") version "2.1.21"
-  kotlin("plugin.jpa") version "2.1.21"
-  kotlin("plugin.allopen") version "2.1.21"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
+  kotlin("plugin.spring") version "2.2.10"
+  kotlin("plugin.jpa") version "2.2.10"
+  kotlin("plugin.allopen") version "2.2.10"
 }
 java {
   sourceCompatibility = JavaVersion.VERSION_21
@@ -23,12 +23,12 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "6.9.0"
+  val shedlockVersion = "6.10.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.787",
-    "com.amazonaws:aws-java-sdk-sts:1.12.787",
-    "io.sentry:sentry-spring-boot-starter:8.14.0",
+    "com.amazonaws:aws-java-sdk-s3:1.12.788",
+    "com.amazonaws:aws-java-sdk-sts:1.12.788",
+    "io.sentry:sentry-spring-boot-starter:8.20.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0",
@@ -42,22 +42,22 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-webflux",
     "org.springframework.session:spring-session-jdbc",
     "org.thymeleaf.extras:thymeleaf-extras-springsecurity6",
-    "com.github.spotbugs:spotbugs-annotations:4.9.3",
+    "com.github.spotbugs:spotbugs-annotations:4.9.4",
     "com.microsoft.azure:applicationinsights-logging-logback:2.6.4",
-    "org.apache.commons:commons-compress:1.27.1",
+    "org.apache.commons:commons-compress:1.28.0",
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
   listOf(
     "org.wiremock:wiremock:3.13.1",
-    "org.htmlunit:htmlunit:4.13.0",
+    "org.htmlunit:htmlunit:4.15.0",
     "org.mockito:mockito-inline:5.2.0",
-    "org.apache.commons:commons-compress:1.27.1",
+    "org.apache.commons:commons-compress:1.28.0",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.12.0",
     "com.squareup.okhttp3:okhttp:4.12.0",
-    "com.microsoft.playwright:playwright:1.52.0",
+    "com.microsoft.playwright:playwright:1.54.0",
   ).forEach { testImplementation(it) }
 
   testRuntimeOnly("com.h2database:h2:1.4.200")

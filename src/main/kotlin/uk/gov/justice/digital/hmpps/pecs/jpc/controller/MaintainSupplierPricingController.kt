@@ -422,7 +422,7 @@ class MaintainSupplierPricingController(
 
   private fun agencyIds(combined: String) = Pair(combined.split("-")[0].trim().uppercase(), combined.split("-")[1].trim().uppercase())
 
-  private fun parseAmount(value: String) = value.toBigDecimalOrNull()?.takeIf { it > BigDecimal.ZERO }?.let { Money.valueOf(it) }
+  private fun parseAmount(value: String) = value.toBigDecimalOrNull()?.takeIf { it >= BigDecimal.ZERO }?.let { Money.valueOf(it) }
 
   private fun ModelMap.getFromLocation() = this.getAttribute(PICK_UP_ATTRIBUTE).takeUnless { it == "" }
 

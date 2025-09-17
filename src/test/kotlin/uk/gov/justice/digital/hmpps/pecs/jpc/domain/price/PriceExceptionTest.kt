@@ -9,12 +9,11 @@ import java.time.DateTimeException
 internal class PriceExceptionTest {
 
   @Test
-  fun `price exception amount must be greater than zero`() {
+  fun `price exception amount must be zero or greater`() {
     assertDoesNotThrow { PriceException(price = mock(), month = 1, priceInPence = 1) }
 
-    assertThatThrownBy { PriceException(price = mock(), month = 1, priceInPence = 0) }.isInstanceOf(
-      IllegalArgumentException::class.java,
-    )
+    assertDoesNotThrow { PriceException(price = mock(), month = 1, priceInPence = 0) }
+
     assertThatThrownBy { PriceException(price = mock(), month = 1, priceInPence = -1) }.isInstanceOf(
       IllegalArgumentException::class.java,
     )
