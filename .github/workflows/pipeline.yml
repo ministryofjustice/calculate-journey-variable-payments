@@ -117,19 +117,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose-plugin      
 
-      - name: Install PostgreSQL client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-
       - name: Start required containers
         run: sudo docker-compose -f docker-compose.integration.yml up -d
 
       - name: Wait for services from inside tester container
         run: |
           echo "Waiting for Auth service from inside tester container..."
-
+          
           sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+            echo "Installing Postgres client in tester..."
+            apk add --no-cache postgresql-client >/dev/null
             for i in $(seq 1 10); do
               echo "Attempt $i: curling http://auth:9090/auth/health"
               if curl --fail --silent http://auth:9090/auth/health; then
