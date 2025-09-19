@@ -125,8 +125,6 @@ jobs:
           echo "Waiting for Auth service from inside tester container..."
           
           sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
-            echo "Installing Postgres client in tester..."
-            apk add --no-cache postgresql-client >/dev/null
             for i in $(seq 1 10); do
               echo "Attempt $i: curling http://auth:9090/auth/health"
               if curl --fail --silent http://auth:9090/auth/health; then
@@ -144,6 +142,8 @@ jobs:
           echo "Waiting for Postgres from inside tester container..."
       
           sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+            echo "Installing Postgres client in tester..."
+            su - root -c "apk add --no-cache postgresql
             for i in $(seq 1 10); do
               echo "Attempt $i: checking Postgres..."
               PGPASSWORD=letmein pg_isready -h db -p 5432 -U jpc -d jpc
