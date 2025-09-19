@@ -26,6 +26,11 @@ services:
     command: -p 5432
     ports:
       - "5433:5432"  # Avoid conflict with auth DB if needed
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U jpc -d jpc" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # Placeholder services for NOMIS and DELIUS if needed for manage-users-api to not error out
   nomis-user-roles-api:

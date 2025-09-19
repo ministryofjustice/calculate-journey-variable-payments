@@ -137,6 +137,24 @@ jobs:
             echo "❌ Auth service did not become ready."
             exit 1
           '
+      - name: Wait for Postgres from inside tester container
+        run: |
+          echo "Waiting for Postgres from inside tester container..."
+      
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+            for i in $(seq 1 10); do
+              echo "Attempt $i: checking Postgres..."
+              PGPASSWORD=letmein pg_isready -h db -p 5432 -U jpc -d jpc
+              if [ $? -eq 0 ]; then
+                echo "✅ Postgres is ready!"
+                exit 0
+              fi
+              echo "Retry $i: Not ready yet. Sleeping..."
+              sleep 10
+            done
+            echo "❌ Postgres did not become ready."
+            exit 1
+          '
 
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
