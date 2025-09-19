@@ -23,6 +23,7 @@ services:
       POSTGRES_PASSWORD: letmein
     networks:
       - app-net
+    command: -p 5432
     ports:
       - "5433:5432"  # Avoid conflict with auth DB if needed
 
