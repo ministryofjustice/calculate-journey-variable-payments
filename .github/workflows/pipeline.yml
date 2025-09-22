@@ -141,7 +141,7 @@ jobs:
         run: |
           echo "Waiting for Postgres from inside tester container..."
       
-          sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester-sql /bin/sh -c '
             for i in $(seq 1 10); do
               echo "Attempt $i: checking Postgres..."
               PGPASSWORD=letmein pg_isready -h db -p 5432 -U jpc -d jpc
