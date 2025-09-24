@@ -173,13 +173,22 @@ jobs:
       - name: List built JAR
         run: ls -lh build/libs/
 
-      - name: Start App
-        shell: bash
+      - name: Build image from Dockerfile
         run: |
-          nohup java -Xmx1024m -jar build/libs/app.jar > app.log 2>&1 &
-        env:
-          SPRING_PROFILES_ACTIVE: integration-tests
-          SERVER_SERVLET_SESSION_COOKIE_SECURE: false
+          docker build -t app_image .
+
+      - name: Run App container in same network
+        run: |
+          NETWORK_NAME=app-net
+          echo "Using network: $NETWORK_NAME"
+
+          docker run -d \
+            --name my_app \
+            --network $NETWORK_NAME \
+            -p 8080:8080 \
+            -e SPRING_PROFILES_ACTIVE=integration-tests \
+            -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
+            app_image
 
       - name: Wait for app to be healthy
         shell: bash
