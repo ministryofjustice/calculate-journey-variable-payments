@@ -202,6 +202,7 @@ jobs:
           done
           echo "App failed to start in time"
           sudo docker logs my_app || true
+          sudo docker exec my_app netstat -tlnp
           exit 1
 
       - name: Run Playwright Integration Tests
