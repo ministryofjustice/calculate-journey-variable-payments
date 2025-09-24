@@ -177,13 +177,9 @@ jobs:
         run: |
           sudo docker build -t app_image .      
 
-      - name: List docker networks
-        run: |
-          sudo docker network ls
-
       - name: Run App container in same network
         run: |
-          NETWORK_NAME=app-net
+          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
           echo "Using network: $NETWORK_NAME"
 
           sudo docker run -d \
