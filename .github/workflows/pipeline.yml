@@ -155,7 +155,6 @@ jobs:
             echo "❌ Postgres did not become ready."
             exit 1
           '
-          sudo docker-compose -f docker-compose.integration.yml logs postgres-jpc
 
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
@@ -202,7 +201,7 @@ jobs:
             sleep 10
           done
           echo "App failed to start in time"
-          cat app.log
+          sudo docker logs my_app || true
           exit 1
 
       - name: Run Playwright Integration Tests
