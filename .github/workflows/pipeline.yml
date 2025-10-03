@@ -115,7 +115,7 @@ jobs:
       - name: Ensure Docker Compose is available
         run: |
           sudo apt-get update
-          sudo apt-get install docker-compose-plugin      
+          sudo apt-get install docker-compose-plugin netstat      
 
       - name: Start required containers
         run: sudo docker-compose -f docker-compose.integration.yml up -d
