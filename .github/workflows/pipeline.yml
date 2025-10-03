@@ -172,22 +172,13 @@ jobs:
       - name: List built JAR
         run: ls -lh build/libs/
 
-      - name: Build image from Dockerfile
+      - name: Start App
+        shell: bash
         run: |
-          sudo docker build -t app_image .      
-
-      - name: Run App container in same network
-        run: |
-          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
-          echo "Using network: $NETWORK_NAME"
-
-          sudo docker run -d \
-            --name my_app \
-            --network $NETWORK_NAME \
-            -p 8080:8080 \
-            -e SPRING_PROFILES_ACTIVE=integration-tests \
-            -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
-            app_image
+          nohup java -Xmx1024m -jar build/libs/app.jar > app.log 2>&1 &
+        env:
+          SPRING_PROFILES_ACTIVE: integration-tests
+          SERVER_SERVLET_SESSION_COOKIE_SECURE: false
 
       - name: Wait for app to be healthy
         shell: bash
@@ -201,8 +192,7 @@ jobs:
             sleep 10
           done
           echo "App failed to start in time"
-          sudo docker logs my_app || true
-          sudo docker exec my_app netstat -tlnp
+          cat app.log || true
           exit 1
 
       - name: Run Playwright Integration Tests
