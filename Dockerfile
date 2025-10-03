@@ -12,11 +12,12 @@ FROM eclipse-temurin:21.0.2_13-jre
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 RUN apt-get update && \
-    apt-get -y upgrade && \
-    apt-get install -y libfreetype6 && \
-    apt-get install -y libfontconfig1 && \
-    apt-get install -y curl && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y \
+        libfreetype6 \
+        libfontconfig1 \
+        curl \
+        net-tools \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
