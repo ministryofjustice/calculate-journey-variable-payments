@@ -4,7 +4,7 @@ spring:
     hibernate:
       ddl-auto: validate
   datasource:
-    url: jdbc:postgresql://postgres-jpc:5432/jpc
+    url: jdbc:postgresql://localhost:5433/jpc
     username: jpc
     password: letmein
 
@@ -21,11 +21,11 @@ CRON_AUTOMATIC_LOCATION_MAPPING: "-"
 CRON_IMPORT_REPORTS: "-"
 CRON_BACKFILL_REPORTS: "-"
 CRON_REPROCESS_EXISTING_MOVES: "-"
-HMPPS_AUTH_BASE_URI: http://auth:9090
-HMPPS_MANAGE_USERS_BASE_URI: http://manage-users-api:9091
+HMPPS_AUTH_BASE_URI: http://localhost:9090
+HMPPS_MANAGE_USERS_BASE_URI: http://localhost:9091
 HMPPS_AUTH_CLIENT_ID: pecs-jpc-client
 HMPPS_AUTH_CLIENT_SECRET: clientsecret
-HMPPS_AUTH_REDIRECT_BASE_URI: http://app:8080
+HMPPS_AUTH_REDIRECT_BASE_URI: http://localhost:8080
 IMPORT_FILES_LOCATIONS: schedule_34_locations_sample.xlsx
 IMPORT_FILES_PRICES_GEO: geoamey_sample.xlsx
 IMPORT_FILES_PRICES_SERCO: serco_sample.xlsx
