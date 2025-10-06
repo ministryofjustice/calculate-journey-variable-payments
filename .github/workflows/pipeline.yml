@@ -141,6 +141,12 @@ jobs:
             echo "❌ Auth service did not become ready."
             exit 1
           '
+      - name: Install lsof
+        run: sudo apt-get update && sudo apt-get install -y lsof
+
+      - name: Check open ports
+        run: |
+          sudo lsof -i -P -n | grep LISTEN
 
       - name: Wait for Postgres from inside tester container
 
@@ -161,7 +167,7 @@ jobs:
             echo "❌ Postgres did not become ready."
             exit 1
           '
-      
+
       - name: Wait for Postgres on host
         run: |
           echo "Waiting for Postgres on localhost:5433..."
