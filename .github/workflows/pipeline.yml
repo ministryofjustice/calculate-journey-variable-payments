@@ -141,12 +141,8 @@ jobs:
             echo "❌ Auth service did not become ready."
             exit 1
           '
-      - name: Install lsof
-        run: sudo apt-get update && sudo apt-get install -y lsof
-
-      - name: Check open ports
-        run: |
-          sudo lsof -i -P -n
+      - name: List open ports with ss
+        run: ss -tuln
 
       - name: Wait for Postgres from inside tester container
 
