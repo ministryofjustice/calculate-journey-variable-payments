@@ -119,7 +119,7 @@ jobs:
       - name: Ensure Docker Compose is available
         run: |
           sudo apt-get update
-          sudo apt-get install docker-compose-plugin      
+          sudo apt-get install -y iproute2 docker-compose-plugin      
 
       - name: Start required containers
         run: sudo docker-compose -f docker-compose.integration.yml up -d
@@ -145,7 +145,6 @@ jobs:
         run: ss -tuln
 
       - name: Wait for Postgres from inside tester container
-
         run: |
           echo "Waiting for Postgres from inside tester container..."
           
