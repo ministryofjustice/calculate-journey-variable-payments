@@ -146,7 +146,7 @@ jobs:
 
       - name: Check open ports
         run: |
-          sudo lsof -i -P -n | grep LISTEN
+          sudo lsof -i -P -n
 
       - name: Wait for Postgres from inside tester container
 
