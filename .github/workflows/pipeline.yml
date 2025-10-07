@@ -190,7 +190,7 @@ jobs:
         run: |
           echo "Waiting for app to be healthy from inside tester container..."
       
-          sudo docker-compose -f docker-compose.integration.yml exec -T tester-sql /bin/sh -c '
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
             for i in $(seq 1 40); do
               echo "Attempt $i: Checking app health..."
               response=$(curl -s http://app:8080/health || true)
