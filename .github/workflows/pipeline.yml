@@ -141,8 +141,6 @@ jobs:
             echo "❌ Auth service did not become ready."
             exit 1
           '
-      - name: List open ports with ss
-        run: ss -tuln
 
       - name: Wait for Postgres from inside tester container
         run: |
@@ -193,7 +191,7 @@ jobs:
           sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
             for i in $(seq 1 40); do
               echo "Attempt $i: Checking app health..."
-              response=$(curl -s http://app:8080/health || true)
+              response=$(curl -s http://my_app:8080/health || true)
               echo "Response: $response"
               echo "$response" | grep "\"status\":\"UP\"" > /dev/null
               if [ $? -eq 0 ]; then
@@ -205,7 +203,7 @@ jobs:
             done
             echo "❌ App failed to become healthy in time."
             echo "---- app.log ----"
-            cat app.log || true
+            sudo docker logs my_app || true
             echo "-----------------"
             exit 1
           '
