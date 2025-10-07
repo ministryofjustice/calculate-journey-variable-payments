@@ -4,7 +4,7 @@ spring:
     hibernate:
       ddl-auto: validate
   datasource:
-    url: jdbc:postgresql://postgres-jpc:5433/jpc
+    url: jdbc:postgresql://postgres-jpc:5432/jpc
     username: jpc
     password: letmein
 
