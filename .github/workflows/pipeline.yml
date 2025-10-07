@@ -163,17 +163,6 @@ jobs:
             exit 1
           '
 
-      - name: Wait for Postgres on host
-        run: |
-          echo "Waiting for Postgres on localhost:5433..."
-          for i in $(seq 1 20); do
-            PGPASSWORD=letmein pg_isready -h localhost -p 5433 -U jpc -d jpc && echo "✅ Postgres is ready!" && exit 0
-            echo "Retry $i: Not ready yet. Sleeping..."
-            sleep 5
-          done
-          echo "❌ Postgres did not become ready."
-          exit 1
-
       - name: Download WireMock
         run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
 
@@ -190,28 +179,46 @@ jobs:
       - name: List built JAR
         run: ls -lh build/libs/
 
-      - name: Start App
-        shell: bash
+      - name: Build image from Dockerfile
         run: |
-          nohup java -Xmx1024m -jar build/libs/app.jar > app.log 2>&1 &
-        env:
-          SPRING_PROFILES_ACTIVE: integration-tests
-          SERVER_SERVLET_SESSION_COOKIE_SECURE: false
+          docker build -t app_image .
 
-      - name: Wait for app to be healthy
-        shell: bash
+      - name: Run App container in the same network
         run: |
-          for i in {1..40}; do
-            if curl -s http://localhost:8080/health | grep '"status":"UP"' > /dev/null; then
-              echo "App is healthy!"
-              exit 0
-            fi
-            echo "Waiting for app..."
-            sleep 10
-          done
-          echo "App failed to start in time"
-          cat app.log || true
-          exit 1
+          NETWORK_NAME=app-net
+          echo "Using network: $NETWORK_NAME"
+
+          docker run -d \
+            --name my_app \
+            --network $NETWORK_NAME \
+            -p 8080:8080 \
+            -e SPRING_PROFILES_ACTIVE=integration-tests \
+            -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
+            app_image
+
+      - name: Wait for app to be healthy (inside tester container)
+        run: |
+          echo "Waiting for app to be healthy from inside tester container..."
+      
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester-sql /bin/sh -c '
+            for i in $(seq 1 40); do
+              echo "Attempt $i: Checking app health..."
+              response=$(curl -s http://app:8080/health || true)
+              echo "Response: $response"
+              echo "$response" | grep "\"status\":\"UP\"" > /dev/null
+              if [ $? -eq 0 ]; then
+                echo "✅ App is healthy!"
+                exit 0
+              fi
+              echo "Retry $i: App not ready yet. Sleeping..."
+              sleep 10
+            done
+            echo "❌ App failed to become healthy in time."
+            echo "---- app.log ----"
+            cat app.log || true
+            echo "-----------------"
+            exit 1
+          '
 
       - name: Run Playwright Integration Tests
         run: |
