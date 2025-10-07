@@ -163,32 +163,22 @@ jobs:
             exit 1
           '
 
-      - name: Download WireMock
-        run: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
-
-      - name: Start WireMock
-        run: java -jar wiremock.jar --port 9999 &
-        shell: bash
-
       - name: Download app JAR
         uses: actions/download-artifact@v4
         with:
           name: app-jar
           path: build/libs
 
-      - name: List built JAR
-        run: ls -lh build/libs/
-
       - name: Build image from Dockerfile
         run: |
-          docker build -t app_image .
+          sudo docker build -t app_image .
 
       - name: Run App container in the same network
         run: |
           NETWORK_NAME=app-net
           echo "Using network: $NETWORK_NAME"
 
-          docker run -d \
+          sudo docker run -d \
             --name my_app \
             --network $NETWORK_NAME \
             -p 8080:8080 \
