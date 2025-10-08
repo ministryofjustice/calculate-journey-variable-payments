@@ -23,12 +23,11 @@ server:
   tomcat:
     accesslog:
       enabled: true
-      directory: /dev
-      prefix: stdout
-      suffix: ""
+      directory: logs
+      prefix: access
+      suffix: .log
       buffered: false
       pattern: "%h %l %u %t \"%r\" %s %b"
-
 
 APP_DB_URL: "jdbc:postgresql://postgres-jpc:5433/jpc?reWriteBatchedInserts=true&user=jpc&password=letmein"
 AWS_DEFAULT_REGION: eu-west-2
