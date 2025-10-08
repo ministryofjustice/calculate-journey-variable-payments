@@ -25,6 +25,7 @@ server:
       enabled: true
       directory: /dev
       prefix: stdout
+      suffix: ""
       buffered: false
       pattern: "%h %l %u %t \"%r\" %s %b"
 
