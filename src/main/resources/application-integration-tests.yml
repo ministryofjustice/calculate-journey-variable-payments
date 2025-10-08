@@ -24,7 +24,7 @@ server:
   tomcat:
     accesslog:
       enabled: true
-      directory: logs
+      directory: /app/logs
       prefix: access
       suffix: .log
       buffered: false
