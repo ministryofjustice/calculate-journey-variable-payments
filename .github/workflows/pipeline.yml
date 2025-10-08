@@ -210,6 +210,12 @@ jobs:
           sudo docker logs my_app || true
           echo "-----------------"
 
+      - name: Stop job if app failed to start
+        if: steps.wait_health.outcome == 'failure'
+        run: |
+          echo "❌ Stopping job because the app failed to start properly."
+          exit 1
+
       - name: Run Playwright Integration Tests
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" ./gradlew testPlaywrightIntegration

@@ -12,6 +12,22 @@ spring:
     enabled: true
     locations: classpath:/db/migration
 
+# 🟩 Additional config for CI visibility
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.boot.actuate.endpoint.web.servlet: DEBUG
+    org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]: INFO
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /dev
+      prefix: stdout
+      buffered: false
+      pattern: "%h %l %u %t \"%r\" %s %b"
+
 
 APP_DB_URL: "jdbc:postgresql://postgres-jpc:5433/jpc?reWriteBatchedInserts=true&user=jpc&password=letmein"
 AWS_DEFAULT_REGION: eu-west-2
