@@ -14,7 +14,10 @@ spring:
 
 # 🟩 Additional config for CI visibility
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
   level:
+    root: INFO
     org.springframework.web: DEBUG
     org.springframework.boot.actuate.endpoint.web.servlet: DEBUG
     org.apache.catalina.valves.AccessLogValve: DEBUG
