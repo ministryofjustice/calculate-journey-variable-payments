@@ -17,6 +17,7 @@ logging:
   level:
     org.springframework.web: DEBUG
     org.springframework.boot.actuate.endpoint.web.servlet: DEBUG
+    org.apache.catalina.valves.AccessLogValve: DEBUG
     org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]: INFO
 
 server:

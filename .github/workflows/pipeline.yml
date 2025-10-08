@@ -210,7 +210,7 @@ jobs:
           sudo docker logs my_app || true
           echo "-----------------"
           echo "---- Tomcat access logs ----"
-          sudo docker exec my_app sh -c 'cat /app/logs/access.log || true'
+          sudo docker exec my_app sh -c 'cat /logs/access*.log || true'
           echo "-----------------------------"
 
       - name: Stop job if app failed to start
