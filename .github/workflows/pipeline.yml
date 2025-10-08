@@ -209,6 +209,9 @@ jobs:
           echo "---- app.log ----"
           sudo docker logs my_app || true
           echo "-----------------"
+          echo "---- Tomcat access logs ----"
+          sudo docker exec my_app sh -c 'cat /app/logs/access.log || true'
+          echo "-----------------------------"
 
       - name: Stop job if app failed to start
         if: steps.wait_health.outcome == 'failure'
