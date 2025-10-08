@@ -182,7 +182,8 @@ jobs:
             -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=integration-tests \
             -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
-            app_image
+            app_image \
+            sh -c "java -jar /app/app.jar"
 
       - name: Wait for app to be healthy (inside tester container)
         id: wait_health
@@ -206,7 +207,7 @@ jobs:
         run: |
           echo "❌ App failed to become healthy in time."
           echo "---- app.log ----"
-          sudo docker exec my_app sh -c 'cat /app/app.log || cat /var/log/app.log || echo "No app.log found"' || true
+          sudo docker logs my_app || true
           echo "-----------------"
 
       - name: Run Playwright Integration Tests
