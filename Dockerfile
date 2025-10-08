@@ -35,7 +35,7 @@ COPY --from=builder --chown=appuser:appgroup /app/build/libs/applicationinsights
 COPY --from=builder --chown=appuser:appgroup /app/applicationinsights.dev.json /app
 COPY --from=builder --chown=appuser:appgroup /app/applicationinsights.json /app
 COPY --from=builder --chown=appuser:appgroup /app/run.sh /app
-
+RUN mkdir -p /app/logs && chown -R 2000:2000 /app/logs
 USER 2000
 
 ENTRYPOINT ["/bin/sh", "/app/run.sh"]
