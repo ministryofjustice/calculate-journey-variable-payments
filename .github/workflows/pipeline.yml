@@ -206,7 +206,7 @@ jobs:
         run: |
           echo "❌ App failed to become healthy in time."
           echo "---- app.log ----"
-          sudo docker logs my_app || true
+          sudo docker exec my_app sh -c 'cat /app/app.log || cat /var/log/app.log || echo "No app.log found"' || true
           echo "-----------------"
 
       - name: Run Playwright Integration Tests
