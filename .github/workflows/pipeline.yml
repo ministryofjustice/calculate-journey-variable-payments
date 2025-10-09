@@ -219,10 +219,18 @@ jobs:
           echo "❌ Stopping job because the app failed to start properly."
           exit 1
 
-      - name: Run Playwright Integration Tests
-        run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" ./gradlew testPlaywrightIntegration
 
+      - name: Run Playwright Integration Tests (in Docker)
+        run: |
+          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
+          echo "Running Playwright tests in network: $NETWORK_NAME"
+          
+          sudo docker run --rm \
+            --network $NETWORK_NAME \
+            -v $PWD:/app \
+            -w /app \
+            mcr.microsoft.com/playwright:v1.47.2-jammy \
+            bash -c "npx playwright install --with-deps && xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' ./gradlew testPlaywrightIntegration"
   deploy_dev:
     name: Deploy to the development environment
     needs:
