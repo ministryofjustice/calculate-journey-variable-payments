@@ -226,28 +226,26 @@ jobs:
           
           # Ensure Gradle wrapper is executable
           chmod +x ./gradlew
-          
           sudo docker run --rm \
             --network $NETWORK_NAME \
-            -v $PWD:/app \
+            -v ${{ github.workspace }}:/app \
             -v ~/.gradle:/root/.gradle \
             -w /app \
             mcr.microsoft.com/playwright:v1.47.2-jammy \
-              bash -c "
-                set -e
-                echo '🔍 Listing /app contents:'
-                ls -l /app
-                echo ''
-                echo 'Installing Playwright dependencies...'
-                npx playwright install --with-deps
-                echo 'Running Gradle Playwright tests...'
-                xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
-                ./gradlew --no-daemon --info testPlaywrightIntegration \
-                -Dplaywright.headless=true \
-                -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
-              "
-  
-
+            bash -c "
+            set -e
+            echo '🔍 Listing /app contents:'
+            ls -l /app
+            echo ''
+            echo 'Installing Playwright dependencies...'
+            npx playwright install --with-deps
+            echo 'Running Gradle Playwright tests...'
+            xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
+            ./gradlew --no-daemon --info testPlaywrightIntegration \
+            -Dplaywright.headless=true \
+            -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
+            "
+          
   deploy_dev:
     name: Deploy to the development environment
     needs:
