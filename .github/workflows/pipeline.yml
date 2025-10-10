@@ -254,7 +254,13 @@ jobs:
             -Dplaywright.headless=true \
             -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
             "
-
+      - name: Upload Playwright videos
+        if: always()  # ensures it runs even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: build/reports/tests/testPlayWrightIntegration/videos/
+          
   deploy_dev:
     name: Deploy to the development environment
     needs:
