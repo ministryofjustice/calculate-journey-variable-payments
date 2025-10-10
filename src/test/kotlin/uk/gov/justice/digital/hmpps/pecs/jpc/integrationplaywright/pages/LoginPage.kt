@@ -7,9 +7,10 @@ import com.microsoft.playwright.options.AriaRole
 class LoginPage(page: Page?) : BasicPage() {
 
   private val page = page
+  private val url = System.getenv("APP_BASE_URL") ?: "http://localhost:8080"
 
   fun login() {
-    page?.navigate("http://localhost:8080/")
+    page?.navigate(url)
     page?.waitForLoadState()
     page?.querySelector("#sign-out")?.click()
     page?.getByLabel("username")?.fill(getProperty("jpc.web.user"))
