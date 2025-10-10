@@ -229,6 +229,7 @@ jobs:
             -v ${{ github.workspace }}:/app \
             -v ~/.gradle:/root/.gradle \
             -w /app \
+            -e APP_BASE_URL="http://my_app:8080" \
             mcr.microsoft.com/playwright:v1.47.2-jammy \
             bash -c "
             set -e
