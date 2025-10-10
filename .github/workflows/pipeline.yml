@@ -260,7 +260,7 @@ jobs:
         with:
           name: playwright-videos
           path: build/reports/tests/testPlayWrightIntegration/videos/
-          
+
   deploy_dev:
     name: Deploy to the development environment
     needs:
