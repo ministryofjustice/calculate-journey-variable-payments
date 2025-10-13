@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.springframework.boot.context.properties.bind.Bindable.mapOf
 import java.nio.file.Paths
 
 internal abstract class PlayWrightTest {
@@ -39,7 +40,10 @@ internal abstract class PlayWrightTest {
   fun createContextAndPage() {
     context = browser?.newContext(
       Browser.NewContextOptions()
-        .setRecordVideoDir(Paths.get("build/reports/tests/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")),
+        .setRecordVideoDir(
+          Paths.get("build/reports/tests/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")
+        )
+        .setExtraHTTPHeaders(mapOf("Host" to "localhost"))
     )
     page = context?.newPage()
   }
