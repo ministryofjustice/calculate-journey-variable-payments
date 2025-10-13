@@ -1,4 +1,6 @@
 spring:
+  web:
+    allowed-hosts: localhost,my_app
   jpa:
     show-sql: true
     hibernate:
@@ -24,8 +26,6 @@ logging:
     org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]: INFO
 
 server:
-  forward-headers-strategy: none
-  allowed-hosts: "localhost,my_app"
   tomcat:
     accesslog:
       enabled: true
