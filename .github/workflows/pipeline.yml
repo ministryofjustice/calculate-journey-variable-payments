@@ -224,51 +224,57 @@ jobs:
         run: |
           NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
           echo "Running Playwright tests in network: $NETWORK_NAME"
-          
+
           sudo docker run --rm \
-            --network $NETWORK_NAME \
-            -v ${{ github.workspace }}:/app \
+            --network "$NETWORK_NAME" \
+            -v "${{ github.workspace }}:/app" \
             -v ~/.gradle:/root/.gradle \
             -w /app \
             -e APP_BASE_URL="http://my_app:8080" \
             mcr.microsoft.com/playwright:v1.47.2-jammy \
-            bash -c "
-            set -e
-            echo 'Installing OpenJDK and curl...'
-            apt-get update -qq
-            apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
-            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-            export PATH=\$JAVA_HOME/bin:\$PATH
-            
-            echo '🔍 Java version:'
-            java -version
-            
-            echo '🔍 Resolving container hostnames...'
-            APP_IP=\$(getent hosts my_app | awk '{ print \$1 }')
-            AUTH_IP=\$(getent hosts auth | awk '{ print \$1 }')
-            export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage --host-resolver-rules=\"MAP my_app $APP_IP, MAP auth $AUTH_IP, EXCLUDE localhost\""
-            echo \"\$APP_IP my_app\" >> /etc/hosts
-            echo \"\$AUTH_IP auth\" >> /etc/hosts
-            cat /etc/hosts
-            
-            echo '🔍 Listing /app contents:'
-            ls -l /app
-            
-            echo 'Testing network connectivity...'
-            ping -c 2 my_app || echo '⚠️ Ping failed'
-            
-            echo 'Checking app health with header Host: localhost...'
-            curl -v -H 'Host: localhost' http://my_app:8080/health || echo '⚠️ Curl failed'
-          
-            echo 'Installing Playwright dependencies...'
-            npx playwright install --with-deps
-            
-            echo 'Running Gradle Playwright tests...'
-            xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
-            ./gradlew --no-daemon --info testPlaywrightIntegration \
-            -Dplaywright.args="$PLAYWRIGHT_ARGS" \
-            -Dplaywright.headless=true 
-            "
+            bash -c '
+              set -e
+              echo "Installing OpenJDK and curl..."
+              apt-get update -qq
+              apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
+              export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+              export PATH=$JAVA_HOME/bin:$PATH
+
+              echo "🔍 Java version:"
+              java -version
+
+              echo "🔍 Resolving container hostnames..."
+              APP_IP=$(getent hosts my_app | awk "{ print \$1 }")
+              AUTH_IP=$(getent hosts auth | awk "{ print \$1 }")
+              echo "Resolved my_app -> $APP_IP"
+              echo "Resolved auth  -> $AUTH_IP"
+
+              echo "$APP_IP my_app" >> /etc/hosts
+              echo "$AUTH_IP auth" >> /etc/hosts
+              cat /etc/hosts
+
+              export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage --host-resolver-rules=\\\"MAP my_app $APP_IP, MAP auth $AUTH_IP, EXCLUDE localhost\\\""
+
+              echo "🔍 Listing /app contents:"
+              ls -l /app
+
+              echo "Testing network connectivity..."
+              ping -c 2 my_app || echo "⚠️ Ping failed"
+
+              echo "Checking app health with header Host: localhost..."
+              curl -v -H "Host: localhost" http://my_app:8080/health || echo "⚠️ Curl failed"
+
+              echo "Installing Playwright dependencies..."
+              npx playwright install --with-deps
+
+              echo "Running Gradle Playwright tests..."
+              xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" \
+                ./gradlew --no-daemon --info testPlaywrightIntegration \
+                -Dplaywright.args="$PLAYWRIGHT_ARGS" \
+                -Dplaywright.headless=true
+            '
+      
+
       - name: Print app logs on failure
         if: always()  # ensures it runs even if tests fail
         run: |
