@@ -222,41 +222,43 @@ jobs:
       - name: Run Playwright Integration Tests in Docker
         id: integration_tests
         run: |
-            sudo docker run --rm \
-              --network $NETWORK_NAME \
-              -v ${{ github.workspace }}:/app \
-              -v ~/.gradle:/root/.gradle \
-              -w /app \
-              -e APP_BASE_URL="http://my_app:8080" \
-              mcr.microsoft.com/playwright:v1.47.2-jammy \
-              bash -c "
-                set -e
-                echo 'Installing OpenJDK and curl...'
-                apt-get update -qq
-                apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
+          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
+          echo "Running Playwright tests in network: $NETWORK_NAME"
+          
+          sudo docker run --rm \
+            --network $NETWORK_NAME \
+            -v ${{ github.workspace }}:/app \
+            -v ~/.gradle:/root/.gradle \
+            -w /app \
+            -e APP_BASE_URL="http://my_app:8080" \
+            mcr.microsoft.com/playwright:v1.47.2-jammy \
+            bash -c "
+            set -e
+            echo 'Installing OpenJDK and curl...'
+            apt-get update -qq
+            apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
+            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+            export PATH=\$JAVA_HOME/bin:\$PATH
             
-                export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-                export PATH=\$JAVA_HOME/bin:\$PATH
+            echo '🔍 Java version:'
+            java -version
             
-                echo '🔍 Java version:'
-                java -version
+            echo '🔍 Listing /app contents:'
+            ls -l /app
             
-                echo '🔍 Listing /app contents:'
-                ls -l /app
+            echo 'Testing network connectivity...'
+            ping -c 2 my_app || echo '⚠️ Ping failed'
+            curl -v http://my_app:8080/health || echo '⚠️ Curl failed'
             
-                echo 'Testing network connectivity...'
-                ping -c 2 my_app || echo '⚠️ Ping failed'
-                curl -v http://my_app:8080/health || echo '⚠️ Curl failed'
+            echo 'Installing Playwright dependencies...'
+            npx playwright install --with-deps
             
-                echo 'Installing Playwright dependencies...'
-                npx playwright install --with-deps
-            
-                echo 'Running Gradle Playwright tests...'
-                xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
-                  ./gradlew --no-daemon --info testPlaywrightIntegration \
-                  -Dplaywright.headless=true \
-                  -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
-              "
+            echo 'Running Gradle Playwright tests...'
+            xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
+            ./gradlew --no-daemon --info testPlaywrightIntegration \
+            -Dplaywright.headless=true \
+            -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
+            "
       - name: Print app logs on failure
         if: steps.integration_tests.outcome == 'failure'
         run: |
