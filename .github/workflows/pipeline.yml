@@ -243,6 +243,13 @@ jobs:
             echo '🔍 Java version:'
             java -version
             
+            echo '🔍 Resolving container hostnames...'
+            APP_IP=\$(getent hosts my_app | awk '{ print \$1 }')
+            AUTH_IP=\$(getent hosts auth | awk '{ print \$1 }')
+            echo \"\$APP_IP my_app\" >> /etc/hosts
+            echo \"\$AUTH_IP auth\" >> /etc/hosts
+            cat /etc/hosts
+            
             echo '🔍 Listing /app contents:'
             ls -l /app
             
