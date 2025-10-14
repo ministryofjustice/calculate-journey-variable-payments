@@ -246,6 +246,7 @@ jobs:
             echo '🔍 Resolving container hostnames...'
             APP_IP=\$(getent hosts my_app | awk '{ print \$1 }')
             AUTH_IP=\$(getent hosts auth | awk '{ print \$1 }')
+            export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage --host-resolver-rules=\"MAP my_app $APP_IP, MAP auth $AUTH_IP, EXCLUDE localhost\""
             echo \"\$APP_IP my_app\" >> /etc/hosts
             echo \"\$AUTH_IP auth\" >> /etc/hosts
             cat /etc/hosts
@@ -265,8 +266,8 @@ jobs:
             echo 'Running Gradle Playwright tests...'
             xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
             ./gradlew --no-daemon --info testPlaywrightIntegration \
-            -Dplaywright.headless=true \
-            -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
+            -Dplaywright.args="$PLAYWRIGHT_ARGS" \
+            -Dplaywright.headless=true 
             "
       - name: Print app logs on failure
         if: steps.integration_tests.outcome == 'failure'
