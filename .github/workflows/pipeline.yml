@@ -270,7 +270,7 @@ jobs:
             -Dplaywright.headless=true 
             "
       - name: Print app logs on failure
-        if: steps.integration_tests.outcome == 'failure'
+        if: always()  # ensures it runs even if tests fail
         run: |
           echo "❌ Tests failed."
           echo "---- app.log ----"
