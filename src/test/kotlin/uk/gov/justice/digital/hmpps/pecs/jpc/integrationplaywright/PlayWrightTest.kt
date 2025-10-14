@@ -9,7 +9,6 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.springframework.boot.context.properties.bind.Bindable.mapOf
 import java.nio.file.Paths
 
 internal abstract class PlayWrightTest {
