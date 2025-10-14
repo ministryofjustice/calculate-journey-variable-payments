@@ -40,9 +40,9 @@ internal abstract class PlayWrightTest {
     context = browser?.newContext(
       Browser.NewContextOptions()
         .setRecordVideoDir(
-          Paths.get("build/reports/tests/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/")
+          Paths.get("build/reports/tests/testPlayWrightIntegration/videos/${this.javaClass.canonicalName}/"),
         )
-        .setExtraHTTPHeaders(mapOf("Host" to "localhost"))
+        .setExtraHTTPHeaders(mapOf("Host" to "localhost")),
     )
     page = context?.newPage()
   }
