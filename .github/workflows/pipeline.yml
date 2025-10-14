@@ -219,41 +219,55 @@ jobs:
           echo "❌ Stopping job because the app failed to start properly."
           exit 1
 
-      - name: Run Playwright Integration Tests (in Docker)
+      - name: Run Playwright Integration Tests in Docker
+        id: integration_tests
         run: |
-          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
-          echo "Running Playwright tests in network: $NETWORK_NAME"
-          
-          sudo docker run --rm \
-            --network $NETWORK_NAME \
-            -v ${{ github.workspace }}:/app \
-            -v ~/.gradle:/root/.gradle \
-            -w /app \
-            -e APP_BASE_URL="http://my_app:8080" \
-            mcr.microsoft.com/playwright:v1.47.2-jammy \
-            bash -c "
-            set -e
-            echo 'Installing OpenJDK...'
-            apt-get update -qq
-            apt-get install -y openjdk-21-jdk > /dev/null
-            export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
-            export PATH=\$JAVA_HOME/bin:\$PATH
+            sudo docker run --rm \
+              --network $NETWORK_NAME \
+              -v ${{ github.workspace }}:/app \
+              -v ~/.gradle:/root/.gradle \
+              -w /app \
+              -e APP_BASE_URL="http://my_app:8080" \
+              mcr.microsoft.com/playwright:v1.47.2-jammy \
+              bash -c "
+                set -e
+                echo 'Installing OpenJDK and curl...'
+                apt-get update -qq
+                apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
             
-            echo '🔍 Java version:'
-            java -version
+                export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+                export PATH=\$JAVA_HOME/bin:\$PATH
             
-            echo '🔍 Listing /app contents:'
-            ls -l /app
+                echo '🔍 Java version:'
+                java -version
             
-            echo 'Installing Playwright dependencies...'
-            npx playwright install --with-deps
+                echo '🔍 Listing /app contents:'
+                ls -l /app
             
-            echo 'Running Gradle Playwright tests...'
-            xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
-            ./gradlew --no-daemon --info testPlaywrightIntegration \
-            -Dplaywright.headless=true \
-            -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
-            "
+                echo 'Testing network connectivity...'
+                ping -c 2 my_app || echo '⚠️ Ping failed'
+                curl -v http://my_app:8080/health || echo '⚠️ Curl failed'
+            
+                echo 'Installing Playwright dependencies...'
+                npx playwright install --with-deps
+            
+                echo 'Running Gradle Playwright tests...'
+                xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' \
+                  ./gradlew --no-daemon --info testPlaywrightIntegration \
+                  -Dplaywright.headless=true \
+                  -Dplaywright.args='--no-sandbox --disable-dev-shm-usage'
+              "
+      - name: Print app logs on failure
+        if: steps.integration_tests.outcome == 'failure'
+        run: |
+          echo "❌ Tests failed."
+          echo "---- app.log ----"
+          sudo docker logs my_app || true
+          echo "-----------------"
+          echo "---- Tomcat access logs ----"
+          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          echo "-----------------------------"
+
       - name: Upload Playwright videos
         if: always()  # ensures it runs even if tests fail
         uses: actions/upload-artifact@v4
