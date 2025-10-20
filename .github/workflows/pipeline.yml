@@ -185,7 +185,7 @@ jobs:
             app_image \
             sh -c "java -jar /app/app.jar"
 
-      - name: Wait for app to be healthy (inside tester container)
+      - name: Wait for app to be healthy
         id: wait_health
         continue-on-error: true
         run: |
