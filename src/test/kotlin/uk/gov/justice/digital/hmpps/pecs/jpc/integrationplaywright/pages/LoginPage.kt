@@ -7,7 +7,7 @@ import com.microsoft.playwright.options.AriaRole
 class LoginPage(page: Page?) : BasicPage() {
 
   private val page = page
-  private val url = System.getenv("APP_BASE_URL") ?: "http://localhost:8080"
+  private val url = System.getenv("APP_BASE_URL")!!.trim() ?: "http://localhost:8080"
 
   fun login() {
     page?.navigate(url)
