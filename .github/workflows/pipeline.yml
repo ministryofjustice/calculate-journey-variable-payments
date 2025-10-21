@@ -177,7 +177,7 @@ jobs:
           echo "Using network: $NETWORK_NAME"
 
           sudo docker run -d \
-            --name my_app \
+            --name my-app \
             --network $NETWORK_NAME \
             -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=integration-tests \
@@ -193,7 +193,7 @@ jobs:
           sudo docker-compose -f docker-compose.integration.yml exec -T auth /bin/sh -c '
             for i in $(seq 1 20); do
               echo "Attempt $i: Checking app health ..."
-              response=$(curl -s -H "Host: localhost" http://my_app:8080/health || true)
+              response=$(curl -s -H "Host: localhost" http://my-app:8080/health || true)
               echo "Response: $response"
               echo "$response" | grep "\"status\":\"UP\"" > /dev/null && exit 0
               echo "Retry $i: App not ready yet. Sleeping..."
@@ -207,10 +207,10 @@ jobs:
         run: |
           echo "❌ App failed to become healthy in time."
           echo "---- app.log ----"
-          sudo docker logs my_app || true
+          sudo docker logs my-app || true
           echo "-----------------"
           echo "---- Tomcat access logs ----"
-          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          sudo docker exec my-app sh -c 'cat /app/logs/*.log || true'
           echo "-----------------------------"
 
       - name: Stop job if app failed to start
@@ -232,7 +232,7 @@ jobs:
             -v "${{ github.workspace }}:/app" \
             -v ~/.gradle:/root/.gradle \
             -w /app \
-            -e APP_BASE_URL="http://my_app:8080" \
+            -e APP_BASE_URL="http://my-app:8080" \
             mcr.microsoft.com/playwright:v1.47.2-jammy \
             bash -c '
               set -e
@@ -247,10 +247,10 @@ jobs:
               java -version
 
               echo "🔍 Testing network connectivity..."
-              ping -c 2 my_app || echo "⚠️ Ping failed"
+              ping -c 2 my-app || echo "⚠️ Ping failed"
 
               echo "Checking app health with header Host: localhost..."
-              curl -v -H "Host: localhost" http://my_app:8080/health || echo "⚠️ Curl failed"
+              curl -v -H "Host: localhost" http://my-app:8080/health || echo "⚠️ Curl failed"
 
               echo "Installing Playwright dependencies..."
               npx playwright install --with-deps
@@ -278,10 +278,10 @@ jobs:
         run: |
           echo "❌ Tests failed."
           echo "---- app.log ----"
-          sudo docker logs my_app || true
+          sudo docker logs my-app || true
           echo "-----------------"
           echo "---- Tomcat access logs ----"
-          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          sudo docker exec my-app sh -c 'cat /app/logs/*.log || true'
           echo "-----------------------------"
 
       - name: Print auth logs on failure
@@ -291,7 +291,7 @@ jobs:
           sudo docker logs auth || true
           echo "-----------------"
           echo "---- Tomcat access logs ----"
-          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          sudo docker exec my-app sh -c 'cat /app/logs/*.log || true'
           echo "-----------------------------"
 
       - name: Upload Playwright videos
