@@ -18,11 +18,9 @@ class LoginPage(page: Page?) : BasicPage() {
     println("DEBUG APP_BASE_URL cleaned='" + url + "' length=" + url.length)
     println(
       "DEBUG APP_BASE_URL codepoints=" +
-        url.toCharArray().joinToString(",") { it.code.toString() }
+        url.toCharArray().joinToString(",") { it.code.toString() },
     )
   }
-
-
 
   fun login() {
     debugUrl()
