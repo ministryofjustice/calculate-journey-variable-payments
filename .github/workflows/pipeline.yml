@@ -222,9 +222,11 @@ jobs:
       - name: Run Playwright Integration Tests in Docker
         id: integration_tests
         run: |
-          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
+          # Detect the correct network name created by docker-compose
+          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net')
           echo "Running Playwright tests in network: $NETWORK_NAME"
 
+          # Run Playwright integration tests container
           sudo docker run --rm \
             --network "$NETWORK_NAME" \
             -v "${{ github.workspace }}:/app" \
@@ -234,6 +236,7 @@ jobs:
             mcr.microsoft.com/playwright:v1.47.2-jammy \
             bash -c '
               set -e
+
               echo "Installing OpenJDK and curl..."
               apt-get update -qq
               apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
@@ -243,22 +246,7 @@ jobs:
               echo "🔍 Java version:"
               java -version
 
-              echo "🔍 Resolving container hostnames..."
-              APP_IP=$(getent hosts my_app | awk "{ print \$1 }")
-              AUTH_IP=$(getent hosts auth | awk "{ print \$1 }")
-              echo "Resolved my_app -> $APP_IP"
-              echo "Resolved auth  -> $AUTH_IP"
-
-              echo "$APP_IP my_app" >> /etc/hosts
-              echo "$AUTH_IP auth" >> /etc/hosts
-              cat /etc/hosts
-
-              export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage --host-resolver-rules=\\\"MAP my_app $APP_IP, MAP auth $AUTH_IP, EXCLUDE localhost\\\""
-
-              echo "🔍 Listing /app contents:"
-              ls -l /app
-
-              echo "Testing network connectivity..."
+              echo "🔍 Testing network connectivity..."
               ping -c 2 my_app || echo "⚠️ Ping failed"
 
               echo "Checking app health with header Host: localhost..."
@@ -266,6 +254,16 @@ jobs:
 
               echo "Installing Playwright dependencies..."
               npx playwright install --with-deps
+
+              # Simplified and safe Playwright launch arguments
+              export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage"
+
+              echo "🔍 Environment check:"
+              echo "APP_BASE_URL=$APP_BASE_URL"
+              echo "PLAYWRIGHT_ARGS=$PLAYWRIGHT_ARGS"
+
+              echo "🔍 Listing /app contents:"
+              ls -l /app
 
               echo "Running Gradle Playwright tests..."
               xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" \
