@@ -286,6 +286,16 @@ jobs:
           sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
           echo "-----------------------------"
 
+      - name: Print auth logs on failure
+        if: always()  # ensures it runs even if tests fail
+        run: |
+          echo "Auth logs."
+          sudo docker logs auth || true
+          echo "-----------------"
+          echo "---- Tomcat access logs ----"
+          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          echo "-----------------------------"
+
       - name: Upload Playwright videos
         if: always()  # ensures it runs even if tests fail
         uses: actions/upload-artifact@v4
