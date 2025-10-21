@@ -250,23 +250,6 @@ jobs:
 
               echo "Checking app health with header Host: localhost..."
               curl -v -H "Host: localhost" http://my-app:8080/health || echo "⚠️ Curl failed"
-          
-              echo "Java URL sanity check:"
-              cat > UrlCheck.java <<EOF
-              public class UrlCheck {
-                public static void main(String[] args) throws Exception {
-                  String base = System.getenv("APP_BASE_URL");
-                  System.out.println("Raw:[" + base + "]");
-                  for (char c : base.toCharArray())
-                    System.out.println("CHAR " + c + " CODE " + (int)c);
-                  String trimmed = base.trim().replaceAll("\\\\p{Cntrl}", "");
-                  System.out.println("Cleaned:[" + trimmed + "]");
-                  java.net.URL u = new java.net.URL(trimmed + "/");
-                  System.out.println("java.net.URL host=" + u.getHost());
-                }
-              }
-              EOF
-              javac UrlCheck.java && java UrlCheck || echo "UrlCheck failed"
 
               echo "Installing Playwright dependencies..."
               npx playwright install --with-deps
