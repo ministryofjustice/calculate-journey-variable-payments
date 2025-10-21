@@ -7,9 +7,29 @@ import com.microsoft.playwright.options.AriaRole
 class LoginPage(page: Page?) : BasicPage() {
 
   private val page = page
-  private val url = System.getenv("APP_BASE_URL")!!.trim() ?: "http://localhost:8080"
+  private val rawEnv = System.getenv("APP_BASE_URL")
+  private val cleaned = rawEnv
+    ?.let { it.trim() }
+    ?.let { it.replace(Regex("\\p{Cntrl}"), "") }
+  private val url = cleaned?.ifBlank { null } ?: "http://localhost:8080"
+
+  private fun debugUrl() {
+    println("DEBUG APP_BASE_URL raw='" + (rawEnv ?: "null") + "'")
+    println("DEBUG APP_BASE_URL cleaned='" + url + "' length=" + url.length)
+    println(
+      "DEBUG APP_BASE_URL codepoints=" +
+        url.toCharArray().joinToString(",") { it.code.toString() }
+    )
+  }
+
+
 
   fun login() {
+    debugUrl()
+    require(url.startsWith("http://") || url.startsWith("https://")) {
+      "Invalid URL scheme: $url"
+    }
+    println("Navigating to: '$url'")
     page?.navigate(url)
     page?.waitForLoadState()
     page?.querySelector("#sign-out")?.click()
