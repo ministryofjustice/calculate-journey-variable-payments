@@ -10,7 +10,7 @@ internal class SanityNavigationTest : PlayWrightTest() {
   fun sanityNavigation() {
     val target = System.getenv("APP_BASE_URL")?.trim().takeUnless { it.isNullOrBlank() } ?: "http://my-app:8080"
 
-    page!!.navigate("http://example.com")
+    page!!.navigate("https://example.com")
     assertTrue(page!!.title().isNotBlank(), "example.com title should not be blank")
 
     page!!.navigate("$target/")

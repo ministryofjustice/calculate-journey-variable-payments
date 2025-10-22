@@ -249,9 +249,6 @@ jobs:
               echo "Checking app health with header Host: localhost..."
               curl -v -H "Host: localhost" http://my-app:8080/health || echo "⚠️ Curl failed"
 
-              echo "Installing Playwright dependencies..."
-              npx playwright install --with-deps
-
               # Simplified and safe Playwright launch arguments
               export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage"
 
