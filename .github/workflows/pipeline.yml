@@ -233,7 +233,7 @@ jobs:
             -v ~/.gradle:/root/.gradle \
             -w /app \
             -e APP_BASE_URL="http://my-app:8080" \
-            mcr.microsoft.com/playwright:v1.47.2-jammy \
+            mcr.microsoft.com/playwright:v1.54.0-jammy \
             bash -c '
               set -e
 
@@ -245,8 +245,6 @@ jobs:
 
               echo "🔍 Java version:"
               java -version
-
-
 
               echo "Checking app health with header Host: localhost..."
               curl -v -H "Host: localhost" http://my-app:8080/health || echo "⚠️ Curl failed"
