@@ -233,6 +233,8 @@ jobs:
             -v ~/.gradle:/root/.gradle \
             -w /app \
             -e APP_BASE_URL="http://my-app:8080" \
+            -e HTTP_PROXY= -e HTTPS_PROXY= -e NO_PROXY= \
+            -e http_proxy= -e https_proxy= -e no_proxy= \
             mcr.microsoft.com/playwright:v1.54.0-jammy \
             bash -c '
               set -e
@@ -260,6 +262,13 @@ jobs:
               ls -l /app
 
               echo "Running Gradle Playwright tests..."
+              set -e
+              for v in HTTP_PROXY HTTPS_PROXY NO_PROXY http_proxy https_proxy no_proxy; do
+                unset "$v"
+              done
+              echo "Proxy vars after unset:"
+              env | grep -i proxy || echo "None"
+          
               xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" \
                 ./gradlew --no-daemon --info testPlaywrightIntegration \
                 -Dplaywright.args="$PLAYWRIGHT_ARGS" \
