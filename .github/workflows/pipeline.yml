@@ -222,6 +222,13 @@ jobs:
       - name: Run Playwright Integration Tests in Docker
         id: integration_tests
         run: |
+          echo "Unsetting proxy vars in runner shell..."
+          for v in HTTP_PROXY HTTPS_PROXY NO_PROXY http_proxy https_proxy no_proxy; do
+            unset "$v"
+          done
+          echo "Verifying none remain:"
+          env | grep -i proxy || echo "None"
+          
           # Detect the correct network name created by docker-compose
           NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net')
           echo "Running Playwright tests in network: $NETWORK_NAME"
@@ -238,7 +245,10 @@ jobs:
             mcr.microsoft.com/playwright:v1.54.0-jammy \
             bash -c '
               set -e
-
+              for v in HTTP_PROXY HTTPS_PROXY NO_PROXY http_proxy https_proxy no_proxy; do unset "$v"; done
+              echo "Inside container proxy check:"
+              env | grep -i proxy || echo "None"
+          
               echo "Installing OpenJDK and curl..."
               apt-get update -qq
               apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
