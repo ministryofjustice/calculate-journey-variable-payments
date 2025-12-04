@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The following command line tools are required to run this script:
+# Required command line tools:
 #  aws cli
 #  kubectl
 #  jq
@@ -8,51 +8,99 @@
 ENV=$1
 SUPPLIER=$2
 
-if [ -z "$ENV" ]
-then
-  echo "No environment specified, please supply environment (dev, preprod or prod) in the 1st argument."
-  exit
+# -----------------------------
+# Validate inputs
+# -----------------------------
+if [ -z "$ENV" ]; then
+  echo "No environment specified. Supply environment (dev, preprod, prod) as the 1st argument."
+  exit 1
 fi
 
-if [ -z "$SUPPLIER" ]
-then
-  echo "No supplier specified, please supply serco or geo in the 2nd argument."
-  exit
+if [ -z "$SUPPLIER" ]; then
+  echo "No supplier specified. Supply 'serco' or 'geo' as the 2nd argument."
+  exit 1
 fi
 
+# -----------------------------
+# Set supplier file
+# -----------------------------
 case $SUPPLIER in
-	serco ) ;;
-	geo ) ;;
-	* ) echo invalid supplier "$SUPPLIER";
-	  exit 1;;
+  serco ) FILE_NAME="serco-prices.xlsx"; ;;
+  geo   ) FILE_NAME="geoamey-prices.xlsx"; ;;
+  * )
+    echo "Invalid supplier: $SUPPLIER"
+    exit 1
+    ;;
 esac
 
-read -r -p "UPLOADING JOURNEY PRICES TO S3 IN $ENV FOR SUPPLIER $SUPPLIER. ARE YOU SURE YOU WANT TO CONTINUE ? (yes/no) " yn
+# Generate S3_KEY by replacing '-' with '_'
+S3_KEY="${FILE_NAME//-/_}"
+
+# -----------------------------
+# Confirmation
+# -----------------------------
+read -r -p "UPLOADING JOURNEY PRICES TO S3 IN $ENV FOR SUPPLIER $SUPPLIER. File to upload: $FILE_NAME. ARE YOU SURE? (yes/no) " yn
 
 case $yn in
-	yes ) ;;
-	no ) echo exiting...;
-		exit;;
-	* ) echo invalid response;
-	  exit 1;;
+  yes ) ;;
+  no )
+    echo "Exiting..."
+    exit 0
+    ;;
+  * )
+    echo "Invalid response"
+    exit 1
+    ;;
 esac
 
-ACCESS_KEY_ID=$(kubectl get secret calculate-journey-variable-payments-bucket -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).access_key_id")
-SECRET_ACCESS_KEY=$(kubectl get secret calculate-journey-variable-payments-bucket -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).secret_access_key")
-BUCKET=$(kubectl get secret calculate-journey-variable-payments-bucket -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).bucket_name")
+# -----------------------------
+# Fetch bucket name
+# -----------------------------
+BUCKET=$(kubectl get secret calculate-journey-variable-payments-bucket \
+  -n calculate-journey-variable-payments-$ENV \
+  -o json | jq -r ".data | map_values(@base64d).bucket_name")
 
-export AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID
-export AWS_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
-export AWS_DEFAULT_REGION=eu-west-2
+if [ -z "$BUCKET" ]; then
+  echo "ERROR: Could not retrieve S3 bucket name."
+  exit 1
+fi
 
-if [ "$SUPPLIER" = "serco" ]
-then
-  aws s3api put-object --bucket $BUCKET --key serco_prices.xlsx --body ./serco-prices.xlsx
-  echo "Uploaded Serco spreadsheet serco-prices.xlsx to '$ENV'."
-elif [ "$SUPPLIER" = "geo" ]
-then
-  aws s3api put-object --bucket $BUCKET --key geoamey_prices.xlsx --body ./geoamey-prices.xlsx
-  echo "Uploaded GEOamey spreadsheet geoamey-prices.xlsx to '$ENV'."
+# -----------------------------
+# Locate service pod
+# -----------------------------
+svcpod=$(kubectl get po -n calculate-journey-variable-payments-$ENV \
+  | grep service-pod | awk '{ print $1 }')
+
+if [ -z "$svcpod" ]; then
+  echo "ERROR: No service-pod found in namespace calculate-journey-variable-payments-$ENV"
+  exit 1
+fi
+
+# -----------------------------
+# Upload to S3
+# -----------------------------
+if [ "$SUPPLIER" = "serco" ]; then
+  # Direct upload from local file
+  aws s3api put-object \
+    --bucket "$BUCKET" \
+    --key "$S3_KEY" \
+    --body "./$FILE_NAME" \
+    >/dev/null 2>&1
+
+  echo "✅ Successfully uploaded $FILE_NAME to S3 bucket '$BUCKET' as '$S3_KEY'."
+
 else
-  echo "Unknown spreadsheet option '$SUPPLIER'."
+  # For geo (or any supplier requiring pod copy + upload)
+  kubectl cp "./$FILE_NAME" \
+    "${svcpod}:/tmp/$FILE_NAME" \
+    -n calculate-journey-variable-payments-$ENV
+
+  kubectl exec -it "$svcpod" -n calculate-journey-variable-payments-$ENV -- \
+    aws s3api put-object \
+      --bucket "$BUCKET" \
+      --key "$S3_KEY" \
+      --body "/tmp/$FILE_NAME" \
+      >/dev/null 2>&1
+
+  echo "✅ Successfully uploaded $FILE_NAME to S3 bucket '$BUCKET' as '$S3_KEY'."
 fi

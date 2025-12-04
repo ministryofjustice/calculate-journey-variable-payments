@@ -14,27 +14,27 @@ SNAPSHOT_IDENTIFIER=$2
 
 if [ -z "$ENV" ]
 then
-  echo "No environment specified, please supply environment in the first argument, dev, preprod or prod."
+  echo "No environment specified, please supply environment in the first argument, dev, preprod or prod." >&2
   exit
 fi
 
 if [ -z "$SNAPSHOT_IDENTIFIER" ]
 then
-  echo "No snapshot identifier specified, please supply snapshot identifier in the second argument."
+  echo "No snapshot identifier specified, please supply snapshot identifier in the second argument." >&2
   exit
 else
   if [[ $SNAPSHOT_IDENTIFIER == "rds"* ]] ; then
-    echo "Cannot delete automatic snapshots"
+    echo "Cannot delete automatic snapshots" >&2
     exit
   fi
 
   NAMESPACE=calculate-journey-variable-payments-$ENV
 
-  echo Using namespace "$NAMESPACE"
+  echo Using namespace "$NAMESPACE" >&2
 
   DATABASE=$(kubectl -n "$NAMESPACE" get secrets rds-instance-"$NAMESPACE" -o json | jq -r ".data | map_values(@base64d).database_host" | cut -d . -f 1)
 
-  echo Using database instance "$DATABASE"
+  echo Using database instance "$DATABASE" >&2
 
   read -r -p "ARE YOU SURE YOU WANT TO DELETE SNAPSHOT $SNAPSHOT_IDENTIFIER ON $NAMESPACE (THIS CANNOT BE REVERSED) ? (yes/no) " yn
 
@@ -45,13 +45,23 @@ else
 	  * ) echo invalid response;
 		  exit 1;;
   esac
+  SVCPOD=$(kubectl get po -n "$NAMESPACE" | grep service-pod | awk '{ print $1 }')
+  echo "Using service pod: $SVCPOD" >&2
 
-  ACCESS_KEY_ID=$(kubectl get secret rds-instance-"$NAMESPACE" -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).access_key_id")
-  SECRET_ACCESS_KEY=$(kubectl get secret rds-instance-"$NAMESPACE" -n calculate-journey-variable-payments-$ENV -o json | jq -r ".data | map_values(@base64d).secret_access_key")
+  RESULT=$(
+    kubectl exec -i "$SVCPOD" -n "$NAMESPACE" -- \
+      aws rds delete-db-snapshot --db-snapshot-identifier "$SNAPSHOT_IDENTIFIER"
+  )
 
-  export AWS_ACCESS_KEY_ID=$ACCESS_KEY_ID
-  export AWS_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
-  export AWS_DEFAULT_REGION=eu-west-2
+  STATUS=$(echo "$RESULT" | jq -r '.DBSnapshot.Status')
+  ID=$(echo "$RESULT" | jq -r '.DBSnapshot.DBSnapshotIdentifier')
 
-  aws rds delete-db-snapshot --db-snapshot-identifier "$SNAPSHOT_IDENTIFIER"
+  if [ "$STATUS" = "deleted" ]; then
+    echo "✅ Snapshot \"$ID\" has been successfully deleted."
+  else
+    echo "❌ Snapshot \"$ID\" status: $STATUS"
+    exit 1
+  fi
+
 fi
+

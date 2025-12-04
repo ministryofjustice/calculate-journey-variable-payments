@@ -1,84 +1,109 @@
 # Bulk price uploads for supplier journey prices
 
-The bulk price uploads feature exists to assist the commercial team with adding large volumes of journey prices to the service.
-This is not a feature we use very often but it does have its place.
+This folder contains scripts to upload journey price spreadsheets to S3 and run a bulk import inside a Kubernetes pod. The import reads prices from spreadsheets stored in the supplier-specific S3 bucket and writes them into the service database via the running application.
 
-The journey price data is sent to us from the commercial team via email in an Excel spreadsheet format. Upon receipt these
-are steps for bulk prices uploads with a possible third option:
+## Prerequisites
 
-1. Take a RDS snapshot of the database using the **take-manual-rds-snapshot.sh** script where the journey prices are going to be loaded.
-2. Using the shell script **upload-journey-prices-spreadsheet-to-s3.sh** upload the spreadsheet(s) to the appropriate environments (dev, preprod, prod) AWS S3 bucket. It is from here where the prices are fed into the service.
-3. Use the script **run-bulk-price-upload.sh** to load the prices from step one above into the system.
-4. (optional) Run a bulk price update via the frontend. Technically this can be done by the end users however you may wish
-   to do this for testing purpose in preprod for example.
-5. (optional) delete the backup RDS snapshot.
+- Access to the target Kubernetes cluster and namespace
+- `kubectl` installed and configured
+- Spreadsheets named `serco-prices.xlsx` and/or `geoamey-prices.xlsx`
+- A manual database snapshot taken before import
+- The `*-prices.xlsx` file must be provided by the supplier and its format must match the example `*-prices.xlsx` in this folder. The order of columns is important; the 2nd, 3rd, and 4th columns are used by the import.
+- Price imports can only take place in the current effective year or the previous effective year. For example, in 2025 you may update 2025 or 2024; attempting 2023 will fail.
 
-**IMPORTANT:**
+## Overview of steps
 
-- IT IS ADVISABLE TO DO A DRY RUN IN THE PRE-PRODUCTION ENVIRONMENT BEFORE DOING THIS IN THE PRODUCTION ENVIRONMENT.
-- CARE SHOULD BE TAKEN WHEN RUNNING ANY COMMANDS IN PRODUCTION.
-- A JOURNEY PRICE WILL ONLY ADDED IF IT IS NOT ALREADY PRICED, EXISTING JOURNEY PRICES ARE NOT UPDATED.
+0. Validate the spreadsheet and year:
+   - Make sure the provided file is formatted correctly (matches the example and column order).
+   - Make sure the effective year is allowed (current year or previous year only).
+1. Take a manual RDS snapshot using `take-manual-rds-snapshot.sh`.
+2. Upload the spreadsheet(s) to S3 using `upload-journey-prices-spreadsheet-to-s3.sh`.
+3. Run the bulk price import using `run-bulk-price-upload.sh`.
+4. Review and action the import logs (see example below).
+5. Optionally validate via the frontend.
+6. Optionally delete the backup RDS snapshot.
 
-### How to upload journey price spreadsheets to S3 in preparation for running the price-import using the script in this folder.
+## Important notes
 
-_Note the script relies on naming of the spreadsheets to upload to be serco-prices.xlsx and geoamey-prices.xlsx and for 
-the files to be in the same directory where the script is executed from. There are some examples already included in the folder._
+- Do a dry run in pre-production before production.
+- Exercise caution when running in production.
+- Set the effective year correctly (e.g., contract Sept 2025–Aug 2026 uses `2025`).
+- The import runs inside an application pod; AWS credentials are provided via the pod environment/service account.
 
-Example taking a RDS snapshot
+## Scripts
 
-_List the snapshots before_
+- `list-rds-snapshots.sh`: Lists manual DB snapshots for an environment.
+- `take-manual-rds-snapshot.sh`: Creates a manual DB snapshot in the target environment.
+- `upload-journey-prices-spreadsheet-to-s3.sh`: Uploads price spreadsheets to S3.
+- `run-bulk-price-upload.sh`: Executes the price import inside a selected pod.
+- `delete-rds-snapshot.sh`: Deletes a manual DB snapshot.
 
-```bash
-$ ./list-rds-snapshots.sh dev
-```
+## Upload spreadsheets to S3
 
-_Take the snapshot and make a note of the snapshot identifier_
+The uploader expects:
+- Files named `serco-prices.xlsx` and/or `geoamey-prices.xlsx`
+- Files to be present in the current working directory
 
-```bash
-$ ./take-manual-rds-snapshot.sh dev
-```
-
-_Check the snapshot has been created and is in "Status" : "available"_
-
-```bash
-$ ./list-rds-snapshots.sh dev
-```
-
-Serco example on development environment from a local terminal session
-
-```bash
-$ ./upload-journey-prices-spreadsheet-to-s3.sh dev serco
-```
-
-GEOAmey example on development environment from a local terminal session
+Examples:
 
 ```bash
-$ ./upload-journey-prices-spreadsheet-to-s3.sh dev geo
+# List snapshots before uploading
+./list-rds-snapshots.sh dev
+
+# Take a snapshot
+./take-manual-rds-snapshot.sh dev
+
+# Verify snapshot status is "available"
+./list-rds-snapshots.sh dev
+
+# Upload spreadsheets
+./upload-journey-prices-spreadsheet-to-s3.sh dev serco
+./upload-journey-prices-spreadsheet-to-s3.sh dev geo
 ```
 
-### How to run the actual bulk price upload part
+## Running the bulk price import
 
-**IMPORTANT:**
-- Make sure the year parameter is set correctly. This is the contractual effective year for the prices e.g. for Sept 2021 to Aug 2022 the year would be 2021.
+The script validates inputs, lists pods, prompts you to choose one, and runs the import inside that pod.
 
-It can be helpful to run this SQL before and after the actual import. This is a simple way of seeing how many prices have been added bar reading the logs.
-You will need to port forward onto the DB to do this though.
+Examples:
+
+```bash
+# Serco (warn on duplicates, overwrite existing prices)
+./run-bulk-price-upload.sh dev serco 2025 WARN
+
+# GEOAmey (error on duplicates, stop import)
+./run-bulk-price-upload.sh dev geo 2025 ERROR
+```
+
+After running, the logs MUST be reviewed and actioned. Confirm the inserted/updated/skipped/error counts are expected, and re-run or investigate if not.
+
+Example log line:
+
+```
+2025-12-04 11:28:15.033  INFO 1170 --- [           main] u.g.j.d.h.p.j.s.pricing.PriceImporter    : GEOAMEY PRICES INSERTED: 2. PRICES UPDATED: 0. PRICES SKIPPED: 0. TOTAL ERRORS: 0 |
+```
+
+SQL to check counts before/after:
 
 ```sql
-select effective_year, count(*) from prices group by effective_year order by effective_year
+select effective_year, count(*) from prices group by effective_year order by effective_year;
 ```
 
-Serco example
+## Action parameter: handling duplicates (WARN vs ERROR)
+
+- `ERROR`: Stops the import immediately when a duplicate price is detected and throws an exception. No existing prices are overwritten. Use this to strictly prevent changes to already priced journeys.
+- `WARN`: Continues the import, logs a warning, and overwrites any existing price with the new one from the spreadsheet. Use this to refresh or correct already priced journeys.
+
+## Troubleshooting
+
+- NullPointerException like `getOptionValues(...) must not be null`: Ensure supplier, year, and action are provided and you selected a valid pod.
+- Import fails: Check the selected pod’s logs, verify spreadsheets exist in S3 for the chosen supplier and environment, and that the effective year is correct.
+- Pod selection: Multiple pods may appear due to load balancing; any application pod is acceptable.
+
+## Clean up
+
+If you created a manual snapshot for safety, you can delete it after validating the import:
 
 ```bash
-$ ./run-bulk-price-upload.sh dev s 2021
+./delete-rds-snapshot.sh dev SNAPSHOT_IDENTIFIER
 ```
-
-GEOAmey example
-
-```bash
-$ ./run-bulk-price-upload.sh dev g 2021
-```
-
-When the prices are imported you will be be given some feedback in the logs as to the success rate e.g. how many
-prices were added and any errors.
