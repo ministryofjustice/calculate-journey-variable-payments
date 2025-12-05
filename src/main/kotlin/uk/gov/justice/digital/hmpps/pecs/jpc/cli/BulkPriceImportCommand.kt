@@ -19,7 +19,7 @@ private val logger = loggerFor<BulkPriceImportCommand>()
 class BulkPriceImportCommand(private val importService: ImportPricesService, private val effectiveYear: EffectiveYear) {
 
   fun bulkImportPricesFor(supplier: Supplier, year: Int, action: PriceImporter.Action? = PriceImporter.Action.ERROR) {
-    if (!effectiveYear.canAddOrUpdatePrices(year)) {
+    if (action != PriceImporter.Action.FORCE && !effectiveYear.canAddOrUpdatePrices(year)) {
       throw RuntimeException(
         "Price imports can only take place in the current '${effectiveYear.current()}' or previous effective year '${effectiveYear.current() - 1}'.",
       )

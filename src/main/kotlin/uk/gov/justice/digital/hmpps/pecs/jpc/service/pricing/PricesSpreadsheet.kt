@@ -67,10 +67,10 @@ class PricesSpreadsheet(
       ?: throw RuntimeException("To location '$toLocationName' for supplier '$supplier' not found")
 
     val existing = findExistingPrice(supplier, fromLocation, toLocation)?.apply {
-      if (action == PriceImporter.Action.WARN) {
-        logger.warn("Overwriting existing price of : '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
-      } else {
+      if (action == PriceImporter.Action.ERROR) {
         throw RuntimeException("Duplicate price: '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
+      } else {
+        logger.warn("Overwriting existing price of : '${fromLocation.siteName}' to '${toLocation.siteName}' for $supplier")
       }
     }
 

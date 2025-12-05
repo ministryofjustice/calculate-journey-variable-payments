@@ -51,12 +51,13 @@ esac
 # Validate action
 # -----------------------------
 case $ACTION in
-  WARN|ERROR ) ;;
+  ERROR|WARN|FORCE ) ;;
   * )
     echo "❌ Invalid action. Only 'WARN' or 'ERROR' are allowed."
     echo "INFO: ACTION controls how duplicate prices are handled:"
     echo "  ERROR - Stops the import and throws an exception when duplicates are found."
-    echo "  WARN  - Logs a warning and overwrites existing prices with the new ones."
+    echo "  WARN  - Logs a warning and overwrites existing prices with the new ones if they differ."
+    echo "  FORCE  - IGNORES CONTRACT YEAR CONSTRAINT. Logs a warning and overwrites existing prices with the new ones if they differ."
     exit 1
     ;;
 esac
