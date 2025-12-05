@@ -8,20 +8,21 @@ This folder contains scripts to upload journey price spreadsheets to S3 and run 
 - `kubectl` installed and configured
 - Spreadsheets named `serco-prices.xlsx` and/or `geoamey-prices.xlsx`
 - A manual database snapshot taken before import
+- Familiarity with the process for restoring from a database snapshot in case issues occur. See: https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-snapshots.html#rds-snapshots
 - The `*-prices.xlsx` file must be provided by the supplier and its format must match the example `*-prices.xlsx` in this folder. The order of columns is important; the 2nd, 3rd, and 4th columns are used by the import.
 - Price imports can only take place in the current effective year or the previous effective year. For example, in 2025 you may update 2025 or 2024; attempting 2023 will fail.
 
 ## Overview of steps
 
-0. Validate the spreadsheet and year:
+1. Validate the spreadsheet and year:
    - Make sure the provided file is formatted correctly (matches the example and column order).
    - Make sure the effective year is allowed (current year or previous year only).
-1. Take a manual RDS snapshot using `take-manual-rds-snapshot.sh`.
-2. Upload the spreadsheet(s) to S3 using `upload-journey-prices-spreadsheet-to-s3.sh`.
-3. Run the bulk price import using `run-bulk-price-upload.sh`.
-4. Review and action the import logs (see example below).
-5. Optionally validate via the frontend.
-6. Optionally delete the backup RDS snapshot.
+2. Take a manual RDS snapshot using `take-manual-rds-snapshot.sh`.
+3. Upload the spreadsheet(s) to S3 using `upload-journey-prices-spreadsheet-to-s3.sh`.
+4. Run the bulk price import using `run-bulk-price-upload.sh`.
+5. Review and action the import logs (see example below).
+6. Optionally validate via the frontend.
+7. Optionally delete the backup RDS snapshot.
 
 ## Important notes
 
