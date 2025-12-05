@@ -117,14 +117,15 @@ esac
 # -----------------------------
 # Execute annual adjustment
 # -----------------------------
-  kubectl -n "$NAMESPACE" exec "$POD" -- java -Xmx2048m -jar app.jar
-  --spring.main.web-application-type=none
-  --price-adjust
-  --supplier="$CHOSEN_SUPPLIER"
-  --year="$YEAR"
-  --inflationary="$INFLATIONARY"
-  --details="$DETAIL"
-  --volumetric="$VOLUMETRIC"
+  kubectl -n "$NAMESPACE" exec "$POD" -- java -Xmx2048m -jar app.jar \
+  --spring.main.web-application-type=none \
+  --price-adjust \
+  --supplier="$CHOSEN_SUPPLIER" \
+  --year="$YEAR" \
+  --inflationary="$INFLATIONARY" \
+  --details="$DETAIL" \
+  --volumetric="$VOLUMETRIC" \
+  | tee adjustment.log
 
 EXIT_CODE=$?
 

@@ -130,7 +130,8 @@ kubectl -n "$NAMESPACE" exec "$POD" -- java -jar app.jar \
   --price-import \
   --supplier="$CHOSEN_SUPPLIER" \
   --year="$EFFECTIVE_YEAR" \
-  --action="$ACTION"
+  --action="$ACTION" \
+  | tee price-upload.log
 
 EXIT_CODE=$?
 
