@@ -76,17 +76,6 @@ if [ -z "$svcpod" ]; then
   exit 1
 fi
 
-# -----------------------------
-# Upload to S3
-# -----------------------------
-  aws s3api put-object \
-    --bucket "$BUCKET" \
-    --key "$S3_KEY" \
-    --body "./$FILE_NAME" \
-    >/dev/null 2>&1
-
-  echo "✅ Successfully uploaded $FILE_NAME to S3 bucket '$BUCKET' as '$S3_KEY'."
-
   kubectl cp "./$FILE_NAME" \
     "${svcpod}:/tmp/$FILE_NAME" \
     -n calculate-journey-variable-payments-$ENV
