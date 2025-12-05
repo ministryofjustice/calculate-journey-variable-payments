@@ -27,6 +27,7 @@ class PriceImporter(
   enum class Action {
     WARN,
     ERROR,
+    FORCE,
   }
 
   fun import(supplier: Supplier, effectiveYear: Int, action: Action? = Action.ERROR) {
