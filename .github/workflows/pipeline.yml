@@ -53,6 +53,14 @@ jobs:
       additional_docker_tag: ${{ inputs.additional_docker_tag }}
       push: ${{ inputs.push || true }}
       docker_multiplatform: false
+    gradle_integration_tests:
+      name: Run the integration tests
+      uses: ./.github/workflows/integration_tests.yml
+      with:
+        postgres-tag: "17"
+        postgres-db: auth-db
+        postgres-username: admin
+        postgres-password: admin_password
   deploy_dev:
     name: Deploy to the development environment
     needs:
