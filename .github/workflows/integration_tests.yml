@@ -67,3 +67,17 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+    steps:
+      - name: Clone repository
+      - uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 25
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+
