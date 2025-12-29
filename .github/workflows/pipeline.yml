@@ -41,19 +41,8 @@ jobs:
     name: Validate the kotlin
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/kotlin_validate.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
-  build:
-    name: Build docker image from hmpps-github-actions
-    if: github.ref == 'refs/heads/main'
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
-    needs:
-      - kotlin_validate
-    with:
-      docker_registry: 'ghcr.io'
-      registry_org: 'ministryofjustice'
-      additional_docker_tag: ${{ inputs.additional_docker_tag }}
-      push: ${{ inputs.push || true }}
-      docker_multiplatform: false
-    gradle_integration_tests:
+
+  gradle_integration_tests:
       name: Run the integration tests
       uses: ./.github/workflows/integration_tests.yml
       with:
@@ -61,6 +50,21 @@ jobs:
         postgres-db: auth-db
         postgres-username: admin
         postgres-password: admin_password
+
+  build:
+    name: Build docker image from hmpps-github-actions
+    if: github.ref == 'refs/heads/main'
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
+    needs:
+      - kotlin_validate
+      - gradle_integration_tests
+    with:
+      docker_registry: 'ghcr.io'
+      registry_org: 'ministryofjustice'
+      additional_docker_tag: ${{ inputs.additional_docker_tag }}
+      push: ${{ inputs.push || true }}
+      docker_multiplatform: false
+
   deploy_dev:
     name: Deploy to the development environment
     needs:
