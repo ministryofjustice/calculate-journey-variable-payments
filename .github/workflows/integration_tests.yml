@@ -19,8 +19,8 @@ on:
         default: 'root'
         required: true
 
-  env:
-    total-runners: 2
+env:
+  total-runners: 2
 
 jobs:
   gradle_build:
