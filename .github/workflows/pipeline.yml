@@ -17,6 +17,14 @@ on:
         default: false
         type: boolean
 
+env:
+  _JAVA_OPTIONS: >-
+    -Xmx1024m
+    -XX:ParallelGCThreads=2
+    -XX:ConcGCThreads=2
+    -Djava.util.concurrent.ForkJoinPool.common.parallelism=2
+    -Dorg.gradle.daemon=false
+
 permissions:
   contents: read
   packages: write
@@ -42,14 +50,208 @@ jobs:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/kotlin_validate.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
 
-  gradle_integration_tests:
-      name: Run the integration tests
-      uses: ./.github/workflows/integration_tests.yml
-      with:
-        postgres-tag: "17"
-        postgres-db: auth-db
-        postgres-username: admin
-        postgres-password: admin_password
+  kotlin_build:
+    name: Build Kotlin JAR
+    runs-on: ubuntu-latest
+    needs: kotlin_validate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: Grant execute permissions
+        run: chmod +x ./gradlew
+      - name: Build JAR
+        run: ./gradlew build
+      - name: Rename JAR to app.jar
+        run: |
+          JAR_FILE=$(ls build/libs/calculate-journey-variable-payments-*.jar | head -n 1)
+          mv "$JAR_FILE" build/libs/app.jar
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/app.jar
+
+  integration_playwright_tests:
+    name: Run Playwright Integration Tests
+    needs:
+      - kotlin_build
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/openjdk:21.0-browsers
+      options: --name app
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get install -y postgresql-client
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Ensure Docker Compose is available
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iproute2 docker-compose-plugin
+      - name: Start required containers
+        run: sudo docker-compose -f docker-compose.integration.yml up -d
+      - name: Wait for services from inside tester container
+        run: |
+          echo "Waiting for Auth service from inside tester container..."
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester /bin/sh -c '
+            for i in $(seq 1 10); do
+              echo "Attempt $i: curling http://auth:9090/auth/health"
+              if curl --fail --silent http://auth:9090/auth/health; then
+                echo "✅ Auth service is ready!"
+                exit 0
+              fi
+              echo "Retry $i: Not ready yet. Sleeping..."
+              sleep 10
+            done
+            echo "❌ Auth service did not become ready."
+            exit 1
+          '
+      - name: Wait for Postgres from inside tester container
+        run: |
+          echo "Waiting for Postgres from inside tester container..."
+          sudo docker-compose -f docker-compose.integration.yml exec -T tester-sql /bin/sh -c '
+            for i in $(seq 1 10); do
+              echo "Attempt $i: checking Postgres..."
+              PGPASSWORD=letmein pg_isready -h postgres-jpc -p 5432 -U jpc -d jpc
+              if [ $? -eq 0 ]; then
+                echo "✅ Postgres is ready!"
+                exit 0
+              fi
+              echo "Retry $i: Not ready yet. Sleeping..."
+              sleep 10
+            done
+            echo "❌ Postgres did not become ready."
+            exit 1
+          '
+      - name: Download app JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
+      - name: Build image from Dockerfile
+        run: |
+          sudo docker build -t app_image .
+      - name: Run App container in the same network
+        run: |
+          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
+          echo "Using network: $NETWORK_NAME"
+          sudo docker run -d \
+            --name my_app \
+            --network $NETWORK_NAME \
+            -p 8080:8080 \
+            -e SPRING_PROFILES_ACTIVE=integration-tests \
+            -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
+            app_image \
+            sh -c "java -jar /app/app.jar"
+      - name: Wait for app to be healthy
+        id: wait_health
+        continue-on-error: true
+        run: |
+          echo "Waiting for app to be healthy from inside tester container..."
+          sudo docker-compose -f docker-compose.integration.yml exec -T auth /bin/sh -c '
+            for i in $(seq 1 20); do
+              echo "Attempt $i: Checking app health ..."
+              response=$(curl -s -H "Host: localhost" http://my_app:8080/health || true)
+              echo "Response: $response"
+              echo "$response" | grep "\"status\":\"UP\"" > /dev/null && exit 0
+              echo "Retry $i: App not ready yet. Sleeping..."
+              sleep 10
+            done
+            exit 1
+          '
+      - name: Print app logs on failure
+        if: steps.wait_health.outcome == 'failure'
+        run: |
+          echo "❌ App failed to become healthy in time."
+          echo "---- app.log ----"
+          sudo docker logs my_app || true
+          echo "-----------------"
+          echo "---- Tomcat access logs ----"
+          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          echo "-----------------------------"
+      - name: Stop job if app failed to start
+        if: steps.wait_health.outcome == 'failure'
+        run: |
+          echo "❌ Stopping job because the app failed to start properly."
+          exit 1
+      - name: Run Playwright Integration Tests in Docker
+        id: integration_tests
+        run: |
+          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
+          echo "Running Playwright tests in network: $NETWORK_NAME"
+          sudo docker run --rm \
+            --network "$NETWORK_NAME" \
+            -v "${{ github.workspace }}:/app" \
+            -v ~/.gradle:/root/.gradle \
+            -w /app \
+            -e APP_BASE_URL="http://my_app:8080" \
+            mcr.microsoft.com/playwright:v1.47.2-jammy \
+            bash -c '
+              set -e
+              echo "Installing OpenJDK and curl..."
+              apt-get update -qq
+              apt-get install -y openjdk-21-jdk curl iputils-ping > /dev/null
+              export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+              export PATH=$JAVA_HOME/bin:$PATH
+              echo "🔍 Java version:"
+              java -version
+              echo "🔍 Resolving container hostnames..."
+              APP_IP=$(getent hosts my_app | awk "{ print \$1 }")
+              AUTH_IP=$(getent hosts auth | awk "{ print \$1 }")
+              echo "Resolved my_app -> $APP_IP"
+              echo "Resolved auth  -> $AUTH_IP"
+              echo "$APP_IP my_app" >> /etc/hosts
+              echo "$AUTH_IP auth" >> /etc/hosts
+              cat /etc/hosts
+              export PLAYWRIGHT_ARGS="--no-sandbox --disable-dev-shm-usage --host-resolver-rules=\\\"MAP my_app $APP_IP, MAP auth $AUTH_IP, EXCLUDE localhost\\\""
+              echo "🔍 Listing /app contents:"
+              ls -l /app
+              echo "Testing network connectivity..."
+              ping -c 2 my_app || echo "⚠️ Ping failed"
+              echo "Checking app health with header Host: localhost..."
+              curl -v -H "Host: localhost" http://my_app:8080/health || echo "⚠️ Curl failed"
+              echo "Installing Playwright dependencies..."
+              npx playwright install --with-deps
+              echo "Running Gradle Playwright tests..."
+              xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" \
+                ./gradlew --no-daemon --info testPlaywrightIntegration \
+                -Dplaywright.args="$PLAYWRIGHT_ARGS" \
+                -Dplaywright.headless=true
+            '
+      - name: Print app logs on failure
+        if: always()
+        run: |
+          echo "Tests completed."
+          echo "---- app.log ----"
+          sudo docker logs my_app || true
+          echo "-----------------"
+          echo "---- Tomcat access logs ----"
+          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+          echo "-----------------------------"
+      - name: Print auth logs on failure
+        if: always()
+        run: |
+          echo "Auth logs."
+          sudo docker logs auth || true
+          echo "-----------------"
+      - name: Upload Playwright videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-videos
+          path: build/reports/tests/testPlayWrightIntegration/videos/
 
   build:
     name: Build docker image from hmpps-github-actions
@@ -57,7 +259,7 @@ jobs:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
     needs:
       - kotlin_validate
-      - gradle_integration_tests
+      - integration_playwright_tests
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
