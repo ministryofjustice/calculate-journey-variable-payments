@@ -145,8 +145,16 @@ jobs:
           sudo docker build -t app_image .
       - name: Run App container in the same network
         run: |
-          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
-          echo "Using network: $NETWORK_NAME"
+          # Find the network created by docker-compose
+          NETWORK_NAME=$(sudo docker network ls --filter "label=com.docker.compose.project" --format '{{.Name}}' | head -n 1)
+          if [ -z "$NETWORK_NAME" ]; then
+            echo "❌ Failed to find docker-compose network"
+            echo "Available networks:"
+            sudo docker network ls
+            exit 1
+          fi
+          echo "✅ Using network: $NETWORK_NAME"
+          
           sudo docker run -d \
             --name my_app \
             --network $NETWORK_NAME \
@@ -155,6 +163,16 @@ jobs:
             -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
             app_image \
             sh -c "java -jar /app/app.jar"
+          
+          # Verify container started
+          sleep 2
+          if ! sudo docker ps | grep -q my_app; then
+            echo "❌ Container my_app failed to start"
+            echo "Container logs:"
+            sudo docker logs my_app || true
+            exit 1
+          fi
+          echo "✅ Container my_app started successfully"
       - name: Wait for app to be healthy
         id: wait_health
         continue-on-error: true
@@ -189,8 +207,12 @@ jobs:
       - name: Run Playwright Integration Tests in Docker
         id: integration_tests
         run: |
-          NETWORK_NAME=$(sudo docker network ls --format '{{.Name}}' | grep 'app-net$')
-          echo "Running Playwright tests in network: $NETWORK_NAME"
+          NETWORK_NAME=$(sudo docker network ls --filter "label=com.docker.compose.project" --format '{{.Name}}' | head -n 1)
+          if [ -z "$NETWORK_NAME" ]; then
+            echo "❌ Failed to find docker-compose network"
+            exit 1
+          fi
+          echo "✅ Running Playwright tests in network: $NETWORK_NAME"
           sudo docker run --rm \
             --network "$NETWORK_NAME" \
             -v "${{ github.workspace }}:/app" \
@@ -233,19 +255,32 @@ jobs:
       - name: Print app logs on failure
         if: always()
         run: |
-          echo "Tests completed."
-          echo "---- app.log ----"
-          sudo docker logs my_app || true
-          echo "-----------------"
-          echo "---- Tomcat access logs ----"
-          sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
-          echo "-----------------------------"
+          echo "Checking for app container..."
+          if sudo docker ps -a --format '{{.Names}}' | grep -q '^my_app$'; then
+            echo "✅ Container my_app found"
+            echo "---- app logs ----"
+            sudo docker logs my_app || true
+            echo "-----------------"
+            echo "---- Tomcat access logs ----"
+            sudo docker exec my_app sh -c 'cat /app/logs/*.log || true'
+            echo "-----------------------------"
+          else
+            echo "⚠️ Container my_app does not exist or has been removed"
+            echo "Running containers:"
+            sudo docker ps -a || true
+          fi
       - name: Print auth logs on failure
         if: always()
         run: |
-          echo "Auth logs."
-          sudo docker logs auth || true
-          echo "-----------------"
+          echo "Checking for auth container..."
+          if sudo docker ps -a --format '{{.Names}}' | grep -q '^auth$'; then
+            echo "✅ Container auth found"
+            echo "---- Auth logs ----"
+            sudo docker logs auth || true
+            echo "-----------------"
+          else
+            echo "⚠️ Container auth does not exist or has been removed"
+          fi
       - name: Upload Playwright videos
         if: always()
         uses: actions/upload-artifact@v4

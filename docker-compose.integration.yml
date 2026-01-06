@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  postgres-jpc:
+    image: postgres:16.4
+    container_name: postgres-jpc
+    environment:
+      POSTGRES_DB: jpc
+      POSTGRES_USER: jpc
+      POSTGRES_PASSWORD: letmein
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jpc -d jpc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  auth-db:
+    image: postgres:16.4
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: auth-db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+    ports:
+      - "7432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d auth-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  localstack:
+    image: localstack/localstack:1.2.0
+    container_name: localstack
+    ports:
+      - "4567-4597:4567-4597"
+    environment:
+      - SERVICES=s3
+      - DEBUG=
+      - DATA_DIR=
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEFAULT_REGION=eu-west-2
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - app-net
+
+  auth:
+    image: ghcr.io/ministryofjustice/hmpps-auth:latest
+    container_name: auth
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+    environment:
+      - SERVER_PORT=9090
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth-db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/auth/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  hmpps-external-users-api:
+    image: ghcr.io/ministryofjustice/hmpps-external-users-api:2024-09-23.3630.2e6d15e
+    container_name: hmpps-external-users-api
+    depends_on:
+      auth:
+        condition: service_healthy
+    ports:
+      - "8089:8089"
+    environment:
+      - SERVER_PORT=8089
+      - SPRING_PROFILES_ACTIVE=dev,local-postgres
+      - API_BASE_URL_OAUTH=http://auth:9090/auth
+      - SPRING_R2DBC_URL=r2dbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
+      - SPRING_FLYWAY_URL=jdbc:postgresql://auth-db:5432/auth-db?sslmode=prefer
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/health/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  hmpps-book-secure-move-api:
+    image: wiremock/wiremock:latest
+    container_name: hmpps-book-secure-move-api
+    ports:
+      - "9999:8081"
+    volumes:
+      - $PWD/wiremock-docker:/home/wiremock
+    command: --verbose --global-response-templating --port=8081
+    networks:
+      - app-net
+
+  tester:
+    image: curlimages/curl:latest
+    container_name: tester
+    depends_on:
+      auth:
+        condition: service_healthy
+    networks:
+      - app-net
+    command: sleep 1000
+
+  tester-sql:
+    image: postgres:16.4
+    container_name: tester-sql
+    depends_on:
+      postgres-jpc:
+        condition: service_healthy
+    networks:
+      - app-net
+    command: sleep 1000
+
+networks:
+  app-net:
+    driver: bridge
+
