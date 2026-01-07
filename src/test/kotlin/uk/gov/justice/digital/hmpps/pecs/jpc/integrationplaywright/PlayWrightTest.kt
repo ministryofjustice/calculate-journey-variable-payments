@@ -32,7 +32,7 @@ internal abstract class PlayWrightTest {
       browser = playwright!!.chromium().launch(
         LaunchOptions()
           .setHeadless(headless)
-          .setArgs(args.toMutableList())
+          .setArgs(args.toMutableList()),
       )
     }
 
