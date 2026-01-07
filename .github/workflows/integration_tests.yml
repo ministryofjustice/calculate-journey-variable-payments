@@ -155,7 +155,7 @@ jobs:
           docker run -d \
             --name my_app \
             --network host \
-            -e SPRING_PROFILES_ACTIVE=integration-tests \
+            -e SPRING_PROFILES_ACTIVE=dev \
             -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
             -e SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${{ inputs.postgres-db }} \
             -e SPRING_DATASOURCE_USERNAME=${{ inputs.postgres-username }} \
