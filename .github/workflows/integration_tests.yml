@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 25
+          java-version: 21
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -110,7 +110,7 @@ jobs:
       - name: Publish Test Report
         uses: ctrf-io/github-test-reporter@27b102a97ccdba9f56029c7771726ccc1417f29a
         with:
-          report-path: './build/test-results/integrationTest/*.xml'
+          report-path: './build/test-results/testPlayWrightIntegration/*.xml'
           use-suite-name: true
           integrations-config: |
             {
