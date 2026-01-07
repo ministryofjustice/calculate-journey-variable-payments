@@ -191,7 +191,21 @@ jobs:
 
       - name: Run Playwright Integration tests
         run: |
-          ./gradlew --info --stacktrace testPlayWrightIntegration
+          docker run --rm \
+            --network host \
+            -v "${{ github.workspace }}:/work" \
+            -v "$HOME/.gradle:/root/.gradle" \
+            -w /work \
+            mcr.microsoft.com/playwright:v1.54.0-jammy \
+            bash -lc '
+              set -e
+              apt-get update -y > /dev/null
+              apt-get install -y openjdk-21-jdk curl > /dev/null
+              export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+              export PATH="$JAVA_HOME/bin:$PATH"
+              java -version
+              ./gradlew --no-daemon --info --stacktrace testPlayWrightIntegration -Dplaywright.headless=true
+            '
 
       - name: Upload raw test reports on failure
         if: failure()
