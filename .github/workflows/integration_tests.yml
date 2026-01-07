@@ -87,7 +87,9 @@ jobs:
         env:
           SERVER_PORT: 9090
           SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:7432/auth-db
+          SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/auth-db
+          SPRING_DATASOURCE_USERNAME: admin
+          SPRING_DATASOURCE_PASSWORD: admin_password
         options: >-
           --health-cmd "curl -f http://localhost:9090/auth/health"
           --health-interval 10s
