@@ -151,7 +151,7 @@ jobs:
         run: |
           set -e
           echo "Listing JARs in build/libs:" && ls -l build/libs || true
-          JAR_PATH=$(ls build/libs/calculate-journey-variable-payments-*.jar | head -n 1 || true)
+          JAR_PATH=$(ls build/libs/app.jar | head -n 1 || true)
           if [ -z "$JAR_PATH" ]; then
             echo "❌ Could not find app JAR in build/libs"
             exit 1
