@@ -147,14 +147,24 @@ jobs:
           echo "❌ HMPPS Auth did not become healthy"
           exit 1
 
-      - name: Build Docker image for app
-        run: docker build -t app_image .
-
-      - name: Run the java app
+      - name: Run the Java app (from built JAR)
         run: |
-          SPRING_PROFILES_ACTIVE=dev \
-          SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
-          java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar &
+          set -e
+          echo "Listing JARs in build/libs:" && ls -l build/libs || true
+          JAR_PATH=$(ls build/libs/calculate-journey-variable-payments-*.jar | head -n 1 || true)
+          if [ -z "$JAR_PATH" ]; then
+            echo "❌ Could not find app JAR in build/libs"
+            exit 1
+          fi
+          echo "Using JAR: $JAR_PATH"
+          nohup env \
+            SPRING_PROFILES_ACTIVE=integration-tests \
+            SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
+            SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${{ inputs.postgres-db }} \
+            SPRING_DATASOURCE_USERNAME=${{ inputs.postgres-username }} \
+            SPRING_DATASOURCE_PASSWORD=${{ inputs.postgres-password }} \
+            java -Xmx1024m -jar "$JAR_PATH" > app.log 2>&1 &
+          echo "App started in background with PID $!"
 
       - name: Wait for app to be healthy
         id: wait_health
@@ -175,8 +185,8 @@ jobs:
       - name: Stop job if app failed to start
         if: steps.wait_health.outcome == 'failure'
         run: |
-          echo "❌ Stopping job because the app failed to start properly."
-          docker logs my_app || true
+          echo "❌ Stopping job because the app failed to start properly. Showing app.log:"
+          (test -f app.log && tail -n 200 app.log) || echo "app.log not found"
           exit 1
 
       - name: Run Playwright Integration tests
