@@ -51,7 +51,7 @@ jobs:
     needs: gradle_build
     strategy:
       matrix:
-        shard: [ 1, 2 ]
+        shard: [ 1 ]
 
     services:
       postgres:
@@ -80,4 +80,51 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
 
+      - name: Gradle Build
+        run: ./gradlew assemble testClasses --build-cache
 
+      - name: Determine tests splitting
+        uses: chaosaffe/split-tests@v1
+        id: split-tests
+        with:
+          glob: src/test/kotlin/**/integrationplaywright/**/*Test.kt
+          split-index: ${{ strategy.job-index }}
+          split-total: ${{ strategy.job-total }}
+
+      - name: Run integration tests
+        run: |
+          # Format the arguments to "./gradlew integrationTest"
+          SPECS_LIST=$(echo  ${{ steps.split-tests.outputs.test-suite }} | sed 's/src\/test\/kotlin\///g;s/\//./g;s/\.kt/ /g' | awk '{for (i=1; i<=NF; i++) print "--tests",$i}')
+          echo "Prepared arguments for Gradle: $SPECS_LIST"
+          ./gradlew testPlayWrightIntegration $SPECS_LIST    
+
+      - name: Upload raw test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: integration-test-results-${{ matrix.shard }}-of-${{ strategy.job-total }}
+          path: |
+            build/test-results
+            build/reports/tests
+
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@27b102a97ccdba9f56029c7771726ccc1417f29a
+        with:
+          report-path: './build/test-results/integrationTest/*.xml'
+          use-suite-name: true
+          integrations-config: |
+            {
+              "junit-to-ctrf": {
+                "enabled": true,
+                "action": "convert",
+                "options": {
+                  "output": "./ctrf-reports/ctrf-report.json",
+                  "toolname": "junit-to-ctrf",
+                  "useSuiteName": true,
+                  "env": {
+                    "appName": "approved-premises-api"
+                  }
+                }
+              }
+            }
+        if: always()
