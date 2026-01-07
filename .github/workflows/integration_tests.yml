@@ -47,11 +47,8 @@ jobs:
 
   integration_playwright_tests:
     runs-on: ubuntu-latest
-    name: "Run test suite in parallel (${{ matrix.shard }})"
+    name: "Run test suite"
     needs: gradle_build
-    strategy:
-      matrix:
-        shard: [ 1 ]
 
     services:
       postgres:
@@ -83,26 +80,21 @@ jobs:
       - name: Gradle Build
         run: ./gradlew assemble testClasses --build-cache
 
-      - name: Determine tests splitting
-        uses: chaosaffe/split-tests@v1
-        id: split-tests
-        with:
-          glob: src/test/kotlin/**/integrationplaywright/**/*Test.kt
-          split-index: ${{ strategy.job-index }}
-          split-total: ${{ strategy.job-total }}
-
-      - name: Run integration tests
+      - name: List compiled test classes (diagnostics)
         run: |
-          # Format the arguments to "./gradlew integrationTest"
-          SPECS_LIST=$(echo  ${{ steps.split-tests.outputs.test-suite }} | sed 's/src\/test\/kotlin\///g;s/\//./g;s/\.kt/ /g' | awk '{for (i=1; i<=NF; i++) print "--tests",$i}')
-          echo "Prepared arguments for Gradle: $SPECS_LIST"
-          ./gradlew testPlayWrightIntegration $SPECS_LIST    
+          echo "Compiled test classes under build/classes:" && ls -R build/classes || true
+          echo "Test runtime classpath (from Gradle):"
+          ./gradlew -q printTestRuntimeClasspath || true
+
+      - name: Run Playwright Integration tests (no filters)
+        run: |
+          ./gradlew --info --stacktrace testPlaywrightIntegration
 
       - name: Upload raw test reports on failure
         if: failure()
         uses: actions/upload-artifact@v6
         with:
-          name: integration-test-results-${{ matrix.shard }}-of-${{ strategy.job-total }}
+          name: integration-test-results
           path: |
             build/test-results
             build/reports/tests
