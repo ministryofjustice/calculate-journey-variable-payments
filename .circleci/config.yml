@@ -5,214 +5,214 @@ orbs:
   browser-tools: circleci/browser-tools@2.1.2
 
 jobs:
-  validate:
-    executor:
-      name: hmpps/java
-      tag: "21.0"
-    environment:
-      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - gradle-{{ checksum "build.gradle.kts" }}
-            - gradle-
-      - run:
-          command: |
-            java -version
-            echo "JAVA_HOME=$JAVA_HOME"
-      - run:
-          command: ./gradlew build
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: gradle-{{ checksum "build.gradle.kts" }}
-      - store_test_results:
-          path: build/test-results
-      - store_artifacts:
-          path: build/reports/tests
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build/libs
-            - build.gradle.kts
-
-  integration_playwright_tests:
-    docker:
-      - image: cimg/openjdk:21.0-browsers
-        environment:
-          _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
-      - image: postgres:16.4
-        environment:
-            - POSTGRES_PASSWORD=admin_password
-            - POSTGRES_USER=admin
-            - POSTGRES_DB=auth-db
-        command: -p 7432
-      - image: quay.io/hmpps/hmpps-auth:latest
-        environment:
-          - SERVER_PORT=9090
-          - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:7432/auth-db
-      - image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
-        environment:
-          - SERVER_PORT=8089
-          - SPRING_PROFILES_ACTIVE=dev,local-postgres
-          - API_BASE_URL_OAUTH=http://localhost:9090/auth
-          - SPRING_R2DBC_URL=r2dbc:postgresql://localhost:7432/auth-db?sslmode=prefer
-          - SPRING_FLYWAY_URL=jdbc:postgresql://localhost:7432/auth-db?sslmode=prefer
-      - image: quay.io/hmpps/hmpps-manage-users-api:latest
-        environment:
-          - SERVER_PORT=9091
-          - SPRING_PROFILES_ACTIVE=dev
-          - HMPPS-AUTH_ENDPOINT_URL=http://localhost:9090/auth
-          - EXTERNAL-USERS_ENDPOINT_URL=http://localhost:8089
-          - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
-          - DELIUS_ENDPOINT_URL=http://community-api:8080
-          - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://localhost:9090/auth/oauth/token
-      - image: postgres:16.4
-        environment:
-          POSTGRES_DB: jpc
-          POSTGRES_USER: jpc
-          POSTGRES_PASSWORD: letmein
-        command: -p 5433
-    resource_class: "xlarge"
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Install System Dependencies
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y \
-              libgtk-4-1 \
-              libgraphene-1.0-0 \
-              libxslt1.1 \
-              libwoff1 \
-              libvpx7 \
-              libevent-2.1-7 \
-              libopus0 \
-              gstreamer1.0-plugins-base \
-              gstreamer1.0-plugins-good \
-              libflite1 \
-              libwebp7 \
-              libavif13 \
-              libharfbuzz-icu0 \
-              libwebpmux3 \
-              libenchant-2-2 \
-              libsecret-1-0 \
-              libhyphen0 \
-              libmanette-0.2-0 \
-              libgles2 \
-              libx264-dev \
-              libgstreamer-gl1.0-0 \
-              libgstreamer-plugins-bad1.0-0 \
-              libwebpdemux2
-      - run:
-          name: Wait for auth
-          command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
-      - run:
-          name: Get wiremock
-          command: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
-      - run:
-          name: Run wiremock
-          command: java -jar wiremock.jar --port 9999
-          background: true
-      - run:
-          name: Run the java app.
-          command: java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar
-          background: true
-          environment:
-            SPRING_PROFILES_ACTIVE: dev
-            SERVER_SERVLET_SESSION_COOKIE_SECURE: false
-      - run:
-          name: Wait for java app to start
-          command: sleep 20
-      - restore_cache:
-          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-      - restore_cache:
-          key: gradle-cache-{{ checksum "build.gradle.kts" }}
-      - save_cache:
-          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-          paths:
-            - /home/circleci/.gradle/wrapper
-      - save_cache:
-          key: gradle-cache-{{ checksum "build.gradle.kts" }}
-          paths:
-            - /home/circleci/.gradle/caches
-      - run:
-          name: Run Playwright Integration Tests
-          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration
-      - store_artifacts:
-          path: build/reports/tests/testPlayWrightIntegration
-          destination: build/reports/tests/testPlayWrightIntegration
-      - store_test_results:
-          path: build/test-results
-
-workflows:
-  version: 2
-  build-test-and-deploy:
-    jobs:
-      - validate:
-          filters:
-            tags:
-              ignore: /.*/
-      - hmpps/helm_lint:
-          name: helm_lint
-      - integration_playwright_tests:
-          requires:
-            - validate
-      - hmpps/build_docker:
-          name: test_build_docker
-          publish: false
-          requires:
-            - validate
-          filters:
-            branches:
-              ignore:
-                - main
-      - hmpps/build_docker:
-          name: build_docker
-          filters:
-            branches:
-              only:
-                - main
-      - hmpps/deploy_env:
-          name: deploy_dev
-          env: "dev"
-          context:
-            - hmpps-common-vars
-          filters:
-            branches:
-              only:
-                - main
-          requires:
-            - validate
-            - build_docker
-            - helm_lint
-            - integration_playwright_tests
-      - request-preprod-approval:
-          type: approval
-          requires:
-            - deploy_dev
-      - hmpps/deploy_env:
-          name: deploy_preprod
-          env: "preprod"
-          context:
-            - hmpps-common-vars
-            - calculate-journey-variable-payments-preprod
-          requires:
-            - request-preprod-approval
-      - request-prod-approval:
-          type: approval
-          requires:
-            - deploy_preprod
-      - hmpps/deploy_env:
-          name: deploy_prod
-          env: "prod"
-          context:
-            - hmpps-common-vars
-            - calculate-journey-variable-payments-prod
-          requires:
-            - request-prod-approval
+#  validate:
+#    executor:
+#      name: hmpps/java
+#      tag: "21.0"
+#    environment:
+#      _JAVA_OPTIONS: -Xmx512m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
+#
+#    steps:
+#      - checkout
+#      - restore_cache:
+#          keys:
+#            - gradle-{{ checksum "build.gradle.kts" }}
+#            - gradle-
+#      - run:
+#          command: |
+#            java -version
+#            echo "JAVA_HOME=$JAVA_HOME"
+#      - run:
+#          command: ./gradlew build
+#      - save_cache:
+#          paths:
+#            - ~/.gradle
+#          key: gradle-{{ checksum "build.gradle.kts" }}
+#      - store_test_results:
+#          path: build/test-results
+#      - store_artifacts:
+#          path: build/reports/tests
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - build/libs
+#            - build.gradle.kts
+#
+#  integration_playwright_tests:
+#    docker:
+#      - image: cimg/openjdk:21.0-browsers
+#        environment:
+#          _JAVA_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false
+#      - image: postgres:16.4
+#        environment:
+#            - POSTGRES_PASSWORD=admin_password
+#            - POSTGRES_USER=admin
+#            - POSTGRES_DB=auth-db
+#        command: -p 7432
+#      - image: quay.io/hmpps/hmpps-auth:latest
+#        environment:
+#          - SERVER_PORT=9090
+#          - SPRING_PROFILES_ACTIVE=dev,local-postgres,auth-seed
+#          - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:7432/auth-db
+#      - image: quay.io/hmpps/hmpps-external-users-api:2024-09-23.3630.2e6d15e
+#        environment:
+#          - SERVER_PORT=8089
+#          - SPRING_PROFILES_ACTIVE=dev,local-postgres
+#          - API_BASE_URL_OAUTH=http://localhost:9090/auth
+#          - SPRING_R2DBC_URL=r2dbc:postgresql://localhost:7432/auth-db?sslmode=prefer
+#          - SPRING_FLYWAY_URL=jdbc:postgresql://localhost:7432/auth-db?sslmode=prefer
+#      - image: quay.io/hmpps/hmpps-manage-users-api:latest
+#        environment:
+#          - SERVER_PORT=9091
+#          - SPRING_PROFILES_ACTIVE=dev
+#          - HMPPS-AUTH_ENDPOINT_URL=http://localhost:9090/auth
+#          - EXTERNAL-USERS_ENDPOINT_URL=http://localhost:8089
+#          - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
+#          - DELIUS_ENDPOINT_URL=http://community-api:8080
+#          - AUTHORIZATION-SERVER_TOKEN_ENDPOINT_URL=http://localhost:9090/auth/oauth/token
+#      - image: postgres:16.4
+#        environment:
+#          POSTGRES_DB: jpc
+#          POSTGRES_USER: jpc
+#          POSTGRES_PASSWORD: letmein
+#        command: -p 5433
+#    resource_class: "xlarge"
+#    steps:
+#      - checkout
+#      - attach_workspace:
+#          at: ~/app
+#      - run:
+#          name: Install System Dependencies
+#          command: |
+#            sudo apt-get update
+#            sudo apt-get install -y \
+#              libgtk-4-1 \
+#              libgraphene-1.0-0 \
+#              libxslt1.1 \
+#              libwoff1 \
+#              libvpx7 \
+#              libevent-2.1-7 \
+#              libopus0 \
+#              gstreamer1.0-plugins-base \
+#              gstreamer1.0-plugins-good \
+#              libflite1 \
+#              libwebp7 \
+#              libavif13 \
+#              libharfbuzz-icu0 \
+#              libwebpmux3 \
+#              libenchant-2-2 \
+#              libsecret-1-0 \
+#              libhyphen0 \
+#              libmanette-0.2-0 \
+#              libgles2 \
+#              libx264-dev \
+#              libgstreamer-gl1.0-0 \
+#              libgstreamer-plugins-bad1.0-0 \
+#              libwebpdemux2
+#      - run:
+#          name: Wait for auth
+#          command: dockerize -wait http://localhost:9090/auth/health -timeout 1m
+#      - run:
+#          name: Get wiremock
+#          command: curl -o wiremock.jar https://repo1.maven.org/maven2/org/wiremock/wiremock-standalone/3.9.1/wiremock-standalone-3.9.1.jar
+#      - run:
+#          name: Run wiremock
+#          command: java -jar wiremock.jar --port 9999
+#          background: true
+#      - run:
+#          name: Run the java app.
+#          command: java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar
+#          background: true
+#          environment:
+#            SPRING_PROFILES_ACTIVE: dev
+#            SERVER_SERVLET_SESSION_COOKIE_SECURE: false
+#      - run:
+#          name: Wait for java app to start
+#          command: sleep 20
+#      - restore_cache:
+#          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+#      - restore_cache:
+#          key: gradle-cache-{{ checksum "build.gradle.kts" }}
+#      - save_cache:
+#          key: gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+#          paths:
+#            - /home/circleci/.gradle/wrapper
+#      - save_cache:
+#          key: gradle-cache-{{ checksum "build.gradle.kts" }}
+#          paths:
+#            - /home/circleci/.gradle/caches
+#      - run:
+#          name: Run Playwright Integration Tests
+#          command: ./gradlew -Dorg.gradle.jvmargs="--illegal-access=permit" -Dkotlin.daemon.jvm.options="--illegal-access=permit" testPlaywrightIntegration
+#      - store_artifacts:
+#          path: build/reports/tests/testPlayWrightIntegration
+#          destination: build/reports/tests/testPlayWrightIntegration
+#      - store_test_results:
+#          path: build/test-results
+#
+#workflows:
+#  version: 2
+#  build-test-and-deploy:
+#    jobs:
+#      - validate:
+#          filters:
+#            tags:
+#              ignore: /.*/
+#      - hmpps/helm_lint:
+#          name: helm_lint
+#      - integration_playwright_tests:
+#          requires:
+#            - validate
+#      - hmpps/build_docker:
+#          name: test_build_docker
+#          publish: false
+#          requires:
+#            - validate
+#          filters:
+#            branches:
+#              ignore:
+#                - main
+#      - hmpps/build_docker:
+#          name: build_docker
+#          filters:
+#            branches:
+#              only:
+#                - main
+#      - hmpps/deploy_env:
+#          name: deploy_dev
+#          env: "dev"
+#          context:
+#            - hmpps-common-vars
+#          filters:
+#            branches:
+#              only:
+#                - main
+#          requires:
+#            - validate
+#            - build_docker
+#            - helm_lint
+#            - integration_playwright_tests
+#      - request-preprod-approval:
+#          type: approval
+#          requires:
+#            - deploy_dev
+#      - hmpps/deploy_env:
+#          name: deploy_preprod
+#          env: "preprod"
+#          context:
+#            - hmpps-common-vars
+#            - calculate-journey-variable-payments-preprod
+#          requires:
+#            - request-preprod-approval
+#      - request-prod-approval:
+#          type: approval
+#          requires:
+#            - deploy_preprod
+#      - hmpps/deploy_env:
+#          name: deploy_prod
+#          env: "prod"
+#          context:
+#            - hmpps-common-vars
+#            - calculate-journey-variable-payments-prod
+#          requires:
+#            - request-prod-approval
