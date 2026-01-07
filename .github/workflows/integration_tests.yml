@@ -64,7 +64,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5433:5432
 
       # Auth service database
       authdb:
@@ -118,7 +118,7 @@ jobs:
         run: |
           echo "Waiting for PostgreSQL to be ready..."
           for i in {1..30}; do
-            pg_isready -h localhost -p 5432 -U ${{ inputs.postgres-username }} && echo "✅ PostgreSQL is ready!" && exit 0
+            pg_isready -h localhost -p 5433 -U ${{ inputs.postgres-username }} && echo "✅ PostgreSQL is ready!" && exit 0
             echo "Attempt $i: PostgreSQL not ready, retrying..."
             sleep 2
           done
@@ -160,7 +160,7 @@ jobs:
           nohup env \
             SPRING_PROFILES_ACTIVE=dev \
             SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
-            SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${{ inputs.postgres-db }} \
+            SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5433/${{ inputs.postgres-db }} \
             SPRING_DATASOURCE_USERNAME=${{ inputs.postgres-username }} \
             SPRING_DATASOURCE_PASSWORD=${{ inputs.postgres-password }} \
             java -Xmx1024m -jar "$JAR_PATH" > app.log 2>&1 &
