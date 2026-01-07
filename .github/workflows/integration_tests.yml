@@ -150,17 +150,11 @@ jobs:
       - name: Build Docker image for app
         run: docker build -t app_image .
 
-      - name: Start app container
+      - name: Run the java app
         run: |
-          docker run -d \
-            --name my_app \
-            --network host \
-            -e SPRING_PROFILES_ACTIVE=dev \
-            -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
-            -e SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${{ inputs.postgres-db }} \
-            -e SPRING_DATASOURCE_USERNAME=${{ inputs.postgres-username }} \
-            -e SPRING_DATASOURCE_PASSWORD=${{ inputs.postgres-password }} \
-            app_image sh -c "java -jar /app/app.jar"
+          SPRING_PROFILES_ACTIVE=dev \
+          SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
+          java -Xmx1024m -jar ~/app/build/libs/calculate-journey-variable-payments-*.jar &
 
       - name: Wait for app to be healthy
         id: wait_health
