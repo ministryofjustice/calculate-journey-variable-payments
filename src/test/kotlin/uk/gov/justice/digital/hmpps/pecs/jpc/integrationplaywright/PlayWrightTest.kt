@@ -24,14 +24,22 @@ internal abstract class PlayWrightTest {
     @JvmStatic
     @BeforeAll
     fun launchBrowser() {
+      val headlessProp = System.getProperty("playwright.headless")
+      val headless = headlessProp?.toBooleanStrictOrNull() ?: true
+      val args = arrayOf("--no-sandbox", "--disable-dev-shm-usage")
+
       playwright = Playwright.create()
-      browser = playwright!!.chromium().launch(LaunchOptions().setHeadless(false))
+      browser = playwright!!.chromium().launch(
+        LaunchOptions()
+          .setHeadless(headless)
+          .setArgs(args.toMutableList()),
+      )
     }
 
     @AfterAll
     @JvmStatic
     fun closeBrowser() {
-      playwright!!.close()
+      playwright?.close()
     }
   }
 
