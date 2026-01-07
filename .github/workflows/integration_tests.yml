@@ -8,15 +8,15 @@ on:
         required: true
       postgres-db:
         type: string
-        default: 'postgres'
+        default: 'jpc'
         required: false
       postgres-password:
         type: string
-        default: 'dev'
+        default: 'letmein'
         required: false
       postgres-username:
         type: string
-        default: 'root'
+        default: 'jpc'
         required: true
 
 env:
@@ -47,10 +47,11 @@ jobs:
 
   integration_playwright_tests:
     runs-on: ubuntu-latest
-    name: "Run test suite"
+    name: "Run Playwright integration tests"
     needs: gradle_build
 
     services:
+      # App database
       postgres:
         image: postgres:${{ inputs.postgres-tag }}
         env:
@@ -64,6 +65,37 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+
+      # Auth service database
+      authdb:
+        image: postgres:${{ inputs.postgres-tag }}
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin_password
+          POSTGRES_DB: auth-db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 7432:5432
+
+      # Real HMPPS Auth service
+      auth:
+        image: ghcr.io/ministryofjustice/hmpps-auth:latest
+        env:
+          SERVER_PORT: 9090
+          SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:7432/auth-db
+        options: >-
+          --health-cmd "curl -f http://localhost:9090/auth/health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+        ports:
+          - 9090:9090
+
     steps:
       - name: Clone repository
         uses: actions/checkout@v6
@@ -80,15 +112,80 @@ jobs:
       - name: Gradle Build
         run: ./gradlew assemble testClasses --build-cache
 
-      - name: List compiled test classes (diagnostics)
+      - name: Wait for PostgreSQL
         run: |
-          echo "Compiled test classes under build/classes:" && ls -R build/classes || true
-          echo "Test runtime classpath (from Gradle):"
-          ./gradlew -q printTestRuntimeClasspath || true
+          echo "Waiting for PostgreSQL to be ready..."
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U ${{ inputs.postgres-username }} && echo "✅ PostgreSQL is ready!" && exit 0
+            echo "Attempt $i: PostgreSQL not ready, retrying..."
+            sleep 2
+          done
+          echo "❌ PostgreSQL did not become ready"
+          exit 1
 
-      - name: Run Playwright Integration tests (no filters)
+      - name: Wait for Auth DB
         run: |
-          ./gradlew --info --stacktrace testPlaywrightIntegration
+          echo "Waiting for Auth DB to be ready..."
+          for i in {1..30}; do
+            pg_isready -h localhost -p 7432 -U admin && echo "✅ Auth DB is ready!" && exit 0
+            echo "Attempt $i: Auth DB not ready, retrying..."
+            sleep 2
+          done
+          echo "❌ Auth DB did not become ready"
+          exit 1
+
+      - name: Wait for HMPPS Auth
+        run: |
+          echo "Waiting for HMPPS Auth to be healthy..."
+          for i in {1..40}; do
+            curl -fsS http://localhost:9090/auth/health && echo "✅ HMPPS Auth is healthy!" && exit 0
+            echo "Attempt $i: Auth not healthy yet, retrying..."
+            sleep 5
+          done
+          echo "❌ HMPPS Auth did not become healthy"
+          exit 1
+
+      - name: Build Docker image for app
+        run: docker build -t app_image .
+
+      - name: Start app container
+        run: |
+          docker run -d \
+            --name my_app \
+            --network host \
+            -e SPRING_PROFILES_ACTIVE=integration-tests \
+            -e SERVER_SERVLET_SESSION_COOKIE_SECURE=false \
+            -e SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/${{ inputs.postgres-db }} \
+            -e SPRING_DATASOURCE_USERNAME=${{ inputs.postgres-username }} \
+            -e SPRING_DATASOURCE_PASSWORD=${{ inputs.postgres-password }} \
+            app_image sh -c "java -jar /app/app.jar"
+
+      - name: Wait for app to be healthy
+        id: wait_health
+        continue-on-error: true
+        run: |
+          echo "Waiting for app to be healthy..."
+          for i in {1..30}; do
+            echo "Attempt $i: Checking app health..."
+            response=$(curl -s http://localhost:8080/health || true)
+            echo "Response: $response"
+            echo "$response" | grep -q '"status":"UP"' && echo "✅ App is healthy!" && exit 0
+            echo "Retry $i: App not ready yet. Sleeping..."
+            sleep 10
+          done
+          echo "❌ App did not become healthy"
+          exit 1
+
+      - name: Stop job if app failed to start
+        if: steps.wait_health.outcome == 'failure'
+        run: |
+          echo "❌ Stopping job because the app failed to start properly."
+          docker logs my_app || true
+          exit 1
+
+      - name: Run Playwright Integration tests
+        run: |
+          ./gradlew --info --stacktrace testPlayWrightIntegration
 
       - name: Upload raw test reports on failure
         if: failure()
@@ -99,24 +196,9 @@ jobs:
             build/test-results
             build/reports/tests
 
-      - name: Publish Test Report
-        uses: ctrf-io/github-test-reporter@27b102a97ccdba9f56029c7771726ccc1417f29a
-        with:
-          report-path: './build/test-results/testPlayWrightIntegration/*.xml'
-          use-suite-name: true
-          integrations-config: |
-            {
-              "junit-to-ctrf": {
-                "enabled": true,
-                "action": "convert",
-                "options": {
-                  "output": "./ctrf-reports/ctrf-report.json",
-                  "toolname": "junit-to-ctrf",
-                  "useSuiteName": true,
-                  "env": {
-                    "appName": "approved-premises-api"
-                  }
-                }
-              }
-            }
+      - name: Upload HTML report (always)
         if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: testPlayWrightIntegration-html-report
+          path: build/reports/tests/testPlayWrightIntegration
