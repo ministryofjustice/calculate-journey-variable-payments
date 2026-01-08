@@ -6,7 +6,7 @@ generic-service:
   serviceAccountName: calculate-journey-variable-payments
 
   image:
-    repository: quay.io/hmpps/calculate-journey-variable-payments
+    repository: ghcr.io/ministryofjustice/calculate-journey-variable-payments
     tag: app_version # override at deployment time
     port: 8080
 
