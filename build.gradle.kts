@@ -23,7 +23,7 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "6.10.0"
+  val shedlockVersion = "7.5.0"
   listOf(
     "com.beust:klaxon:5.6",
     "com.amazonaws:aws-java-sdk-s3:1.12.788",
@@ -78,11 +78,30 @@ tasks {
     compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
   }
 
+  val baseTest = named<Test>("test")
+
   val testPlayWrightIntegration by registering(Test::class) {
+    dependsOn("testClasses")
+
+    // Use standard test source set outputs/classpath
+    val sourceSets = project.extensions.getByName("sourceSets") as org.gradle.api.tasks.SourceSetContainer
+    testClassesDirs = sourceSets.getByName("test").output.classesDirs
+    classpath = sourceSets.getByName("test").runtimeClasspath
+
+    // Diagnostics
+    doFirst {
+      println("[testPlayWrightIntegration] testClassesDirs: ${'$'}{testClassesDirs.files}")
+      testClassesDirs.files.forEach { f -> println("[classesDir] ${'$'}f exists=${'$'}{f.exists()} contains=${'$'}{f.listFiles()?.size ?: 0}") }
+    }
+
     testLogging.showStandardStreams = true
     testLogging.exceptionFormat = TestExceptionFormat.FULL
     useJUnitPlatform()
 
-    include("uk/gov/justice/digital/hmpps/pecs/jpc/integrationplaywright/*")
+    filter { isFailOnNoMatchingTests = true }
+
+    reports.junitXml.required.set(true)
+    reports.junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/testPlayWrightIntegration").get().asFile)
+    reports.html.required.set(true)
   }
 }
