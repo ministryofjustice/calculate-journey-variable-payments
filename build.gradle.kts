@@ -2,9 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
-  kotlin("plugin.spring") version "2.2.10"
-  kotlin("plugin.jpa") version "2.2.10"
-  kotlin("plugin.allopen") version "2.2.10"
+  kotlin("plugin.spring") version "2.3.10"
+  kotlin("plugin.jpa") version "2.3.10"
+  kotlin("plugin.allopen") version "2.3.10"
 }
 java {
   sourceCompatibility = JavaVersion.VERSION_21
@@ -23,16 +23,16 @@ dependencyCheck {
 
 dependencies {
 
-  val shedlockVersion = "7.5.0"
+  val shedlockVersion = "7.6.0"
   listOf(
     "com.beust:klaxon:5.6",
-    "com.amazonaws:aws-java-sdk-s3:1.12.788",
-    "com.amazonaws:aws-java-sdk-sts:1.12.788",
-    "io.sentry:sentry-spring-boot-starter:8.20.0",
+    "com.amazonaws:aws-java-sdk-s3:1.12.797",
+    "com.amazonaws:aws-java-sdk-sts:1.12.797",
+    "io.sentry:sentry-spring-boot-starter:8.32.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
     "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0",
-    "org.apache.poi:poi-ooxml:5.4.1",
+    "org.apache.poi:poi-ooxml:5.5.1",
     "org.flywaydb:flyway-database-postgresql",
     "org.springframework.boot:spring-boot-starter-security",
     "org.springframework.boot:spring-boot-starter-data-jpa",
@@ -42,27 +42,27 @@ dependencies {
     "org.springframework.boot:spring-boot-starter-webflux",
     "org.springframework.session:spring-session-jdbc",
     "org.thymeleaf.extras:thymeleaf-extras-springsecurity6",
-    "com.github.spotbugs:spotbugs-annotations:4.9.4",
+    "com.github.spotbugs:spotbugs-annotations:4.9.8",
     "com.microsoft.azure:applicationinsights-logging-logback:2.6.4",
     "org.apache.commons:commons-compress:1.28.0",
   ).forEach { implementation(it) }
   implementation(kotlin("script-runtime"))
 
   listOf(
-    "org.wiremock:wiremock:3.13.1",
-    "org.htmlunit:htmlunit:4.15.0",
+    "org.wiremock:wiremock:3.13.2",
+    "org.htmlunit:htmlunit:4.21.0",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.28.0",
     "org.springframework.boot:spring-boot-starter-test",
     "org.springframework.security:spring-security-test",
     "com.squareup.okhttp3:mockwebserver:4.12.0",
     "com.squareup.okhttp3:okhttp:4.12.0",
-    "com.microsoft.playwright:playwright:1.54.0",
+    "com.microsoft.playwright:playwright:1.58.0",
   ).forEach { testImplementation(it) }
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.7")
+  runtimeOnly("org.postgresql:postgresql:42.7.10")
 }
 kotlin {
   jvmToolchain(21)
