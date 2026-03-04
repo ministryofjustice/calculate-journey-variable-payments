@@ -45,11 +45,20 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ matrix.environments }}
+  app_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.app_version.outputs.version }}
+    steps:
+      - id: app_version
+        name: Application version creators
+        uses: ministryofjustice/hmpps-github-actions/.github/actions/build-test-and-deploy/create_app_version@v2
   kotlin_validate:
     name: Validate the kotlin
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/kotlin_validate.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
-
+    needs:
+      - app_version
   kotlin_build:
     name: Build Kotlin JAR
     runs-on: ubuntu-latest
@@ -59,7 +68,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - name: Grant execute permissions
         run: chmod +x ./gradlew
       - name: Build JAR

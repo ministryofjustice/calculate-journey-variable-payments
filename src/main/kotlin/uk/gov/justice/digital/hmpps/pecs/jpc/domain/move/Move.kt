@@ -121,7 +121,7 @@ data class Move(
 
   @Json(ignored = true)
   @Column(nullable = false, length = 1024)
-  var notes: String = "",
+  var notes: String? = "",
 
   @Json(ignored = true)
   @Transient
@@ -169,16 +169,23 @@ data class Move(
     const val CANCELLATION_REASON_CANCELLED_BY_PMU = "cancelled_by_pmu"
     const val CANCELLATION_REASON_INCOMPLETE_PER = "incomplete_per"
 
-    fun fromJson(json: String): Move? = Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
-      .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
-      .fieldConverter(JsonDateConverter::class, jsonDateConverter)
-      .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Move>(json)
+    fun fromJson(json: String): Move? {
+      val move = Klaxon().fieldConverter(JsonMoveStatusConverter::class, moveStatusConverter)
+        .fieldConverter(JsonSupplierConverter::class, jsonSupplierConverter)
+        .fieldConverter(JsonDateConverter::class, jsonDateConverter)
+        .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).parse<Move>(json)
+
+      // Validate required fields are not null or the literal string "null"
+      return move?.takeIf {
+        it.fromNomisAgencyId != "null" && it.updatedAt != null
+      }
+    }
   }
 
   fun toJson(): String = Klaxon().fieldConverter(JsonDateConverter::class, jsonDateConverter)
     .fieldConverter(JsonDateTimeConverter::class, jsonDateTimeConverter).toJsonString(this)
 
-  override fun toString(): String = "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='$notes')"
+  override fun toString(): String = "Move(moveId='$moveId', profileId=$profileId, updatedAt=$updatedAt, supplier=$supplier, moveType=$moveType, status=$status, reference='$reference', moveDate=$moveDate, fromNomisAgencyId='$fromNomisAgencyId', reportFromLocationType='$reportFromLocationType', fromSiteName=$fromSiteName, fromLocationType=$fromLocationType, toNomisAgencyId=$toNomisAgencyId, reportToLocationType=$reportToLocationType, toSiteName=$toSiteName, toLocationType=$toLocationType, pickUpDateTime=$pickUpDateTime, dropOffOrCancelledDateTime=$dropOffOrCancelledDateTime, cancellationReason=$cancellationReason, cancellationReasonComment=$cancellationReasonComment, notes='${notes.orEmpty()}')"
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -202,7 +209,7 @@ data class Move(
     if (dropOffOrCancelledDateTime != other.dropOffOrCancelledDateTime) return false
     if (cancellationReason != other.cancellationReason) return false
     if (cancellationReasonComment != other.cancellationReasonComment) return false
-    if (notes != other.notes) return false
+    if (notes.orEmpty() != other.notes.orEmpty()) return false
 
     return true
   }
@@ -224,7 +231,7 @@ data class Move(
     result = 31 * result + (dropOffOrCancelledDateTime?.hashCode() ?: 0)
     result = 31 * result + (cancellationReason?.hashCode() ?: 0)
     result = 31 * result + (cancellationReasonComment?.hashCode() ?: 0)
-    result = 31 * result + notes.hashCode()
+    result = 31 * result + (notes?.hashCode() ?: 0)
     return result
   }
 
