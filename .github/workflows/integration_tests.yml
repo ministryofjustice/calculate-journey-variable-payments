@@ -94,6 +94,7 @@ jobs:
           HMPPS_AUTH_AUTHORIZATION_SERVER_BASEURL: http://localhost:9090/auth
           AUTHORIZATION_API_ENDPOINT_URL: http://localhost:9090/auth
         options: >-
+          --health-cmd "curl -f http://localhost:9090/auth/health"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 60
