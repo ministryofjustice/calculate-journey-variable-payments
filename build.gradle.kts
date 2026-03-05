@@ -2,13 +2,13 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
-  kotlin("plugin.spring") version "2.2.10"
-  kotlin("plugin.jpa") version "2.2.10"
-  kotlin("plugin.allopen") version "2.2.10"
+  kotlin("plugin.spring") version "2.3.10"
+  kotlin("plugin.jpa") version "2.3.10"
+  kotlin("plugin.allopen") version "2.3.10"
 }
 java {
-  sourceCompatibility = JavaVersion.VERSION_21
-  targetCompatibility = JavaVersion.VERSION_21
+  sourceCompatibility = JavaVersion.VERSION_25
+  targetCompatibility = JavaVersion.VERSION_25
 }
 
 allOpen {
@@ -65,7 +65,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.7")
 }
 kotlin {
-  jvmToolchain(21)
+  jvmToolchain(25)
 }
 
 tasks {
@@ -75,7 +75,7 @@ tasks {
   }
 
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
   }
 
   val baseTest = named<Test>("test")

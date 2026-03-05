@@ -56,7 +56,10 @@ class JourneyQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
     }
 
     val stringPlaceholders = listOf(supplier.name, fromSiteName, toSiteName).filter { !it.isNullOrBlank() }
-    val placeholders = (stringPlaceholders + effectiveYear).toTypedArray()
+    val placeholders: Array<Any> =
+      (stringPlaceholders + effectiveYear)
+        .map { it as Any }
+        .toTypedArray()
     return jdbcTemplate.query(selectPricesSQL, pricesRowMapper, *placeholders)
   }
 

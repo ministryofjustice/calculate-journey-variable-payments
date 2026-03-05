@@ -37,7 +37,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -86,15 +86,19 @@ jobs:
         image: ghcr.io/ministryofjustice/hmpps-auth:latest
         env:
           SERVER_PORT: 9090
-          SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed
+          SPRING_PROFILES_ACTIVE: dev,local-postgres,auth-seed,internal-authorization-server
           SPRING_DATASOURCE_URL: jdbc:postgresql://authdb:5432/auth-db
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: admin_password
+          APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+          HMPPS_AUTH_AUTHORIZATION_SERVER_BASEURL: http://localhost:9090/auth
+          AUTHORIZATION_API_ENDPOINT_URL: http://localhost:9090/auth
         options: >-
-          --health-cmd "curl -f http://localhost:9090/auth/health"
+          --health-cmd "java -version"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 20
+          --health-retries 60
+          --health-start-period 120s
         ports:
           - 9090:9090
 
@@ -106,7 +110,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -200,8 +204,8 @@ jobs:
             bash -lc '
               set -e
               apt-get update -y > /dev/null
-              apt-get install -y openjdk-21-jdk curl > /dev/null
-              export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+              apt-get install -y openjdk-25-jdk curl > /dev/null
+              export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
               export PATH="$JAVA_HOME/bin:$PATH"
               java -version
               ./gradlew --no-daemon --info --stacktrace testPlayWrightIntegration -Dplaywright.headless=true
