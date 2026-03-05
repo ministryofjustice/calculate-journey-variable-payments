@@ -91,8 +91,9 @@ jobs:
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: admin_password
           AUTHORIZATION_SERVER_BASE_URL: http://localhost:9090/auth
+          APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=00000000-0000-0000-0000-000000000000"
         options: >-
-          --health-cmd "wget -q --spider http://localhost:9090/auth/health"
+          --health-cmd "cat < /dev/tcp/localhost/9090 || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 20
