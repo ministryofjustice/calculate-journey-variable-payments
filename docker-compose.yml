@@ -26,7 +26,7 @@ services:
       - POSTGRES_DB=auth-db
 
   localstack:
-    image: localstack/localstack:4.13.1
+    image: localstack/localstack:4.14.0
     container_name: localstack
     ports:
       - "4567-4597:4567-4597"
