@@ -31,7 +31,7 @@ dependencies {
     "io.sentry:sentry-spring-boot-starter:8.20.0",
     "net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion",
     "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion",
-    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0",
+    "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1",
     "org.apache.poi:poi-ooxml:5.4.1",
     "org.flywaydb:flyway-database-postgresql",
     "org.springframework.boot:spring-boot-starter-security",
