@@ -1,10 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.7"
-  kotlin("plugin.spring") version "2.3.10"
-  kotlin("plugin.jpa") version "2.3.10"
-  kotlin("plugin.allopen") version "2.3.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.2.5"
+  kotlin("plugin.spring") version "2.3.21"
+  kotlin("plugin.jpa") version "2.3.21"
+  kotlin("plugin.allopen") version "2.3.21"
 }
 java {
   sourceCompatibility = JavaVersion.VERSION_25
@@ -62,7 +62,7 @@ dependencies {
 
   testRuntimeOnly("com.h2database:h2:1.4.200")
 
-  runtimeOnly("org.postgresql:postgresql:42.7.7")
+  runtimeOnly("org.postgresql:postgresql:42.7.11")
 }
 kotlin {
   jvmToolchain(25)
