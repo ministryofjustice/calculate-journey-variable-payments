@@ -57,10 +57,6 @@ jobs:
     name: Validate the kotlin
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/kotlin_validate.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
-    with:
-      gradle-command: 'BUILD_NUMBER=${{ needs.app_version.outputs.version}} ./gradlew assemble check'
-      upload-build-artifacts: ${{ github.ref == 'refs/heads/main' }}
-      java-version: "25"
     needs:
       - app_version
   kotlin_build:
