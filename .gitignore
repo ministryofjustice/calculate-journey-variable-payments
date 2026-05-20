@@ -45,3 +45,10 @@ out/
 *.xlsx
 /.prodenv
 /.devenv
+
+#Synk
+.snyk
+
+# LocalStack data directory
+.localstack/
+
