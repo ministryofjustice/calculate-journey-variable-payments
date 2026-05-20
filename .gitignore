@@ -48,3 +48,7 @@ out/
 
 #Synk
 .snyk
+
+# LocalStack data directory
+.localstack/
+
