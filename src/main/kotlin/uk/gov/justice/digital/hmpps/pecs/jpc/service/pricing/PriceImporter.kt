@@ -61,10 +61,12 @@ class PriceImporter(
     var skipCount = 0
 
     spreadsheet.forEachRow {
-      if (it.previousPrice != null) {
-        if (it.previousPrice.priceInPence != it.priceInPence) {
-          supplierPricingService.updatePriceForSupplier(it.previousPrice, it.price())
-          // auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(it.previousPrice!!)))
+      val previousPrice = it.previousPrice
+
+      if (previousPrice != null) {
+        if (previousPrice.priceInPence != it.priceInPence) {
+          supplierPricingService.updatePriceForSupplier(previousPrice, it.price())
+          // auditService.create(AuditableEvent.updatePrice(priceRepo.save(it), Money(previousPrice)))
           updateCount++
         } else {
           logger.info("No price change, skipping")
