@@ -50,7 +50,7 @@ dependencies {
 
   listOf(
     "org.wiremock:wiremock:3.13.2",
-    "org.htmlunit:htmlunit:4.21.0",
+    "org.htmlunit:htmlunit:5.0.0",
     "org.mockito:mockito-inline:5.2.0",
     "org.apache.commons:commons-compress:1.28.0",
     "org.springframework.boot:spring-boot-starter-test",
