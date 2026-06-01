@@ -15,6 +15,19 @@ class LoginPage(page: Page?) : BasicPage() {
     page?.getByLabel("username")?.fill(getProperty("jpc.web.user"))
     page?.getByLabel("password")?.fill(getProperty("jpc.web.password"))
     page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sign In"))?.click()
+    page?.waitForLoadState()
+
+    // Handle extended email verification page if it appears
+    skipExtendedEmailVerificationIfPresent()
+  }
+
+  private fun skipExtendedEmailVerificationIfPresent() {
+    val h1Text = page?.locator("h1")?.textContent() ?: ""
+    if (h1Text.contains("Verify your email", ignoreCase = true)) {
+      // Click "Skip for now" link (id="cancel", href="/auth/verify-email-skip")
+      page?.locator("a#cancel")?.click()
+      page?.waitForLoadState()
+    }
   }
 
   fun isLoginSuccessful() {
