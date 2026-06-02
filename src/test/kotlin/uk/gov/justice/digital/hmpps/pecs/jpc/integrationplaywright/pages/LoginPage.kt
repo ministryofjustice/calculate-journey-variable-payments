@@ -22,11 +22,14 @@ class LoginPage(page: Page?) : BasicPage() {
   }
 
   private fun skipExtendedEmailVerificationIfPresent() {
-    // Check if the "Skip for now" link exists on the extended email verification page
-    // Use count() which doesn't wait/timeout - returns 0 immediately if not found
-    val skipLink = page?.locator("a#cancel")
-    if ((skipLink?.count() ?: 0) > 0) {
-      skipLink?.click()
+    // Wait for h1 to be visible (exists on both email verification and select service pages)
+    val h1 = page?.locator("h1")
+    h1?.waitFor()
+
+    // If we're on the email verification page, click "Skip for now"
+    val h1Text = h1?.textContent() ?: ""
+    if (h1Text.contains("Verify your email", ignoreCase = true)) {
+      page?.locator("a#cancel")?.click()
       page?.waitForLoadState()
     }
   }
