@@ -29,7 +29,9 @@ class LoginPage(page: Page?) : BasicPage() {
     // If we're on the email verification page, click "Skip for now"
     val h1Text = h1?.textContent() ?: ""
     if (h1Text.contains("Verify your email", ignoreCase = true)) {
-      page?.locator("a#cancel")?.click()
+      // Try multiple selectors for the skip link
+      val skipLink = page?.locator("a#cancel, a:has-text('Skip for now'), a[href='/auth/verify-email-skip']")?.first()
+      skipLink?.click()
       page?.waitForLoadState()
     }
   }
