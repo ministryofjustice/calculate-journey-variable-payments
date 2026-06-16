@@ -1,4 +1,5 @@
-FROM eclipse-temurin:25.0.3_9-jre AS builder
+ARG BASE_IMAGE=ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy
+FROM --platform=$BUILDPLATFORM ${BASE_IMAGE} AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER:-1_0_0}
@@ -8,7 +9,7 @@ ADD . .
 RUN ./gradlew clean assemble -Dorg.gradle.daemon=false
 
 
-FROM eclipse-temurin:25.0.3_9-jre
+FROM ${BASE_IMAGE}
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 RUN apt-get update && \

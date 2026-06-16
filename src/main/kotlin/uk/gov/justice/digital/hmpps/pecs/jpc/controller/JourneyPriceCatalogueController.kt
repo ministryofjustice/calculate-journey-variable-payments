@@ -35,16 +35,18 @@ class JourneyPriceCatalogueController(
     @SessionAttribute(name = SUPPLIER_ATTRIBUTE, required = false) supplier: Supplier?,
     @SessionAttribute(name = DATE_ATTRIBUTE, required = false) movesFrom: LocalDate?,
     response: HttpServletResponse?,
-  ): ResponseEntity<InputStreamResource?>? {
+  ): ResponseEntity<InputStreamResource> {
     if (supplier == null || movesFrom == null) {
       logger.info("Missing session attributes, no session or session has expired.")
-
       return ResponseEntity.noContent().build()
     }
 
     logger.info("getting spreadsheet for $supplier")
 
-    return journeyPriceCatalogueService.generate(SecurityContextHolder.getContext().authentication, supplier, movesFrom)
+    val authentication = SecurityContextHolder.getContext().authentication
+      ?: return ResponseEntity.noContent().build()
+
+    return journeyPriceCatalogueService.generate(authentication, supplier, movesFrom)
       ?.let { file ->
         val uploadDateTime = timeSource.dateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"))
         val filename =

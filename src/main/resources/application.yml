@@ -29,25 +29,27 @@ spring:
     timeout: 20M
   security:
     oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${hmpps-auth.url}/.well-known/jwks.json
+          issuer-uri: ${HMPPS_AUTH_BASE_URI}/auth/issuer
+
       client:
         provider:
-          hmpps:
-            authorization-uri: ${HMPPS_AUTH_BASE_URI}/auth/oauth/authorize
-            token-uri: ${HMPPS_AUTH_BASE_URI}/auth/oauth/token
+          hmpps-auth:
+            authorization-uri: ${hmpps-auth.url}/oauth/authorize
+            token-uri: ${hmpps-auth.url}/oauth/token
             user-info-uri: ${HMPPS_MANAGE_USERS_BASE_URI}/users/me
             user-name-attribute: username
         registration:
           hmpps:
             client-id: ${HMPPS_AUTH_CLIENT_ID}
             client-secret: ${HMPPS_AUTH_CLIENT_SECRET}
-            provider: hmpps
+            provider: hmpps-auth
             scope: read
             authorization-grant-type: authorization_code
             redirect-uri: ${HMPPS_AUTH_REDIRECT_BASE_URI}/login/oauth2/code/hmpps
 
-      resourceserver:
-        jwt:
-          issuer-uri: ${HMPPS_AUTH_BASE_URI}/auth/issuer
 
   flyway:
     locations: classpath:/db/migration/ddl,classpath:/db/migration/dml

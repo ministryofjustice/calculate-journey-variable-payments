@@ -53,7 +53,7 @@ internal class AnnualPriceAdjusterTest {
         multiplier = 1.5.toBigDecimal(),
         effectiveYear = 2020,
       )
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
+      whenever(priceAdjustmentRepository.saveAndFlush(any<PriceAdjustment>())).thenReturn(expectedPriceAdjustment)
 
       val actualLockId =
         priceAdjuster.attemptLockForPriceAdjustment(Supplier.GEOAMEY, AdjustmentMultiplier(1.5.toBigDecimal()), 2020)
@@ -78,7 +78,7 @@ internal class AnnualPriceAdjusterTest {
         multiplier = 2.0.toBigDecimal(),
         effectiveYear = 2021,
       )
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(expectedPriceAdjustment)
+      whenever(priceAdjustmentRepository.saveAndFlush(any<PriceAdjustment>())).thenReturn(expectedPriceAdjustment)
 
       val actualLockId =
         priceAdjuster.attemptLockForPriceAdjustment(Supplier.SERCO, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)

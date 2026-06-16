@@ -24,7 +24,7 @@ import java.util.UUID
   indexes = [
     Index(
       name = "price_id_month_index",
-      columnList = "price_id, month",
+      columnList = "price_id, \"month\"",
       unique = true,
     ),
   ],
@@ -38,7 +38,7 @@ data class PriceException(
   @JoinColumn(name = "price_id", nullable = false)
   val price: Price,
 
-  @Column(name = "month", nullable = false)
+  @Column(name = "\"month\"", nullable = false)
   val month: Int,
 
   @Column(name = "price_in_pence", nullable = false)

@@ -48,7 +48,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
   @BeforeEach
   fun before() {
-    authentication = SecurityContextHolder.getContext().authentication
+    authentication = SecurityContextHolder.getContext().authentication!!
   }
 
   @Nested
@@ -109,7 +109,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
 
     @Test
     internal fun `monitoring service captures failed price adjustment`() {
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(mock())
+      whenever(priceAdjustmentRepository.saveAndFlush(any<PriceAdjustment>())).thenReturn(mock())
 
       whenever(
         annualPriceAdjusterSpy.inflationary(
@@ -141,7 +141,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
     @Test
     internal fun `auditing service captures successful price adjustment`() {
       fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
+      whenever(priceAdjustmentRepository.saveAndFlush(any<PriceAdjustment>())).thenReturn(
         PriceAdjustment(
           supplier = Supplier.GEOAMEY,
           multiplier = 2.0.toBigDecimal(),
@@ -149,7 +149,7 @@ internal class AnnualPriceAdjustmentsServiceTest {
         ),
       )
 
-      whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
+      whenever(priceAdjustmentRepository.existsById(any<UUID>())).thenReturn(true)
 
       AnnualPriceAdjustmentsService(
         annualPriceAdjuster,
@@ -256,14 +256,14 @@ internal class AnnualPriceAdjustmentsServiceTest {
     @Test
     internal fun `auditing service captures successful price adjustment`() {
       fakeLockForFor(Supplier.GEOAMEY, AdjustmentMultiplier(2.0.toBigDecimal()), 2021)
-      whenever(priceAdjustmentRepository.saveAndFlush(any())).thenReturn(
+      whenever(priceAdjustmentRepository.saveAndFlush(any<PriceAdjustment>())).thenReturn(
         PriceAdjustment(
           supplier = Supplier.GEOAMEY,
           multiplier = 2.0.toBigDecimal(),
           effectiveYear = 2021,
         ),
       )
-      whenever(priceAdjustmentRepository.existsById(any())).thenReturn(true)
+      whenever(priceAdjustmentRepository.existsById(any<UUID>())).thenReturn(true)
 
       AnnualPriceAdjustmentsService(
         annualPriceAdjuster,

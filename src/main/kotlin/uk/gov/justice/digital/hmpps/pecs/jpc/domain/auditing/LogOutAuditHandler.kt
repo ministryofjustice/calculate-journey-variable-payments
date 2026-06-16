@@ -11,11 +11,11 @@ class LogOutAuditHandler(
   private val authLogoutSuccessUri: String,
 ) : SimpleUrlLogoutSuccessHandler() {
   override fun onLogoutSuccess(
-    request: HttpServletRequest?,
-    response: HttpServletResponse?,
+    request: HttpServletRequest,
+    response: HttpServletResponse,
     authentication: Authentication?,
   ) {
-    auditService.create(AuditableEvent.logOutEvent(authentication!!))
+    authentication?.let { auditService.create(AuditableEvent.logOutEvent(it)) }
     defaultTargetUrl = authLogoutSuccessUri
     super.onLogoutSuccess(request, response, authentication)
   }

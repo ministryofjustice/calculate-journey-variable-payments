@@ -4,16 +4,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Import
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 import uk.gov.justice.digital.hmpps.pecs.jpc.config.aws.ReportingProvider
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.move.Move
@@ -25,8 +24,8 @@ import java.time.temporal.ChronoUnit
  * This uses the test move data files in test/resources/move
  * The ReportingProvider uses the local filesystem as defined in TestConfig
  */
-@ExtendWith(SpringExtension::class)
-@Import(TestConfig::class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ContextConfiguration(classes = [TestConfig::class])
 @ActiveProfiles("test")
 internal class ReportImporterTest(
   @Autowired private val provider: ReportingProvider,

@@ -15,7 +15,7 @@ private val logger = loggerFor<BasmWebClientConfiguration>()
 class BasmWebClientConfiguration(@Value("\${BASM_API_BASE_URL}") val baseUri: String) {
 
   @Bean
-  fun basmWebClient(): WebClient? {
+  fun basmApiWebClient(): WebClient? {
     logger.info("****Using BaSM web client with base URI $baseUri****")
 
     return WebClient.builder().baseUrl(baseUri).build()

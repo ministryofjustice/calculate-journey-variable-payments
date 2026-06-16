@@ -48,7 +48,7 @@ internal class LocationsServiceTest {
   @Test
   internal fun `new location is added and audited`() {
     whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(null)
-    whenever(locationRepository.save(any())).thenReturn(Location(LocationType.PR, "AGENCY_ID", "SITE NAME"))
+    whenever(locationRepository.save(any<Location>())).thenReturn(Location(LocationType.PR, "AGENCY_ID", "SITE NAME"))
 
     service.setLocationDetails("agency_iD ", "site name", LocationType.PR)
 
@@ -68,7 +68,7 @@ internal class LocationsServiceTest {
     val existingLocation = Location(LocationType.PR, "AGENCY_ID", "SITE NAME")
 
     whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(existingLocation)
-    whenever(locationRepository.save(any())).thenReturn(existingLocation.copy(siteName = "NEW SITE NAME"))
+    whenever(locationRepository.save(any<Location>())).thenReturn(existingLocation.copy(siteName = "NEW SITE NAME"))
 
     service.setLocationDetails("agency_iD ", "new site name", LocationType.PR)
 
@@ -88,7 +88,7 @@ internal class LocationsServiceTest {
     val existingLocation = Location(LocationType.PR, "AGENCY_ID", "SITE NAME")
 
     whenever(locationRepository.findByNomisAgencyId("AGENCY_ID")).thenReturn(existingLocation)
-    whenever(locationRepository.save(any())).thenReturn(
+    whenever(locationRepository.save(any<Location>())).thenReturn(
       existingLocation.copy(
         locationType = LocationType.MC,
         siteName = "SITE NAME",

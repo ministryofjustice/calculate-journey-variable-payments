@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDateTime
 import java.util.UUID

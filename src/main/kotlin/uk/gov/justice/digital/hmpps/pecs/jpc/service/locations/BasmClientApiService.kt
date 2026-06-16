@@ -70,7 +70,7 @@ class BasmClientApiService(
         .block(basmApiTimeout)
     }
       .onFailure { recordFailure(it) }
-      .getOrDefault(listOf()).filterNotNull()
+      .getOrDefault(listOf()) ?: listOf()
   }
 }
 

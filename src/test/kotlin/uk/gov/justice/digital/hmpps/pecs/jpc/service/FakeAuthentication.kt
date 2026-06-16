@@ -16,11 +16,11 @@ internal class FakeAuthentication :
   private val authentication: Authentication = mock { on { name } doReturn "mock username" }
   private val securityContext: SecurityContext = mock { on { authentication } doReturn authentication }
 
-  override fun beforeEach(context: ExtensionContext?) {
+  override fun beforeEach(context: ExtensionContext) {
     SecurityContextHolder.setContext(securityContext)
   }
 
-  override fun afterEach(context: ExtensionContext?) {
+  override fun afterEach(context: ExtensionContext) {
     SecurityContextHolder.clearContext()
   }
 }

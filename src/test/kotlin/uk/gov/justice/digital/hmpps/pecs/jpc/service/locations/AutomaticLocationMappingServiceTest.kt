@@ -55,7 +55,7 @@ internal class AutomaticLocationMappingServiceTest {
     val basmLocation = BasmNomisLocation(" Name", "agency_iD ", LocationType.CRT)
 
     whenever(basmClientApiService.findNomisAgenciesCreatedOn(fixedTime.toLocalDate())).thenReturn(listOf(basmLocation))
-    whenever(locationRepository.save(any())).thenReturn(Location(LocationType.CRT, "AGENCY_ID", "NAME"))
+    whenever(locationRepository.save(any<Location>())).thenReturn(Location(LocationType.CRT, "AGENCY_ID", "NAME"))
 
     service.mapIfNotPresentLocationsCreatedOn(fixedTime.toLocalDate())
 
@@ -84,7 +84,7 @@ internal class AutomaticLocationMappingServiceTest {
         basmLocationTwo,
       ),
     )
-    whenever(locationRepository.save(any())).thenReturn(
+    whenever(locationRepository.save(any<Location>())).thenReturn(
       Location(LocationType.CRT, "AGENCY_ONE_ID", "ONE"),
       Location(LocationType.PB, "AGENCY_TWO_ID", "TWO"),
     )
