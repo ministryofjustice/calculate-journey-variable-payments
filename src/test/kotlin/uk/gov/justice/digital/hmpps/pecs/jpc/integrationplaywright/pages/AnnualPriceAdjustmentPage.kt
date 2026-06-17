@@ -62,7 +62,7 @@ class AnnualPriceAdjustmentPage(page: Page?) {
       val refreshedRows = page?.locator("//tr[td[contains(text(), '$message')]]")
       rowCount = refreshedRows?.count() ?: 0
       if (rowCount > 0) {
-        rows?.all()  // Update rows reference
+        rows?.all() // Update rows reference
       }
     }
 
