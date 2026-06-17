@@ -12,7 +12,9 @@ RUN ./gradlew clean assemble -Dorg.gradle.daemon=false
 FROM ${BASE_IMAGE}
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
-RUN apt-get update && \
+RUN mkdir -p /var/lib/apt/lists/partial && \
+    apt-get clean && \
+    apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y libfreetype6 && \
     apt-get install -y libfontconfig1 && \
