@@ -69,5 +69,5 @@ class CommandRunner(
 
   private fun ApplicationArguments.getDate(attribute: String) = this.get(attribute)?.let { LocalDate.parse(it) } ?: throw RuntimeException("Missing date argument $attribute")
 
-  private fun ApplicationArguments.get(attribute: String) = this.getOptionValues(attribute).firstOrNull()?.trim()?.uppercase()
+  private fun ApplicationArguments.get(attribute: String) = this.getOptionValues(attribute)?.firstOrNull()?.trim()?.uppercase()
 }

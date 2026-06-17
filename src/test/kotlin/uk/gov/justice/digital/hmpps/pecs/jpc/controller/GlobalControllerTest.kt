@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.TestConfig
 @ContextConfiguration(classes = [TestConfig::class])
 @TestPropertySource(
   properties = [
-    "HMPPS_AUTH_BASE_URI=http://fake_auth_base_url",
+    "hmpps-auth.url=http://fake_auth_base_url",
     "FEEDBACK_URL=http://fake_feedback_url",
   ],
 )

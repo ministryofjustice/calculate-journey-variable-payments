@@ -46,9 +46,6 @@ out/
 /.prodenv
 /.devenv
 
-#Synk
-.snyk
-
 # LocalStack data directory
 .localstack/
 

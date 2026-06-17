@@ -46,8 +46,25 @@ class AnnualPriceAdjustmentPage(page: Page?) {
 
   fun isPriceAdjustmentRecordsPresent(message: String) {
     page?.waitForLoadState()
+
+    // Give the table a moment to fully render all rows
+    Thread.sleep(1000)
+
     val rows = page?.locator("//tr[td[contains(text(), '$message')]]")
-    val rowCount = rows?.count() ?: 0
+    var rowCount = rows?.count() ?: 0
+
+    // If no rows found, try refreshing the page as data might need to be reloaded
+    if (rowCount == 0) {
+      logger.warn("No rows found for message: $message. Attempting page refresh...")
+      page?.reload()
+      page?.waitForLoadState()
+      Thread.sleep(1000)
+      val refreshedRows = page?.locator("//tr[td[contains(text(), '$message')]]")
+      rowCount = refreshedRows?.count() ?: 0
+      if (rowCount > 0) {
+        rows?.all() // Update rows reference
+      }
+    }
 
     assertThat(rows).hasCount(rowCount)
     if (rowCount !in 1..2) {

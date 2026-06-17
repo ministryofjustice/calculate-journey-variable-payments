@@ -11,7 +11,5 @@ class FilterConfiguration {
    * All requests will be filtered through here to ensure a supplier has been chosen for current flow in the service.
    */
   @Bean
-  fun chooseFilter(): FilterRegistrationBean<ChooseSupplierFilter> = FilterRegistrationBean<ChooseSupplierFilter>().apply {
-    this.filter = ChooseSupplierFilter()
-  }
+  fun chooseFilter(): FilterRegistrationBean<ChooseSupplierFilter> = FilterRegistrationBean(ChooseSupplierFilter())
 }

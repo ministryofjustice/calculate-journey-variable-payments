@@ -42,7 +42,7 @@ class SecurityConfiguration<S : Session> {
   @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
   private lateinit var issuer: String
 
-  @Value("\${HMPPS_AUTH_BASE_URI}")
+  @Value("\${hmpps-auth.url}")
   private lateinit var authLogoutSuccessUri: String
 
   @Autowired
@@ -124,7 +124,7 @@ class SecurityConfiguration<S : Session> {
     response.sendRedirect(ssoLogoutUri())
   }
 
-  private fun ssoLogoutUri() = authLogoutSuccessUri.plus("/auth/sign-out")
+  private fun ssoLogoutUri() = authLogoutSuccessUri.plus("/sign-out")
 
   @Bean
   fun securityDialectForThymeleafSecurityExtras(): SpringSecurityDialect? = SpringSecurityDialect()

@@ -66,7 +66,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
       " left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id " +
       " left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id " +
       " left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?" +
-      " left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?" +
+      " left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.\"month\" = ?" +
       " where sm.move_type is not null and sm.supplier = ? and sm.move_month = ? and sm.move_year = ? and sm.drop_off_or_cancelled is not null" +
       " group by sm.move_id) as s on m.move_id = s.move_id " +
       "GROUP BY m.move_type"
@@ -112,7 +112,7 @@ class MoveQueryRepository(@Autowired val jdbcTemplate: JdbcTemplate) {
             left join LOCATIONS jfl on j.from_nomis_agency_id = jfl.nomis_agency_id  
             left join LOCATIONS jtl on j.to_nomis_agency_id = jtl.nomis_agency_id  
             left join PRICES p on jfl.location_id = p.from_location_id and jtl.location_id = p.to_location_id and j.effective_year = p.effective_year and p.supplier = ?
-            left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe.month = ?
+            left join PRICE_EXCEPTIONS pe on p.price_id = pe.price_id and pe."month" = ?
     """.trimIndent()
 
   val moveJourneyRowMapper = RowMapper { resultSet: ResultSet, _: Int ->

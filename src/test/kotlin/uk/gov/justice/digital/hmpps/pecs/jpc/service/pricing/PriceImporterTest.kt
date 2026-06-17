@@ -66,7 +66,7 @@ internal class PriceImporterTest {
       effectiveYear = 2020,
     )
 
-    whenever(priceRepo.save(any())).thenReturn(priceToAudit)
+    whenever(priceRepo.save(any<Price>())).thenReturn(priceToAudit)
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
     import.import(Supplier.SERCO, 2019)
@@ -74,7 +74,7 @@ internal class PriceImporterTest {
     verify(locationRepo).findAll()
     verify(sercoPricesProvider).get()
     verify(priceRepo, times(2)).count()
-    verify(priceRepo).save(any())
+    verify(priceRepo).save(any<Price>())
     verify(auditService).create(auditCaptor.capture())
 
     with(auditCaptor.firstValue) {
@@ -99,7 +99,7 @@ internal class PriceImporterTest {
       effectiveYear = 2019,
     )
 
-    whenever(priceRepo.save(any())).thenReturn(priceToAudit)
+    whenever(priceRepo.save(any<Price>())).thenReturn(priceToAudit)
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
     import.import(Supplier.GEOAMEY, 2019)
@@ -107,7 +107,7 @@ internal class PriceImporterTest {
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
     verify(priceRepo, times(2)).count()
-    verify(priceRepo).save(any())
+    verify(priceRepo).save(any<Price>())
     verify(auditService).create(auditCaptor.capture())
 
     with(auditCaptor.firstValue) {
@@ -145,7 +145,7 @@ internal class PriceImporterTest {
       previousPrice = oldPrice,
     )
 
-    whenever(priceRepo.save(any())).thenReturn(priceToAudit)
+    whenever(priceRepo.save(any<Price>())).thenReturn(priceToAudit)
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
     import.import(Supplier.GEOAMEY, 2019, PriceImporter.Action.WARN)
@@ -184,7 +184,7 @@ internal class PriceImporterTest {
       previousPrice = oldPrice,
     )
 
-    whenever(priceRepo.save(any())).thenReturn(priceToAudit)
+    whenever(priceRepo.save(any<Price>())).thenReturn(priceToAudit)
     whenever(locationRepo.findAll()).thenReturn(listOf(fromLocation, toLocation))
 
     import.import(Supplier.GEOAMEY, 2019, PriceImporter.Action.WARN)
@@ -192,7 +192,7 @@ internal class PriceImporterTest {
     verify(locationRepo).findAll()
     verify(geoameyPricesProvider).get()
     verify(priceRepo, times(2)).count()
-    verify(priceRepo, never()).save(any())
+    verify(priceRepo, never()).save(any<Price>())
     verify(auditService, never()).create(any())
   }
 

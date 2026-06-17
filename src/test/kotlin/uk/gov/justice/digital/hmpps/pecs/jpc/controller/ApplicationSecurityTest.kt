@@ -3,8 +3,8 @@ package uk.gov.justice.digital.hmpps.pecs.jpc.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.mock.web.MockHttpSession
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout
@@ -26,7 +26,7 @@ import java.time.LocalDate
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-@TestPropertySource(properties = ["HMPPS_AUTH_BASE_URI=http://fake_auth_redirect_url"])
+@TestPropertySource(properties = ["hmpps-auth.url=http://fake_auth_redirect_url"])
 internal class ApplicationSecurityTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders
@@ -65,7 +65,7 @@ internal class ApplicationSecurityTest(@Autowired private val wac: WebApplicatio
     mockMvc.get("/") { session = mockSession }
       .andExpect { status { is3xxRedirection() } }
       .andExpect { unauthenticated() }
-      .andExpect { request { redirectedUrl("http://fake_auth_redirect_url/auth/sign-out") } }
+      .andExpect { request { redirectedUrl("http://fake_auth_redirect_url/sign-out") } }
 
     assertThat(mockSession.isInvalid).isTrue
   }

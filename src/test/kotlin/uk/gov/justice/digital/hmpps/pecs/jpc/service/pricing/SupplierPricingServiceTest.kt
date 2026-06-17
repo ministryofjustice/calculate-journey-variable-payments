@@ -87,7 +87,7 @@ internal class SupplierPricingServiceTest {
 
   @Test
   internal fun `add new price for supplier`() {
-    whenever(priceRepository.save(any())).thenReturn(sercoPrice)
+    whenever(priceRepository.save(any<Price>())).thenReturn(sercoPrice)
 
     service.addPriceForSupplier(
       Supplier.SERCO,
@@ -120,7 +120,7 @@ internal class SupplierPricingServiceTest {
       )
     }.isInstanceOf(RuntimeException::class.java).hasMessage("Price adjustment in currently progress for SERCO")
 
-    verify(priceRepository, never()).save(any())
+    verify(priceRepository, never()).save(any<Price>())
   }
 
   @Test
@@ -136,7 +136,7 @@ internal class SupplierPricingServiceTest {
     }.isInstanceOf(RuntimeException::class.java)
       .hasMessage("Price changes can no longer be made, change is outside of price change window.")
 
-    verify(priceRepository, never()).save(any())
+    verify(priceRepository, never()).save(any<Price>())
   }
 
   @Test
@@ -210,7 +210,7 @@ internal class SupplierPricingServiceTest {
         effectiveYear,
       ),
     ).thenReturn(sercoPrice)
-    whenever(priceRepository.save(any())).thenReturn(sercoPrice)
+    whenever(priceRepository.save(any<Price>())).thenReturn(sercoPrice)
 
     service.updatePriceForSupplier(
       Supplier.SERCO,
@@ -220,7 +220,7 @@ internal class SupplierPricingServiceTest {
       effectiveYear,
     )
 
-    verify(priceRepository, never()).save(any())
+    verify(priceRepository, never()).save(any<Price>())
     verify(auditService, never()).create(any())
   }
 
@@ -234,7 +234,7 @@ internal class SupplierPricingServiceTest {
         effectiveYear,
       ),
     ).thenReturn(sercoPrice)
-    whenever(priceRepository.save(any())).thenReturn(sercoPrice)
+    whenever(priceRepository.save(any<Price>())).thenReturn(sercoPrice)
 
     service.updatePriceForSupplier(
       Supplier.SERCO,

@@ -58,6 +58,10 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+hmpps-auth:
+  url: "http://localhost:9090/auth"
+
 logging:
   level:
     ROOT: INFO

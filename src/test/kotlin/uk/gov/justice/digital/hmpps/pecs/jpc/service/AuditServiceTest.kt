@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatcher
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -50,22 +49,25 @@ internal class AuditServiceTest {
   private lateinit var authentication: Authentication
   private val eventCaptor = argumentCaptor<AuditEvent>()
 
-  private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) = verify(auditEventRepository).save(
-    argThat(
-      AuditEventMatcher(
-        AuditEvent(
-          type,
-          dateTime,
-          username.trim().uppercase(),
-          if (metadata != null) Klaxon().toJsonString(metadata) else null,
-        ),
-      ),
-    ),
-  )
+  private fun verifyEvent(type: AuditEventType, username: String, metadata: Map<String, Any>? = null) {
+    verify(auditEventRepository).save(eventCaptor.capture())
+
+    val expected = AuditEvent(
+      type,
+      dateTime,
+      username.trim().uppercase(),
+      if (metadata != null) Klaxon().toJsonString(metadata) else null,
+    )
+
+    assertThat(eventCaptor.firstValue.username).isEqualTo(expected.username)
+    assertThat(eventCaptor.firstValue.createdAt).isEqualTo(expected.createdAt)
+    assertThat(eventCaptor.firstValue.eventType).isEqualTo(expected.eventType)
+    assertThat(eventCaptor.firstValue.metadata).isEqualTo(expected.metadata)
+  }
 
   @BeforeEach
   fun before() {
-    authentication = SecurityContextHolder.getContext().authentication
+    authentication = SecurityContextHolder.getContext().authentication!!
   }
 
   @Test

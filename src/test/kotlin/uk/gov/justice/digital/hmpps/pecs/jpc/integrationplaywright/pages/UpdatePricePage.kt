@@ -36,8 +36,8 @@ class UpdatePricePage(page: Page?) {
   fun removeAllPriceExceptions() {
     val removeButton = page?.locator("button[id^='remove-exception-']")?.first()
     if (removeButton?.isVisible == true) {
-      removeButton?.click()
-      page?.waitForLoadState()
+      removeButton.click()
+      page.waitForLoadState()
       removeAllPriceExceptions()
     }
   }
