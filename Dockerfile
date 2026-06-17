@@ -1,5 +1,4 @@
-ARG BASE_IMAGE=ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy
-FROM --platform=$BUILDPLATFORM ${BASE_IMAGE} AS builder
+FROM eclipse-temurin:25.0.3_9-jre AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER:-1_0_0}
@@ -9,12 +8,10 @@ ADD . .
 RUN ./gradlew clean assemble -Dorg.gradle.daemon=false
 
 
-FROM ${BASE_IMAGE}
+FROM eclipse-temurin:25.0.3_9-jre
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
-RUN mkdir -p /var/lib/apt/lists/partial && \
-    apt-get clean && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y libfreetype6 && \
     apt-get install -y libfontconfig1 && \
