@@ -60,7 +60,7 @@ management:
         time-to-live: 2000ms
 
 hmpps-auth:
-  url: "http://localhost:8090/auth"
+  url: "http://localhost:9090/auth"
 
 logging:
   level:

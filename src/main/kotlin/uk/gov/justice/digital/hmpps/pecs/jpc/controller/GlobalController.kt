@@ -13,7 +13,7 @@ class GlobalController {
   @Value("\${FEEDBACK_URL:#}")
   private lateinit var feedbackUrl: String
 
-  @Value("\${HMPPS_AUTH_BASE_URI}")
+  @Value("\${hmpps-auth.url}")
   private lateinit var hmppsUri: String
 
   @ModelAttribute("feedbackUrl")

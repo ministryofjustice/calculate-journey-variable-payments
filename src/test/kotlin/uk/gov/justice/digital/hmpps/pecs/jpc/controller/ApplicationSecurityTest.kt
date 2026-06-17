@@ -26,7 +26,7 @@ import java.time.LocalDate
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ContextConfiguration(classes = [TestConfig::class])
-@TestPropertySource(properties = ["HMPPS_AUTH_BASE_URI=http://fake_auth_redirect_url"])
+@TestPropertySource(properties = ["hmpps-auth.url=http://fake_auth_redirect_url"])
 internal class ApplicationSecurityTest(@Autowired private val wac: WebApplicationContext) {
 
   private val mockMvc = MockMvcBuilders
@@ -65,7 +65,7 @@ internal class ApplicationSecurityTest(@Autowired private val wac: WebApplicatio
     mockMvc.get("/") { session = mockSession }
       .andExpect { status { is3xxRedirection() } }
       .andExpect { unauthenticated() }
-      .andExpect { request { redirectedUrl("http://fake_auth_redirect_url/auth/sign-out") } }
+      .andExpect { request { redirectedUrl("http://fake_auth_redirect_url/sign-out") } }
 
     assertThat(mockSession.isInvalid).isTrue
   }
