@@ -1,9 +1,6 @@
 spring:
   application:
     name: calculate-journey-variable-payments
-  autoconfigure:
-    exclude:
-      - uk.gov.justice.hmpps.kotlin.auth.HmppsResourceServerConfiguration
   jpa:
     show-sql: true
     generate-ddl: false

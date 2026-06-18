@@ -11,8 +11,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
+import org.springframework.security.oauth2.core.endpoint.PkceParameterNames
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.oauth2.jwt.JwtDecoder
@@ -47,6 +51,9 @@ class SecurityConfiguration<S : Session> {
 
   @Autowired
   private lateinit var auditService: AuditService
+
+  @Autowired
+  private lateinit var clientRegistrationRepository: ClientRegistrationRepository
 
   @Bean
   fun jdbcHttpSessionCustomizer(): PostgreSqlJdbcHttpSessionCustomizer = PostgreSqlJdbcHttpSessionCustomizer()
@@ -86,7 +93,24 @@ class SecurityConfiguration<S : Session> {
       it.accessDeniedHandler(accessDeniedHandler())
     }
     .oauth2Login {
-      it.userInfoEndpoint { userInfoConfig -> userInfoConfig.userService(oAuth2UserService()) }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
+      it.authorizationEndpoint { authEndpoint ->
+        authEndpoint.authorizationRequestResolver(
+          DefaultOAuth2AuthorizationRequestResolver(
+            clientRegistrationRepository,
+            OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI,
+          ).also { resolver ->
+            resolver.setAuthorizationRequestCustomizer { builder ->
+              builder
+                .additionalParameters { params ->
+                  params.remove(PkceParameterNames.CODE_CHALLENGE)
+                  params.remove(PkceParameterNames.CODE_CHALLENGE_METHOD)
+                }
+                .attributes { attrs -> attrs.remove(PkceParameterNames.CODE_VERIFIER) }
+            }
+          },
+        )
+      }
+        .userInfoEndpoint { oAuth2UserService() }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
     }
     .logout {
       it.logoutSuccessHandler(logOutHandler())
