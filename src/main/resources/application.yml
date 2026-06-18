@@ -104,3 +104,6 @@ logging:
     ROOT: INFO
     uk.gov.justice.digital.hmpps.pecs.jpc.config.security: DEBUG
     org.springframework.security.oauth2: DEBUG
+    org.springframework.security.web.session: DEBUG
+    org.springframework.security.web.authentication: DEBUG
+    org.springframework.session.jdbc: DEBUG

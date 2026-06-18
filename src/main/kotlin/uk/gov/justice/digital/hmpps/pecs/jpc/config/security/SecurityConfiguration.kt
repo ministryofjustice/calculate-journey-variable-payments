@@ -110,7 +110,12 @@ class SecurityConfiguration<S : Session> {
           },
         )
       }
-        .userInfoEndpoint { oAuth2UserService() }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
+        .userInfoEndpoint { it.userService(oAuth2UserService()) }
+        .failureHandler { request, response, exception ->
+          logger.error("OAuth2 login failure [uri=${request.requestURI}, session=${request.requestedSessionId?.take(8)}...]: ${exception.message}")
+          response.sendRedirect(ssoLogoutUri())
+        }
+        .successHandler(logInHandler())
     }
     .logout {
       it.logoutSuccessHandler(logOutHandler())
@@ -125,9 +130,11 @@ class SecurityConfiguration<S : Session> {
   fun logOutHandler() = LogOutAuditHandler(auditService, ssoLogoutUri())
 
   @Bean
-  fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> = OAuth2UserService { userRequest ->
+  fun jwtDecoder(): JwtDecoder = JwtDecoders.fromIssuerLocation(issuer)
 
-    val jwt = (JwtDecoders.fromIssuerLocation(issuer) as JwtDecoder).decode(userRequest.accessToken.tokenValue)
+  @Bean
+  fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> = OAuth2UserService { userRequest ->
+    val jwt = jwtDecoder().decode(userRequest.accessToken.tokenValue)
     val userAttributes = jwt.claims
     DefaultOAuth2User(
       jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
