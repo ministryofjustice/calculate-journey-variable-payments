@@ -26,6 +26,7 @@ spring:
     store-type: jdbc
     jdbc:
       initialize-schema: never
+      flush-mode: immediate
     timeout: 20M
   security:
     oauth2:
