@@ -86,7 +86,7 @@ class SecurityConfiguration<S : Session> {
       it.accessDeniedHandler(accessDeniedHandler())
     }
     .oauth2Login {
-      it.userInfoEndpoint { oAuth2UserService() }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
+      it.userInfoEndpoint { userInfoConfig -> userInfoConfig.userService(oAuth2UserService()) }.failureUrl(ssoLogoutUri()).successHandler(logInHandler())
     }
     .logout {
       it.logoutSuccessHandler(logOutHandler())
