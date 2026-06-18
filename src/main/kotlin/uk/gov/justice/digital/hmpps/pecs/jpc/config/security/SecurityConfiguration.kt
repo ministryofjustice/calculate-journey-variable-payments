@@ -85,9 +85,6 @@ class SecurityConfiguration<S : Session> {
     .sessionManagement {
       it.invalidSessionUrl(ssoLogoutUri())
         .sessionAuthenticationErrorUrl(ssoLogoutUri())
-        .sessionConcurrency { concurrency ->
-          concurrency.maximumSessions(1)
-        }
     }
     .exceptionHandling {
       it.accessDeniedHandler(accessDeniedHandler())
