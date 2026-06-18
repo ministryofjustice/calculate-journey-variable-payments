@@ -102,5 +102,5 @@ management:
 logging:
   level:
     ROOT: INFO
-    uk.gov.justice.digital.hmpps.pecs.jpc.config.security: INFO
-    org.springframework.security.oauth2: WARN
+    uk.gov.justice.digital.hmpps.pecs.jpc.config.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
