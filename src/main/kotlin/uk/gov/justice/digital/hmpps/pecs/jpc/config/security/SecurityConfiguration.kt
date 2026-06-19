@@ -23,9 +23,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtDecoders
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
+import org.springframework.session.FlushMode
 import org.springframework.session.Session
 import org.springframework.session.config.SessionRepositoryCustomizer
 import org.springframework.session.jdbc.JdbcIndexedSessionRepository
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogInAuditHandler
 import uk.gov.justice.digital.hmpps.pecs.jpc.domain.auditing.LogOutAuditHandler
@@ -38,6 +40,7 @@ private val logger = loggerFor<SecurityConfiguration<*>>()
  * All OAuth2 and user session management is configured here.
  */
 @EnableWebSecurity
+@EnableJdbcHttpSession(maxInactiveIntervalInSeconds = 1200) // 20 minutes — Spring Boot 4.0 removed Spring Session auto-configuration
 @ConditionalOnWebApplication
 @EnableMethodSecurity
 @Configuration
@@ -60,6 +63,7 @@ class SecurityConfiguration<S : Session> {
 
   class PostgreSqlJdbcHttpSessionCustomizer : SessionRepositoryCustomizer<JdbcIndexedSessionRepository> {
     override fun customize(sessionRepository: JdbcIndexedSessionRepository) {
+      sessionRepository.setFlushMode(FlushMode.IMMEDIATE)
       sessionRepository.setCreateSessionAttributeQuery(CREATE_SESSION_ATTRIBUTE_QUERY)
     }
 
