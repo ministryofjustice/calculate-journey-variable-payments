@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.0"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.3"
   kotlin("plugin.spring") version "2.4.0"
   kotlin("plugin.jpa") version "2.4.0"
   kotlin("plugin.allopen") version "2.4.0"
@@ -27,7 +27,7 @@ dependencies {
   implementation("com.beust:klaxon:5.6")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.797")
   implementation("com.amazonaws:aws-java-sdk-sts:1.12.797")
-  implementation("io.sentry:sentry-spring-boot-starter:8.44.0")
+  implementation("io.sentry:sentry-spring-boot-starter:8.46.0")
   implementation("net.javacrumbs.shedlock:shedlock-spring:7.7.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1")
@@ -51,10 +51,10 @@ dependencies {
   implementation("org.apache.commons:commons-compress:1.28.0")
   implementation(kotlin("script-runtime"))
 
-  runtimeOnly("org.postgresql:postgresql:42.7.11")
+  runtimeOnly("org.postgresql:postgresql:42.7.12")
 
   testImplementation("org.wiremock:wiremock:3.13.2")
-  testImplementation("org.htmlunit:htmlunit:5.1.0")
+  testImplementation("org.htmlunit:htmlunit:5.2.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.apache.commons:commons-compress:1.28.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -65,10 +65,10 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:5.4.0")
   testImplementation("com.squareup.okhttp3:okhttp:5.4.0")
-  testImplementation("com.microsoft.playwright:playwright:1.60.0")
+  testImplementation("com.microsoft.playwright:playwright:1.61.0")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
 
-  testRuntimeOnly("com.h2database:h2:2.3.232")
+  testRuntimeOnly("com.h2database:h2:2.4.240")
 }
 kotlin {
   jvmToolchain(25)
