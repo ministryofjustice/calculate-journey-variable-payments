@@ -11,7 +11,7 @@ generic-service:
       - calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk
 
   env:
-    JAVA_OPTS: "-Xmx1024m"
+    JAVA_TOOL_OPTIONS: "-Xmx1024m"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
     HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api-dev.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments-dev.apps.cloud-platform.service.justice.gov.uk"

@@ -9,7 +9,7 @@ generic-service:
     tlsSecretName: calculate-journey-variable-payments-cert
 
   env:
-    JAVA_OPTS: "-Xmx1539m"
+    JAVA_TOOL_OPTIONS: "-Xmx1539m"
     HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
     HMPPS_MANAGE_USERS_BASE_URI: "https://manage-users-api.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_REDIRECT_BASE_URI: "https://calculate-journey-variable-payments.hmpps.service.justice.gov.uk"
