@@ -19,36 +19,13 @@ on:
         default: 'jpc'
         required: true
 
-env:
-  total-runners: 2
-
 jobs:
-  gradle_build:
-    name: Gradle Build
-    runs-on: ubuntu-latest
-    env:
-      _JAVA_OPTIONS: "-Xmx4g"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-
-      - name: Set up java
-        uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5
-        with:
-          distribution: 'temurin'
-          java-version: 25
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
-
-      - name: Gradle Build
-        run: ./gradlew assemble testClasses --build-cache
-
   integration_playwright_tests:
     runs-on: ubuntu-latest
     name: "Run Playwright integration tests"
-    needs: gradle_build
+    env:
+      _JAVA_OPTIONS: "-Xmx4g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
 
     services:
       # App database
@@ -117,6 +94,15 @@ jobs:
 
       - name: Gradle Build
         run: ./gradlew assemble testClasses --build-cache
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('build.gradle.kts') }}
+
+      - name: Install Playwright browser system dependencies
+        run: npx --yes playwright@1.61.0 install-deps chromium
 
       - name: Wait for PostgreSQL
         run: |
@@ -194,22 +180,7 @@ jobs:
           exit 1
 
       - name: Run Playwright Integration tests
-        run: |
-          docker run --rm \
-            --network host \
-            -v "${{ github.workspace }}:/work" \
-            -v "$HOME/.gradle:/root/.gradle" \
-            -w /work \
-            mcr.microsoft.com/playwright:v1.54.0-jammy \
-            bash -lc '
-              set -e
-              apt-get update -y > /dev/null
-              apt-get install -y openjdk-25-jdk curl > /dev/null
-              export JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
-              export PATH="$JAVA_HOME/bin:$PATH"
-              java -version
-              ./gradlew --no-daemon --info --stacktrace testPlayWrightIntegration -Dplaywright.headless=true
-            '
+        run: ./gradlew --no-daemon testPlayWrightIntegration -Dplaywright.headless=true
 
       - name: Upload raw test reports on failure
         if: failure()
