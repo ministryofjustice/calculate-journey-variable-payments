@@ -82,7 +82,6 @@ jobs:
         with:
           name: build-results
           path: build/libs
-          retention-days: 1
 
   integration_playwright_tests:
     name: Run Playwright Integration Tests
