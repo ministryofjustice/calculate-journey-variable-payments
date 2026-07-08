@@ -2,7 +2,7 @@
 # Values here are the same across all environments
 generic-service:
   nameOverride: calculate-journey-variable-payments
-  productId: "DPS077" # productId for the product that this belongs too
+  productId: "DPS077" # productId for the product that this belongs to
   replicaCount: 2
   serviceAccountName: calculate-journey-variable-payments
 
