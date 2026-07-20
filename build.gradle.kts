@@ -23,7 +23,7 @@ dependencyCheck {
 
 dependencies {
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.5.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.0.0")
   implementation("com.beust:klaxon:5.6")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.797")
   implementation("com.amazonaws:aws-java-sdk-sts:1.12.797")
