@@ -27,7 +27,7 @@ dependencies {
   implementation("com.beust:klaxon:5.6")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.797")
   implementation("com.amazonaws:aws-java-sdk-sts:1.12.797")
-  implementation("io.sentry:sentry-spring-boot-starter:8.48.0")
+  implementation("io.sentry:sentry-spring-boot-starter:8.50.1")
   implementation("net.javacrumbs.shedlock:shedlock-spring:7.7.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1")
@@ -54,7 +54,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.13")
 
   testImplementation("org.wiremock:wiremock:3.13.2")
-  testImplementation("org.htmlunit:htmlunit:5.2.0")
+  testImplementation("org.htmlunit:htmlunit:5.3.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.apache.commons:commons-compress:1.28.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -68,7 +68,7 @@ dependencies {
   testImplementation("com.microsoft.playwright:playwright:1.61.0")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
 
-  testRuntimeOnly("com.h2database:h2:2.3.232")
+  testRuntimeOnly("com.h2database:h2:2.4.240")
 }
 kotlin {
   jvmToolchain(25)
