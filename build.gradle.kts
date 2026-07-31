@@ -66,7 +66,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:mockwebserver:5.4.0")
   testImplementation("com.squareup.okhttp3:okhttp:5.4.0")
   testImplementation("com.microsoft.playwright:playwright:1.61.0")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.0")
 
   testRuntimeOnly("com.h2database:h2:2.3.232")
 }
