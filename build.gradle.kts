@@ -68,7 +68,7 @@ dependencies {
   testImplementation("com.microsoft.playwright:playwright:1.62.0")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.1")
 
-  testRuntimeOnly("com.h2database:h2:2.4.240")
+  testRuntimeOnly("com.h2database:h2:2.3.232")
 }
 kotlin {
   jvmToolchain(25)
