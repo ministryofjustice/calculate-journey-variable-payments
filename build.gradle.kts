@@ -2,9 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.8"
-  kotlin("plugin.spring") version "2.4.10"
-  kotlin("plugin.jpa") version "2.4.10"
-  kotlin("plugin.allopen") version "2.4.10"
+  kotlin("plugin.spring") version "2.4.20"
+  kotlin("plugin.jpa") version "2.4.20"
+  kotlin("plugin.allopen") version "2.4.20"
 }
 java {
   sourceCompatibility = JavaVersion.VERSION_25
@@ -68,7 +68,7 @@ dependencies {
   testImplementation("com.microsoft.playwright:playwright:1.62.0")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.1")
 
-  testRuntimeOnly("com.h2database:h2:2.3.232")
+  testRuntimeOnly("com.h2database:h2:2.5.250")
 }
 kotlin {
   jvmToolchain(25)
