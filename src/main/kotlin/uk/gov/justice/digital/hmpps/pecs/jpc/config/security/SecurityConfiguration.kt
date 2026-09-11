@@ -140,8 +140,13 @@ class SecurityConfiguration<S : Session> {
   fun oAuth2UserService(): OAuth2UserService<OAuth2UserRequest, OAuth2User> = OAuth2UserService { userRequest ->
     val jwt = jwtDecoder().decode(userRequest.accessToken.tokenValue)
     val userAttributes = jwt.claims
+    val authorityNames = requireNotNull(jwt.getClaimAsStringList("authorities")) {
+      "Missing 'authorities' claim in access token"
+    }
+    val authorities = authorityNames.map { SimpleGrantedAuthority(it) }
+
     DefaultOAuth2User(
-      jwt.getClaimAsStringList("authorities").stream().map { SimpleGrantedAuthority(it) }.toList(),
+      authorities,
       userAttributes,
       "name",
     )

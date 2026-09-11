@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.5.7"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.8"
   kotlin("plugin.spring") version "2.4.10"
   kotlin("plugin.jpa") version "2.4.10"
   kotlin("plugin.allopen") version "2.4.10"
@@ -27,9 +27,9 @@ dependencies {
   implementation("com.beust:klaxon:5.6")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.797")
   implementation("com.amazonaws:aws-java-sdk-sts:1.12.797")
-  implementation("io.sentry:sentry-spring-boot-starter:8.54.0")
-  implementation("net.javacrumbs.shedlock:shedlock-spring:7.9.0")
-  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.9.0")
+  implementation("io.sentry:sentry-spring-boot-starter:8.56.0")
+  implementation("net.javacrumbs.shedlock:shedlock-spring:7.10.1")
+  implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.10.1")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1")
   implementation("org.apache.poi:poi-ooxml:5.5.1")
   implementation("org.flywaydb:flyway-core")
@@ -54,7 +54,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.13")
 
   testImplementation("org.wiremock:wiremock:3.13.2")
-  testImplementation("org.htmlunit:htmlunit:5.4.0")
+  testImplementation("org.htmlunit:htmlunit:5.5.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.apache.commons:commons-compress:1.28.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
