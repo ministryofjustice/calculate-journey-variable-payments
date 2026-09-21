@@ -6,23 +6,23 @@ import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 class ManageJourneyPriceCataloguePage(page: Page?) {
 
   private val url = "http://localhost:8080/manage-journey-price-catalogue"
-  private val page = page
+  private val page = requireNotNull(page)
 
   fun gotToPage() {
-    page?.navigate(url)
-    page?.waitForLoadState()
+    page.navigate(url)
+    page.waitForLoadState()
   }
 
   fun isPageSuccessful() {
-    val h1 = page?.locator("h1")
+    val h1 = page.locator("h1")
     assertThat(h1).containsText("Manage Journey Price Catalogue")
   }
   fun goToFindJourneys() {
-    page?.getByText("Find journeys")?.click()
-    page?.waitForLoadState()
+    page.getByText("Find journeys").click()
+    page.waitForLoadState()
   }
   fun goToAnnualPriceAdjustment() {
-    page?.getByText("Apply bulk price adjustment")?.click()
-    page?.waitForLoadState()
+    page.getByText("Apply bulk price adjustment").click()
+    page.waitForLoadState()
   }
 }

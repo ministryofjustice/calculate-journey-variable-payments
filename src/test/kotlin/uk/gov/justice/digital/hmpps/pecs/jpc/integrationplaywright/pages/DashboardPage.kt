@@ -8,53 +8,53 @@ import uk.gov.justice.digital.hmpps.pecs.jpc.domain.price.Supplier
 class DashboardPage(page: Page?) {
 
   private val dashboardUrl = "http://localhost:8080/dashboard"
-  private val page = page
+  private val page = requireNotNull(page)
 
   fun gotToPage() {
-    page?.navigate(dashboardUrl)
-    page?.waitForLoadState()
+    page.navigate(dashboardUrl)
+    page.waitForLoadState()
   }
 
   fun isPageSuccessful(supplier: Supplier) {
-    page?.waitForURL(dashboardUrl)
-    assertThat(page!!).hasURL(dashboardUrl)
+    page.waitForURL(dashboardUrl)
+    assertThat(page).hasURL(dashboardUrl)
     val supplierLocator = page.getByText(supplier.name)
     assertThat(supplierLocator.first()).isVisible()
   }
 
   fun isDownloadAllMovesActive() {
-    val download = page?.waitForDownload {
+    val download = page.waitForDownload {
       page.locator("a.download-icon").click()
     }
 
-    val downloadingHeading = page?.locator("a.govuk-heading-s:has-text('Downloading...')")
+    val downloadingHeading = page.locator("a.govuk-heading-s:has-text('Downloading...')")
     assertThat(downloadingHeading).isVisible()
 
-    val downloadAllHeading = page?.locator("a.govuk-heading-s:has-text('Download all moves')")
+    val downloadAllHeading = page.locator("a.govuk-heading-s:has-text('Download all moves')")
     assertThat(downloadAllHeading).isVisible(LocatorAssertions.IsVisibleOptions().setTimeout(20000.0))
 
-    assert(download?.suggestedFilename()?.let { it.endsWith(".csv") || it.endsWith(".xlsx") } == true)
+    assert(download.suggestedFilename().let { it.endsWith(".csv") || it.endsWith(".xlsx") })
   }
 
   fun goToStandardMoves() {
     gotToPage()
-    page?.waitForURL(dashboardUrl)
-    page?.locator("a:has-text(\"Standard\")")?.click()
+    page.waitForURL(dashboardUrl)
+    page.locator("a:has-text(\"Standard\")").click()
   }
 
   fun goToMoveBuyReferenceId() {
     gotToPage()
-    page?.waitForURL(dashboardUrl)
-    page?.locator("a:has-text(\"Find by move reference ID\")")?.click()
+    page.waitForURL(dashboardUrl)
+    page.locator("a:has-text(\"Find by move reference ID\")").click()
   }
 
   fun goToLongHaulMoves() {
     gotToPage()
-    page?.waitForURL(dashboardUrl)
-    page?.locator("a:has-text(\"Long haul\")")?.click()
+    page.waitForURL(dashboardUrl)
+    page.locator("a:has-text(\"Long haul\")").click()
   }
 
   fun navigateToMovesBy(moveTypeLabel: String) {
-    page?.locator("a:has-text(\"${moveTypeLabel}\")")?.click()
+    page.locator("a:has-text(\"${moveTypeLabel}\")").click()
   }
 }

@@ -7,34 +7,34 @@ import com.microsoft.playwright.options.AriaRole
 class LoginPage(page: Page?) : BasicPage() {
 
   private val url = "http://localhost:9090/auth/sign-in"
-  private val page = page
+  private val page = requireNotNull(page)
 
   fun login() {
-    page?.navigate(url)
-    page?.waitForLoadState()
-    page?.getByLabel("username")?.fill(getProperty("jpc.web.user"))
-    page?.getByLabel("password")?.fill(getProperty("jpc.web.password"))
-    page?.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sign In"))?.click()
-    page?.waitForLoadState()
+    page.navigate(url)
+    page.waitForLoadState()
+    page.getByLabel("username").fill(getProperty("jpc.web.user"))
+    page.getByLabel("password").fill(getProperty("jpc.web.password"))
+    page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sign In")).click()
+    page.waitForLoadState()
 
     // Handle extended email verification page if it appears
     skipExtendedEmailVerificationIfPresent()
   }
 
   private fun skipExtendedEmailVerificationIfPresent() {
-    val h1 = page?.locator("h1")
-    h1?.waitFor()
+    val h1 = page.locator("h1")
+    h1.waitFor()
 
-    val h1Text = h1?.textContent() ?: ""
+    val h1Text = h1.textContent() ?: ""
     if (h1Text.contains("Verify your email", ignoreCase = true)) {
       // Skip button
-      page?.locator("#cancel")?.click()
-      page?.waitForLoadState()
+      page.locator("#cancel").click()
+      page.waitForLoadState()
     }
   }
 
   fun isLoginSuccessful() {
-    val h1 = page?.locator("h1")
+    val h1 = page.locator("h1")
     assertThat(h1).containsText("Select service")
   }
 }
