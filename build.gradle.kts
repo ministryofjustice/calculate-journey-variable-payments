@@ -23,7 +23,7 @@ dependencyCheck {
 
 dependencies {
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.0.1")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.0.2")
   implementation("com.beust:klaxon:5.6")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.797")
   implementation("com.amazonaws:aws-java-sdk-sts:1.12.797")
@@ -66,7 +66,7 @@ dependencies {
   testImplementation("com.squareup.okhttp3:mockwebserver:5.5.0")
   testImplementation("com.squareup.okhttp3:okhttp:5.5.0")
   testImplementation("com.microsoft.playwright:playwright:1.63.0")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.1")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.0.2")
 
   testRuntimeOnly("com.h2database:h2:2.5.250")
 }
