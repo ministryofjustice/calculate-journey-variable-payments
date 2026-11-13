@@ -65,7 +65,7 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:5.5.1")
   testImplementation("com.squareup.okhttp3:okhttp:5.5.1")
-  testImplementation("com.microsoft.playwright:playwright:1.64.0")
+  testImplementation("com.microsoft.playwright:playwright:1.65.0")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.1.0")
 
   testRuntimeOnly("com.h2database:h2:2.5.252")
