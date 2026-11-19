@@ -11,9 +11,9 @@
 version: v1.25.1
 # ignores vulnerabilities until expiry date; change duration by modifying expiry date
 ignore:
-  SNYK-JAVA-IOOPENTELEMETRY-17280222:
+  SNYK-JAVA-ORGGLASSFISHJAXB-20883142:
     - '*':
-        reason: Suppression for baggage limits issue as we use header size limits
-        expires: 2026-07-11T00:00:00.000Z
-        created: 2026-06-11T07:38:00.250Z
+        reason: Suppression for JAXB issue as we don't use JAXB, have no endpoints that accept XML and all SQS/SNS usage is JSON based
+        expires: 2026-11-23T00:00:00.000Z
+        created: 2026-10-23T12:05:00.000Z
 patch: {}
