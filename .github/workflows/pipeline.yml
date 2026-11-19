@@ -20,6 +20,7 @@ on:
 env:
   _JAVA_OPTIONS: >-
     -Xmx1024m
+    -XX:-UseBASE64Intrinsics
     -XX:ParallelGCThreads=2
     -XX:ConcGCThreads=2
     -Djava.util.concurrent.ForkJoinPool.common.parallelism=2
