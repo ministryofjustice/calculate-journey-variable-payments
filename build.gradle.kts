@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.15"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.1.1"
   kotlin("plugin.spring") version "2.4.21"
   kotlin("plugin.jpa") version "2.4.21"
   kotlin("plugin.allopen") version "2.4.21"
@@ -27,7 +27,7 @@ dependencies {
   implementation("com.beust:klaxon:5.6")
   implementation("com.amazonaws:aws-java-sdk-s3:1.12.797")
   implementation("com.amazonaws:aws-java-sdk-sts:1.12.797")
-  implementation("io.sentry:sentry-spring-boot-starter:8.64.0")
+  implementation("io.sentry:sentry-spring-boot-starter:8.65.0")
   implementation("net.javacrumbs.shedlock:shedlock-spring:7.11.0")
   implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.11.0")
   implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:4.0.1")
@@ -54,7 +54,7 @@ dependencies {
   runtimeOnly("org.postgresql:postgresql:42.7.14")
 
   testImplementation("org.wiremock:wiremock:3.13.2")
-  testImplementation("org.htmlunit:htmlunit:5.7.0")
+  testImplementation("org.htmlunit:htmlunit:5.8.0")
   testImplementation("org.mockito:mockito-inline:5.2.0")
   testImplementation("org.apache.commons:commons-compress:1.28.0")
   testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -65,7 +65,7 @@ dependencies {
   testImplementation("org.springframework.security:spring-security-test")
   testImplementation("com.squareup.okhttp3:mockwebserver:5.5.1")
   testImplementation("com.squareup.okhttp3:okhttp:5.5.1")
-  testImplementation("com.microsoft.playwright:playwright:1.64.0")
+  testImplementation("com.microsoft.playwright:playwright:1.65.1")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:3.1.0")
 
   testRuntimeOnly("com.h2database:h2:2.5.252")
